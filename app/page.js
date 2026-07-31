@@ -10,7 +10,6 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 );
 
-// Păstrează Nomenclatorul exact cum era...
 const nomenclatorClauze = {
   prestari: [
     { id: 'clauzaPi', titlu: '1. Suspendare IP / Proprietate Intelectuală', detaliu: 'Drepturile patrimoniale de autor și utilizare asupra livrabilelor se transferă exclusiv la data stingerii integrale, certe și exigibile a obligațiilor de plată.' },
@@ -73,8 +72,8 @@ export default function Home() {
   const [autoStep, setAutoStep] = useState('upload');
   const [hydrated, setHydrated] = useState(false);
   
-  const [qrType, setQrType] = useState('vcard'); 
-  const [qrData, setQrData] = useState({ name: '', phone: '', iban: '', suma: '', url: '' });
+  const [qrType, setQrType] = useState('url'); 
+  const [qrData, setQrData] = useState({ nume: '', telefon: '', iban: '', suma: '', url: '', email: '', functie: '', banca: '' });
   const [qrGeneratedUrl, setQrGeneratedUrl] = useState('');
 
   const [cursBnr, setCursBnr] = useState({ eur: '4.9752', usd: '4.5820' });
@@ -146,6 +145,16 @@ export default function Home() {
     autoVin: '', autoMarcaModel: '', autoNumarInmatriculare: '', autoPret: '', clientEmail: '',
     autoAdresaVanzator: '', autoAdresaCumparator: '', pretIncludeTVA: false, autoMoneda: 'RON'
   });
+
+  const genereazaValoareQR = () => {
+    if (qrType === 'vcard') {
+      return `BEGIN:VCARD\nVERSION:3.0\nFN:${qrData.nume}\nTITLE:${qrData.functie}\nTEL:${qrData.telefon}\nEMAIL:${qrData.email}\nEND:VCARD`;
+    }
+    if (qrType === 'iban') {
+      return `BCD\n002\n1\nSCT\n\n${qrData.nume}\n${qrData.iban}\n${qrData.suma}\n\n\n\n${qrData.banca}`;
+    }
+    return qrData.url || 'https://contractsmart.ro';
+  };
 
   useEffect(() => {
     try {
@@ -231,7 +240,6 @@ export default function Home() {
     ctx.beginPath();
     const rect = canvas.getBoundingClientRect();
     
-    // Corecție suport pentru touch (mobil)
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
     
@@ -245,7 +253,6 @@ export default function Home() {
     const ctx = canvas.getContext('2d');
     const rect = canvas.getBoundingClientRect();
     
-    // Corecție suport pentru touch (mobil)
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
@@ -371,7 +378,6 @@ export default function Home() {
     
     setWidgetLoading(true);
     try {
-      const isPremium = user && ['founder', 'pro', 'premium'].includes(user.status);
       const res = await fetch('/api/company-info', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -787,7 +793,7 @@ export default function Home() {
         a.remove();
         window.URL.revokeObjectURL(url);
       } else {
-        alert('Eroare la descărcarea raportului din backend.');
+        alert('Eroare la descărcarea raportului din backend. Te rugăm să reîncerci.');
       }
     } catch {
       alert('Eroare de rețea la descărcarea PDF-ului.');
@@ -1140,32 +1146,49 @@ export default function Home() {
 
             </div>
 
-            {/* WIDGET QR CODE RESTAURAT */}
+            {/* WIDGET QR CODE COMPLEX */}
             <div className="max-w-7xl mx-auto px-6 mt-6">
               <div className="bg-[#12181D] p-6 rounded-2xl border border-slate-800 shadow-xl flex flex-col md:flex-row gap-8 items-center justify-between">
                  <div className="flex-1 w-full space-y-4">
                     <div>
                       <span className="text-[#8ba888] text-xs font-bold uppercase tracking-wider block mb-1">Utilitar Rapid</span>
                       <h3 className="text-white font-bold text-xl">Generator Coduri QR</h3>
-                      <p className="text-xs text-slate-400 mt-1">Transformă linkuri, numere de telefon sau conturi IBAN în format scanabil.</p>
+                      <p className="text-xs text-slate-400 mt-1">Transformă linkuri, cărți de vizită sau conturi IBAN în format scanabil.</p>
                     </div>
-                    <div className="flex gap-4 items-center">
-                       <select value={qrType} onChange={(e) => setQrType(e.target.value)} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none">
+                    
+                    <div className="flex flex-col gap-3">
+                       <select value={qrType} onChange={(e) => setQrType(e.target.value)} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none w-full sm:w-1/2">
                           <option value="url">Website URL</option>
-                          <option value="phone">Număr Telefon</option>
-                          <option value="iban">Cont IBAN</option>
+                          <option value="vcard">Carte de Vizită (vCard)</option>
+                          <option value="iban">Cont IBAN (Plată Rapidă)</option>
                        </select>
-                       <input 
-                          type="text" 
-                          placeholder={qrType === 'url' ? 'https://...' : qrType === 'phone' ? '+40...' : 'RO..'} 
-                          value={qrData.url} 
-                          onChange={(e) => setQrData({...qrData, url: e.target.value})} 
-                          className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none" 
-                       />
+
+                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                         {qrType === 'url' && (
+                           <input type="text" placeholder="https://..." value={qrData.url} onChange={(e) => setQrData({...qrData, url: e.target.value})} className="col-span-1 sm:col-span-2 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none" />
+                         )}
+                         {qrType === 'vcard' && (
+                           <>
+                             <input type="text" placeholder="Nume Complet" value={qrData.nume} onChange={(e) => setQrData({...qrData, nume: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none" />
+                             <input type="text" placeholder="Funcție / Titlu" value={qrData.functie} onChange={(e) => setQrData({...qrData, functie: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none" />
+                             <input type="tel" placeholder="Număr Telefon" value={qrData.telefon} onChange={(e) => setQrData({...qrData, telefon: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none" />
+                             <input type="email" placeholder="Adresă Email" value={qrData.email} onChange={(e) => setQrData({...qrData, email: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none" />
+                           </>
+                         )}
+                         {qrType === 'iban' && (
+                           <>
+                             <input type="text" placeholder="Nume Titular Cont" value={qrData.nume} onChange={(e) => setQrData({...qrData, nume: e.target.value})} className="col-span-1 sm:col-span-2 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none" />
+                             <input type="text" placeholder="RO.. IBAN" value={qrData.iban} onChange={(e) => setQrData({...qrData, iban: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none" />
+                             <input type="text" placeholder="Denumire Bancă" value={qrData.banca} onChange={(e) => setQrData({...qrData, banca: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none" />
+                             <input type="number" placeholder="Suma (RON) - Opțional" value={qrData.suma} onChange={(e) => setQrData({...qrData, suma: e.target.value})} className="col-span-1 sm:col-span-2 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none" />
+                           </>
+                         )}
+                       </div>
                     </div>
+
                  </div>
                  <div className="w-40 h-40 flex items-center justify-center bg-white p-2 rounded-xl shadow-inner shrink-0">
-                    <QRCodeSVG value={qrData.url || 'https://contractsmart.ro'} size={140} />
+                    <QRCodeSVG value={genereazaValoareQR()} size={140} />
                  </div>
               </div>
             </div>
@@ -1293,7 +1316,6 @@ export default function Home() {
                             <option value="EUR">EUR (€)</option>
                           </select>
                         </div>
-                        {/* UPDATE INTERFAȚĂ MOBIL & COTA TVA 21% */}
                         <label className="flex items-center w-full sm:w-1/2 text-xs text-slate-400 cursor-pointer select-none p-2.5 bg-[#0B0F12] border border-slate-800 rounded-lg">
                           <input type="checkbox" checked={formData.estePlatitorTVA} onChange={e => setFormData({...formData, estePlatitorTVA: e.target.checked})} className="mr-3 accent-[#8ba888]" />
                           <span className="truncate">Firma e plătitoare de TVA (+21%)</span>
@@ -1318,7 +1340,6 @@ export default function Home() {
                   </div>
 
                   <div className="bg-[#0B0F12] p-4 rounded-xl border border-slate-800 space-y-2">
-                    {/* ASIGURARE FUNCȚIONARE SEMNĂTURĂ PE TOUCH (MOBIL) */}
                     <canvas ref={canvasRef} width={600} height={150} onTouchStart={pornesteDesenul} onTouchMove={deseneaza} onTouchEnd={opresteDesenul} onMouseDown={pornesteDesenul} onMouseMove={deseneaza} onMouseUp={opresteDesenul} onMouseLeave={opresteDesenul} className="w-full h-32 bg-white rounded-lg border border-slate-700 cursor-crosshair block touch-none" />
                     <button type="button" onClick={curataCanvas} className="text-[10px] text-red-400 hover:underline block text-right w-full">Șterge / Resemnează</button>
                   </div>

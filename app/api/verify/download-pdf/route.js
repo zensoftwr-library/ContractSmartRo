@@ -71,11 +71,13 @@ export async function POST(req) {
         defaultViewport: chromium.defaultViewport,
         executablePath: await chromium.executablePath("https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar.br"),
         headless: chromium.headless,
+        ignoreHTTPSErrors: true,
       });
     }
 
     const page = await browser.newPage();
-    await page.setContent(htmlRaport, { waitUntil: 'networkidle0' });
+    // Modificat in domcontentloaded pentru a preveni timeout-ul pe Vercel
+    await page.setContent(htmlRaport, { waitUntil: 'domcontentloaded' });
     const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true });
     await browser.close();
 

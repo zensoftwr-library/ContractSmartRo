@@ -30,13 +30,15 @@ export async function POST(request) {
       }
     }
 
-    // Apel către API-ul oficial gratuit ANAF v8
     const today = new Date().toISOString().split('T')[0];
     const anafPayload = [{ cui: parseInt(cui, 10), data: today }];
 
     const res = await fetch(`https://webservicesp.anaf.ro/PlatitorTvaRest/api/v8/ws/tva`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      },
       body: JSON.stringify(anafPayload),
       cache: 'no-store'
     });
@@ -80,10 +82,9 @@ export async function POST(request) {
 
   } catch (e) {
     console.error("Eroare ANAF:", e);
-    // Fallback grațios (nu mai dăm eroare 500)
     return NextResponse.json({ 
       success: false, 
-      message: 'Serviciul ANAF este temporar indisponibil. Te rugăm să completezi datele firmei manual.' 
+      message: 'Nu am putut prelua datele de la ANAF. Serverul lor poate fi ocupat momentan.' 
     }, { status: 200 });
   }
 }

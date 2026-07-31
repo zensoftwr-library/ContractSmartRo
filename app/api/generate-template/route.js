@@ -19,20 +19,17 @@ export async function POST(request) {
       return NextResponse.json({ success: false, message: 'Template ID lipsă.' }, { status: 400 });
     }
 
-    // 1. FILTRARE ȘI CONDIȚIONARE CRYPTOGRAFICĂ PRIVILEGII CONFORM STRATEGIEI
     if (templateId !== 'prestari_gratuit') {
       if (!userId) {
         return NextResponse.json({ success: false, message: 'Autentificare obligatorie pentru descărcarea modelelor premium.' }, { status: 401 });
       }
 
-      // Verificăm statusul abonamentului direct în tabelul profiles din Supabase
       const { data: profil } = await supabase
         .from('profiles')
         .select('subscription_tier, subscription_status')
         .eq('id', userId)
         .single();
 
-      // Verificăm dacă există o achiziție individuală directă One-Time de 49 lei pentru acest șablon specific
       const { data: achizitii } = await supabase
         .from('user_purchases')
         .select('product_id')
@@ -55,7 +52,6 @@ export async function POST(request) {
     let temeiLegal = '';
     let articoleSpecificeHtml = '';
 
-    // DICȚIONAR JURIDIC DINAMIC PENTRU CELE 10 MODELE ÎN ALB
     switch (templateId) {
       case 'prestari_gratuit':
         titluOficial = "CONTRACT-CADRU DE PRESTĂRI SERVICII COMERCIALE";
@@ -158,7 +154,6 @@ export async function POST(request) {
         temeiLegal = "Dispozițiile generale comerciale în conformitate cu Codul Civil român.";
     }
 
-    // ARANJAMENT JURIDIC PRESTABILIT PREMIUM "ÎN ALB" - INTEGRAT CU LINII FLEXIBILE STRUCTURALE
     const htmlTemplateBlank = `
       <!DOCTYPE html>
       <html>
@@ -175,8 +170,6 @@ export async function POST(request) {
           .signature-layout { margin-top: 60px; display: flex; justify-content: space-between; page-break-inside: avoid; }
           .signature-column { width: 45%; text-align: center; border-top: 1px solid #000000; padding-top: 8px; font-size: 13px; font-weight: bold; }
           .footer { margin-top: 80px; border-top: 1px solid #e2e8f0; padding-top: 10px; font-size: 10px; color: #64748b; text-align: center; font-family: Arial, sans-serif; }
-          
-          /* IMPLEMENTARE CHIRURGICALĂ SIDEQUEST LINII FLEXIBILE DINAMICE */
           .linia-dinamica { display: inline-block; border-bottom: 1px solid #000000; height: 16px; vertical-align: bottom; }
         </style>
       </head>
@@ -218,23 +211,24 @@ export async function POST(request) {
       </html>
     `;
 
-    // EXECUTARE PRIN PUPPETEER PENTRU REZOLVAREA DEFINITIVĂ A FILIERI .DOCX ERORI
     let browser;
-  if (process.env.NODE_ENV === 'development') {
-    browser = await puppeteer.launch({ headless: "new", executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" });
-  } else {
-    browser = await puppeteer.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(
-        "https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar.br"
-      ),
-      headless: chromium.headless,
-    });
-  }
+    if (process.env.NODE_ENV === 'development') {
+      browser = await puppeteer.launch({ headless: "new", executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" });
+    } else {
+      browser = await puppeteer.launch({
+        args: chromium.args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath(
+          "https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar.br"
+        ),
+        headless: chromium.headless,
+        ignoreHTTPSErrors: true,
+      });
+    }
 
     const page = await browser.newPage();
-    await page.setContent(htmlTemplateBlank, { waitUntil: 'networkidle0' });
+    // Modificat in domcontentloaded pentru a preveni timeout pe Vercel
+    await page.setContent(htmlTemplateBlank, { waitUntil: 'domcontentloaded' });
     
     const pdfBuffer = await page.pdf({
       format: 'A4',
