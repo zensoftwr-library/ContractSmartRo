@@ -18,17 +18,17 @@ async function randeazaHtmlInPdf(htmlContent) {
   let browser;
   
   if (process.env.NODE_ENV === 'development') {
-    // Local: folosește Chrome-ul tău din PC
     browser = await puppeteer.launch({ 
       headless: "new", 
       executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" 
     });
   } else {
-    // Producție (Vercel): folosește Sparticuz Chromium
     browser = await puppeteer.launch({
       args: chromium.args,
       defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
+      executablePath: await chromium.executablePath(
+        "https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar.br"
+      ),
       headless: chromium.headless,
     });
   }

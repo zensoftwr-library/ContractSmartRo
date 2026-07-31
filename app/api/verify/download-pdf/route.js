@@ -63,10 +63,29 @@ export async function POST(req) {
 
     let browser;
     try {
-      browser = await puppeteer.launch({ headless: "new", executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" });
-    } catch {
-      browser = await puppeteer.launch({ headless: "new" });
+      if (process.env.NODE_ENV === 'development') {
+        browser = await puppeteer.launch({ headless: "new", executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" });
+      } else {
+        browser = await puppeteer.launch({
+          args: chromium.args,
+          defaultViewport: chromium.defaultViewport,
+          executablePath: await chromium.executablePath(
+            "https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar.br"
+          ),
+          headless: chromium.headless,
+        });
+      }
+    } catch (e) {
+      browser = await puppeteer.launch({
+        args: chromium.args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath(
+          "https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar.br"
+        ),
+        headless: chromium.headless,
+      });
     }
+
     const page = await browser.newPage();
     await page.setContent(htmlRaport, { waitUntil: 'networkidle0' });
     const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true });

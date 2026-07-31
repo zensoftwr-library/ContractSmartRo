@@ -219,7 +219,18 @@ export async function POST(request) {
     `;
 
     // EXECUTARE PRIN PUPPETEER PENTRU REZOLVAREA DEFINITIVĂ A FILIERI .DOCX ERORI
-    let browser=await puppeteer.launch(process.env.NODE_ENV==='development'?{headless:"new",executablePath:"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"}:{args:chromium.args,executablePath:await chromium.executablePath(),headless:chromium.headless});
+    let browser = await puppeteer.launch(
+  process.env.NODE_ENV === 'development'
+    ? { headless: "new", executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" }
+    : {
+        args: chromium.args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath(
+          "https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar.br"
+        ),
+        headless: chromium.headless,
+      }
+);
 
     const page = await browser.newPage();
     await page.setContent(htmlTemplateBlank, { waitUntil: 'networkidle0' });

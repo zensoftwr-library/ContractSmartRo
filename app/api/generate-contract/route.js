@@ -265,7 +265,14 @@ export async function POST(request) {
       if (process.env.NODE_ENV === 'development') {
         browser = await puppeteer.launch({ headless: "new", executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" });
       } else {
-        browser = await puppeteer.launch({ args: chromium.args, executablePath: await chromium.executablePath(), headless: chromium.headless });
+        browser = await puppeteer.launch({ 
+          args: chromium.args, 
+          defaultViewport: chromium.defaultViewport,
+          executablePath: await chromium.executablePath(
+            "https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar.br"
+          ), 
+          headless: chromium.headless 
+        });
       }
 
     const page = await browser.newPage();
