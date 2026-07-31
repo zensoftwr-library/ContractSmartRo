@@ -10,6 +10,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 );
 
+// Păstrează Nomenclatorul exact cum era...
 const nomenclatorClauze = {
   prestari: [
     { id: 'clauzaPi', titlu: '1. Suspendare IP / Proprietate Intelectuală', detaliu: 'Drepturile patrimoniale de autor și utilizare asupra livrabilelor se transferă exclusiv la data stingerii integrale, certe și exigibile a obligațiilor de plată.' },
@@ -61,7 +62,7 @@ const nomenclatorClauze = {
     { id: 'clauzaTaxaAnulare', titlu: '1. Arvună Confirmatorie (Pierdere Avans)', detaliu: 'În temeiul Art. 1544 Cod Civil, dacă Promitentul-Cumpărător renunță la tranzacție, avansul se pierde integral. Dacă Promitentul-Vânzător refuză perfectarea, va restitui dublul arvunei primite.' },
     { id: 'clauzaPenalitati', titlu: '2. Penalități Zi de Întârziere Act Notarial', detaliu: 'Refuzul nejustificat sau neprezentarea uneia dintre părți la biroul notarial la data fixată atrage o penalitate simetrică pe fiecare zi de întârziere, datorată cu titlu de daune interese moratorii.' },
     { id: 'clauzaAprobareTacita', titlu: '3. Rezoluțiune de Drept la Termenul Fixat', detaliu: 'Împlinirea termenului extinctiv fără perfectarea contractului de vânzare determină desființarea de drept a promisiunii prin efectul pactului comisoriu, fără punere în întârziere sau formalități.' },
-    { id: 'clauzaPromisSarcini', titlu: '4. Garanție Evicțiune și Sarcini Imobil', detaliu: 'Promitentul-Vânzător garantează pe propria răspundere că imobilul este liber de orice sarcini, ipoteci, privilegii, procese de revendicare sau litigii aflate pe rolul instanțelor judecătorești.' },
+    { id: 'clauzaPromisSarcini', titlu: '4. Garanție Evicțiune și Sarcini Imobil', detaliu: 'Promitentul-Vânzător garantează pe propria răspundere că imobilul este liber de orice sarcini, ipoteci, privileges, procese de revendicare sau litigii aflate pe rolul instanțelor judecătorești.' },
     { id: 'clauzaPromisCheltuieli', titlu: '5. Repartizare Taxe Notariale', detaliu: 'Cheltuielile ocazionate de autentificarea actelor, onorariile notariale, taxele de intabulare în Cartea Funciară (OCPI) și extrasul de autentificare vor fi suportate conform convenției părților.' }
   ]
 };
@@ -92,7 +93,7 @@ export default function Home() {
   
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
-  const [authConfirmPassword, setAuthConfirmPassword] = useState(''); // STATE ADAUGAT PENTRU CONFIRMARE
+  const [authConfirmPassword, setAuthConfirmPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
 
   const [widgetCompany, setWidgetCompany] = useState(null);
@@ -229,7 +230,12 @@ export default function Home() {
     const ctx = canvas.getContext('2d');
     ctx.beginPath();
     const rect = canvas.getBoundingClientRect();
-    ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    
+    // Corecție suport pentru touch (mobil)
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    
+    ctx.moveTo(clientX - rect.left, clientY - rect.top);
     setIsDrawing(true);
   };
 
@@ -238,7 +244,12 @@ export default function Home() {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     const rect = canvas.getBoundingClientRect();
-    ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+    
+    // Corecție suport pentru touch (mobil)
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+    ctx.lineTo(clientX - rect.left, clientY - rect.top);
     ctx.strokeStyle = '#000000';
     ctx.lineWidth = 2.5;
     ctx.stroke();
@@ -252,7 +263,6 @@ export default function Home() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   };
 
-  // FETCH PROFIL REAL DIN SUPABASE
   useEffect(() => {
     const fetchUserProfile = async (userId, email) => {
       try {
@@ -474,8 +484,6 @@ export default function Home() {
     e.preventDefault();
     if (!user) {
       alert('Pentru a descărca documentul direct în format binar, creează un cont rapid în 10 secunde.');
-      
-      // RESETARE STARĂ PENTRU A DESCHIDE MODALUL PE "AUTENTIFICARE"
       setIsSignUp(false);
       setAuthEmail('');
       setAuthPassword('');
@@ -597,8 +605,6 @@ export default function Home() {
     e.preventDefault();
     if (!user) {
       alert('Creează un cont rapid pentru a securiza și descărca documentele auto.');
-      
-      // RESETARE STARĂ PENTRU A DESCHIDE MODALUL PE "AUTENTIFICARE"
       setIsSignUp(false);
       setAuthEmail('');
       setAuthPassword('');
@@ -726,7 +732,6 @@ export default function Home() {
       if (isSignUp) {
         const { data, error } = await supabase.auth.signUp({ email: authEmail, password: authPassword });
         if (error) {
-           // TRATARE CLARA EROARE SUPABASE
            if (error.message.includes("Password should be at least 6 characters")) {
                throw new Error("Parola trebuie să aibă minim 6 caractere.");
            } else if (error.message.includes("User already registered")) {
@@ -737,15 +742,12 @@ export default function Home() {
         }
         
         alert("Cont creat cu succes! Te poți autentifica acum.");
-        
-        // Resetăm starea pentru a-l lăsa să se logheze
         setIsSignUp(false);
         setAuthPassword('');
         setAuthConfirmPassword('');
       } else {
         const { data, error } = await supabase.auth.signInWithPassword({ email: authEmail, password: authPassword });
         if (error) {
-            // TRATARE CLARA EROARE SUPABASE
             if (error.message.includes("Invalid login credentials")) {
                 throw new Error("E-mailul sau parola sunt incorecte.");
             } else {
@@ -888,7 +890,6 @@ export default function Home() {
                   <label className="text-[10px] text-slate-400 uppercase font-bold block mb-1">Parolă Validă</label>
                   <input type="password" required placeholder="••••••••" value={authPassword} onChange={e => setAuthPassword(e.target.value)} className="w-full p-3 bg-[#0B0F12] border border-slate-700 rounded-xl text-xs text-white outline-none focus:border-[#8ba888]" />
                 </div>
-                {/* CAMP ADAUGAT PENTRU CONFIRMARE */}
                 {isSignUp && (
                   <div>
                     <label className="text-[10px] text-slate-400 uppercase font-bold block mb-1">Confirmă Parola</label>
@@ -906,7 +907,7 @@ export default function Home() {
           </div>
         )}
 
-        {/* MODAL PLĂȚI PER CONTRACT (FREEMIUM) */}
+        {/* MODAL PLĂȚI PER CONTRACT */}
         {showPaymentModal && (
           <div className="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn">
             <div className="bg-[#12181D] border border-slate-800 p-8 rounded-3xl max-w-md w-full shadow-2xl relative text-center">
@@ -1138,6 +1139,37 @@ export default function Home() {
               </div>
 
             </div>
+
+            {/* WIDGET QR CODE RESTAURAT */}
+            <div className="max-w-7xl mx-auto px-6 mt-6">
+              <div className="bg-[#12181D] p-6 rounded-2xl border border-slate-800 shadow-xl flex flex-col md:flex-row gap-8 items-center justify-between">
+                 <div className="flex-1 w-full space-y-4">
+                    <div>
+                      <span className="text-[#8ba888] text-xs font-bold uppercase tracking-wider block mb-1">Utilitar Rapid</span>
+                      <h3 className="text-white font-bold text-xl">Generator Coduri QR</h3>
+                      <p className="text-xs text-slate-400 mt-1">Transformă linkuri, numere de telefon sau conturi IBAN în format scanabil.</p>
+                    </div>
+                    <div className="flex gap-4 items-center">
+                       <select value={qrType} onChange={(e) => setQrType(e.target.value)} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none">
+                          <option value="url">Website URL</option>
+                          <option value="phone">Număr Telefon</option>
+                          <option value="iban">Cont IBAN</option>
+                       </select>
+                       <input 
+                          type="text" 
+                          placeholder={qrType === 'url' ? 'https://...' : qrType === 'phone' ? '+40...' : 'RO..'} 
+                          value={qrData.url} 
+                          onChange={(e) => setQrData({...qrData, url: e.target.value})} 
+                          className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none" 
+                       />
+                    </div>
+                 </div>
+                 <div className="w-40 h-40 flex items-center justify-center bg-white p-2 rounded-xl shadow-inner shrink-0">
+                    <QRCodeSVG value={qrData.url || 'https://contractsmart.ro'} size={140} />
+                 </div>
+              </div>
+            </div>
+
           </div>
         )}
 
@@ -1253,19 +1285,18 @@ export default function Home() {
                     <span className="text-xs font-bold text-slate-400 uppercase block">Obiectul Serviciilor / Tranzacției și Remunerație</span>
                     <textarea placeholder="Descrierea explicită a sarcinilor, termenelor și obiectivelor..." value={formData.obiect} onChange={e => setFormData({...formData, obiect: e.target.value})} className="w-full p-3 bg-[#0B0F12] border border-slate-700 rounded-lg text-xs h-16 text-white resize-none" required></textarea>
                     {formData.tipContract !== 'nda' && (
-                      <div className="flex gap-4 items-center">
-                        <div className="flex-1">
-                          <input type="number" placeholder="Valoare Contractuală" autoComplete="new-password" value={formData.valoare} onChange={e => setFormData({...formData, valoare: e.target.value})} className="w-full p-2.5 bg-[#0B0F12] border border-slate-700 rounded-lg text-xs text-white" required />
-                        </div>
-                        <div className="w-24">
-                          <select value={formData.moneda} onChange={e => setFormData({...formData, moneda: e.target.value})} className="w-full bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#8ba888]">
+                      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                        <div className="flex w-full sm:w-1/2 gap-3">
+                          <input type="number" placeholder="Valoare Contractuală" autoComplete="new-password" value={formData.valoare} onChange={e => setFormData({...formData, valoare: e.target.value})} className="flex-1 p-2.5 bg-[#0B0F12] border border-slate-700 rounded-lg text-xs text-white" required />
+                          <select value={formData.moneda} onChange={e => setFormData({...formData, moneda: e.target.value})} className="w-24 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#8ba888]">
                             <option value="RON">RON</option>
                             <option value="EUR">EUR (€)</option>
                           </select>
                         </div>
-                        <label className="flex items-center text-xs text-slate-400 cursor-pointer select-none p-2 bg-[#0B0F12] border border-slate-800 rounded-lg">
-                          <input type="checkbox" checked={formData.estePlatitorTVA} onChange={e => setFormData({...formData, estePlatitorTVA: e.target.checked})} className="mr-2 accent-[#8ba888]" />
-                          <span>Firma este plătitoare de TVA (+19%)</span>
+                        {/* UPDATE INTERFAȚĂ MOBIL & COTA TVA 21% */}
+                        <label className="flex items-center w-full sm:w-1/2 text-xs text-slate-400 cursor-pointer select-none p-2.5 bg-[#0B0F12] border border-slate-800 rounded-lg">
+                          <input type="checkbox" checked={formData.estePlatitorTVA} onChange={e => setFormData({...formData, estePlatitorTVA: e.target.checked})} className="mr-3 accent-[#8ba888]" />
+                          <span className="truncate">Firma e plătitoare de TVA (+21%)</span>
                         </label>
                       </div>
                     )}
@@ -1287,7 +1318,8 @@ export default function Home() {
                   </div>
 
                   <div className="bg-[#0B0F12] p-4 rounded-xl border border-slate-800 space-y-2">
-                    <canvas ref={canvasRef} width={600} height={150} onMouseDown={pornesteDesenul} onMouseMove={deseneaza} onMouseUp={opresteDesenul} onMouseLeave={opresteDesenul} className="w-full h-32 bg-white rounded-lg border border-slate-700 cursor-crosshair block" />
+                    {/* ASIGURARE FUNCȚIONARE SEMNĂTURĂ PE TOUCH (MOBIL) */}
+                    <canvas ref={canvasRef} width={600} height={150} onTouchStart={pornesteDesenul} onTouchMove={deseneaza} onTouchEnd={opresteDesenul} onMouseDown={pornesteDesenul} onMouseMove={deseneaza} onMouseUp={opresteDesenul} onMouseLeave={opresteDesenul} className="w-full h-32 bg-white rounded-lg border border-slate-700 cursor-crosshair block touch-none" />
                     <button type="button" onClick={curataCanvas} className="text-[10px] text-red-400 hover:underline block text-right w-full">Șterge / Resemnează</button>
                   </div>
 
@@ -1353,7 +1385,7 @@ export default function Home() {
                         )}
                       </div>
 
-                      <span className="text-xs font-bold text-[#8ba888] uppercase block pt-2">Pasul 3: Încărcare Acte pentru Citire Optică OCR [ Acest pas este optional si necesita Verificarea datelor completate automat! ]</span>
+                      <span className="text-xs font-bold text-[#8ba888] uppercase block pt-2">Pasul 3: Încărcare Acte pentru Citire Optică OCR [ Acest pas este optional ]</span>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         
                         <div className="bg-[#0B0F12] p-4 border border-slate-800 rounded-xl text-center flex flex-col justify-between min-h-[140px]">
@@ -1462,9 +1494,9 @@ export default function Home() {
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <div className="flex gap-1">
-                            <input type="number" placeholder="Preț Vânzare Vehicul" autoComplete="new-password" required value={autoData.autoPret} onChange={e => setAutoData({...autoData, autoPret: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded-lg text-xs text-white outline-none w-full" />
-                            <select value={autoData.autoMoneda} onChange={e => setAutoData({...autoData, autoMoneda: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none">
+                          <div className="flex flex-col sm:flex-row gap-3">
+                            <input type="number" placeholder="Preț Vânzare Vehicul" autoComplete="new-password" required value={autoData.autoPret} onChange={e => setAutoData({...autoData, autoPret: e.target.value})} className="flex-1 p-2.5 bg-[#0B0F12] border border-slate-700 rounded-lg text-xs text-white outline-none w-full" />
+                            <select value={autoData.autoMoneda} onChange={e => setAutoData({...autoData, autoMoneda: e.target.value})} className="w-24 bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none">
                               <option value="RON">RON</option>
                               <option value="EUR">EUR</option>
                             </select>

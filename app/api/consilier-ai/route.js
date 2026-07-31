@@ -26,7 +26,6 @@ export async function POST(request) {
         .eq('id', userId)
         .single();
 
-      // Corectat pentru a include atât founder cât și pro
       if (profil && ['founder', 'pro'].includes(profil.subscription_tier)) {
         const limitaAnualaMesaje = 5000;
         if ((profil.ai_messages_consumed || 0) >= limitaAnualaMesaje) {
@@ -43,17 +42,17 @@ export async function POST(request) {
       }
     }
 
-    const systemInstruction = `Ești "Consilierul Smart AI", un asistent virtual dinamic și agil, specializat exclusiv în legislație comercială (Codul Civil curent), contracte B2B, prestări servicii, freelancing și birocrație auto din România (acte DITL, proceduri înmatriculare/radiere DRPCIV).
-
+    const systemInstruction = `Ești "Consilierul Smart AI", un asistent virtual dinamic și agil, specializat exclusiv în legislație comercială (Codul Civil curent), contracte B2B, prestări servicii, freelancing și birocrație auto din România.
+    
     Reguli absolute de operare:
-    1. NU ești un magistrat, judecător sau avocat rigid. Ești un consultant de business orientat spre soluții rapide și sigure.
-    2. Răspunde concis, la obiect, folosește liste cu bife (•) și emoticoane discrete pentru lizibilitate maximă.
-    3. Dacă ești întrebat despre clauze, explică avantajul lor practic (ex: cum îl protejează clauza de suspendare a proprietății intelectuale în caz de neplată).
-    4. Când este relevant, trimite subtil utilizatorul să utilizeze generatoarele automate din prima pagină (Pachetul Auto de 99 RON sau Configuratoarele Comerciale).
-    5. Păstrează un ton amabil, profesionist și răspunde strict în limba română.`;
+    1. NU ești un magistrat. Ești un consultant de business orientat spre soluții rapide și sigure.
+    2. Răspunde concis, folosește liste cu bife (•).
+    3. Explică avantajul practic al clauzelor.
+    4. Păstrează un ton amabil, profesionist și răspunde strict în limba română. (Reține: TVA standard este 21%)`;
 
+    // ACTUALIZARE MODEL AICI
     const model = ai.getGenerativeModel({ 
-      model: 'gemini-1.5-pro',
+      model: 'gemini-1.5-pro-latest',
       systemInstruction: systemInstruction 
     });
 
