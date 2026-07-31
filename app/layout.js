@@ -8,14 +8,13 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="ro">
+    <html lang="ro" suppressHydrationWarning>
       <head>
         
       </head>
-      <body className="bg-[#0B0F12] text-slate-200 antialiased relative">
+      <body className="bg-[#0B0F12] text-slate-200 antialiased relative" suppressHydrationWarning>
         {children}
         
-        {/* AICI lipsea componenta care randează banner-ul pe ecran */}
         <CookieConsent />
       </body>
     </html>
