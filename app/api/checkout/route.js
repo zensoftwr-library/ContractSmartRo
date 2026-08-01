@@ -26,8 +26,7 @@ export async function POST(req) {
         data: {
           type: "checkouts",
           attributes: {
-            checkout_data: { custom: { user_id: userId, product_id: tipProdus } }
-          },
+checkout_data: { custom: { user_id: userId ? String(userId) : 'anonim', product_id: tipProdus } }          },
           relationships: {
             store: { data: { type: "stores", id: STORE_ID } },
             variant: { data: { type: "variants", id: variantId.toString() } }
