@@ -26,9 +26,8 @@ async function randeazaHtmlInPdf(htmlContent) {
 
   if (process.env.NODE_ENV === 'development') {
     launchOptions.executablePath = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
-  } else {
-    launchOptions.executablePath = "/usr/bin/chromium"; 
   }
+  // În producție nu mai setăm executablePath, Puppeteer va folosi browserul intern
 
   const browser = await puppeteer.launch(launchOptions);
   const page = await browser.newPage();

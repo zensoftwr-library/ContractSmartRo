@@ -9,7 +9,8 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 );
 
-const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+// Aici am corectat numele variabilei în genAI
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
 export async function POST(request) {
   try {
