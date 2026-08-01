@@ -1007,76 +1007,9 @@ export default function Home() {
             </div>
 
             {/* BENTO GRID ÎN 3 COLOANE */}
-            <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+            <div className="max-w-3xl mx-auto px-6 mt-6 flex flex-col items-center justify-center">
               
-              {/* COLOANA 1: INTEROGARE REALĂ ANAF */}
-              <div className="bg-[#12181D] p-5 rounded-2xl border border-slate-800 shadow-xl flex flex-col min-h-[380px] justify-between">
-                <div className="w-full">
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Interogare Bilanț Firmă (ANAF)</span>
-                  <form onSubmit={handleQuickAnafFormSubmit} className="space-y-1.5">
-                    <input type="text" placeholder="Introdu CUI firmă..." value={anafCui} onChange={e => setAnafCui(e.target.value)} className="w-full bg-[#0B0F12] border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white outline-none focus:border-[#8ba888]" />
-                    <button type="submit" disabled={widgetLoading} className="w-full bg-[#8ba888] text-[#0B0F12] text-xs font-bold py-1.5 rounded-lg transition hover:opacity-90">
-                      {widgetLoading ? 'Se interoghează...' : 'Verifică Indicatori Fiscali'}
-                    </button>
-                  </form>
-
-                  {widgetCompany && (
-                    <div className="mt-3 p-3 bg-[#0B0F12] border border-slate-800 rounded-xl space-y-2.5 text-[11px] block clear-both">
-                      <div className="text-white font-mono text-xs font-bold text-center border-b border-slate-800/80 pb-1 truncate">{widgetCompany.nume}</div>
-                      <div className="flex justify-between text-slate-400"><span>Status:</span><span className="text-emerald-400 font-bold">{widgetCompany.stare}</span></div>
-                      <div className="flex justify-between text-slate-400"><span>TVA:</span><span className="text-slate-200">{widgetCompany.platitor_tva ? 'Plătitor' : 'Neplătitor'}</span></div>
-                      
-                      {widgetCompany.detalii_fiscale ? (
-                        <div className="space-y-1 bg-[#12181D]/50 p-2 rounded-lg border border-slate-800/60 font-mono text-[10px]">
-                          <div className="flex justify-between text-slate-400"><span>Cifră Afaceri:</span><span className="text-slate-200">{widgetCompany.detalii_fiscale.cifra_afaceri?.toLocaleString('ro-RO') || '0'} lei</span></div>
-                          <div className="flex justify-between text-slate-400"><span>Profit Net:</span><span className="text-slate-200">{widgetCompany.detalii_fiscale.profit_net?.toLocaleString('ro-RO') || '0'} lei</span></div>
-                          <div className="flex justify-between text-slate-400"><span>Angajați:</span><span className="text-slate-200">{widgetCompany.detalii_fiscale.angajati || '0'}</span></div>
-                        </div>
-                      ) : (
-                        <div className="text-[10px] text-amber-500 italic p-1 border border-amber-900/30 rounded bg-amber-950/10 text-center">Datele fiscale nu sunt disponibile.</div>
-                      )}
-                      
-                      <div className="pt-2 border-t border-slate-800 relative block min-h-[40px]">
-                        {((['founder', 'pro', 'premium'].includes(user?.status)) && widgetCompany.detalii_premium) ? (
-                          <div className="space-y-2">
-                            <div className="bg-[#12181D]/40 p-2 rounded-lg border border-slate-800 text-[10px] font-mono space-y-1">
-                              <div className="flex justify-between"><span className="text-slate-500">Risc insolvență:</span><span className="text-emerald-400 font-bold">MINIM (Aprobat Fondator)</span></div>
-                              <div className="flex justify-between"><span className="text-slate-500">Datorii stat:</span><span className="text-slate-300">0 RON</span></div>
-                            </div>
-                            <button type="button" onClick={() => handleDynamicReportDownload('anaf', anafCui)} className="w-full bg-emerald-600/90 hover:bg-emerald-700 text-white font-bold py-2 rounded-xl text-xs transition tracking-tight flex items-center justify-center gap-1 cursor-pointer">📥 Descarcă Audit Fiscal .PDF</button>
-                          </div>
-                        ) : (
-                          <div className="w-full block">
-                            <button type="button" onClick={() => { if(!user) { setIsSignUp(false); setShowAuthModal(true); } else { handleCumparaPremium('auto_report'); } }} className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-black font-black py-2 rounded-xl text-xs transition tracking-tight cursor-pointer">🔓 Deblochează Raport Premium (19 lei)</button>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="pt-1 w-full block">
-                        <button 
-                          type="button" 
-                          onClick={() => {
-                            if (!user) {
-                              alert('Pentru a importa datele direct în configuratorul de contracte, te rugăm să te autentifici.');
-                              setIsSignUp(false);
-                              setShowAuthModal(true);
-                            } else {
-                              setFormData(prev => ({ ...prev, prestatorNume: widgetCompany.nume, prestatorCui: anafCui, tipContract: 'prestari' }));
-                              setStep(2);
-                              window.scrollTo({top: 0, behavior: 'smooth'});
-                            }
-                          }} 
-                          className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold text-[11px] py-2 rounded-xl transition block cursor-pointer"
-                        >
-                          ⚡ Importă datele în formularul activ
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* COLOANA 2: CALCULATOR FISCAL */}
+              {/* COLOANA 1: CALCULATOR FISCAL */}
               <div className="bg-[#12181D] p-5 rounded-2xl border border-slate-800 shadow-xl flex flex-col min-h-[380px] justify-between">
                 <div>
                   <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">Calculator Fiscal Inteligent (Plafoane CASS)</span>
@@ -1579,18 +1512,8 @@ export default function Home() {
             <span className="text-[#8ba888] text-xs font-black uppercase tracking-widest block mb-1">Standard de Securitate Financiară</span>
             <h2 className="text-3xl font-black text-white tracking-tight">Planuri de Business, Pachete Auto & Micro-Tranzacții</h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
-            
-            <div className="bg-[#12181D] border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
-              <div>
-                <span className="text-[10px] font-mono text-slate-500 block uppercase">Verificări One-Time</span>
-                <h4 className="text-sm font-bold text-white mt-1">Interogare CUI</h4>
-                <div className="text-lg font-black text-[#8ba888] mt-2 mb-3">19 RON <span className="text-[10px] text-slate-500 font-normal">/ raport</span></div>
-                <p className="text-[11px] text-slate-400 leading-relaxed">Verificarea stării active ANAF</p>
-              </div>
-              <button type="button" onClick={() => handleCumparaPremium('auto_report')} className="w-full mt-4 bg-[#0B0F12] hover:bg-slate-900 border border-slate-700 text-white font-bold py-2 rounded-xl text-xs transition">Interoghează</button>
-            </div>
-            
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
+               
             <div className="bg-[#12181D] border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
               <div>
                 <span className="text-[10px] font-mono text-emerald-500 font-bold block uppercase">Freemium</span>
