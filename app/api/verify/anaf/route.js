@@ -17,8 +17,9 @@ export async function POST(req) {
     }
 
     const curatCui = cui.toString().replace(/[^0-9]/g, '');
+    const dataAzi = new Date().toISOString().split('T')[0];
 
-    // Verificăm drepturile în baza de date Supabase (Pro/Founder sau achiziție punctuală)
+    // Verificare drepturi abonament în Supabase
     let areDrepturi = false;
     if (userId) {
       const { data: profil } = await supabase.from('profiles').select('subscription_tier, subscription_status').eq('id', userId).single();
@@ -29,49 +30,40 @@ export async function POST(req) {
       }
     }
 
-    // Interogare prin API alternativ stabil pentru datele ANAF
-    let dateFirma = null;
-    try {
-      const anafReq = await fetch(`https://anaf.かに.ro/api/v1/pesh/cui/${curatCui}`).catch(() => null);
-      if (anafReq && anafReq.ok) {
-        const json = await anafReq.json();
-        if (json && json.date_generale) {
-          dateFirma = {
-            denumire: json.date_generale.denumire,
-            adresa: json.date_generale.adresa_sediu_social,
-            scpTVA: json.inregistrare_scop_tva?.scptva || false,
-            stare_inregistrare: json.stare_inregistrare_duplicat?.stare_inregistrare || "ACTIV"
-          };
-        }
-      }
-    } catch (e) {
-      console.error("Eroare API alternativ ANAF:", e);
+    // Interogare directă la noul API oficial ANAF V9
+    const anafResponse = await fetch('https://webservicesp.anaf.ro/PlatitorTvaRest/api/v9/ws/tva', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify([{ cui: parseInt(curatCui, 10), data: dataAzi }])
+    });
+
+    if (!anafResponse.ok) {
+      throw new Error("Eroare de comunicare la serverul ANAF");
     }
 
-    // Fallback direct pe un format sigur dacă serviciul extern are lag, sau date simulate de siguranță pentru CUI-ul introdus
-    if (!dateFirma) {
-      // Dacă este un CUI de test sau dorim să asigurăm că nu dă eroare niciodată utilizatorului:
-      dateFirma = {
-        denumire: `SOCIETATEA CUI ${curatCui} SRL`,
-        adresa: "România",
-        scpTVA: true,
-        stare_inregistrare: "ACTIV"
-      };
+    const anafJson = await anafResponse.json();
+
+    if (!anafJson || !anafJson.found || anafJson.found.length === 0) {
+      return NextResponse.json({ success: false, error: "CUI-ul interogat nu a fost găsit în baza de date a Ministerului Finanțelor." }, { status: 404 });
     }
+
+    const infoFirma = anafJson.found[0];
+    const dateGenerale = infoFirma.date_generale || {};
 
     return NextResponse.json({
       success: true,
       necesita_plata: !areDrepturi,
       date: {
         cui: curatCui,
-        denumire: dateFirma.denumire,
-        statusTva: dateFirma.scpTVA ? "Plătitor de TVA" : "Neplătitor de TVA",
-        stareInactivitate: dateFirma.stare_inregistrare?.includes("INACTIV") ? "INACTIVĂ FISCAL" : "ACTIVĂ",
-        adresaSediu: dateFirma.adresa,
+        denumire: dateGenerale.denumire || "Denumire indisponibilă",
+        statusTva: infoFirma.inregistrare_scop_Tva?.scpTVA ? "Plătitor de TVA" : "Neplătitor de TVA",
+        stareInactivitate: dateGenerale.stare_inregistrare?.includes("INACTIV") ? "INACTIVĂ FISCAL" : "ACTIVĂ",
+        adresaSediu: dateGenerale.adresa || "Adresă nespecificată",
         detalii_premium: areDrepturi ? {
-          datorii: 0,
-          activeImobilizate: 120000,
-          riscInsolventa: "MINIM (Scor A+ conform algoritmului fiscal 2026)"
+          formaJuridica: dateGenerale.forma_juridica || "Nespecificat",
+          organFiscal: dateGenerale.organFiscalCompetent || "Nespecificat",
+          stareInregistrare: dateGenerale.stare_inregistrare || "ACTIV",
+          data1: dateGenerale.data_inregistrare || "-"
         } : null
       }
     });
