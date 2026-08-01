@@ -71,7 +71,7 @@ export default function Home() {
   const [step, setStep] = useState(1);
   const [autoStep, setAutoStep] = useState('upload');
   const [hydrated, setHydrated] = useState(false);
-  
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [qrType, setQrType] = useState('url'); 
   const [qrData, setQrData] = useState({ nume: '', telefon: '', iban: '', suma: '', url: '', email: '', functie: '', banca: '' });
   const [qrGeneratedUrl, setQrGeneratedUrl] = useState('');
@@ -167,6 +167,31 @@ export default function Home() {
       setHydrated(true);
     }
   }, []);
+
+  const descarcaQR = () => {
+    const svg = document.getElementById('qr-cod-generat');
+    if (!svg) return;
+    
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+    
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.fillStyle = "white"; // Fundal alb pentru scanare corectă
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+      
+      const pngFile = canvas.toDataURL("image/png");
+      const downloadLink = document.createElement("a");
+      downloadLink.download = `ContractSmart_QR_${qrType}.png`;
+      downloadLink.href = pngFile;
+      downloadLink.click();
+    };
+    img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)));
+  };
 
   const calculeazaTaxeComplet = () => {
     const SALARIU_MINIM_2026 = 4050;
@@ -831,44 +856,72 @@ export default function Home() {
       </div>
 
       {/* NAVBAR */}
-      <nav className="sticky top-0 z-40 backdrop-blur-md bg-[#0B0F12]/90 border-b border-slate-800 py-4 px-6 flex justify-between items-center shadow-lg transition-all">
-        <div className="w-[180px] h-[30px] flex items-center" onClick={() => setStep(1)}>
-          <svg viewBox="0 0 240 40" className="w-full h-full cursor-pointer">
-            <g transform="translate(0, 2)">
-              <path d="M24 6 C15 6, 8 13, 8 22 C8 31, 15 38, 24 38 C31 38, 37 33, 39 27" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round"/>
-              <path d="M16 21 L21 26 L32 12" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
-            </g>
-            <text x="48" y="26" fontFamily="system-ui, -apple-system, sans-serif" fontWeight="900" fontSize="20" fill="#FFFFFF" letterSpacing="-0.5">
-              Contract<tspan fill="#8ba888">Smart</tspan>
-            </text>
-          </svg>
-        </div>
-        
-        <div className="flex items-center space-x-5">
-          <Link href="/modele-contracte" className="text-xs text-slate-400 hover:text-white transition">Modele Contracte</Link>
-          <span className="text-slate-800">|</span>
-          <Link href="/baza-legala" className="text-xs text-slate-400 hover:text-white transition">Validitate Juridică</Link>
-          <span className="text-slate-800">|</span>
-          <Link href="/termeni-si-conditii" className="text-xs text-slate-400 hover:text-white transition">Termeni și Condiții</Link>
-          <span className="text-slate-800">|</span>
+      {/* NAVBAR OPTIMIZAT */}
+      <nav className="sticky top-0 z-40 backdrop-blur-md bg-[#0B0F12]/90 border-b border-slate-800 py-4 px-6 shadow-lg transition-all">
+        <div className="flex justify-between items-center">
+          <div className="w-[180px] h-[30px] flex items-center" onClick={() => setStep(1)}>
+            <svg viewBox="0 0 240 40" className="w-full h-full cursor-pointer">
+              <g transform="translate(0, 2)">
+                <path d="M24 6 C15 6, 8 13, 8 22 C8 31, 15 38, 24 38 C31 38, 37 33, 39 27" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round"/>
+                <path d="M16 21 L21 26 L32 12" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+              </g>
+              <text x="48" y="26" fontFamily="system-ui, -apple-system, sans-serif" fontWeight="900" fontSize="20" fill="#FFFFFF" letterSpacing="-0.5">
+                Contract<tspan fill="#8ba888">Smart</tspan>
+              </text>
+            </svg>
+          </div>
           
-          {!user ? (
-            <button type="button" onClick={() => { setIsSignUp(false); setAuthPassword(''); setAuthConfirmPassword(''); setShowAuthModal(true); }} className="text-xs font-bold text-slate-300 hover:text-[#8ba888] transition">Autentificare / Cont Nou</button>
-          ) : (
-            <div className="flex items-center space-x-3 text-xs">
-              <span className="text-slate-400">Cont: <strong className="text-white font-mono font-normal">{user.email}</strong> 
-                <span className="ml-1.5 text-[10px] uppercase font-bold bg-[#16221A] text-[#8ba888] px-2 py-0.5 rounded border border-emerald-900/40">
-                  {user.status === 'founder' ? 'Fondator' : user.status === 'pro' ? 'Pro' : 'Gratuit'}
-                </span>
-              </span>
-              <button type="button" onClick={handleLogout} className="text-red-400 font-bold hover:underline">Ieșire</button>
-              <span className="text-slate-800">|</span>
-              <button type="button" onClick={stergeCont} className="text-slate-500 hover:text-red-400 text-[11px] transition">Șterge Cont</button>
-            </div>
-          )}
+          {/* Buton Hamburger pentru Mobil */}
+          <button 
+            className="md:hidden text-[#8ba888] text-2xl focus:outline-none"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? '✕' : '☰'}
+          </button>
 
-          <button onClick={() => { const el = document.getElementById('sectiune-preturi'); el?.scrollIntoView({ behavior: 'smooth' }); }} className="bg-[#8ba888] hover:opacity-90 text-[#0B0F12] font-black text-xs px-4 py-2 rounded-xl transition shadow-lg shadow-[#8ba888]/10">Vezi Oferte</button>
+          {/* Meniu Desktop */}
+          <div className="hidden md:flex items-center space-x-5">
+            <Link href="/modele-contracte" className="text-xs text-slate-400 hover:text-white transition">Modele Contracte</Link>
+            <span className="text-slate-800">|</span>
+            <Link href="/baza-legala" className="text-xs text-slate-400 hover:text-white transition">Validitate Juridică</Link>
+            <span className="text-slate-800">|</span>
+            <Link href="/termeni-si-conditii" className="text-xs text-slate-400 hover:text-white transition">Termeni și Condiții</Link>
+            <span className="text-slate-800">|</span>
+            
+            {!user ? (
+              <button type="button" onClick={() => { setIsSignUp(false); setShowAuthModal(true); }} className="text-xs font-bold text-slate-300 hover:text-[#8ba888] transition">Autentificare / Cont Nou</button>
+            ) : (
+              <div className="flex items-center space-x-3 text-xs">
+                <span className="text-slate-400">Cont: <strong className="text-white font-mono font-normal">{user.email}</strong> 
+                  <span className="ml-1.5 text-[10px] uppercase font-bold bg-[#16221A] text-[#8ba888] px-2 py-0.5 rounded border border-emerald-900/40">
+                    {user.status}
+                  </span>
+                </span>
+                <button type="button" onClick={handleLogout} className="text-red-400 font-bold hover:underline">Ieșire</button>
+              </div>
+            )}
+            <button onClick={() => { const el = document.getElementById('sectiune-preturi'); el?.scrollIntoView({ behavior: 'smooth' }); }} className="bg-[#8ba888] hover:opacity-90 text-[#0B0F12] font-black text-xs px-4 py-2 rounded-xl transition shadow-lg shadow-[#8ba888]/10">Vezi Oferte</button>
+          </div>
         </div>
+
+        {/* Meniu Mobil (Dropdown) */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden flex flex-col space-y-4 pt-4 mt-4 border-t border-slate-800 animate-fadeIn">
+            <Link href="/modele-contracte" className="text-sm text-slate-300 hover:text-white">Modele Contracte</Link>
+            <Link href="/baza-legala" className="text-sm text-slate-300 hover:text-white">Validitate Juridică</Link>
+            <Link href="/termeni-si-conditii" className="text-sm text-slate-300 hover:text-white">Termeni și Condiții</Link>
+            
+            {!user ? (
+              <button type="button" onClick={() => { setIsMobileMenuOpen(false); setIsSignUp(false); setShowAuthModal(true); }} className="text-sm font-bold text-[#8ba888] text-left">Autentificare / Cont Nou</button>
+            ) : (
+              <div className="flex flex-col space-y-2 border-t border-slate-800/50 pt-2">
+                <span className="text-xs text-slate-400">Logat ca: {user.email}</span>
+                <button type="button" onClick={handleLogout} className="text-red-400 text-sm font-bold text-left">Ieșire din cont</button>
+              </div>
+            )}
+            <button onClick={() => { setIsMobileMenuOpen(false); const el = document.getElementById('sectiune-preturi'); el?.scrollIntoView({ behavior: 'smooth' }); }} className="bg-[#8ba888] text-[#0B0F12] font-black text-sm px-4 py-3 rounded-xl text-center">Vezi Oferte</button>
+          </div>
+        )}
       </nav>
 
       {/* AMBIENT BLOBS */}
@@ -1187,9 +1240,10 @@ export default function Home() {
                     </div>
 
                  </div>
-                 <div className="w-40 h-40 flex items-center justify-center bg-white p-2 rounded-xl shadow-inner shrink-0">
-                    <QRCodeSVG value={genereazaValoareQR()} size={140} />
-                 </div>
+                 <div className="flex-col gap-3 shrink-0 bg-white p-2 rounded-xl">
+                  <QRCodeSVG id="qr-cod-generat" value={genereazaValoareQR()} size={140}/>
+                  <button onClick={descarcaQR}>Descarcă QR</button>
+                  </div>
               </div>
             </div>
 

@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import puppeteer from 'puppeteer-core';
-import chromium from '@sparticuz/chromium-min';
+import puppeteer from 'puppeteer-core'; // Dacă ai instalat doar 'puppeteer' pe server, poți schimba în 'puppeteer'
 import JSZip from 'jszip';
 import twilio from 'twilio';
 
@@ -15,28 +14,31 @@ const twilioClient = twilio(
 );
 
 async function randeazaHtmlInPdf(htmlContent) {
-  let browser;
-  
+  const launchOptions = {
+    headless: "new",
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-gpu'
+    ]
+  };
+
   if (process.env.NODE_ENV === 'development') {
-    browser = await puppeteer.launch({ 
-      headless: "new", 
-      executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" 
-    });
+    launchOptions.executablePath = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
   } else {
-    browser = await puppeteer.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(
-        "https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar.br"
-      ),
-      headless: chromium.headless,
-    });
+    // Aceasta este calea standard pe un VPS Ubuntu dacă instalezi chromium. 
+    // Dacă instalezi pachetul complet "puppeteer" din npm, își descarcă el un Chrome intern și poți omite complet `executablePath` aici.
+    launchOptions.executablePath = "/usr/bin/chromium-browser"; 
   }
 
+  const browser = await puppeteer.launch(launchOptions);
   const page = await browser.newPage();
-  await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+  
+  await page.setContent(htmlContent, { waitUntil: 'domcontentloaded' });
   const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true });
   await browser.close();
+  
   return pdfBuffer;
 }
 
