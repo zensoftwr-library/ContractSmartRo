@@ -1006,131 +1006,129 @@ export default function Home() {
               </div>
             </div>
 
-            {/* BENTO GRID ÎN 3 COLOANE */}
-            <div className="max-w-3xl mx-auto px-6 mt-6 flex flex-col items-center justify-center">
-              
-              {/* COLOANA 1: CALCULATOR FISCAL */}
-              <div className="bg-[#12181D] p-5 rounded-2xl border border-slate-800 shadow-xl flex flex-col min-h-[380px] justify-between">
-                <div>
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">Calculator Fiscal Inteligent (Plafoane CASS)</span>
-                  <div className="space-y-4 text-xs">
-                    <div>
-                      <label className="text-slate-400 block mb-1">
-                        Venit Brut Facturat Lunar: <span className="text-white font-mono font-bold">{fiscal.venitLunar.toLocaleString('ro-RO')} RON</span>
-                      </label>
-                      <input 
-                        type="range" 
-                        min="0" 
-                        max="50000" 
-                        step="1" 
-                        value={fiscal.venitLunar} 
-                        onChange={e => setFiscal({...fiscal, venitLunar: Number(e.target.value)})} 
-                        className="w-full h-1 bg-slate-800 rounded appearance-none cursor-pointer accent-[#8ba888]" 
-                      />
-                    </div>
-                    <div className="grid grid-cols-1 gap-2">
-                      <div>
-                        <label className="text-slate-400 block mb-1">Formă de Organizare</label>
-                        <select value={fiscal.formaJuridica} onChange={e => setFiscal({...fiscal, formaJuridica: e.target.value})} className="w-full bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-white outline-none text-xs">
-                          <option value="SRL">SRL (Microîntreprindere)</option>
-                          <option value="PFA_SISTEM_REAL">PFA (Sistem Real)</option>
-                        </select>
-                      </div>
-                    </div>
-                    {fiscal.formaJuridica !== 'PFA_SISTEM_REAL' && (
-                      <div className="grid grid-cols-2 gap-2 pt-1">
-                        <label className="flex items-center p-2 bg-[#0B0F12] rounded-lg border border-slate-800 cursor-pointer">
-                          <input type="checkbox" checked={fiscal.areAngajati} onChange={e => setFiscal({...fiscal, areAngajati: e.target.checked})} className="mr-2 accent-[#8ba888]" />
-                          Are Angajați
-                        </label>
-                        <label className="flex items-center p-2 bg-[#0B0F12] rounded-lg border border-slate-800/60 cursor-pointer">
-                          <input type="checkbox" checked={fiscal.platitorTva} onChange={e => setFiscal({...fiscal, platitorTva: e.target.checked})} className="mr-2 accent-[#8ba888]" />
-                          Plătitor TVA
-                        </label>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="w-full space-y-3">
-                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800/80 font-mono text-[11px]">
-                    <div className="bg-[#0B0F12] p-2 rounded-xl border border-slate-800/40">
-                      <span className="text-slate-500 block">Impozit lunar estimat:</span>
-                      <span className="text-slate-300 font-bold">{rezultateFiscale.defalcare.impozit} RON</span>
-                    </div>
-                    <div className="bg-[#0B0F12] p-2 rounded-xl border border-slate-800/40">
-                      <span className="text-slate-500 block">Contribuții (CAS/CASS):</span>
-                      <span className="text-slate-300 font-bold">{rezultateFiscale.defalcare.sociale} RON</span>
-                    </div>
-                  </div>
-
-                  <div className="pt-2 border-t border-slate-800 bg-[#0B0F12] p-3 rounded-xl border border-slate-800/60 flex justify-between items-center text-xs">
-                    <div><span className="text-slate-400 block">Dări Stat (Total): <strong className="text-red-400 font-mono">{rezultateFiscale.taxeLunare} RON</strong></span></div>
-                    <div className="text-right"><span className="text-slate-400 block">Profit Curat Net Lunar: <strong className="text-[#8ba888] font-mono text-sm">{rezultateFiscale.netLunar} RON</strong></span></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* WIDGET QR CODE COMPLEX */}
-            <div className="max-w-7xl mx-auto px-6 mt-6">
-              <div className="bg-[#12181D] p-6 rounded-2xl border border-slate-800 shadow-xl flex flex-col md:flex-row gap-8 items-center justify-between">
-                 <div className="flex-1 w-full space-y-4">
-                    <div>
-                      <span className="text-[#8ba888] text-xs font-bold uppercase tracking-wider block mb-1">Utilitar Rapid</span>
-                      <h3 className="text-white font-bold text-xl">Generator Coduri QR</h3>
-                      <p className="text-xs text-slate-400 mt-1">Transformă linkuri, cărți de vizită sau conturi IBAN în format scanabil.</p>
-                    </div>
-                    
-                    <div className="flex flex-col gap-3">
-                       <select value={qrType} onChange={(e) => setQrType(e.target.value)} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none w-full sm:w-1/2">
-                          <option value="url">Website URL</option>
-                          <option value="vcard">Carte de Vizită (vCard)</option>
-                          <option value="iban">Cont IBAN (Plată Rapidă)</option>
-                       </select>
-
-                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                         {qrType === 'url' && (
-                           <input type="text" placeholder="https://..." value={qrData.url} onChange={(e) => setQrData({...qrData, url: e.target.value})} className="col-span-1 sm:col-span-2 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none" />
-                         )}
-                         {qrType === 'vcard' && (
-                           <>
-                             <input type="text" placeholder="Nume Complet" value={qrData.nume} onChange={(e) => setQrData({...qrData, nume: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none" />
-                             <input type="text" placeholder="Funcție / Titlu" value={qrData.functie} onChange={(e) => setQrData({...qrData, functie: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none" />
-                             <input type="tel" placeholder="Număr Telefon" value={qrData.telefon} onChange={(e) => setQrData({...qrData, telefon: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none" />
-                             <input type="email" placeholder="Adresă Email" value={qrData.email} onChange={(e) => setQrData({...qrData, email: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none" />
-                           </>
-                         )}
-                         {qrType === 'iban' && (
-                           <>
-                             <input type="text" placeholder="Nume Titular Cont" value={qrData.nume} onChange={(e) => setQrData({...qrData, nume: e.target.value})} className="col-span-1 sm:col-span-2 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none" />
-                             <input type="text" placeholder="RO.. IBAN" value={qrData.iban} onChange={(e) => setQrData({...qrData, iban: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none" />
-                             <input type="text" placeholder="Denumire Bancă" value={qrData.banca} onChange={(e) => setQrData({...qrData, banca: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none" />
-                             <input type="number" placeholder="Suma (RON) - Opțional" value={qrData.suma} onChange={(e) => setQrData({...qrData, suma: e.target.value})} className="col-span-1 sm:col-span-2 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none" />
-                           </>
-                         )}
-                       </div>
-                    </div>
-
-                 </div>
-                 <div className="flex-col gap-3 shrink-0 bg-white p-2 rounded-xl">
-                  <QRCodeCanvas 
-                      id="contract-qr"
-                      value={genereazaValoareQR()} 
-                      size={140}      // Dimensiune mult mai mare
-                      fgColor="#8ba888"   // Verdele Matcha al platformei
-                      level="H"           // Corecție erori maximă
-                      includeMargin={true}
-                    />
-                  <button onClick={handleDownloadQR} className="bg-[#8ba888] text-white font-bold py-2 px-4 rounded">
-                    Descărcare QR (PNG)
-                  </button>
-                  </div>
-              </div>
-            </div>
-
+            {/* BENTO GRID ÎN 2 COLOANE PENTRU CELE 2 UTILITARE */}
+<div className="max-w-6xl mx-auto px-6 mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+  
+  {/* COLOANA 1: CALCULATOR FISCAL */}
+  <div className="bg-[#12181D] p-5 rounded-2xl border border-slate-800 shadow-xl flex flex-col justify-between">
+    <div>
+      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">Calculator Fiscal Inteligent (Plafoane CASS)</span>
+      <div className="space-y-4 text-xs">
+        <div>
+          <label className="text-slate-400 block mb-1">
+            Venit Brut Facturat Lunar: <span className="text-white font-mono font-bold">{fiscal.venitLunar.toLocaleString('ro-RO')} RON</span>
+          </label>
+          <input 
+            type="range" 
+            min="0" 
+            max="50000" 
+            step="1" 
+            value={fiscal.venitLunar} 
+            onChange={e => setFiscal({...fiscal, venitLunar: Number(e.target.value)})} 
+            className="w-full h-1 bg-slate-800 rounded appearance-none cursor-pointer accent-[#8ba888]" 
+          />
+        </div>
+        <div className="grid grid-cols-1 gap-2">
+          <div>
+            <label className="text-slate-400 block mb-1">Formă de Organizare</label>
+            <select value={fiscal.formaJuridica} onChange={e => setFiscal({...fiscal, formaJuridica: e.target.value})} className="w-full bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-white outline-none text-xs">
+              <option value="SRL">SRL (Microîntreprindere)</option>
+              <option value="PFA_SISTEM_REAL">PFA (Sistem Real)</option>
+            </select>
+          </div>
+        </div>
+        {fiscal.formaJuridica !== 'PFA_SISTEM_REAL' && (
+          <div className="grid grid-cols-2 gap-2 pt-1">
+            <label className="flex items-center p-2 bg-[#0B0F12] rounded-lg border border-slate-800 cursor-pointer">
+              <input type="checkbox" checked={fiscal.areAngajati} onChange={e => setFiscal({...fiscal, areAngajati: e.target.checked})} className="mr-2 accent-[#8ba888]" />
+              Are Angajați
+            </label>
+            <label className="flex items-center p-2 bg-[#0B0F12] rounded-lg border border-slate-800/60 cursor-pointer">
+              <input type="checkbox" checked={fiscal.platitorTva} onChange={e => setFiscal({...fiscal, platitorTva: e.target.checked})} className="mr-2 accent-[#8ba888]" />
+              Plătitor TVA
+            </label>
           </div>
         )}
+      </div>
+    </div>
+    
+    <div className="w-full space-y-3 mt-4">
+      <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800/80 font-mono text-[11px]">
+        <div className="bg-[#0B0F12] p-2 rounded-xl border border-slate-800/40">
+          <span className="text-slate-500 block">Impozit lunar estimat:</span>
+          <span className="text-slate-300 font-bold">{rezultateFiscale.defalcare.impozit} RON</span>
+        </div>
+        <div className="bg-[#0B0F12] p-2 rounded-xl border border-slate-800/40">
+          <span className="text-slate-500 block">Contribuții (CAS/CASS):</span>
+          <span className="text-slate-300 font-bold">{rezultateFiscale.defalcare.sociale} RON</span>
+        </div>
+      </div>
+
+      <div className="pt-2 border-t border-slate-800 bg-[#0B0F12] p-3 rounded-xl border border-slate-800/60 flex justify-between items-center text-xs">
+        <div><span className="text-slate-400 block">Dări Stat (Total): <strong className="text-red-400 font-mono">{rezultateFiscale.taxeLunare} RON</strong></span></div>
+        <div className="text-right"><span className="text-slate-400 block">Profit Curat Net Lunar: <strong className="text-[#8ba888] font-mono text-sm">{rezultateFiscale.netLunar} RON</strong></span></div>
+      </div>
+    </div>
+  </div>
+
+  {/* COLOANA 2: WIDGET QR CODE COMPLEX */}
+  <div className="bg-[#12181D] p-5 rounded-2xl border border-slate-800 shadow-xl flex flex-col justify-between">
+    <div className="space-y-4">
+      <div>
+        <span className="text-[#8ba888] text-xs font-bold uppercase tracking-wider block mb-1">Utilitar Rapid</span>
+        <h3 className="text-white font-bold text-lg">Generator Coduri QR</h3>
+        <p className="text-xs text-slate-400 mt-1">Transformă linkuri, cărți de vizită sau conturi IBAN în format scanabil.</p>
+      </div>
+      
+      <div className="flex flex-col gap-3">
+         <select value={qrType} onChange={(e) => setQrType(e.target.value)} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none w-full">
+            <option value="url">Website URL</option>
+            <option value="vcard">Carte de Vizită (vCard)</option>
+            <option value="iban">Cont IBAN (Plată Rapidă)</option>
+         </select>
+
+         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {qrType === 'url' && (
+              <input type="text" placeholder="https://..." value={qrData.url} onChange={(e) => setQrData({...qrData, url: e.target.value})} className="col-span-1 sm:col-span-2 bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none" />
+            )}
+            {qrType === 'vcard' && (
+              <>
+                <input type="text" placeholder="Nume Complet" value={qrData.nume} onChange={(e) => setQrData({...qrData, nume: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none" />
+                <input type="text" placeholder="Funcție / Titlu" value={qrData.functie} onChange={(e) => setQrData({...qrData, functie: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none" />
+                <input type="tel" placeholder="Număr Telefon" value={qrData.telefon} onChange={(e) => setQrData({...qrData, telefon: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none" />
+                <input type="email" placeholder="Adresă Email" value={qrData.email} onChange={(e) => setQrData({...qrData, email: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none" />
+              </>
+            )}
+            {qrType === 'iban' && (
+              <>
+                <input type="text" placeholder="Nume Titular" value={qrData.nume} onChange={(e) => setQrData({...qrData, nume: e.target.value})} className="col-span-1 sm:col-span-2 bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none" />
+                <input type="text" placeholder="RO.. IBAN" value={qrData.iban} onChange={(e) => setQrData({...qrData, iban: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none" />
+                <input type="text" placeholder="Bancă" value={qrData.banca} onChange={(e) => setQrData({...qrData, banca: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none" />
+                <input type="number" placeholder="Suma RON" value={qrData.suma} onChange={(e) => setQrData({...qrData, suma: e.target.value})} className="col-span-1 sm:col-span-2 bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none" />
+              </>
+            )}
+         </div>
+      </div>
+    </div>
+
+    <div className="flex items-center justify-between gap-4 pt-4 mt-4 border-t border-slate-800">
+      <div className="bg-white p-2 rounded-xl shrink-0">
+        <QRCodeCanvas 
+            id="contract-qr"
+            value={genereazaValoareQR()} 
+            size={110} 
+            fgColor="#8ba888" 
+            level="H" 
+            includeMargin={true}
+        />
+      </div>
+      <button onClick={handleDownloadQR} className="w-full bg-[#8ba888] hover:bg-[#789575] text-white font-bold py-3 px-4 rounded-xl text-xs transition">
+        Descărcare QR (PNG)
+      </button>
+    </div>
+  </div>
+
+</div>
 
         {/* STEP 2: MULTI-FORMULAR SECREȚIONAT STRUCTURAL */}
         {step === 2 && (
