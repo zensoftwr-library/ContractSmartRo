@@ -169,15 +169,28 @@ export default function Home() {
   }, []);
 
   const handleDownloadQR = () => {
-  const canvas = document.getElementById('contract-qr');
-  if (canvas) {
-    const pngUrl = canvas.toDataURL('image/png', 1.0); // 1.0 e calitatea maximă
-    const downloadLink = document.createElement('a');
-    downloadLink.href = pngUrl;
-    downloadLink.download = 'ContractSmart-QR.png';
-    downloadLink.click();
-  }
-};
+    const canvas = document.getElementById('contract-qr');
+    if (canvas) {
+      // Creăm un canvas temporar la o rezoluție mare (ex: 1000x1000 pixeli) pentru claritate maximă la descărcare
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = 1000;
+      tempCanvas.height = 1000;
+      const ctx = tempCanvas.getContext('2d');
+      
+      // Umplem fundalul cu alb pentru contrast curat
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+      
+      // Desenăm QR-ul original la scara mare
+      ctx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
+
+      const pngUrl = tempCanvas.toDataURL('image/png', 1.0);
+      const downloadLink = document.createElement('a');
+      downloadLink.href = pngUrl;
+      downloadLink.download = 'ContractSmart-QR-Mare.png';
+      downloadLink.click();
+    }
+  };
 
   const calculeazaTaxeComplet = () => {
     const SALARIU_MINIM_2026 = 4050;
@@ -994,7 +1007,7 @@ export default function Home() {
             </div>
 
             {/* BENTO GRID ÎN 3 COLOANE */}
-            <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+            <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
               
               {/* COLOANA 1: INTEROGARE REALĂ ANAF */}
               <div className="bg-[#12181D] p-5 rounded-2xl border border-slate-800 shadow-xl flex flex-col min-h-[380px] justify-between">
@@ -1171,7 +1184,7 @@ export default function Home() {
                   <QRCodeCanvas 
                       id="contract-qr"
                       value={genereazaValoareQR()} 
-                      size={300}          // Dimensiune mult mai mare
+                      size={180}      // Dimensiune mult mai mare
                       fgColor="#8ba888"   // Verdele Matcha al platformei
                       level="H"           // Corecție erori maximă
                       includeMargin={true}
@@ -1571,9 +1584,9 @@ export default function Home() {
             <div className="bg-[#12181D] border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
               <div>
                 <span className="text-[10px] font-mono text-slate-500 block uppercase">Verificări One-Time</span>
-                <h4 className="text-sm font-bold text-white mt-1">Interogare CUI / VIN</h4>
+                <h4 className="text-sm font-bold text-white mt-1">Interogare CUI</h4>
                 <div className="text-lg font-black text-[#8ba888] mt-2 mb-3">19 RON <span className="text-[10px] text-slate-500 font-normal">/ raport</span></div>
-                <p className="text-[11px] text-slate-400 leading-relaxed">Verificarea stării active ANAF sau interogarea automată a cazierului de daune și odometru RAR.</p>
+                <p className="text-[11px] text-slate-400 leading-relaxed">Verificarea stării active ANAF</p>
               </div>
               <button type="button" onClick={() => handleCumparaPremium('auto_report')} className="w-full mt-4 bg-[#0B0F12] hover:bg-slate-900 border border-slate-700 text-white font-bold py-2 rounded-xl text-xs transition">Interoghează</button>
             </div>
