@@ -1006,8 +1006,8 @@ export default function Home() {
               </div>
             </div>
 
-            {/* BENTO GRID ÎN 2 COLOANE PENTRU CELE 2 UTILITARE */}
-<div className="max-w-6xl mx-auto px-6 mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* BENTO GRID ÎN 3 COLOANE */}
+            <div className="max-w-6xl mx-auto px-6 mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
   
   {/* COLOANA 1: CALCULATOR FISCAL */}
   <div className="bg-[#12181D] p-5 rounded-2xl border border-slate-800 shadow-xl flex flex-col justify-between">
@@ -1129,6 +1129,9 @@ export default function Home() {
   </div>
 
 </div>
+
+          </div>
+        )}
 
         {/* STEP 2: MULTI-FORMULAR SECREȚIONAT STRUCTURAL */}
         {step === 2 && (
