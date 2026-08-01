@@ -50,11 +50,8 @@ export async function POST(request) {
     3. Explică avantajul practic al clauzelor.
     4. Păstrează un ton amabil, profesionist și răspunde strict în limba română. (Reține: TVA standard este 21%)`;
 
-    // Am schimbat modelul in gemini-1.5-flash pentru disponibilitate stabila in Vercel
-    const model = ai.getGenerativeModel({ 
-      model: 'gemini-1.5-flash',
-      systemInstruction: systemInstruction 
-    });
+    // Am schimbat modelul in gemini-3.5-flash pentru disponibilitate stabila in Vercel
+    const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
 
     const contents = [];
     if (history && history.length > 0) {

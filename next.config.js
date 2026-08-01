@@ -1,8 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  serverExternalPackages: ["@sparticuz/chromium-min", "puppeteer-core"],
-  typescript: { ignoreBuildErrors: true },
-  output: 'standalone',
+  serverExternalPackages: ["puppeteer"],
+  typescript: { ignoreBuildErrors: true }
 };
 
 export default nextConfig;

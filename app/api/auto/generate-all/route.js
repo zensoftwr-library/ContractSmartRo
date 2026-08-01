@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import puppeteer from 'puppeteer-core'; // Dacă ai instalat doar 'puppeteer' pe server, poți schimba în 'puppeteer'
+import puppeteer from 'puppeteer';
 import JSZip from 'jszip';
 import twilio from 'twilio';
 
@@ -15,7 +15,7 @@ const twilioClient = twilio(
 
 async function randeazaHtmlInPdf(htmlContent) {
   const launchOptions = {
-    headless: "new",
+    headless: true,
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
@@ -27,9 +27,7 @@ async function randeazaHtmlInPdf(htmlContent) {
   if (process.env.NODE_ENV === 'development') {
     launchOptions.executablePath = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
   } else {
-    // Aceasta este calea standard pe un VPS Ubuntu dacă instalezi chromium. 
-    // Dacă instalezi pachetul complet "puppeteer" din npm, își descarcă el un Chrome intern și poți omite complet `executablePath` aici.
-    launchOptions.executablePath = "/usr/bin/chromium-browser"; 
+    launchOptions.executablePath = "/usr/bin/chromium"; 
   }
 
   const browser = await puppeteer.launch(launchOptions);

@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import puppeteer from 'puppeteer-core';
-import chromium from '@sparticuz/chromium-min';
+import puppeteer from 'puppeteer';
 import { createClient } from '@supabase/supabase-js';
 
 export const dynamic = 'force-dynamic';
@@ -213,21 +212,19 @@ export async function POST(request) {
 
     let browser;
     if (process.env.NODE_ENV === 'development') {
-      browser = await puppeteer.launch({ headless: "new", executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" });
+      browser = await puppeteer.launch({ 
+        headless: true, 
+        executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" 
+      });
     } else {
       browser = await puppeteer.launch({
-        args: chromium.args,
-        defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath(
-          "https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar.br"
-        ),
-        headless: chromium.headless,
-        ignoreHTTPSErrors: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu'],
+        executablePath: '/usr/bin/chromium',
+        headless: true,
       });
     }
 
     const page = await browser.newPage();
-    // Modificat in domcontentloaded pentru a preveni timeout pe Vercel
     await page.setContent(htmlTemplateBlank, { waitUntil: 'domcontentloaded' });
     
     const pdfBuffer = await page.pdf({
