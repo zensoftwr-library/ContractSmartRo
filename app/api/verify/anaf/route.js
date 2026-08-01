@@ -32,7 +32,7 @@ export async function POST(req) {
     // Interogare OFICIALĂ, LIVE și GRATUITĂ ANAF API v8
     let dateFirma = null;
     try {
-      const anafReq = await fetch('https://webservicesp.anaf.ro/PlatitorTvaRest/api/v8/ws/tva', {
+      const anafReq = await fetch('https://api.anaf.ro/PlatitorTvaRest/api/v8/ws/tva', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify([{ cui: parseInt(curatCui), data: new Date().toISOString().split('T')[0] }])
