@@ -1136,6 +1136,55 @@ export default function Home() {
                     </button>
                   </form>
 
+                  {rarWidgetReport && (
+                    <div className="mt-3 p-3 bg-[#0B0F12] border border-slate-800 rounded-xl space-y-2.5 text-[11px] block clear-both">
+                      <div className="text-white font-mono text-xs font-bold text-center border-b border-slate-800/80 pb-1.5">PREVIZUALIZARE RAPORT TEHNIC</div>
+                      <div className="flex justify-between text-slate-400"><span>Status ITP:</span><span className="text-emerald-400 font-bold">{rarWidgetReport.date?.itpValid ? 'VALID' : 'EXPIRAT'}</span></div>
+                      <div className="flex justify-between text-slate-400"><span>Valabilitate ITP:</span><span className="text-slate-200">{rarWidgetReport.date?.dataExpirareItp}</span></div>
+                      
+                      <div className="mt-2 pt-2 border-t border-slate-800 relative block min-h-[40px]">
+                        {((['founder', 'pro', 'premium'].includes(user?.status)) || rarWidgetReport.necesita_plata === false) ? (
+                          <div className="space-y-2">
+                            <div className="bg-[#12181D]/50 p-2 rounded-lg border border-slate-800 text-[10px] font-mono text-slate-300">
+                              <span className="text-emerald-400 font-bold block mb-0.5">✓ Istoric curat (Aprobat)</span>
+                              <span>Odometru stabil: Nicio neconcordanță detectată.</span>
+                            </div>
+                            <button type="button" onClick={() => handleDynamicReportDownload('rar', rarWidgetVin)} className="w-full bg-emerald-600/90 hover:bg-emerald-700 text-white font-bold py-2 rounded-xl text-xs transition tracking-tight flex items-center justify-center gap-1 cursor-pointer">📥 Descarcă Raport RAR .PDF</button>
+                          </div>
+                        ) : (
+                          <div className="w-full block">
+                            <button type="button" onClick={() => { if(!user) { setIsSignUp(false); setShowAuthModal(true); } else { handleCumparaPremium('auto_report'); } }} className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-black font-black py-2 rounded-xl text-xs transition tracking-tight cursor-pointer">🔓 Deblochează Kilometraj & Daune (19 lei)</button>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="pt-1 w-full block">
+                        <button 
+                          type="button" 
+                          onClick={() => {
+                            if (!user) {
+                              alert('Pentru a importa datele în asistentul auto, te rugăm să te autentifici.');
+                              setIsSignUp(false);
+                              setShowAuthModal(true);
+                            } else {
+                              setAutoData(prev => ({ ...prev, autoVin: rarWidgetVin }));
+                              setFormData(prev => ({ ...prev, tipContract: 'auto' }));
+                              setStep(2);
+                              window.scrollTo({top: 0, behavior: 'smooth'});
+                            }
+                          }} 
+                          className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold text-[11px] py-2 rounded-xl transition block cursor-pointer"
+                        >
+                          ⚡ Importă în configuratorul Auto
+                        </button>
+                      </div>
+                    </div>
+                  )} 
+                </div>
+              </div>
+
+            </div>
+
             {/* WIDGET QR CODE COMPLEX */}
             <div className="max-w-7xl mx-auto px-6 mt-6">
               <div className="bg-[#12181D] p-6 rounded-2xl border border-slate-800 shadow-xl flex flex-col md:flex-row gap-8 items-center justify-between">
