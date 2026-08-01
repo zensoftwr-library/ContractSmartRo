@@ -1229,7 +1229,7 @@ export default function Home() {
                  <div className="flex-col gap-3 shrink-0 bg-white p-2 rounded-xl">
                   <QRCodeCanvas 
                       id="contract-qr"
-                      value={linkContract} 
+                      value={genereazaValoareQR()} 
                       size={300}          // Dimensiune mult mai mare
                       fgColor="#8ba888"   // Verdele Matcha al platformei
                       level="H"           // Corecție erori maximă
