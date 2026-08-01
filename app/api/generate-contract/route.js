@@ -19,13 +19,26 @@ export async function POST(request) {
       return NextResponse.json({ success: false, message: 'Utilizator neautentificat.' }, { status: 401 });
     }
 
-    const { data: profile } = await supabase.from('profiles').select('subscription_tier, subscription_status, credits_remaining').eq('id', userId).single();
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('subscription_tier, subscription_status, credits_remaining')
+      .eq('id', userId)
+      .single();
 
-    const isPremium = ['pro', 'founder', 'premium'].includes(profile?.subscription_tier) && profile?.subscription_status === 'active';
+    // Curățăm textul din baza de date ca să ignorăm majusculele și spațiile invizibile
+    const tier = (profile?.subscription_tier || 'free').toLowerCase().trim();
+    const status = (profile?.subscription_status || '').toLowerCase().trim();
+
+    // Verificăm dacă e pro sau founder (chiar dacă statusul lipsește pentru founder)
+    const isPremium = ['pro', 'founder', 'premium'].includes(tier);
     const availableCredits = profile?.credits_remaining || 0;
 
     if (!isPremium && availableCredits <= 0) {
-      return NextResponse.json({ success: false, needsPayment: true, message: 'Ai atins limita gratuită lunară. Achiziționează un credit sau un plan Pro.' }, { status: 403 });
+      return NextResponse.json({ 
+        success: false, 
+        needsPayment: true, 
+        message: `Ai atins limita gratuită lunară. Contul tău este înregistrat ca: ${tier}` 
+      }, { status: 403 });
     }
 
     // Temei Juridic (Restul codului tău rămâne intact)
