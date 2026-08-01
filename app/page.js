@@ -1184,7 +1184,7 @@ export default function Home() {
                   <QRCodeCanvas 
                       id="contract-qr"
                       value={genereazaValoareQR()} 
-                      size={180}      // Dimensiune mult mai mare
+                      size={140}      // Dimensiune mult mai mare
                       fgColor="#8ba888"   // Verdele Matcha al platformei
                       level="H"           // Corecție erori maximă
                       includeMargin={true}
