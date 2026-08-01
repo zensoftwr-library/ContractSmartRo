@@ -28,7 +28,7 @@ export async function POST(req) {
     // VERIFICARE DREPTURI ACCES AUTO
     if (!data.userId) return NextResponse.json({ success: false, message: 'Neautentificat' }, { status: 401 });
     
-    onst { data: p } = await supabase.from('profiles').select('subscription_tier').eq('id', data.userId).single();
+    const { data: p } = await supabase.from('profiles').select('subscription_tier').eq('id', data.userId).single();
     const tier = (p?.subscription_tier || '').toLowerCase().trim();
     const isFounder = tier === 'founder';
 
