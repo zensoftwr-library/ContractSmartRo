@@ -2,7 +2,7 @@
 import './globals.css';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { QRCodeSVG } from 'qrcode.react';
+import { QRCodeCanvas } from 'qrcode.react';
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
@@ -168,30 +168,16 @@ export default function Home() {
     }
   }, []);
 
-  const descarcaQR = () => {
-    const svg = document.getElementById('qr-cod-generat');
-    if (!svg) return;
-    
-    const svgData = new XMLSerializer().serializeToString(svg);
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    const img = new Image();
-    
-    img.onload = () => {
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.fillStyle = "white"; // Fundal alb pentru scanare corectă
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0);
-      
-      const pngFile = canvas.toDataURL("image/png");
-      const downloadLink = document.createElement("a");
-      downloadLink.download = `ContractSmart_QR_${qrType}.png`;
-      downloadLink.href = pngFile;
-      downloadLink.click();
-    };
-    img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)));
-  };
+  const handleDownloadQR = () => {
+  const canvas = document.getElementById('contract-qr');
+  if (canvas) {
+    const pngUrl = canvas.toDataURL('image/png', 1.0); // 1.0 e calitatea maximă
+    const downloadLink = document.createElement('a');
+    downloadLink.href = pngUrl;
+    downloadLink.download = 'ContractSmart-QR.png';
+    downloadLink.click();
+  }
+};
 
   const calculeazaTaxeComplet = () => {
     const SALARIU_MINIM_2026 = 4050;
@@ -1241,8 +1227,17 @@ export default function Home() {
 
                  </div>
                  <div className="flex-col gap-3 shrink-0 bg-white p-2 rounded-xl">
-                  <QRCodeSVG id="qr-cod-generat" value={genereazaValoareQR()} size={140}/>
-                  <button onClick={descarcaQR}>Descarcă QR</button>
+                  <QRCodeCanvas 
+                      id="contract-qr"
+                      value={linkContract} 
+                      size={300}          // Dimensiune mult mai mare
+                      fgColor="#8ba888"   // Verdele Matcha al platformei
+                      level="H"           // Corecție erori maximă
+                      includeMargin={true}
+                    />
+                  <button onClick={handleDownloadQR} className="bg-[#8ba888] text-white font-bold py-2 px-4 rounded">
+                    Descărcare QR (PNG)
+                  </button>
                   </div>
               </div>
             </div>

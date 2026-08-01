@@ -151,7 +151,6 @@ export async function POST(request) {
       clauzeInjectateHtml += `<li><strong>ART. 4.19. SUPORTARE TAXE ȘI HONORARII NOTARIALE:</strong> Toate costurile privitoare la autentificarea actelor, taxele de intabulare ANCPI și onorariul notarului public cad în sarcina financiară exclusivă a Promitentului-Cumpărător.</li>`;
     }
 
-    // FUNCȚIE UTILITARĂ PENTRU RANDAREA FLUIDĂ SAU CURGEREA LINIEI DINAMICE CONFORM SIDEQUEST-ULUI
     const field = (valoare, minWidth = "120px") => {
       if (valoare && valoare.toString().trim() !== '') {
         return `<span class="valoare-importata">${valoare.toString().trim()}</span>`;
@@ -159,7 +158,6 @@ export async function POST(request) {
       return `<span class="linia-dinamica" style="min-width: ${minWidth};">&nbsp;</span>`;
     };
 
-    // CONSTRUCȚIA DOCUMENTULUI HTML - STANDARD ACADEMIC AVOCĂȚESC
     const htmlContract = `
       <!DOCTYPE html>
       <html>
@@ -180,7 +178,6 @@ export async function POST(request) {
           .signature-placeholder { height: 60px; font-size: 11px; color: #94a3b8; font-weight: normal; font-style: italic; padding-top: 20px; }
           .legal-footer { margin-top: 70px; border-top: 1px solid #e2e8f0; padding-top: 10px; font-size: 10px; color: #64748b; text-align: center; font-family: Arial, sans-serif; }
           
-          /* STILURI SPECIALE CSS PENTRU CURGEREA ORGANICĂ CONFORM SIDEQUEST */
           .linia-dinamica { display: inline-block; border-bottom: 1px solid #000000; vertical-align: bottom; height: 18px; }
           .valoare-importata { font-weight: bold; border-bottom: 1px transparent solid; display: inline; padding: 0 2px; }
         </style>
@@ -259,7 +256,6 @@ export async function POST(request) {
       </html>
     `;
 
-    // EXECUTAREA INTERNĂ ÎN PUPPETEER PENTRU VPS CLASIC / LOCAL
     let browser;
     if (process.env.NODE_ENV === 'development') {
       browser = await puppeteer.launch({ 
@@ -284,7 +280,6 @@ export async function POST(request) {
 
     await browser.close();
 
-    // DEDUCT CREDIT (doar dacă e plan Free și PDF-ul a fost generat cu succes)
     if (!isPremium && availableCredits > 0) {
       await supabase.from('profiles').update({ credits_remaining: availableCredits - 1 }).eq('id', userId);
     }
