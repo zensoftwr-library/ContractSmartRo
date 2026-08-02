@@ -32,6 +32,7 @@ export async function POST(request) {
     const isPremium = ['pro', 'founder', 'premium'].includes(tier);
     const availableCredits = profile?.credits_remaining || 0;
 
+    // Aici e validarea care te lasă să treci dacă ești Pro sau Founder
     if (!isPremium && availableCredits <= 0) {
       return NextResponse.json({ 
         success: false, 
@@ -260,6 +261,7 @@ export async function POST(request) {
     const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true, margin: { top: '40px', bottom: '40px', left: '40px', right: '40px' } });
     await browser.close();
 
+    // Scade creditul doar dacă utilizatorul nu are abonament Premium
     if (!isPremium && availableCredits > 0) {
       await supabase.from('profiles').update({ credits_remaining: availableCredits - 1 }).eq('id', userId);
     }

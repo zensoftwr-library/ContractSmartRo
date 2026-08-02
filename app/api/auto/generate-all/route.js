@@ -49,13 +49,15 @@ export async function POST(req) {
     const fisierBv = formData.get('buletin_vanzator');
     const fisierBc = formData.get('buletin_cumparator');
 
-    // 1. VERIFICARE DREPTURI ACCES AUTO (Fondator Free sau Achiziție Obligatorie)
+    // VERIFICARE DREPTURI ACCES AUTO (Fondator Free sau Achiziție Obligatorie)
     if (!data.userId) {
       return NextResponse.json({ success: false, message: 'Neautentificat' }, { status: 401 });
     }
     
     const { data: profile } = await supabase.from('profiles').select('subscription_tier').eq('id', data.userId).single();
     const tier = (profile?.subscription_tier || '').toLowerCase().trim();
+    
+    // Aici validăm rolul de fondator
     const isFounder = tier === 'founder';
 
     if (!isFounder) {
@@ -359,7 +361,6 @@ Infrastructură operată automat prin platforma securizată ContractSmart 2026.
 
     const zipContent = await zip.generateAsync({ type: "uint8array" });
 
-    // Trimitere e-mail automat via Resend cu pachetul .ZIP atașat
     if (process.env.RESEND_API_KEY && data.clientEmail) {
       try {
         const { Resend } = await import('resend');

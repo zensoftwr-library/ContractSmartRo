@@ -216,7 +216,7 @@ export default function Home() {
     }
 
     const totalTaxeAnuale = impozitFirma + cas + cass + dividendTax;
-    const tvaLunar = fiscal.platitorTva ? fiscal.venitLunar * 0.19 : 0;
+    const tvaLunar = fiscal.platitorTva ? fiscal.venitLunar * 0.21 : 0;
 
     return {
       taxeLunare: Math.round(totalTaxeAnuale / 12),
@@ -944,7 +944,7 @@ export default function Home() {
       
       {fiscal.platitorTva && (
          <div className="bg-[#0B0F12] p-2 rounded-xl border border-slate-800/40">
-           <span className="text-slate-500 block">TVA Colectat (19%):</span>
+           <span className="text-slate-500 block">TVA Colectat (21%):</span>
            <span className="text-slate-300 font-bold">{rezultateFiscale.tvaLunar} RON</span>
          </div>
       )}
