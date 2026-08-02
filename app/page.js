@@ -223,7 +223,8 @@ export default function Home() {
       netLunar: Math.round((brutAnual - totalTaxeAnuale) / 12),
       tvaLunar: Math.round(tvaLunar),
       defalcare: {
-        impozit: Math.round((impozitFirma + dividendTax) / 12),
+        impozit: Math.round(impozitFirma / 12), // Impozit micro separat
+        dividende: Math.round(dividendTax / 12), // Am adăugat dividendele
         sociale: Math.round((cas + cass) / 12)
       }
     };
@@ -933,7 +934,7 @@ export default function Home() {
     <div className="w-full space-y-3 mt-4">
       <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800/80 font-mono text-[11px]">
         <div className="bg-[#0B0F12] p-2 rounded-xl border border-slate-800/40">
-          <span className="text-slate-500 block">Impozit lunar estimat:</span>
+          <span className="text-slate-500 block">Impozit micro/venit:</span>
           <span className="text-slate-300 font-bold">{rezultateFiscale.defalcare.impozit} RON</span>
         </div>
         <div className="bg-[#0B0F12] p-2 rounded-xl border border-slate-800/40">
@@ -942,12 +943,21 @@ export default function Home() {
         </div>
       </div>
       
-      {fiscal.platitorTva && (
-         <div className="bg-[#0B0F12] p-2 rounded-xl border border-slate-800/40">
-           <span className="text-slate-500 block">TVA Colectat (21%):</span>
-           <span className="text-slate-300 font-bold">{rezultateFiscale.tvaLunar} RON</span>
-         </div>
-      )}
+      <div className="grid grid-cols-2 gap-2 font-mono text-[11px]">
+        {fiscal.formaJuridica === 'SRL' && (
+          <div className="bg-[#0B0F12] p-2 rounded-xl border border-slate-800/40">
+            <span className="text-slate-500 block">Impozit Dividende (8%):</span>
+            <span className="text-slate-300 font-bold">{rezultateFiscale.defalcare.dividende} RON</span>
+          </div>
+        )}
+        
+        {fiscal.platitorTva && (
+           <div className="bg-[#0B0F12] p-2 rounded-xl border border-slate-800/40">
+             <span className="text-slate-500 block">TVA Colectat (21%):</span>
+             <span className="text-slate-300 font-bold">{rezultateFiscale.tvaLunar} RON</span>
+           </div>
+        )}
+      </div>
 
       <div className="pt-2 border-t border-slate-800 bg-[#0B0F12] p-3 rounded-xl border border-slate-800/60 flex justify-between items-center text-xs">
         <div><span className="text-slate-400 block">Dări Stat (Total): <strong className="text-red-400 font-mono">{rezultateFiscale.taxeLunare} RON</strong></span></div>

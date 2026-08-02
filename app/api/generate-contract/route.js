@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import puppeteer from 'puppeteer';
 
 export const dynamic = 'force-dynamic';
-const supabase = createClient(process.env.SUPABASE_URL || '', process.env.SUPABASE_SERVICE_ROLE_KEY || '');
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
 export async function POST(request) {
   try {
@@ -29,7 +29,8 @@ export async function POST(request) {
       .single();
 
     const tier = (profile?.subscription_tier || 'free').toLowerCase().trim();
-    const isPremium = ['pro', 'founder', 'premium'].includes(tier);
+    const isPremium = tier.includes('founder') || tier.includes('pro');
+    console.log("Tier:", tier, "User:", userId);
     const availableCredits = profile?.credits_remaining || 0;
 
     // Aici e validarea care te lasă să treci dacă ești Pro sau Founder
