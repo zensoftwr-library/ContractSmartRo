@@ -1,9 +1,15 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import puppeteer from 'puppeteer';
+import twilio from 'twilio';
 
 export const dynamic = 'force-dynamic';
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+const supabase = createClient(process.env.SUPABASE_URL || '', process.env.SUPABASE_SERVICE_ROLE_KEY || '');
+
+const twilioClient = twilio(
+  process.env.TWILIO_ACCOUNT_SID || '',
+  process.env.TWILIO_AUTH_TOKEN || ''
+);
 
 export async function POST(request) {
   try {
@@ -15,7 +21,9 @@ export async function POST(request) {
     const body = await request.json();
     const { 
       tipContract, initiatorRol, obiect, valoare, moneda, 
-      prestatorNume, prestatorCui, clientNume, clientCui, semnăturaBase64, userId
+      prestatorNume, prestatorCui, clientNume, clientCui, 
+      clientEmail, clientTelefon, trimitePeWhatsApp, 
+      semnăturaBase64, userId
     } = body;
 
     if (!userId) {
@@ -30,10 +38,8 @@ export async function POST(request) {
 
     const tier = (profile?.subscription_tier || 'free').toLowerCase().trim();
     const isPremium = tier.includes('founder') || tier.includes('pro');
-    console.log("Tier:", tier, "User:", userId);
     const availableCredits = profile?.credits_remaining || 0;
 
-    // Aici e validarea care te lasă să treci dacă ești Pro sau Founder
     if (!isPremium && availableCredits <= 0) {
       return NextResponse.json({ 
         success: false, 
@@ -262,12 +268,63 @@ export async function POST(request) {
     const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true, margin: { top: '40px', bottom: '40px', left: '40px', right: '40px' } });
     await browser.close();
 
-    // Scade creditul doar dacă utilizatorul nu are abonament Premium
+    // -------------------------------------------------------------------------
+    // TRIMITE EMAIL VIA RESEND
+    // -------------------------------------------------------------------------
+    if (process.env.RESEND_API_KEY && clientEmail) {
+      try {
+        const { Resend } = await import('resend');
+        const resend = new Resend(process.env.RESEND_API_KEY);
+
+        await resend.emails.send({
+          from: 'ContractSmart <onboarding@resend.dev>',
+          to: clientEmail,
+          subject: `Document Securizat - ${titluContractOficial}`,
+          text: `Salutare!\n\nRegăsiți atașat contractul comercial generat securizat prin intermediul platformei ContractSmart.\n\nO zi excelentă!`,
+          attachments: [
+            {
+              filename: `contract_${tipContract}_securizat.pdf`,
+              content: Buffer.from(pdfBuffer),
+            },
+          ],
+        });
+        console.log("E-mail expediat cu succes către:", clientEmail);
+      } catch (emailErr) {
+        console.error("Eroare trimitere e-mail Resend:", emailErr.message);
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // TRIMITE WHATSAPP VIA TWILIO
+    // -------------------------------------------------------------------------
+    if (trimitePeWhatsApp && clientTelefon && process.env.TWILIO_WHATSAPP_FROM) {
+      try {
+        const numarDestinatar = clientTelefon.trim();
+        const formatE164 = numarDestinatar.startsWith('+') ? numarDestinatar : `+4${numarDestinatar}`;
+        
+        await twilioClient.messages.create({
+          from: process.env.TWILIO_WHATSAPP_FROM,
+          to: `whatsapp:${formatE164}`,
+          body: `Salutare! Documentul dvs. (${titluContractOficial}) a fost emis și transmis în siguranță pe e-mail via ContractSmart.`
+        });
+        console.log("Mesaj WhatsApp trimis cu succes către:", formatE164);
+      } catch (twilioError) {
+        console.error("Eroare trimitere WhatsApp Twilio:", twilioError.message);
+      }
+    }
+
     if (!isPremium && availableCredits > 0) {
       await supabase.from('profiles').update({ credits_remaining: availableCredits - 1 }).eq('id', userId);
     }
 
-    return new NextResponse(pdfBuffer, { status: 200, headers: { 'Content-Type': 'application/pdf', 'Content-Disposition': `attachment; filename=contract_${tipContract}_securizat.pdf`, 'Content-Length': pdfBuffer.length }});
+    return new NextResponse(pdfBuffer, { 
+      status: 200, 
+      headers: { 
+        'Content-Type': 'application/pdf', 
+        'Content-Disposition': `attachment; filename=contract_${tipContract}_securizat.pdf`, 
+        'Content-Length': pdfBuffer.length 
+      }
+    });
   } catch (error) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
   }
