@@ -223,8 +223,8 @@ export default function Home() {
       netLunar: Math.round((brutAnual - totalTaxeAnuale) / 12),
       tvaLunar: Math.round(tvaLunar),
       defalcare: {
-        impozit: Math.round(impozitFirma / 12), // Impozit micro separat
-        dividende: Math.round(dividendTax / 12), // Am adăugat dividendele
+        impozit: Math.round(impozitFirma / 12),
+        dividende: Math.round(dividendTax / 12),
         sociale: Math.round((cas + cass) / 12)
       }
     };
@@ -662,6 +662,24 @@ export default function Home() {
     window.location.reload();
   };
 
+  const stergeCont = async () => {
+    if (!confirm("Ești sigur? Acțiunea este ireversibilă și pierzi toate contractele și creditele.")) return;
+    try {
+      const res = await fetch(`/api/user/manage?userId=${user.id}&email=${user.email}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        await supabase.auth.signOut();
+        setUser(null);
+        setWidgetCompany(null);
+        alert("Contul tău a fost șters.");
+      } else {
+        alert(data.message);
+      }
+    } catch {
+      alert("Eroare de rețea la ștergerea contului.");
+    }
+  };
+
   const handleAuthSubmit = async (e) => {
     e.preventDefault();
     if (!authEmail || !authPassword) return alert('Introdu datele complete.');
@@ -778,7 +796,9 @@ export default function Home() {
                     {user.status}
                   </span>
                 </span>
-                <button type="button" onClick={handleLogout} className="text-red-400 font-bold hover:underline">Ieșire</button>
+                <button type="button" onClick={handleLogout} className="text-slate-300 hover:text-white font-bold hover:underline">Ieșire</button>
+                <span className="text-slate-800">|</span>
+                <button type="button" onClick={stergeCont} className="text-red-500 font-bold hover:underline">Șterge Cont</button>
               </div>
             )}
             <button onClick={() => { const el = document.getElementById('sectiune-preturi'); el?.scrollIntoView({ behavior: 'smooth' }); }} className="bg-[#8ba888] hover:opacity-90 text-[#0B0F12] font-black text-xs px-4 py-2 rounded-xl transition shadow-lg shadow-[#8ba888]/10">Vezi Oferte</button>
@@ -796,7 +816,10 @@ export default function Home() {
             ) : (
               <div className="flex flex-col space-y-2 border-t border-slate-800/50 pt-2">
                 <span className="text-xs text-slate-400">Logat ca: {user.email}</span>
-                <button type="button" onClick={handleLogout} className="text-red-400 text-sm font-bold text-left">Ieșire din cont</button>
+                <div className="flex space-x-4 pt-1">
+                  <button type="button" onClick={handleLogout} className="text-slate-300 text-sm font-bold text-left hover:text-white">Ieșire</button>
+                  <button type="button" onClick={stergeCont} className="text-red-500 text-sm font-bold text-left hover:underline">Șterge Cont</button>
+                </div>
               </div>
             )}
             <button onClick={() => { setIsMobileMenuOpen(false); const el = document.getElementById('sectiune-preturi'); el?.scrollIntoView({ behavior: 'smooth' }); }} className="bg-[#8ba888] text-[#0B0F12] font-black text-sm px-4 py-3 rounded-xl text-center">Vezi Oferte</button>
