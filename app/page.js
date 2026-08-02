@@ -99,9 +99,6 @@ export default function Home() {
   const [widgetLoading, setWidgetLoading] = useState(false);
 
   const [anafCui, setAnafCui] = useState('');
-  const [rarWidgetVin, setRarWidgetVin] = useState('');
-  const [rarWidgetLoading, setRarWidgetLoading] = useState(false);
-  const [rarWidgetReport, setRarWidgetReport] = useState(null);
   const [isAiOpen, setIsAiOpen] = useState(false);
 
   const [fiscal, setFiscal] = useState({
@@ -124,7 +121,6 @@ export default function Home() {
     clauzaSplitPayment: false, clauzaRetentie: false
   });
 
-  const [rarData, setRarData] = useState(null);
   const [autoDocs, setAutoDocs] = useState({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon: null });
   const [isUploading, setIsUploading] = useState(false);
 
@@ -171,17 +167,14 @@ export default function Home() {
   const handleDownloadQR = () => {
     const canvas = document.getElementById('contract-qr');
     if (canvas) {
-      // Creăm un canvas temporar la o rezoluție mare (ex: 1000x1000 pixeli) pentru claritate maximă la descărcare
       const tempCanvas = document.createElement('canvas');
       tempCanvas.width = 1000;
       tempCanvas.height = 1000;
       const ctx = tempCanvas.getContext('2d');
       
-      // Umplem fundalul cu alb pentru contrast curat
       ctx.fillStyle = '#FFFFFF';
       ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
       
-      // Desenăm QR-ul original la scara mare
       ctx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
 
       const pngUrl = tempCanvas.toDataURL('image/png', 1.0);
@@ -223,9 +216,12 @@ export default function Home() {
     }
 
     const totalTaxeAnuale = impozitFirma + cas + cass + dividendTax;
+    const tvaLunar = fiscal.platitorTva ? fiscal.venitLunar * 0.19 : 0;
+
     return {
       taxeLunare: Math.round(totalTaxeAnuale / 12),
       netLunar: Math.round((brutAnual - totalTaxeAnuale) / 12),
+      tvaLunar: Math.round(tvaLunar),
       defalcare: {
         impozit: Math.round((impozitFirma + dividendTax) / 12),
         sociale: Math.round((cas + cass) / 12)
@@ -424,71 +420,6 @@ export default function Home() {
     }
   };
 
-  const handleQuickRarWidgetSubmit = async (e) => {
-    e.preventDefault();
-    const vinCurat = rarWidgetVin.replace(/[^A-HJ-NPR-Z0-9]/gi, '').toUpperCase().trim();
-    if (!vinCurat || vinCurat.length !== 17) return alert('Introdu o serie de șasiu (VIN) validă.');
-    
-    setRarWidgetLoading(true);
-    setRarWidgetReport(null);
-    try {
-      const res = await fetch('/api/auto/rar-check', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ vin: vinCurat, userId: user?.id || null })
-      }).then(r => r.json());
-
-      if (res.success && res.date) {
-        setRarWidgetReport({
-          ...res,
-          date: {
-            itpValid: res.date.itpValid,
-            dataExpirareItp: res.date.dataExpirareItp
-          }
-        });
-        
-        if (res.rarReport?.kmNeconformi || res.rarReport?.odometruProbleme) {
-          alert("⚠️ ATENȚIE: Raportul RAR indică suspiciuni de manipulare a odometrului (km dați înapoi) sau istoric de daune majore!");
-        }
-      } else {
-        alert(res.error || 'Eroare la interogarea RAR.');
-      }
-    } catch {
-      alert('Eroare de rețea la interogarea serverelor RAR.');
-    } finally {
-      setRarWidgetLoading(false);
-    }
-  };
-
-  const handleInterogareRar = async (e) => {
-    e.preventDefault();
-    if (!autoData.autoVin) return alert('Introdu seria de șasiu (VIN)!');
-    setAutoStep('rar_loading');
-
-    try {
-      const res = await fetch('/api/auto/rar-check', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ vin: autoData.autoVin, userId: user?.id || null })
-      });
-      const data = await res.json();
-      if (data.success) {
-        setRarData(data.rarReport);
-        setAutoStep('rar_result');
-        
-        if (data.rarReport?.kmNeconformi || data.rarReport?.odometruProbleme) {
-          alert("⚠️ ALERTĂ SISTEM: Acest vehicul prezintă neconcordanțe tehnice în baza de date RAR (posibili kilometri dați înapoi). Verificați cu atenție clauza de km garantați din procesul-verbal!");
-        }
-      } else {
-        alert(data.error || 'Nu s-au putut prelua datele de la RAR.');
-        setAutoStep('upload');
-      }
-    } catch {
-      alert('Eroare la comunicarea cu API-ul RAR.');
-      setAutoStep('upload');
-    }
-  };
-
   const handleCumparaPremium = async (tipProdus = 'founder') => {
     setLoading(true);
     try {
@@ -650,8 +581,7 @@ export default function Home() {
         ...autoData,
         clientEmail: user.email,
         userId: user.id, 
-        pretIncludeTVA: autoData.pretIncludeTVA,
-        rarReportBonus: rarData || null
+        pretIncludeTVA: autoData.pretIncludeTVA
       };
       
       binarFormData.append('autoDataJson', JSON.stringify(secureAutoDataPayload));
@@ -731,24 +661,6 @@ export default function Home() {
     window.location.reload();
   };
 
-  const stergeCont = async () => {
-    if (!confirm("Ești sigur? Acțiunea este ireversibilă și pierzi toate contractele și creditele.")) return;
-    try {
-      const res = await fetch(`/api/user/manage?userId=${user.id}&email=${user.email}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        await supabase.auth.signOut();
-        setUser(null);
-        setWidgetCompany(null);
-        alert("Contul tău a fost șters.");
-      } else {
-        alert(data.message);
-      }
-    } catch {
-      alert("Eroare de rețea la ștergerea contului.");
-    }
-  };
-
   const handleAuthSubmit = async (e) => {
     e.preventDefault();
     if (!authEmail || !authPassword) return alert('Introdu datele complete.');
@@ -798,34 +710,6 @@ export default function Home() {
     }
   };
 
-  const handleDynamicReportDownload = async (tip, cheieIdentificare) => {
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/verify/download-pdf`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tip: tip, identificator: cheieIdentificare, userId: user?.id })
-      });
-      if (res.ok) {
-        const blob = await res.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `raport_premium_${tip}_${cheieIdentificare}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.URL.revokeObjectURL(url);
-      } else {
-        alert('Eroare la descărcarea raportului din backend. Te rugăm să reîncerci.');
-      }
-    } catch {
-      alert('Eroare de rețea la descărcarea PDF-ului.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   if (!hydrated) {
     return <div className="min-h-screen bg-[#0B0F12]" />;
   }
@@ -855,7 +739,6 @@ export default function Home() {
       </div>
 
       {/* NAVBAR */}
-      {/* NAVBAR OPTIMIZAT */}
       <nav className="sticky top-0 z-40 backdrop-blur-md bg-[#0B0F12]/90 border-b border-slate-800 py-4 px-6 shadow-lg transition-all">
         <div className="flex justify-between items-center">
           <div className="w-[180px] h-[30px] flex items-center" onClick={() => setStep(1)}>
@@ -870,7 +753,6 @@ export default function Home() {
             </svg>
           </div>
           
-          {/* Buton Hamburger pentru Mobil */}
           <button 
             className="md:hidden text-[#8ba888] text-2xl focus:outline-none"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -878,7 +760,6 @@ export default function Home() {
             {isMobileMenuOpen ? '✕' : '☰'}
           </button>
 
-          {/* Meniu Desktop */}
           <div className="hidden md:flex items-center space-x-5">
             <Link href="/modele-contracte" className="text-xs text-slate-400 hover:text-white transition">Modele Contracte</Link>
             <span className="text-slate-800">|</span>
@@ -903,7 +784,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Meniu Mobil (Dropdown) */}
         {isMobileMenuOpen && (
           <div className="md:hidden flex flex-col space-y-4 pt-4 mt-4 border-t border-slate-800 animate-fadeIn">
             <Link href="/modele-contracte" className="text-sm text-slate-300 hover:text-white">Modele Contracte</Link>
@@ -929,9 +809,7 @@ export default function Home() {
         <div className="absolute w-[600px] h-[600px] rounded-full bg-slate-700/5 blur-[150px]" style={{ top: 'calc(50% - (var(--scroll-y) * 0.2))', right: '10%' }} />
       </div>
 
-      {/* CONȚINUT EXCLUSIV */}
       <div className="relative z-10">
-
         {/* MODAL AUTH */}
         {showAuthModal && (
           <div className="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn">
@@ -1063,6 +941,13 @@ export default function Home() {
           <span className="text-slate-300 font-bold">{rezultateFiscale.defalcare.sociale} RON</span>
         </div>
       </div>
+      
+      {fiscal.platitorTva && (
+         <div className="bg-[#0B0F12] p-2 rounded-xl border border-slate-800/40">
+           <span className="text-slate-500 block">TVA Colectat (19%):</span>
+           <span className="text-slate-300 font-bold">{rezultateFiscale.tvaLunar} RON</span>
+         </div>
+      )}
 
       <div className="pt-2 border-t border-slate-800 bg-[#0B0F12] p-3 rounded-xl border border-slate-800/60 flex justify-between items-center text-xs">
         <div><span className="text-slate-400 block">Dări Stat (Total): <strong className="text-red-400 font-mono">{rezultateFiscale.taxeLunare} RON</strong></span></div>
@@ -1130,7 +1015,7 @@ export default function Home() {
 
 </div>
 
-          </div>
+            </div>
         )}
 
         {/* STEP 2: MULTI-FORMULAR SECREȚIONAT STRUCTURAL */}
@@ -1291,8 +1176,8 @@ export default function Home() {
               ) : (
                 <form onSubmit={handleGenereazaPachetAuto} className="space-y-6" autoComplete="off">
                   <div className="border-b border-slate-800 pb-3">
-                    <h2 className="text-2xl font-black text-white">Asistent Automatizat de Vânzare Auto & Verificare RAR</h2>
-                    <p className="text-xs text-slate-400">Generare Contracte (5 exemplare), Fișă Înmatriculare și Verificare Cadru ITP/RAR</p>
+                    <h2 className="text-2xl font-black text-white">Asistent Automatizat de Vânzare Auto</h2>
+                    <p className="text-xs text-slate-400">Generare Contracte (5 exemplare) și Fișă Înmatriculare DITL</p>
                   </div>
 
                   {autoStep === 'upload' && (
@@ -1410,69 +1295,19 @@ export default function Home() {
                             </select>
                           </div>
                         </div>
+                        
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                           <input type="email" placeholder="Email Contracte Finalizate" autoComplete="new-password" required value={autoData.clientEmail} onChange={e => setAutoData({...autoData, clientEmail: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded-lg text-xs text-white outline-none" />
+                           <label className="flex items-center text-xs text-slate-400 cursor-pointer select-none border border-slate-800 rounded-lg p-2.5 bg-[#0B0F12]">
+                             <input type="checkbox" checked={autoData.pretIncludeTVA} onChange={e => setAutoData({...autoData, pretIncludeTVA: e.target.checked})} className="mr-2 accent-[#8ba888]" />
+                             <span>Prețul include TVA (Dacă Vânzătorul e PJ plătitor)</span>
+                           </label>
+                        </div>
+                        
                         <div className="flex justify-between items-center pt-2">
-                          <button type="button" onClick={() => { setStep(1); setAutoStep('upload'); }} className="text-xs text-slate-400 underline">Înapoi</button>
-                          <button type="button" onClick={handleInterogareRar} disabled={isUploading} className="bg-[#8ba888] text-black font-bold px-6 py-2.5 rounded-xl text-xs hover:opacity-90 transition">
-                            {isUploading ? 'Se procesează...' : 'Verifică Status ITP & Istoric RAR'}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {autoStep === 'rar_loading' && (
-                    <div className="py-12 text-center space-y-3">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-b-[#8ba888] mx-auto"></div>
-                      <p className="text-xs text-slate-400">Se apelează registrul tehnic pentru seria {autoData.autoVin}...</p>
-                    </div>
-                  )}
-
-                  {autoStep === 'rar_result' && (
-                    <div className="space-y-4">
-                      <div className="bg-[#16221A] border border-[#8ba888]/30 p-4 rounded-xl space-y-2">
-                        <span className="text-xs font-bold text-[#8ba888] uppercase block">✓ Validare Cadru Tehnic de Bază RAR</span>
-                        <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
-                          <div><span className="text-slate-400 block">Status ITP:</span> <span className="text-white">{rarData?.itpValid ? 'VALID' : 'EXPIRAT'}</span></div>
-                          <div><span className="text-slate-400 block">Valabilitate ITP:</span> <span className="text-white">{rarData?.itpData || '-'}</span></div>
-                        </div>
-                      </div>
-
-                      <div className="space-y-4">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <div className="space-y-2 bg-[#0B0F12] p-3 rounded-xl border border-slate-800">
-                            <span className="text-[11px] font-bold text-slate-400 uppercase block">Date Vânzător Oglindite</span>
-                            <input type="text" placeholder="Nume Vânzător" autoComplete="new-password" required value={autoData.vanzatorNume} onChange={e => setAutoData({...autoData, vanzatorNume: e.target.value})} className="w-full p-2 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none" />
-                            <input type="text" placeholder="CNP / CUI" autoComplete="new-password" required value={autoData.vanzatorCnp} onChange={e => setAutoData({...autoData, vanzatorCnp: e.target.value})} className="w-full p-2 bg-[#12181D] border border-slate-700 rounded text-xs text-white font-mono outline-none" />
-                          </div>
-                          <div className="space-y-2 bg-[#0B0F12] p-3 rounded-xl border border-slate-800">
-                            <span className="text-[11px] font-bold text-slate-400 uppercase block">Date Cumpărător Oglindite</span>
-                            <input type="text" placeholder="Nume Cumpărător" autoComplete="new-password" required value={autoData.cumparatorNume} onChange={e => setAutoData({...autoData, cumparatorNume: e.target.value})} className="w-full p-2 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none" />
-                            <input type="text" placeholder="CNP / CUI" autoComplete="new-password" required value={autoData.cumparatorCnp} onChange={e => setAutoData({...autoData, cumparatorCnp: e.target.value})} className="w-full p-2 bg-[#12181D] border border-slate-700 rounded text-xs text-white font-mono outline-none" />
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <div className="flex flex-col sm:flex-row gap-3">
-                            <input type="number" placeholder="Preț Vânzare Vehicul" autoComplete="new-password" required value={autoData.autoPret} onChange={e => setAutoData({...autoData, autoPret: e.target.value})} className="flex-1 p-2.5 bg-[#0B0F12] border border-slate-700 rounded-lg text-xs text-white outline-none w-full" />
-                            <select value={autoData.autoMoneda} onChange={e => setAutoData({...autoData, autoMoneda: e.target.value})} className="w-24 bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none">
-                              <option value="RON">RON</option>
-                              <option value="EUR">EUR</option>
-                            </select>
-                          </div>
-                          <input type="email" placeholder="Email Contracte Finalizate" autoComplete="new-password" required value={autoData.clientEmail} onChange={e => setAutoData({...autoData, clientEmail: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded-lg text-xs text-white outline-none" />
-                        </div>
-
-                        <div className="bg-[#0B0F12] p-4 rounded-xl border border-slate-800 flex justify-between items-center mb-4">
-                          <label className="flex items-center text-xs text-slate-400 cursor-pointer select-none">
-                            <input type="checkbox" checked={autoData.pretIncludeTVA} onChange={e => setAutoData({...autoData, pretIncludeTVA: e.target.checked})} className="mr-2 accent-[#8ba888]" />
-                            <span>Prețul include TVA (Tranzacție emisă de Persoană Juridică plătitoare)</span>
-                          </label>
-                        </div>
-
-                        <div className="flex justify-between items-center pt-2">
-                          <button type="button" onClick={() => setAutoStep('upload')} className="text-xs text-slate-400 underline">Înapoi la acte</button>
-                          <button type="submit" className="bg-[#8ba888] text-black font-black px-6 py-2.5 rounded-xl text-xs tracking-tight transition hover:opacity-90">
-                            Generează Pachet Securizat Auto .ZIP ({autoData.autoMoneda === 'EUR' ? `${Math.round(99 / cursBnr.eur)} EUR` : '99 RON'})
+                          <button type="button" onClick={() => { setStep(1); setAutoStep('upload'); }} className="text-xs text-slate-400 underline">Înapoi la panou</button>
+                          <button type="submit" disabled={isUploading || loading} className="bg-[#8ba888] text-black font-black px-6 py-2.5 rounded-xl text-xs tracking-tight transition hover:opacity-90">
+                            {loading ? 'Se procesează...' : `Generează Pachet Securizat Auto .ZIP (${autoData.autoMoneda === 'EUR' ? `${Math.round(99 / cursBnr.eur)} EUR` : '99 RON'})`}
                           </button>
                         </div>
                       </div>
@@ -1514,7 +1349,7 @@ export default function Home() {
             <h2 className="text-3xl font-black text-white tracking-tight">Planuri de Business, Pachete Auto & Micro-Tranzacții</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
-               
+                
             <div className="bg-[#12181D] border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
               <div>
                 <span className="text-[10px] font-mono text-emerald-500 font-bold block uppercase">Freemium</span>
