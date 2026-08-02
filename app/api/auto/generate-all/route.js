@@ -6,8 +6,7 @@ import twilio from 'twilio';
 
 export const dynamic = 'force-dynamic';
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
-
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 const twilioClient = twilio(
   process.env.TWILIO_ACCOUNT_SID || '',
   process.env.TWILIO_AUTH_TOKEN || ''
