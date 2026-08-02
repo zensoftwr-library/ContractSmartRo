@@ -196,14 +196,12 @@ export default function Home() {
     if (fiscal.formaJuridica === 'SRL') {
       impozitFirma = brutAnual * (fiscal.areAngajati ? 0.01 : 0.03);
       const profitRamas = brutAnual - impozitFirma;
-      dividendTax = profitRamas * 0.08;
+      dividendTax = profitRamas * 0.16; // Modificat de la 0.08 la 0.16
       
       if (profitRamas >= SALARIU_MINIM_2026 * 24) cass = SALARIU_MINIM_2026 * 24 * 0.10;
       else if (profitRamas >= SALARIU_MINIM_2026 * 12) cass = SALARIU_MINIM_2026 * 12 * 0.10;
       else if (profitRamas >= SALARIU_MINIM_2026 * 6) cass = SALARIU_MINIM_2026 * 6 * 0.10;
-    } else if (fiscal.formaJuridica === 'PFA_SISTEM_REAL') {
-      if (brutAnual >= SALARIU_MINIM_2026 * 24) cas = SALARIU_MINIM_2026 * 24 * 0.25;
-      else if (brutAnual >= SALARIU_MINIM_2026 * 12) cas = SALARIU_MINIM_2026 * 12 * 0.25;
+    }
       
       const bazzCass = Math.max(SALARIU_MINIM_2026 * 6, Math.min(brutAnual, SALARIU_MINIM_2026 * 60));
       cass = bazzCass * 0.10;
@@ -969,7 +967,7 @@ export default function Home() {
       <div className="grid grid-cols-2 gap-2 font-mono text-[11px]">
         {fiscal.formaJuridica === 'SRL' && (
           <div className="bg-[#0B0F12] p-2 rounded-xl border border-slate-800/40">
-            <span className="text-slate-500 block">Impozit Dividende (8%):</span>
+            <span className="text-slate-500 block">Impozit Dividende (16%):</span>
             <span className="text-slate-300 font-bold">{rezultateFiscale.defalcare.dividende} RON</span>
           </div>
         )}
