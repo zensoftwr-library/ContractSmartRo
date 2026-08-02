@@ -206,7 +206,7 @@ export default function Home() {
       const bazzCass = Math.max(SALARIU_MINIM_2026 * 6, Math.min(brutAnual, SALARIU_MINIM_2026 * 60));
       cass = bazzCass * 0.10;
       impozitFirma = Math.max(0, (brutAnual - cas) * 0.10);
-    } else {
+      else {
       const bazaCalcul = fiscal.normaRegiune;
       cas = bazaCalcul >= SALARIU_MINIM_2026 * 12 ? SALARIU_MINIM_2026 * 12 * 0.25 : 0;
       cass = bazaCalcul >= SALARIU_MINIM_2026 * 6 ? SALARIU_MINIM_2026 * 6 * 0.10 : SALARIU_MINIM_2026 * 6 * 0.10;
