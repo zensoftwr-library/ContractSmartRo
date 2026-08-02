@@ -194,19 +194,24 @@ export default function Home() {
     let dividendTax = 0;
 
     if (fiscal.formaJuridica === 'SRL') {
-      impozitFirma = brutAnual * (fiscal.areAngajati ? 0.01 : 0.03);
-      const profitRamas = brutAnual - impozitFirma;
-      dividendTax = profitRamas * 0.10; 
+      impozitFirma = brutAnual * 0.16;
+      const profitRamas = Math.max(0, brutAnual - impozitFirma);
+      dividendTax = profitRamas * 0.10;
       
-      if (profitRamas >= SALARIU_MINIM_2026 * 24) cass = SALARIU_MINIM_2026 * 24 * 0.10;
-      else if (profitRamas >= SALARIU_MINIM_2026 * 12) cass = SALARIU_MINIM_2026 * 12 * 0.10;
-      else if (profitRamas >= SALARIU_MINIM_2026 * 6) cass = SALARIU_MINIM_2026 * 6 * 0.10;
-    }
+      if (fiscal.areAngajati) {
+        cas = brutAnual * 0.25;
+        cass = brutAnual * 0.10;
+      }
+    } 
+    else if (fiscal.formaJuridica === 'PFA_SISTEM_REAL') {
+      if (brutAnual >= SALARIU_MINIM_2026 * 24) cas = SALARIU_MINIM_2026 * 24 * 0.25;
+      else if (brutAnual >= SALARIU_MINIM_2026 * 12) cas = SALARIU_MINIM_2026 * 12 * 0.25;
       
       const bazzCass = Math.max(SALARIU_MINIM_2026 * 6, Math.min(brutAnual, SALARIU_MINIM_2026 * 60));
       cass = bazzCass * 0.10;
       impozitFirma = Math.max(0, (brutAnual - cas) * 0.10);
-      else {
+    } 
+    else {
       const bazaCalcul = fiscal.normaRegiune;
       cas = bazaCalcul >= SALARIU_MINIM_2026 * 12 ? SALARIU_MINIM_2026 * 12 * 0.25 : 0;
       cass = bazaCalcul >= SALARIU_MINIM_2026 * 6 ? SALARIU_MINIM_2026 * 6 * 0.10 : SALARIU_MINIM_2026 * 6 * 0.10;
