@@ -174,7 +174,7 @@ export default function Home() {
       
       ctx.fillStyle = '#FFFFFF';
       ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-      
+      ctx.imageSmoothingEnabled = false;
       ctx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
 
       const pngUrl = tempCanvas.toDataURL('image/png', 1.0);
