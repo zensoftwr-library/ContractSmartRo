@@ -9,7 +9,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 );
 
-// Aici am corectat numele variabilei în genAI
+// Inițializăm Gemini API cu cheia din .env
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
 export async function POST(request) {
@@ -20,6 +20,7 @@ export async function POST(request) {
       return NextResponse.json({ success: false, message: 'Mesajul utilizatorului lipsește.' }, { status: 400 });
     }
 
+    // 1. Verificarea limitelor utilizatorului
     if (userId) {
       const { data: profil } = await supabase
         .from('profiles')
@@ -43,17 +44,56 @@ export async function POST(request) {
       }
     }
 
+    // ==========================================
+    // INCEPUT SISTEM RAG CU GEMINI EMBEDDINGS
+    // ==========================================
+
+    // A. Transformăm întrebarea într-un vector numeric
+    const embeddingModel = genAI.getGenerativeModel({ model: "text-embedding-004" });
+    const embeddingResult = await embeddingModel.embedContent(message);
+    const queryEmbedding = embeddingResult.embedding.values;
+
+    // B. Căutăm în Supabase cele mai relevante 3 articole de lege
+    const { data: contextLegal } = await supabase.rpc('match_documents', {
+      query_embedding: queryEmbedding,
+      match_threshold: 0.75, 
+      match_count: 3
+    });
+
+    // C. Formatăm contextul găsit pentru a-l injecta în creierul AI-ului
+    let contextText = "";
+    if (contextLegal && contextLegal.length > 0) {
+      contextText = "CONTEXT LEGISLATIV EXTRAS (Folosește aceste informații pentru a răspunde):\n";
+      contextLegal.forEach(doc => {
+        contextText += `- ${doc.continut}\n`;
+      });
+    } else {
+      contextText = "Nu s-au găsit actualizări specifice în baza de date. Răspunde folosind cunoștințele tale generale despre legislația din România.";
+    }
+
+    // ==========================================
+    // SFÂRȘIT SISTEM RAG
+    // ==========================================
+
+    // 2. Configurarea Prompt-ului de Sistem (acum include și RAG)
     const systemInstruction = `Ești "Consilierul Smart AI", un asistent virtual dinamic și agil, specializat exclusiv în legislație comercială (Codul Civil curent), contracte B2B, prestări servicii, freelancing și birocrație auto din România.
     
     Reguli absolute de operare:
     1. NU ești un magistrat. Ești un consultant de business orientat spre soluții rapide și sigure.
     2. Răspunde concis, folosește liste cu bife (•).
     3. Explică avantajul practic al clauzelor.
-    4. Păstrează un ton amabil, profesionist și răspunde strict în limba română. (Reține: TVA standard este 21%)`;
+    4. Păstrează un ton amabil, profesionist și răspunde strict în limba română. (Reține: TVA standard este 21%, Impozit 16%, Dividende 10%).
+    5. BAZEAZĂ-TE ÎN PRIMUL RÂND pe următorul context legislativ extras din Monitorul Oficial pentru a răspunde:
+    
+    ${contextText}`;
 
-    // Am schimbat modelul in gemini-3.5-flash pentru disponibilitate stabila in Vercel
-    const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
+    // 3. Inițializăm modelul tău preferat (gemini-3.5-flash) și îi dăm instrucțiunile
+    const chatModel = genAI.getGenerativeModel({ 
+      model: "gemini-3.5-flash",
+      systemInstruction: { parts: [{ text: systemInstruction }] }
+    });
 
+    // 4. Formatarea istoricului pentru Gemini
     const contents = [];
     if (history && history.length > 0) {
       history.forEach(msg => {
@@ -69,7 +109,8 @@ export async function POST(request) {
       parts: [{ text: message }]
     });
 
-    const result = await model.generateContent({
+    // 5. Generarea răspunsului final
+    const result = await chatModel.generateContent({
       contents: contents,
       generationConfig: {
         temperature: 0.4,
