@@ -921,12 +921,19 @@ setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon
         {step === 1 && (
           <div className="w-full">
             <div className="max-w-4xl mx-auto text-center py-16 px-4">
-              <span className="bg-[#16221A] text-[#8ba888] border border-[#8ba888]/20 text-[10px] sm:text-xs font-bold px-4 py-1.5 rounded-full tracking-wider uppercase">
-                Infrastructură Electronică
+              <span className="hidden md:inline-block bg-[#16221A] text-[#8ba888] border border-[#8ba888]/20 text-xs font-bold px-4 py-1.5 rounded-full tracking-wider uppercase">
+                Infrastructură Electronică de Securizare Comercială
               </span>
-              <span className="bg-[#16221A] text-[#8ba888] border border-[#8ba888]/20 text-[10px] sm:text-xs font-bold px-4 py-1.5 rounded-full tracking-wider uppercase">
-                de Securizare Comercială
-              </span>
+
+              {/* Varianta Mobile (două bule perfect rotunjite, vizibilă doar pe telefoane/tablete) */}
+              <div className="flex md:hidden flex-wrap justify-center gap-2">
+                <span className="bg-[#16221A] text-[#8ba888] border border-[#8ba888]/20 text-[10px] sm:text-xs font-bold px-4 py-1.5 rounded-full tracking-wider uppercase">
+                  Infrastructură Electronică
+                </span>
+                <span className="bg-[#16221A] text-[#8ba888] border border-[#8ba888]/20 text-[10px] sm:text-xs font-bold px-4 py-1.5 rounded-full tracking-wider uppercase">
+                  de Securizare Comercială
+                </span>
+              </div>
               <h1 className="text-5xl md:text-6xl font-black text-white mt-6 leading-tight tracking-tighter">Asigurarea Încasărilor <br/><span className="text-[#8ba888]">Privitor La Management de Clauze</span></h1>
               
               <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto px-4">
