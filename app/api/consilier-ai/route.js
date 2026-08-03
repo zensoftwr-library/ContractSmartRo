@@ -89,7 +89,7 @@ export async function POST(request) {
 
     // 3. Inițializăm modelul tău preferat (gemini-3.5-flash) și îi dăm instrucțiunile
     const chatModel = genAI.getGenerativeModel({ 
-      model: "gemini-3.5-flash",
+      model: "gemini-3.6-flash",
       systemInstruction: { parts: [{ text: systemInstruction }] }
     });
 
