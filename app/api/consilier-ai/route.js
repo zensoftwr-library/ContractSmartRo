@@ -49,7 +49,7 @@ export async function POST(request) {
     // ==========================================
 
     // A. Transformăm întrebarea într-un vector numeric
-    const embeddingModel = genAI.getGenerativeModel({ model: "text-embedding-004" });
+    const embeddingModel = genAI.getGenerativeModel({ model: "gemini-embedding-2" });
     const embeddingResult = await embeddingModel.embedContent(message);
     const queryEmbedding = embeddingResult.embedding.values;
 

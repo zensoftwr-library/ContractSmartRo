@@ -180,8 +180,14 @@ export default function Home() {
       const pngUrl = tempCanvas.toDataURL('image/png', 1.0);
       const downloadLink = document.createElement('a');
       downloadLink.href = pngUrl;
-      downloadLink.download = 'ContractSmart-QR-Mare.png';
+      downloadLink.download = 'ContractSmart-QR.png';
+      
+      // FIX-UL: Link-ul trebuie adăugat temporar în pagină pentru ca browserul să permită descărcarea
+      document.body.appendChild(downloadLink);
       downloadLink.click();
+      document.body.removeChild(downloadLink);
+    } else {
+      alert("Eroare: Codul QR nu a putut fi generat pentru descărcare.");
     }
   };
 
@@ -481,6 +487,8 @@ export default function Home() {
         document.body.removeChild(elementA);
         window.URL.revokeObjectURL(urlDownload);
         alert('Succes! Contractul a fost generat dinamic și descărcat automat în format PDF.');
+        setFormData({ tipContract: 'prestari', initiatorRol: 'prestator', prestatorNume: '', prestatorCui: '', prestatorEmail: '', prestatorLogo: '', prestatorCuloare: '#8ba888', clientNume: '', clientCui: '', clientEmail: '', clientTelefon: '', obiect: '', valoare: '', moneda: 'RON', emiteFacturaAvans: false, trimitePeWhatsApp: false, estePlatitorTVA: false, clauzaPi: true, clauzaPenalitati: true, clauzaRevizii: false, tarifOrar: '150', clauzaRawFoto: false, clauzaMarketingTerti: false, clauzaAprobareTacita: false, clauzaTaxaAnulare: false, clauzaSplitPayment: false, clauzaRetentie: false });
+curataCanvas();
       } else {
         const textEroare = await res.json();
         if (textEroare.needsPayment) {
@@ -616,6 +624,8 @@ export default function Home() {
         document.body.removeChild(elementA);
         window.URL.revokeObjectURL(urlDownload);
         setAutoStep('success');
+        setAutoData({ vanzatorTip: 'PF', vanzatorNume: '', vanzatorCnp: '', vanzatorCui: '', vanzatorRegCom: '', vanzatorSediu: '', cumparatorTip: 'PF', cumparatorNume: '', cumparatorCnp: '', cumparatorCui: '', cumparatorRegCom: '', cumparatorSediu: '', autoVin: '', autoMarcaModel: '', autoNumarInmatriculare: '', autoPret: '', clientEmail: '', autoAdresaVanzator: '', autoAdresaCumparator: '', pretIncludeTVA: false, autoMoneda: 'RON' });
+setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon: null });
       } else {
         const textEroare = await res.json();
         if (textEroare.needsPayment) {
