@@ -300,6 +300,19 @@ export default function Home() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   };
 
+  const handleInapoiPrincipal = () => {
+  setStep(1);
+  setAutoStep('upload');
+  
+  // Resetare date contract
+  setFormData({ tipContract: 'prestari', initiatorRol: 'prestator', prestatorNume: '', prestatorCui: '', prestatorEmail: '', prestatorLogo: '', prestatorCuloare: '#8ba888', clientNume: '', clientCui: '', clientEmail: '', clientTelefon: '', obiect: '', valoare: '', moneda: 'RON', emiteFacturaAvans: false, trimitePeWhatsApp: false, estePlatitorTVA: false, clauzaPi: true, clauzaPenalitati: true, clauzaRevizii: false, tarifOrar: '150', clauzaRawFoto: false, clauzaMarketingTerti: false, clauzaAprobareTacita: false, clauzaTaxaAnulare: false, clauzaSplitPayment: false, clauzaRetentie: false });
+  curataCanvas();
+
+  // Resetare date auto
+  setAutoData({ vanzatorTip: 'PF', vanzatorNume: '', vanzatorCnp: '', vanzatorCui: '', vanzatorRegCom: '', vanzatorSediu: '', cumparatorTip: 'PF', cumparatorNume: '', cumparatorCnp: '', cumparatorCui: '', cumparatorRegCom: '', cumparatorSediu: '', autoVin: '', autoMarcaModel: '', autoNumarInmatriculare: '', autoPret: '', clientEmail: '', autoAdresaVanzator: '', autoAdresaCumparator: '', pretIncludeTVA: false, autoMoneda: 'RON' });
+  setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon: null });
+};
+
   useEffect(() => {
     const fetchUserProfile = async (userId, email) => {
       try {
@@ -1068,7 +1081,7 @@ setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon
         {step === 2 && (
           <div className="max-w-3xl mx-auto py-6 px-4">
             <div className="mb-4 flex items-center justify-between bg-[#12181D] border border-slate-800/80 px-5 py-3 rounded-xl shadow-lg">
-              <button type="button" onClick={() => { setStep(1); setAutoStep('upload'); }} className="text-xs font-bold text-[#8ba888] hover:text-white flex items-center gap-1.5 transition">
+              <button type="button" onClick={handleInapoiPrincipal} className="text-xs font-bold text-[#8ba888] hover:text-white flex items-center gap-1.5 transition">
                 &larr; Înapoi la Panoul Principal
               </button>
               <span className="text-[10px] font-mono text-slate-500 uppercase">Configurare Securizată v2.0</span>
@@ -1213,7 +1226,7 @@ setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon
                   </div>
 
                   <div className="flex justify-between items-center pt-6 border-t border-slate-800">
-                    <button type="button" onClick={() => { setStep(1); setAutoStep('upload'); }} className="text-xs text-slate-400 underline">Înapoi</button>
+                    <button type="button" onClick={handleInapoiPrincipal} className="text-xs text-slate-400 underline">Înapoi</button>
                     <button type="submit" disabled={loading} className="bg-[#8ba888] text-[#0B0F12] font-black px-8 py-4 rounded-xl text-sm transition hover:opacity-90">
                       {loading ? 'Se înregistrează...' : 'Descărcare PDF directă'}
                     </button>
@@ -1351,7 +1364,7 @@ setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon
                         </div>
                         
                         <div className="flex justify-between items-center pt-2">
-                          <button type="button" onClick={() => { setStep(1); setAutoStep('upload'); }} className="text-xs text-slate-400 underline">Înapoi la panou</button>
+                          <button type="button" onClick={handleInapoiPrincipal} className="text-xs text-slate-400 underline">Înapoi la panou</button>
                           <button type="submit" disabled={isUploading || loading} className="bg-[#8ba888] text-black font-black px-6 py-2.5 rounded-xl text-xs tracking-tight transition hover:opacity-90">
                             {loading ? 'Se procesează...' : `Generează Pachet Securizat Auto .ZIP (${autoData.autoMoneda === 'EUR' ? `${Math.round(99 / cursBnr.eur)} EUR` : '99 RON'})`}
                           </button>
