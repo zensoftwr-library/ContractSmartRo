@@ -13,7 +13,7 @@ export async function POST(request) {
     const talonAuto = formData.get('talon_auto');
 
     if (!buletinVanzator || !buletinCumparator || !talonAuto) {
-      return NextResponse.json({ success: false, message: 'Toate documentele sunt obligatorii (Buletine + Talon).' }, { status: 400 });
+      return NextResponse.json({ success: false, message: 'Toate documentele sunt obligatorii (Buletine + Talon) pentru a compila dosarul.' }, { status: 400 });
     }
 
     // 1. SIMULARE OCR PRODUCȚIE (AICI SE VA CONECTA API-UL DE OCR EXTERN PRECUM BASE64.AI SAU GOOGLE VISION)
@@ -44,7 +44,7 @@ export async function POST(request) {
       });
 
       if (resRar.ok) {
-        const rarData = await resRar.ok ? await resRar.json() : null;
+        const rarData = await resRar.json();
         if (rarData) {
           istoricAutoLive = {
             daune: rarData.are_daune || false,
@@ -72,7 +72,7 @@ export async function POST(request) {
       success: true,
       date_acte: dateExtraseOCR,
       verificare_auto: istoricAutoLive,
-      mesaj_alerta: istoricAutoLive.kilometri_suspecti 
+      mesaj_alerta: (istoricAutoLive.kilometri_suspecti || istoricAutoLive.daune)
         ? "⚠️ WARNING: Modificări de kilometraj sau istoric de daune detectate în baza de date centralizată!" 
         : "✅ Date verificate. Vehiculul nu prezintă anomalii de kilometraj înregistrate."
     });

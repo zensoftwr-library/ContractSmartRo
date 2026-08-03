@@ -48,15 +48,13 @@ export async function POST(req) {
     const fisierBv = formData.get('buletin_vanzator');
     const fisierBc = formData.get('buletin_cumparator');
 
-    // VERIFICARE DREPTURI ACCES AUTO (Fondator Free sau Achiziție Obligatorie)
+    // VERIFICARE DREPTURI ACCES AUTO
     if (!data.userId) {
       return NextResponse.json({ success: false, message: 'Neautentificat' }, { status: 401 });
     }
     
     const { data: profile } = await supabase.from('profiles').select('subscription_tier').eq('id', data.userId).single();
     const tier = (profile?.subscription_tier || '').toLowerCase().trim();
-    
-    // Aici validăm rolul de fondator
     const isFounder = tier === 'founder';
 
     if (!isFounder) {
@@ -67,7 +65,7 @@ export async function POST(req) {
         .single();
         
       if (!achizitie) {
-        return NextResponse.json({ success: false, needsPayment: true, message: 'Acces interzis. Necesită achiziție individuală a pachetului auto sau cont de Membru Fondator.' }, { status: 403 });
+        return NextResponse.json({ success: false, needsPayment: true, message: 'Acces interzis. Necesită achiziție.' }, { status: 403 });
       }
     }
 
@@ -89,7 +87,6 @@ export async function POST(req) {
 
       if (data.pretIncludeTVA !== undefined) {
         insertPayload['pret_include_tva'] = !!data.pretIncludeTVA;
-        insertPayload['pretIncludeTVA'] = !!data.pretIncludeTVA;
       }
 
       await supabase.from('contracts').insert([insertPayload]);
@@ -112,12 +109,12 @@ export async function POST(req) {
       : " (net, operațiune neimpozabilă în sfera TVA / persoană fizică)";
 
     let dateVanzatorHtml = data.vanzatorTip === 'PJ' 
-      ? `Societatea ${field(data.vanzatorNume, "200px")}, CUI ${field(data.vanzatorCui, "100px")}, Reg. Com. ${field(data.vanzatorRegCom, "100px")}, cu sediul social în ${field(data.vanzatorSediu, "220px")}, reprezentată legal de ${field(data.vanzatorReprezentant, "150px")}`
-      : `Subsemnatul ${field(data.vanzatorNume, "200px")}, CNP ${field(data.vanzatorCnp, "110px")}, cu domiciliul în localitatea ${field(data.autoAdresaVanzator, "220px")}`;
+      ? `Societatea ${field(data.vanzatorNume, "200px")}, CUI ${field(data.vanzatorCui, "100px")}, Reg. Com. ${field(data.vanzatorRegCom, "100px")}, cu sediul social în ${field(data.vanzatorSediu, "220px")}, reprezentată legal conform actelor constitutive`
+      : `Subsemnatul/a ${field(data.vanzatorNume, "200px")}, CNP ${field(data.vanzatorCnp, "110px")}, cu domiciliul în localitatea ${field(data.autoAdresaVanzator, "220px")}`;
 
     let dateCumparatorHtml = data.cumparatorTip === 'PJ'
-      ? `Societatea ${field(data.cumparatorNume, "200px")}, CUI ${field(data.cumparatorCui, "100px")}, Reg. Com. ${field(data.cumparatorRegCom, "100px")}, cu sediul social în ${field(data.cumparatorSediu, "220px")}, reprezentată legal de ${field(data.cumparatorReprezentant, "150px")}`
-      : `Subsemnatul ${field(data.cumparatorNume, "200px")}, CNP ${field(data.cumparatorCnp, "110px")}, cu domiciliul în localitatea ${field(data.autoAdresaCumparator, "220px")}`;
+      ? `Societatea ${field(data.cumparatorNume, "200px")}, CUI ${field(data.cumparatorCui, "100px")}, Reg. Com. ${field(data.cumparatorRegCom, "100px")}, cu sediul social în ${field(data.cumparatorSediu, "220px")}, reprezentată legal conform actelor constitutive`
+      : `Subsemnatul/a ${field(data.cumparatorNume, "200px")}, CNP ${field(data.cumparatorCnp, "110px")}, cu domiciliul în localitatea ${field(data.autoAdresaCumparator, "220px")}`;
 
     const zip = new JSZip();
 
@@ -134,43 +131,61 @@ export async function POST(req) {
       .valoare-importata { font-weight: bold; padding: 0 3px; border-bottom: 1px transparent solid; }
     `;
 
+    // 1. CONTRACTUL DE VÂNZARE-CUMPĂRARE (Model ITĂ-014 cu clauze extinse)
     for (const ex of tipuriExemplare) {
       const htmlContractOficial = `
         <!DOCTYPE html>
-        <html>
+        <html lang="ro">
         <head>
           <meta charset="utf-8">
           <style>
-            body { font-family: 'Times New Roman', Times, serif; padding: 45px; color: #000; font-size: 12px; line-height: 1.5; }
-            .official-box { border: 2px solid #000; padding: 12px; margin-bottom: 25px; text-align: center; font-weight: bold; font-family: Arial, sans-serif; font-size: 11px; }
-            .title { text-align: center; font-size: 14px; font-weight: bold; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
-            .section-title { font-weight: bold; margin-top: 18px; margin-bottom: 6px; text-transform: uppercase; border-bottom: 1px solid #000; font-size: 12px; }
-            .row-data { margin-bottom: 8px; text-align: justify; text-indent: 25px; }
-            .signature-area { margin-top: 50px; display: flex; justify-content: space-between; page-break-inside: avoid; }
-            .sig-box { width: 45%; border-top: 1px solid #000; text-align: center; padding-top: 6px; font-weight: bold; font-size: 11px; }
+            @page { margin: 20mm 15mm; }
+            body { font-family: 'Times New Roman', Times, serif; color: #000; font-size: 11.5px; line-height: 1.4; }
+            .official-box { border: 2px solid #000; padding: 8px; margin-bottom: 15px; text-align: center; font-weight: bold; font-family: Arial, sans-serif; font-size: 10px; background-color: #f9f9f9; }
+            .title { text-align: center; font-size: 15px; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; }
+            .section-title { font-weight: bold; margin-top: 15px; margin-bottom: 5px; text-transform: uppercase; border-bottom: 1px solid #000; font-size: 12px; background-color: #f0f0f0; padding: 2px 5px; }
+            .row-data { margin-bottom: 8px; text-align: justify; }
+            .legal-clause { font-size: 10px; text-align: justify; margin-bottom: 6px; color: #111; }
+            .legal-clause strong { color: #000; }
+            .signature-area { margin-top: 35px; display: flex; justify-content: space-between; page-break-inside: avoid; }
+            .sig-box { width: 40%; border-top: 1px solid #000; text-align: center; padding-top: 5px; font-weight: bold; font-size: 11px; }
             ${stiluriSidequestComune}
           </style>
         </head>
         <body>
-          <div class="official-box">MODEL TIPIC OFICIAL MODEL ITĂ - 014 // ${ex.destinatie}</div>
-          <div class="title">CONTRACT DE ÎNSTRĂINARE - DOBÂNDIRE A UNUI MIJLOC DE TRANSPORT<br>Conform Prevederilor Codului Fiscal din România 2026</div>
+          <div class="official-box">MODEL ITĂ - 014 // ${ex.destinatie} <br/> Formular aprobat conform legislației fiscale și a Codului Civil în vigoare</div>
+          <div class="title">CONTRACT DE ÎNSTRĂINARE - DOBÂNDIRE A UNUI MIJLOC DE TRANSPORT</div>
           
-          <div class="section-title">1. PERSOANA CARE ÎNSTRĂINEAZĂ (VÂNZĂTOR)</div>
-          <div class="row-data">${dateVanzatorHtml}, deținător de drept al mijlocului de transport în baza actelor de proprietate și a certificatului de înmatriculare validat.</div>
+          <div class="section-title">CAP. I - PĂRȚILE CONTRACTANTE</div>
+          <div class="row-data"><strong>1. VÂNZĂTOR (Persoana care înstrăinează):</strong> ${dateVanzatorHtml}, în calitate de proprietar legal și exclusiv al bunului.</div>
+          <div class="row-data"><strong>2. CUMPĂRĂTOR (Persoana care dobândește):</strong> ${dateCumparatorHtml}, în calitate de dobânditor, care preia toate obligațiile fiscale născute din posesia bunului.</div>
 
-          <div class="section-title">2. PERSOANA CARE DOBÂNDEȘTE (CUMPĂRĂTOR)</div>
-          <div class="row-data">${dateCumparatorHtml}, care preia toate obligațiile fiscale născute din posesia bunului.</div>
+          <div class="section-title">CAP. II - OBIECTUL CONTRACTULUI ȘI DATELE DE IDENTIFICARE</div>
+          <div class="row-data">
+            Vânzătorul transmite dreptul de proprietate, iar Cumpărătorul preia bunul mobil (mijlocul de transport) având următoarele date tehnice: 
+            Marca și modelul: <strong>${field(data.autoMarcaModel, "150px")}</strong>, 
+            Număr de înmatriculare curent: <strong>${field(data.autoNumarInmatriculare, "100px")}</strong>, 
+            Serie Șasiu (VIN): <strong style="font-family: monospace; font-size: 13px;">${field(data.autoVin, "180px")}</strong>.
+          </div>
 
-          <div class="section-title">3. OBIECTUL CONTRACTULUI (IDENTIFICARE VEHICUL SUB PROFIL TEHNIC)</div>
-          <div class="row-data">Mijlocul de transport marca și modelul: ${field(data.autoMarcaModel, "150px")}, Număr de înmatriculare curent: ${field(data.autoNumarInmatriculare, "100px")}, Serie Șasiu (VIN): <strong style="font-family: monospace;">${field(data.autoVin, "180px")}</strong>.</div>
-          <div class="row-data"><strong>GARANȚIE CONTRACTUALĂ VRA (Vicii Ascunse):</strong> În conformitate cu normele imperative ale <strong>Art. 1707 din Codul Civil român</strong>, Vânzătorul garantează pe propria răspundere că bunul nu prezintă defecțiuni structurale, elemente de siguranță compromise sau manipulări ilicite ale odometrului/kilometrajului.</div>
+          <div class="section-title">CAP. III - PREȚUL ȘI MODALITATEA DE PLATĂ</div>
+          <div class="row-data">
+            Prețul vânzării, stabilit de comun acord, ferm și neajustabil, este de: <strong style="font-size: 13px;">${field(data.autoPret, "100px")} ${data.autoMoneda || 'RON'}</strong>${textTvaContract}. 
+            Plata se consideră efectuată integral, prin consimțământul părților, la data semnării prezentului înscris.
+          </div>
 
-          <div class="section-title">4. PREȚ, SCADENȚĂ ȘI ACHITARE BANCARĂ</div>
-          <div class="row-data">Prețul cert, lichid și exigibil stabilit de comun acord pentru înstrăinarea vehiculului este de: <strong style="font-size: 13px;">${field(data.autoPret, "100px")} ${data.autoMoneda || 'RON'}</strong>${textTvaContract}, sumă stinsă integral prin decontare directă sau ordin de plată anexat.</div>
+          <div class="section-title">CAP. IV - CLAUZE SPECIALE, RĂSPUNDERE ȘI GARANȚII JURIDICE</div>
+          <div class="legal-clause"><strong>Art. 4.1 Garanția contra evicțiunii:</strong> Vânzătorul garantează pe Cumpărător, conform Art. 1695 Cod Civil, împotriva oricărei evicțiuni totale sau parțiale. Vânzătorul declară pe proprie răspundere, sub sancțiunea legii penale (fals în declarații), că vehiculul este proprietatea sa exclusivă, este liber de sarcini, nu este gajat, sechestrat, nu face obiectul unui litigiu sau al unei proceduri de executare silită, iar taxele/impozitele locale sunt achitate la zi.</div>
+          <div class="legal-clause"><strong>Art. 4.2 Garanția pentru vicii și starea tehnică:</strong> Bunul se vinde în starea tehnică și estetică în care se află la momentul predării. Cumpărătorul declară că a inspectat vehiculul, a efectuat probele tehnice de drum și este de acord cu starea acestuia. Conform normelor imperative ale Art. 1707 Cod Civil, Vânzătorul răspunde exclusiv pentru viciile ascunse grave, existente la momentul predării, care nu puteau fi descoperite printr-o verificare rezonabilă.</div>
+          <div class="legal-clause"><strong>Art. 4.3 Transferul proprietății și al riscurilor:</strong> Dreptul de proprietate se transferă la momentul achitării prețului. Riscul pieirii fortuite și sarcina suportării oricăror cheltuieli, taxe, sancțiuni contravenționale (amenzi de circulație, C.N.A.I.R., parcări) și asigurări trec în mod irevocabil asupra Cumpărătorului din momentul semnării Procesului-Verbal de Predare-Primire.</div>
+          <div class="legal-clause"><strong>Art. 4.4 Prelucrarea datelor (GDPR):</strong> Părțile consimt reciproc la prelucrarea datelor cu caracter personal înscrise în prezentul contract strict în scopul executării tranzacției și îndeplinirii obligațiilor legale privind fiscalizarea și înmatricularea/radierea, conform Regulamentului (UE) 2016/679.</div>
+
+          <div class="section-title">CAP. V - DISPOZIȚII FINALE</div>
+          <div class="legal-clause">Prezentul contract a fost încheiat astăzi, <strong>${dataCurenta}</strong>, în 5 (cinci) exemplare originale, având aceeași forță juridică probantă, câte unul pentru fiecare parte, și 3 exemplare pentru autoritățile competente. Eventualele litigii decurgând din executarea prezentului contract se vor soluționa pe cale amiabilă, iar în caz de eșec, de către instanțele judecătorești competente material și teritorial.</div>
 
           <div class="signature-area">
-            <div class="sig-box">SEMNĂTURĂ VÂNZĂTOR / ȘTAMPILĂ</div>
-            <div class="sig-box">SEMNĂTURĂ CUMPĂRĂTOR</div>
+            <div class="sig-box">VÂNZĂTOR <br/> <span style="font-size: 9px; font-weight: normal;">(Semnătura și ștampila, după caz)</span></div>
+            <div class="sig-box">CUMPĂRĂTOR <br/> <span style="font-size: 9px; font-weight: normal;">(Semnătura și ștampila, după caz)</span></div>
           </div>
         </body>
         </html>
@@ -179,38 +194,51 @@ export async function POST(req) {
       zip.file(`01_Contract_Auto_Model_ITA014_Exemplar_${ex.nr}.pdf`, pdfBuffer);
     }
 
+    // 2. PROCESUL-VERBAL DE PREDARE-PRIMIRE (Transferul de răspundere)
     const htmlProcesVerbal = `
       <!DOCTYPE html>
-      <html>
+      <html lang="ro">
       <head>
         <meta charset="utf-8">
         <style>
-          body { font-family: 'Times New Roman', Times, serif; padding: 45px; color: #000; font-size: 12px; line-height: 1.5; }
-          .header-pv { text-align: center; font-weight: bold; border-bottom: 2px dashed #000; padding-bottom: 10px; margin-bottom: 25px; text-transform: uppercase; }
-          .title-pv { text-align: center; font-size: 15px; font-weight: bold; margin-bottom: 20px; }
-          .paragraph { text-align: justify; margin-bottom: 12px; text-indent: 25px; }
-          .sig-layout { margin-top: 60px; display: flex; justify-content: space-between; }
-          .sig-box { width: 45%; border-top: 1px solid #000; text-align: center; padding-top: 5px; font-weight: bold; }
+          @page { margin: 25mm 20mm; }
+          body { font-family: 'Times New Roman', Times, serif; color: #000; font-size: 13px; line-height: 1.6; }
+          .header-pv { text-align: center; font-weight: bold; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 30px; text-transform: uppercase; font-size: 12px; }
+          .title-pv { text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 25px; text-decoration: underline; }
+          .paragraph { text-align: justify; margin-bottom: 15px; text-indent: 20px;}
+          .highlight-box { border: 2px solid #b91c1c; background-color: #fef2f2; padding: 15px; margin: 20px 0; font-size: 12px; text-align: justify; }
+          .sig-layout { margin-top: 70px; display: flex; justify-content: space-between; page-break-inside: avoid; }
+          .sig-box { width: 40%; border-top: 1px solid #000; text-align: center; padding-top: 5px; font-weight: bold; }
           ${stiluriSidequestComune}
         </style>
       </head>
       <body>
-        <div class="header-pv">Act Accesoriu Procedural Obligatoriu // ContractSmart 2026</div>
-        <div class="title-pv">PROCES-VERBAL DE PREDARE - PRIMIRE VEHICUL</div>
+        <div class="header-pv">Anexă Obligatorie la Contractul de Înstrăinare-Dobândire • Conform Normelor Drpciv</div>
+        <div class="title-pv">PROCES-VERBAL DE PREDARE-PRIMIRE VEHICUL</div>
         
-        <div class="paragraph">Încheiat astăzi, data de <strong>${dataCurenta}</strong>, la ora exactă <strong>${oraCurenta}</strong>, ca urmare a perfectării contractului de înstrăinare-dobândire pentru vehiculul marca/model ${field(data.autoMarcaModel, "140px")}, având seria de șasiu ${field(data.autoVin, "180px")}.</div>
+        <div class="paragraph">Încheiat astăzi, <strong>${dataCurenta}</strong>, la ora exactă <strong>${oraCurenta}</strong>, ca act accesoriu la Contractul de Înstrăinare-Dobândire privind vehiculul marca/model <strong>${field(data.autoMarcaModel, "140px")}</strong>, având numărul de identificare (VIN) <strong style="font-family: monospace; font-size: 14px;">${field(data.autoVin, "180px")}</strong>.</div>
         
-        <div class="paragraph">Subsemnatul/Societatea Vânzătoare predă, iar Cumpărătorul primește vehiculul identificat mai sus, împreună cu următoarele accesorii corelative: cheile autoturismului (număr: ${field(data.autoCheiNumar || '2', "40px")}), Cartea de Identitate a Vehiculului (CIV), certificatul de înmatriculare (talonul) completat olograf pe verso cu textul „Înstrăinat către... la data de ${dataCurenta}” și asigurarea RCA validă.</div>
+        <div class="paragraph"><strong>1. OBIECTUL PREDĂRII:</strong> Vânzătorul predă, iar Cumpărătorul preia în posesie faptică vehiculul identificat mai sus. Odată cu autovehiculul, au fost predate următoarele bunuri și documente în original:</div>
+        <ul style="margin-top: -5px; list-style-type: disc;">
+          <li>Cartea de Identitate a Vehiculului (CIV);</li>
+          <li>Certificatul de Înmatriculare (Talonul), completat olograf pe verso la rubrica înstrăinării;</li>
+          <li>Chei de contact (Număr: <strong>${field(data.autoCheiNumar || '2', "30px")}</strong> bucăți);</li>
+          <li>Polita de asigurare RCA valabilă (dacă a fost convenit transferul temporar al acesteia).</li>
+        </ul>
+
+        <div class="paragraph"><strong>2. STAREA TEHNICĂ ȘI ODOMETRUL:</strong> Cumpărătorul confirmă că a preluat vehiculul în starea tehnică asumată prin contract. Rulajul indicat de odometru (kilometraj) la momentul predării fizice este de: <strong>${field(data.autoKilometri || '.......', "80px")} km</strong>.</div>
         
-        <div class="header-pv" style="border:none; margin: 15px 0; font-size:11px; text-align:justify; font-weight:bold; color:#ef4444;">
-          ⚠️ IMPLICAȚIE JURIDICĂ ABSOLUTĂ: Din secunda semnării prezentului proces-verbal, Cumpărătorul preia răspunderea civilă și penală integrală cu privire la exploatarea mijlocului de transport. Orice contravenție rutieră (amenzi de viteză, camere radar, rovinietă), accident sau delict civil comise post-predare revin de drept Cumpărătorului, Vânzătorul fiind exonerat total în fața instanțelor judecătorești.
+        <div class="highlight-box">
+          <strong>3. CLAUZĂ DE EXONERARE ABSOLUTĂ ȘI TRANSFERUL RĂSPUNDERII:</strong>
+          <br/><br/>
+          Părțile convin în mod expres și irevocabil că, începând cu data de <strong>${dataCurenta}</strong>, ora <strong>${oraCurenta}</strong>, Cumpărătorul preia integral și exclusiv paza juridică a bunului, precum și absolut orice răspundere civilă, contravențională sau penală legată de utilizarea, staționarea sau deplasarea acestuia pe drumurile publice.
+          <br/><br/>
+          Orice sancțiune (amendă C.N.A.I.R. pentru lipsă rovinietă, depășirea vitezei legale înregistrată de radare, parcări neregulamentare, taxe de pod/drum) sau daune provocate terților din accidente rutiere, survenite după data și ora menționate anterior, <strong>cad exclusiv în sarcina Cumpărătorului</strong>. Prezentul proces-verbal constituie probă absolută și titlu de exonerare de răspundere a Vânzătorului în fața organelor de Poliție, autorităților fiscale și a instanțelor de judecată.
         </div>
 
-        <div class="paragraph">Starea odometrului (kilometraj înregistrat în bord la momentul predării fizice): ${field(data.autoKilometri || '150000', "100px")} km.</div>
-
         <div class="sig-layout">
-          <div class="sig-box">AM PREDAT VEHICULUL (VÂNZĂTOR)</div>
-          <div class="sig-box">AM PRIMIT VEHICULUL (CUMPĂRĂTOR)</div>
+          <div class="sig-box">VÂNZĂTOR <br/><span style="font-weight: normal; font-size:10px;">(Am predat vehiculul și actele)</span></div>
+          <div class="sig-box">CUMPĂRĂTOR <br/><span style="font-weight: normal; font-size:10px;">(Am primit vehiculul și actele)</span></div>
         </div>
       </body>
       </html>
@@ -218,43 +246,66 @@ export async function POST(req) {
     const pdfPvBuffer = await randeazaHtmlInPdf(htmlProcesVerbal);
     zip.file(`06_Proces_Verbal_Predare_Primire_Exonerare_Raspundere.pdf`, pdfPvBuffer);
 
+    // 3. CERERILE OFICIALE DRPCIV / DITL
     const htmlCereriOficiale = `
       <!DOCTYPE html>
-      <html>
+      <html lang="ro">
       <head>
         <meta charset="utf-8">
         <style>
-          body { font-family: Arial, sans-serif; padding: 40px; color: #000; font-size: 11px; line-height: 1.4; }
-          .form-title { text-align: center; font-size: 13px; font-weight: bold; text-transform: uppercase; margin-bottom: 25px; }
-          .field-row { margin-bottom: 12px; border-bottom: 1px dotted #666; padding-bottom: 2px; height: 20px; }
+          @page { margin: 20mm; }
+          body { font-family: Arial, sans-serif; color: #000; font-size: 12px; line-height: 1.6; }
+          .form-title { text-align: center; font-size: 14px; font-weight: bold; text-transform: uppercase; margin-bottom: 30px; }
+          .form-subtitle { text-align: center; font-size: 12px; font-weight: bold; margin-bottom: 20px; }
+          .field-row { margin-bottom: 15px; border-bottom: 1px dotted #888; padding-bottom: 3px; }
           .page-break { page-break-before: always; }
           ${stiluriSidequestComune}
         </style>
       </head>
       <body>
-        <div class="form-title">CERERE PENTRU RADIEREA DIN EVIDENȚĂ A UNUI VEHICUL<br>Către Serviciul Public Regim Permise și Înmatriculări</div>
-        <div class="field-row">Subsemnatul/Societatea (Vânzător): ${field(data.vanzatorNume, "250px")}</div>
-        <div class="field-row">Identificator (CNP/CUI): ${field(data.vanzatorTip === 'PJ' ? data.vanzatorCui : data.vanzatorCnp, "150px")}</div>
-        <div class="field-row">Solicit radierea din circulație a vehiculului marca: ${field(data.autoMarcaModel, "180px")}</div>
-        <div class="field-row">Serie șasiu (VIN): ${field(data.autoVin, "180px")}, având numărul de înmatriculare: ${field(data.autoNumarInmatriculare, "120px")}.</div>
-        <div class="field-row">Motivul radierii: Înstrăinare conform contractului anexat la data de ${dataCurenta}.</div>
-        <div style="margin-top:40px; text-align:right; font-weight:bold;">Semnătură Vânzător: __________________</div>
+        <div class="form-title">CERERE PENTRU RADIEREA DIN EVIDENȚĂ A UNUI VEHICUL</div>
+        <div class="form-subtitle">Către Serviciul Public Comunitar Regim Permise și Înmatriculări Vehicule / DITL</div>
+        
+        <div class="field-row">Subsemnatul/Societatea (Vânzător): <strong>${field(data.vanzatorNume, "300px")}</strong></div>
+        <div class="field-row">C.I. (Serie/Nr) / CNP / CUI: <strong>${field(data.vanzatorTip === 'PJ' ? data.vanzatorCui : data.vanzatorCnp, "200px")}</strong></div>
+        <div class="field-row">Domiciliat / Sediul în: <strong>${field(data.vanzatorTip === 'PJ' ? data.vanzatorSediu : data.autoAdresaVanzator, "300px")}</strong></div>
+        <div class="field-row">Solicit radierea din evidența circulației a vehiculului marca: <strong>${field(data.autoMarcaModel, "200px")}</strong></div>
+        <div class="field-row">Serie șasiu (VIN): <strong style="font-family: monospace;">${field(data.autoVin, "200px")}</strong>, având numărul de înmatriculare: <strong>${field(data.autoNumarInmatriculare, "150px")}</strong>.</div>
+        <div class="field-row">Motivul radierii: Înstrăinare conform contractului de vânzare-cumpărare anexat, încheiat la data de ${dataCurenta}.</div>
+        
+        <div style="margin-top: 40px; text-align: right; font-weight: bold; padding-right: 50px;">
+          Data: ${dataCurenta}<br/><br/><br/>
+          Semnătură Vânzător / Ștampilă
+        </div>
 
         <div class="page-break"></div>
 
-        <div class="form-title">CERERE PENTRU ÎNMATRICULAREA UNUI VEHICUL<br>Către Serviciul Public Regim Permise și Înmatriculări</div>
-        <div class="field-row">Subsemnatul/Societatea (Cumpărător): ${field(data.cumparatorNume, "250px")}</div>
-        <div class="field-row">Identificator (CNP/CUI): ${field(data.cumparatorTip === 'PJ' ? data.cumparatorCui : data.cumparatorCnp, "150px")}</div>
-        <div class="field-row">Solicit înmatricularea în evidențele oficiale a vehiculului marca: ${field(data.autoMarcaModel, "180px")}</div>
-        <div class="field-row">Serie șasiu (VIN): <strong style="font-family:monospace;">${field(data.autoVin, "180px")}</strong>, preț achiziție: ${field(data.autoPret, "100px")} ${data.autoMoneda || 'RON'}.</div>
-        <div class="field-row">Solicit plăcuțe cu număr: [ ] La rând / [ ] Preferențial</div>
-        <div style="margin-top:40px; text-align:right; font-weight:bold;">Semnătură Cumpărător: __________________</div>
+        <div class="form-title">CERERE PENTRU ÎNMATRICULAREA / TRANSCRIEREA UNUI VEHICUL</div>
+        <div class="form-subtitle">Către Serviciul Public Comunitar Regim Permise și Înmatriculări Vehicule / DITL</div>
+        
+        <div class="field-row">Subsemnatul/Societatea (Cumpărător): <strong>${field(data.cumparatorNume, "300px")}</strong></div>
+        <div class="field-row">C.I. (Serie/Nr) / CNP / CUI: <strong>${field(data.cumparatorTip === 'PJ' ? data.cumparatorCui : data.cumparatorCnp, "200px")}</strong></div>
+        <div class="field-row">Domiciliat / Sediul în: <strong>${field(data.cumparatorTip === 'PJ' ? data.cumparatorSediu : data.autoAdresaCumparator, "300px")}</strong></div>
+        <div class="field-row">Solicit înmatricularea / transcrierea în evidențele oficiale a vehiculului marca: <strong>${field(data.autoMarcaModel, "200px")}</strong></div>
+        <div class="field-row">Serie șasiu (VIN): <strong style="font-family: monospace;">${field(data.autoVin, "200px")}</strong>, dobândit prin contract la prețul de: <strong>${field(data.autoPret, "100px")} ${data.autoMoneda || 'RON'}</strong>.</div>
+        <div class="field-row">Referitor la plăcuțele cu numărul de înmatriculare solicit: </div>
+        <div style="margin-left: 20px; line-height: 1.8;">
+          [ &nbsp; ] Atribuirea unui număr de înmatriculare la rând<br/>
+          [ &nbsp; ] Atribuirea unui număr de înmatriculare preferențial: ............................................<br/>
+          [ &nbsp; ] Păstrarea vechiului număr de înmatriculare (dacă este cazul)
+        </div>
+        
+        <div style="margin-top: 40px; text-align: right; font-weight: bold; padding-right: 50px;">
+          Data: ${dataCurenta}<br/><br/><br/>
+          Semnătură Cumpărător / Ștampilă
+        </div>
       </body>
       </html>
     `;
     const pdfCereriBuffer = await randeazaHtmlInPdf(htmlCereriOficiale);
     zip.file(`07_Cereri_Oficiale_Inmatriculare_si_Radiere_DRPCIV.pdf`, pdfCereriBuffer);
 
+    // ATAȘARE ACTE SCANATE
     if (fisierTalon && fisierTalon.size > 0) {
       zip.file(`Acte_Originale_Client/Copie_Certificat_Inmatriculare_Talon.jpg`, Buffer.from(await fisierTalon.arrayBuffer()));
     }
@@ -268,6 +319,7 @@ export async function POST(req) {
       zip.file(`Acte_Originale_Client/Copie_Act_Identitate_Cumparator.jpg`, Buffer.from(await fisierBc.arrayBuffer()));
     }
 
+    // GHID PROCEDURAL
     const continutGhidTxt = `CONTRACTSMART LEGAL-TECH // INSTRUCTAJ PROCEDURAL DOSAR AUTO
 ================================================================================
 Vehicul: ${data.autoMarcaModel || 'Mijloc Transport'} | VIN: ${data.autoVin || 'Nespecificat'}
@@ -342,6 +394,7 @@ Infrastructură operată automat prin platforma securizată ContractSmart 2026.
 
     zip.file(`Ghid_Post_Vanzare.txt`, continutGhidTxt);
 
+    // NOTIFICARE WHATSAPP TWILIO
     if (data.clientTelefon || data.clientEmail) {
       try {
         const numarDestinatar = data.clientTelefon ? data.clientTelefon.trim() : '';
@@ -360,6 +413,7 @@ Infrastructură operată automat prin platforma securizată ContractSmart 2026.
 
     const zipContent = await zip.generateAsync({ type: "uint8array" });
 
+    // EMAIL RESEND
     if (process.env.RESEND_API_KEY && data.clientEmail) {
       try {
         const { Resend } = await import('resend');
