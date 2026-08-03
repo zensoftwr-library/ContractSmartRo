@@ -761,7 +761,7 @@ setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon
 
   return (
     <div 
-      className="min-h-screen bg-[#0B0F12] text-slate-200 font-sans pb-16 relative overflow-x-hidden"
+      className="min-h-screen bg-[#0B0F12] text-slate-200 font-sans pb-16 relative overflow-clip"
       style={{
         '--scroll-y': `${scrollPercent * 100}%`,
         '--scroll-y-reverse': `${(1 - scrollPercent) * 100}%`
@@ -786,8 +786,8 @@ setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon
       {/* NAVBAR */}
       <nav className="sticky top-0 z-40 backdrop-blur-md bg-[#0B0F12]/90 border-b border-slate-800 py-4 px-6 shadow-lg transition-all">
         <div className="flex justify-between items-center">
-          <div className="w-[180px] h-[30px] flex items-center" onClick={() => setStep(1)}>
-            <svg viewBox="0 0 240 40" className="w-full h-full cursor-pointer">
+          <div className="w-[180px] h-[30px] flex items-center cursor-pointer" onClick={handleInapoiPrincipal}>
+            <svg viewBox="0 0 240 40" className="w-full h-full">
               <g transform="translate(0, 2)">
                 <path d="M24 6 C15 6, 8 13, 8 22 C8 31, 15 38, 24 38 C31 38, 37 33, 39 27" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round"/>
                 <path d="M16 21 L21 26 L32 12" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
@@ -806,9 +806,9 @@ setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon
           </button>
 
           <div className="hidden md:flex items-center space-x-5">
-            <Link href="/modele-contracte" className="text-xs text-slate-400 hover:text-white transition">Modele Contracte</Link>
+            <Link href="/modele-contracte" className="text-xs text-slate-400 hover:text-white transition">Modele Contracte Standard</Link>
             <span className="text-slate-800">|</span>
-            <Link href="/baza-legala" className="text-xs text-slate-400 hover:text-white transition">Validitate Juridică</Link>
+            <Link href="/baza-legala" className="text-xs text-slate-400 hover:text-white transition">Articole Validitate Juridică</Link>
             <span className="text-slate-800">|</span>
             <Link href="/termeni-si-conditii" className="text-xs text-slate-400 hover:text-white transition">Termeni și Condiții</Link>
             <span className="text-slate-800">|</span>
@@ -833,8 +833,8 @@ setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon
 
         {isMobileMenuOpen && (
           <div className="md:hidden flex flex-col space-y-4 pt-4 mt-4 border-t border-slate-800 animate-fadeIn">
-            <Link href="/modele-contracte" className="text-sm text-slate-300 hover:text-white">Modele Contracte</Link>
-            <Link href="/baza-legala" className="text-sm text-slate-300 hover:text-white">Validitate Juridică</Link>
+            <Link href="/modele-contracte" className="text-sm text-slate-300 hover:text-white">Modele Contracte Standard</Link>
+            <Link href="/baza-legala" className="text-sm text-slate-300 hover:text-white">Articole Validitate Juridică</Link>
             <Link href="/termeni-si-conditii" className="text-sm text-slate-300 hover:text-white">Termeni și Condiții</Link>
             
             {!user ? (
@@ -853,10 +853,10 @@ setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon
         )}
       </nav>
 
-      {/* AMBIENT BLOBS */}
-      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className="absolute w-[500px] h-[500px] rounded-full bg-[#8ba888]/5 blur-[120px]" style={{ top: 'calc(10% + (var(--scroll-y) * 0.3))', left: '15%' }} />
-        <div className="absolute w-[600px] h-[600px] rounded-full bg-slate-700/5 blur-[150px]" style={{ top: 'calc(50% - (var(--scroll-y) * 0.2))', right: '10%' }} />
+      {/* AMBIENT BLOBS - FIX PENTRU SAFARI */}
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-clip">
+        <div className="absolute w-[500px] h-[500px] rounded-full bg-[#8ba888]/5 blur-[100px] transform-gpu" style={{ top: 'calc(10% + (var(--scroll-y) * 0.3))', left: '15%' }} />
+        <div className="absolute w-[600px] h-[600px] rounded-full bg-slate-700/5 blur-[120px] transform-gpu" style={{ top: 'calc(50% - (var(--scroll-y) * 0.2))', right: '10%' }} />
       </div>
 
       <div className="relative z-10">
@@ -921,7 +921,12 @@ setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon
         {step === 1 && (
           <div className="w-full">
             <div className="max-w-4xl mx-auto text-center py-16 px-4">
-              <span className="bg-[#16221A] text-[#8ba888] border border-[#8ba888]/20 text-xs font-bold px-4 py-1.5 rounded-full tracking-wider uppercase">Infrastructură Electronică de Securizare Comercială</span>
+              <span className="bg-[#16221A] text-[#8ba888] border border-[#8ba888]/20 text-[10px] sm:text-xs font-bold px-4 py-1.5 rounded-full tracking-wider uppercase">
+                Infrastructură Electronică
+              </span>
+              <span className="bg-[#16221A] text-[#8ba888] border border-[#8ba888]/20 text-[10px] sm:text-xs font-bold px-4 py-1.5 rounded-full tracking-wider uppercase">
+                de Securizare Comercială
+              </span>
               <h1 className="text-5xl md:text-6xl font-black text-white mt-6 leading-tight tracking-tighter">Asigurarea Încasărilor <br/><span className="text-[#8ba888]">Privitor La Management de Clauze</span></h1>
               
               <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto px-4">
@@ -1483,7 +1488,11 @@ setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon
                 ) : (
                   aiChatMessages.map((msg, idx) => (
                     <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-[85%] p-3 rounded-xl text-xs ${msg.role === 'user' ? 'bg-[#8ba888] text-[#0B0F12]' : 'bg-[#12181D] border border-slate-800 text-slate-300'}`}>
+                      <div className={`max-w-[85%] p-3 text-xs shadow-md ${
+                        msg.role === 'user' 
+                          ? 'bg-[#8ba888] text-[#0B0F12] rounded-2xl rounded-tr-sm' 
+                          : 'bg-[#12181D] border border-slate-800 text-slate-300 rounded-2xl rounded-tl-sm'
+                      }`}>
                         {msg.content}
                       </div>
                     </div>
@@ -1529,7 +1538,7 @@ setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon
         <footer className="relative z-10 border-t border-slate-800 bg-[#0B0F12] pt-12 pb-8 mt-16 text-center">
           <div className="max-w-5xl mx-auto px-6 space-y-6">
             <div className="flex justify-center">
-              <div className="w-[180px] h-[30px]">
+              <div className="w-[180px] h-[30px] cursor-pointer" onClick={handleInapoiPrincipal}>
                 <svg viewBox="0 0 240 40" className="w-full h-full mx-auto">
                   <g transform="translate(0, 2)">
                     <path d="M24 6 C15 6, 8 13, 8 22 C8 31, 15 38, 24 38 C31 38, 37 33, 39 27" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round"/>
@@ -1549,7 +1558,7 @@ setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon
               <span>•</span>
               <Link href="/modele-contracte" className="hover:text-[#8ba888] transition">Modele Predefinite</Link>
               <span>•</span>
-              <Link href="/baza-legala" className="hover:text-[#8ba888] transition">Validitate Juridică & Cod Civil</Link>
+              <Link href="/baza-legala" className="hover:text-[#8ba888] transition">Articole Validitate Juridică & Cod Civil</Link>
             </div>
             <div className="pt-6 border-t border-slate-800/40 text-[11px] text-slate-500 font-mono">
               <p>© 2026 ContractSmart. Powered by ZenSoftware. Toate drepturile rezervate legal.</p>
