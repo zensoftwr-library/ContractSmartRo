@@ -86,7 +86,17 @@ export default function Home() {
   const [qrGeneratedUrl, setQrGeneratedUrl] = useState('');
 
   const [cursBnr, setCursBnr] = useState({ eur: '4.9752', usd: '4.5820' });
-  
+  const [qrColor, setQrColor] = useState('#000000');
+  const [qrLogo, setQrLogo] = useState(null);
+
+  const handleQrLogoUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => setQrLogo(event.target.result);
+      reader.readAsDataURL(file);
+    }
+  };
   const [indiciBursa, setIndiciBursa] = useState({
     bet: { puncte: '17,420.50', procent: '+1.24%', vol: '45.2M', high: '17,450.00', low: '17,210.20', trend: [] },
     sp500: { puncte: '5,310.12', procent: '+0.68%', vol: '2.1B', high: '5,325.50', low: '5,280.10', trend: [] },
@@ -171,40 +181,17 @@ export default function Home() {
   }, []);
 
   const handleDownloadQR = () => {
-    const canvas = document.getElementById('contract-qr');
+    // Acum țintim un QR invizibil, randat nativ la 1000x1000px, pentru o claritate absolut perfectă.
+    const canvas = document.getElementById('contract-qr-download');
     if (canvas) {
-      const tempCanvas = document.createElement('canvas');
-      tempCanvas.width = 1000;
-      tempCanvas.height = 1000;
-      const ctx = tempCanvas.getContext('2d');
-      
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-      ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
-
       try {
-        const dataUrl = tempCanvas.toDataURL('image/png', 1.0);
-        const arr = dataUrl.split(',');
-        const mime = arr[0].match(/:(.*?);/)[1];
-        const bstr = atob(arr[1]);
-        let n = bstr.length;
-        const u8arr = new Uint8Array(n);
-        while (n--) {
-          u8arr[n] = bstr.charCodeAt(n);
-        }
-        const blob = new Blob([u8arr], { type: mime });
-        const blobUrl = URL.createObjectURL(blob);
-        
+        const dataUrl = canvas.toDataURL('image/png', 1.0);
         const downloadLink = document.createElement('a');
-        downloadLink.href = blobUrl;
-        downloadLink.download = 'ContractSmart-QR.png';
-        
+        downloadLink.href = dataUrl;
+        downloadLink.download = 'ContractSmart-QR-HighRes.png';
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
-        
-        setTimeout(() => window.URL.revokeObjectURL(blobUrl), 200);
       } catch (e) {
         alert("Codul QR s-a generat, dar browserul blochează descărcarea automată.");
       }
@@ -1236,28 +1223,47 @@ export default function Home() {
                             <button onClick={() => handleCheckout('qr_branding')} className="text-[10px] font-bold text-amber-500 hover:underline">Deblochează (9€)</button>
                           )}
                         </label>
-                        <div className={`space-y-2 ${(profil?.subscription_tier === 'free' && !profil?.has_qr_branding) ? 'opacity-50 pointer-events-none' : ''}`}>
+                        <div className={`space-y-3 ${(profil?.subscription_tier === 'free' && !profil?.has_qr_branding) ? 'opacity-50 pointer-events-none' : ''}`}>
                           <div>
-                            <label className="text-slate-400 text-[10px] mb-1 block">Culoare QR</label>
-                            <input type="color" className="w-full h-8 rounded cursor-pointer" defaultValue="#000000" />
+                            <label className="text-slate-400 text-[10px] mb-1 block">Culoare QR (Alege sau Hex)</label>
+                            <div className="flex items-center gap-2">
+                              <input type="color" value={qrColor} onChange={(e) => setQrColor(e.target.value)} className="w-10 h-8 rounded cursor-pointer shrink-0 bg-transparent border-0 p-0" />
+                              <input type="text" value={qrColor} onChange={(e) => setQrColor(e.target.value)} placeholder="#000000" className="flex-1 bg-[#12181D] border border-slate-700 rounded-lg p-1.5 text-white text-xs font-mono outline-none focus:border-[#8ba888] transition-colors" />
+                            </div>
                           </div>
                           <div>
                             <label className="text-slate-400 text-[10px] mb-1 block">Încarcă Logo (Centru)</label>
-                            <input type="file" accept="image/png, image/jpeg" className="w-full text-[10px] text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-[10px] file:font-semibold file:bg-[#8ba888]/10 file:text-[#8ba888] hover:file:bg-[#8ba888]/20" />
+                            <input type="file" accept="image/png, image/jpeg, image/svg+xml" onChange={handleQrLogoUpload} className="w-full text-[10px] text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-[10px] file:font-semibold file:bg-[#8ba888]/10 file:text-[#8ba888] hover:file:bg-[#8ba888]/20" />
+                            {qrLogo && <button type="button" onClick={() => setQrLogo(null)} className="text-[10px] text-red-400 mt-1 hover:underline block">Șterge Logo ❌</button>}
                           </div>
                         </div>
                       </div>
 
                       <div className="bg-[#16221A] rounded-xl p-4 flex flex-col items-center justify-center border border-slate-800">
-                        <div className="bg-white p-2 rounded-xl shadow-lg mb-3 relative flex justify-center items-center">
+                        <div className="bg-white p-2 rounded-xl shadow-lg mb-3 relative flex justify-center items-center overflow-hidden">
+                          {/* 1. QR-ul Vizibil în Interfață (Mic, pentru Preview) */}
                           <QRCodeCanvas 
                             id="contract-qr"
                             value={getQrValue()} 
-                            size={100} 
+                            size={130} 
                             level={"H"}
-                            fgColor="#000000"
+                            fgColor={qrColor}
                             bgColor="#FFFFFF"
+                            imageSettings={qrLogo ? { src: qrLogo, height: 30, width: 30, excavate: true } : undefined}
                           />
+
+                          {/* 2. QR-ul Ascuns (Randat nativ la 1000px HD pentru un Export Perfect) */}
+                          <div className="hidden">
+                            <QRCodeCanvas 
+                              id="contract-qr-download"
+                              value={getQrValue()} 
+                              size={1000} 
+                              level={"H"}
+                              fgColor={qrColor}
+                              bgColor="#FFFFFF"
+                              imageSettings={qrLogo ? { src: qrLogo, height: 250, width: 250, excavate: true } : undefined}
+                            />
+                          </div>
                           {qrType === 'dynamic' && (
                             <div className="absolute -bottom-2 -right-2 bg-purple-600 p-1 rounded-full shadow-lg">
                               <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
