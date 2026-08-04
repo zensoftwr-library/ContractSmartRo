@@ -290,7 +290,7 @@ export async function POST(request) {
         });
         console.log("E-mail expediat cu succes către:", clientEmail);
       } catch (emailErr) {
-        console.error("Eroare trimitere e-mail Resend:", emailErr.message);
+        console.error("❌ EROARE RESEND DETALIATĂ:", emailErr);
       }
     }
 
@@ -309,7 +309,7 @@ export async function POST(request) {
         });
         console.log("Mesaj WhatsApp trimis cu succes către:", formatE164);
       } catch (twilioError) {
-        console.error("Eroare trimitere WhatsApp Twilio:", twilioError.message);
+        console.error("❌ EROARE TWILIO DETALIATĂ:", twilioError.status, twilioError.message);
       }
     }
 

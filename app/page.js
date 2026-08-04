@@ -980,9 +980,20 @@ setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon
       <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">Calculator Fiscal Inteligent (Plafoane CASS)</span>
       <div className="space-y-4 text-xs">
         <div>
-          <label className="text-slate-400 block mb-1">
-            Venit Brut Facturat Lunar: <span className="text-white font-mono font-bold">{fiscal.venitLunar.toLocaleString('ro-RO')} RON</span>
-          </label>
+          <div className="flex justify-between items-center mb-2">
+            <label className="text-slate-400 text-xs">Valoare Factură:</label>
+            <div className="flex items-center gap-1.5">
+              <input
+                type="number"
+                min="0"
+                value={fiscal.venitLunar === 0 ? '' : fiscal.venitLunar}
+                onChange={e => setFiscal({...fiscal, venitLunar: Number(e.target.value)})}
+                className="bg-[#0B0F12] border border-slate-700 rounded-lg px-2 py-1 text-white font-mono font-bold text-xs w-24 text-right outline-none focus:border-[#8ba888] transition-colors"
+                placeholder="0"
+              />
+              <span className="text-slate-400 font-mono text-xs">RON</span>
+            </div>
+          </div>
           <input 
             type="range" 
             min="0" 
