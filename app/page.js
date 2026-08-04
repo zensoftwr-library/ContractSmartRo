@@ -81,7 +81,38 @@ export default function Home() {
   const [isGeneratingShortlink, setIsGeneratingShortlink] = useState(false);
   const [showStatsModal, setShowStatsModal] = useState(false);
   const [qrStats, setQrStats] = useState([]);
+  const [editingQrId, setEditingQrId] = useState(null);
+  const [editQrUrl, setEditQrUrl] = useState('');
 
+  const handleEditQr = async (id) => {
+    if (!editQrUrl) return;
+    try {
+      const res = await fetch('/api/qr/manage', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, newUrl: editQrUrl, userId: user.id })
+      });
+      if (res.ok) {
+        setQrStats(prev => prev.map(q => q.id === id ? { ...q, url: editQrUrl } : q));
+        setEditingQrId(null);
+        setEditQrUrl('');
+      }
+    } catch(e) {}
+  };
+
+  const handleDeleteQr = async (id) => {
+    if (!confirm('Sigur vrei să ștergi acest link? Codul QR tipărit nu va mai duce nicăieri!')) return;
+    try {
+      const res = await fetch('/api/qr/manage', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, userId: user.id })
+      });
+      if (res.ok) {
+        setQrStats(prev => prev.filter(q => q.id !== id));
+      }
+    } catch(e) {}
+  };
   const [qrData, setQrData] = useState({ nume: '', telefon: '', iban: '', suma: '', url: '', email: '', functie: '', banca: '' });
   const [qrGeneratedUrl, setQrGeneratedUrl] = useState('');
 
@@ -972,25 +1003,40 @@ export default function Home() {
         {/* MODAL STATISTICI QR */}
         {showStatsModal && (
           <div className="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn">
-            <div className="bg-[#12181D] border border-slate-800 p-8 rounded-3xl max-w-lg w-full shadow-2xl relative">
-              <button type="button" onClick={() => setShowStatsModal(false)} className="absolute top-4 right-4 text-slate-500 hover:text-white text-md font-bold transition">✕</button>
-              <h3 className="text-xl font-black text-white mb-2">Panou Analiză QR</h3>
-              <p className="text-xs text-slate-400 mb-6">Urmărește performanța shortlink-urilor tale generate din platformă.</p>
+            <div className="bg-[#12181D] border border-slate-800 p-8 rounded-3xl max-w-2xl w-full shadow-2xl relative">
+              <button type="button" onClick={() => { setShowStatsModal(false); setEditingQrId(null); }} className="absolute top-4 right-4 text-slate-500 hover:text-white text-md font-bold transition">✕</button>
+              <h3 className="text-xl font-black text-white mb-2">Panou Analiză și Gestiune QR</h3>
+              <p className="text-xs text-slate-400 mb-6">Modifică destinația codurilor tipărite în timp real sau urmărește conversiile.</p>
               
               <div className="bg-[#0B0F12] rounded-xl border border-slate-800 overflow-hidden">
-                <div className="max-h-60 overflow-y-auto p-4 space-y-3">
+                <div className="max-h-80 overflow-y-auto p-4 space-y-3">
                   {qrStats.length === 0 ? (
                     <p className="text-xs text-slate-500 text-center py-4">Nu ai coduri dinamice generate încă.</p>
                   ) : (
                     qrStats.map((stat, i) => (
-                      <div key={i} className="bg-[#16221A] p-3 rounded-lg border border-slate-800/80 flex justify-between items-center">
-                        <div>
-                          <p className="text-xs text-white font-mono mb-1 truncate max-w-[200px]">{stat.url}</p>
-                          <p className="text-[10px] text-slate-500">ID: {stat.id} | Ultimul scan: {stat.lastScan ? new Date(stat.lastScan).toLocaleString('ro-RO') : 'Niciodată'}</p>
+                      <div key={i} className="bg-[#16221A] p-4 rounded-lg border border-slate-800/80 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div className="flex-1 w-full">
+                          {editingQrId === stat.id ? (
+                            <div className="flex gap-2 w-full mb-2">
+                              <input type="text" value={editQrUrl} onChange={(e) => setEditQrUrl(e.target.value)} placeholder="Noua destinație (https://...)" className="flex-1 bg-[#0B0F12] border border-slate-700 rounded p-1.5 text-xs text-white outline-none focus:border-[#8ba888]" />
+                              <button onClick={() => handleEditQr(stat.id)} className="bg-[#8ba888] text-black px-3 py-1.5 rounded text-xs font-bold hover:opacity-90">Salvează</button>
+                              <button onClick={() => setEditingQrId(null)} className="text-slate-400 px-2 text-xs hover:text-white">Anulează</button>
+                            </div>
+                          ) : (
+                            <p className="text-sm text-white font-mono mb-1 truncate max-w-[280px]" title={stat.url}>{stat.url}</p>
+                          )}
+                          <p className="text-[10px] text-slate-500">ID Cod: <strong className="text-slate-300">{stat.id}</strong> | Ultimul scan: {stat.lastScan ? new Date(stat.lastScan).toLocaleString('ro-RO') : 'Niciodată'}</p>
                         </div>
-                        <div className="text-right">
-                          <span className="block text-lg font-black text-purple-400">{stat.totalScans}</span>
-                          <span className="text-[10px] uppercase text-slate-500">Scanări</span>
+                        
+                        <div className="flex items-center gap-6 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-0 border-slate-800 pt-3 sm:pt-0">
+                          <div className="flex gap-3">
+                            <button onClick={() => { setEditingQrId(stat.id); setEditQrUrl(stat.url); }} className="text-[10px] text-[#8ba888] hover:underline uppercase font-bold">Editează</button>
+                            <button onClick={() => handleDeleteQr(stat.id)} className="text-[10px] text-red-400 hover:underline uppercase font-bold">Șterge</button>
+                          </div>
+                          <div className="text-right">
+                            <span className="block text-xl font-black text-purple-400">{stat.totalScans}</span>
+                            <span className="text-[10px] uppercase text-slate-500 font-bold">Scanări</span>
+                          </div>
                         </div>
                       </div>
                     ))
