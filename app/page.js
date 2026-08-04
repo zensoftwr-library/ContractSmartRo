@@ -2,8 +2,7 @@
 import './globals.css';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { QRCodeSVG } from 'qrcode.react'; // Changed to SVG since canvas is causing issues with LemonSqueezy UI below
-import { QRCodeCanvas } from 'qrcode.react';
+import { QRCodeSVG, QRCodeCanvas } from 'qrcode.react';
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
@@ -181,11 +180,7 @@ export default function Home() {
       ctx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
 
       try {
-        // 1. Luăm imaginea brută
         const dataUrl = tempCanvas.toDataURL('image/png', 1.0);
-        
-        // 2. O transformăm sincron într-un fișier fizic virtual (Blob)
-        // Această metodă trece de toate blocajele Safari / iOS WebKit
         const arr = dataUrl.split(',');
         const mime = arr[0].match(/:(.*?);/)[1];
         const bstr = atob(arr[1]);
@@ -195,11 +190,8 @@ export default function Home() {
           u8arr[n] = bstr.charCodeAt(n);
         }
         const blob = new Blob([u8arr], { type: mime });
-        
-        // 3. Generăm un URL scurt, nativ sistemului de operare (blob:http...)
         const blobUrl = URL.createObjectURL(blob);
         
-        // 4. Declansam descarcarea
         const downloadLink = document.createElement('a');
         downloadLink.href = blobUrl;
         downloadLink.download = 'ContractSmart-QR.png';
@@ -208,11 +200,9 @@ export default function Home() {
         downloadLink.click();
         document.body.removeChild(downloadLink);
         
-        // Eliberăm memoria după descărcare
         setTimeout(() => window.URL.revokeObjectURL(blobUrl), 200);
-        
       } catch (e) {
-        alert("Codul QR s-a generat, dar browserul acestui telefon blochează descărcarea automată. Folosește un alt browser.");
+        alert("Codul QR s-a generat, dar browserul blochează descărcarea automată.");
       }
     } else {
       alert("Eroare: Codul QR nu a putut fi generat pentru descărcare.");
@@ -329,17 +319,13 @@ export default function Home() {
   };
 
   const handleInapoiPrincipal = () => {
-  setStep(1);
-  setAutoStep('upload');
-  
-  // Resetare date contract
-  setFormData({ tipContract: 'prestari', initiatorRol: 'prestator', prestatorNume: '', prestatorCui: '', prestatorEmail: '', prestatorLogo: '', prestatorCuloare: '#8ba888', clientNume: '', clientCui: '', clientEmail: '', clientTelefon: '', obiect: '', valoare: '', moneda: 'RON', emiteFacturaAvans: false, trimitePeWhatsApp: false, estePlatitorTVA: false, clauzaPi: true, clauzaPenalitati: true, clauzaRevizii: false, tarifOrar: '150', clauzaRawFoto: false, clauzaMarketingTerti: false, clauzaAprobareTacita: false, clauzaTaxaAnulare: false, clauzaSplitPayment: false, clauzaRetentie: false });
-  curataCanvas();
-
-  // Resetare date auto
-  setAutoData({ vanzatorTip: 'PF', vanzatorNume: '', vanzatorCnp: '', vanzatorCui: '', vanzatorRegCom: '', vanzatorSediu: '', cumparatorTip: 'PF', cumparatorNume: '', cumparatorCnp: '', cumparatorCui: '', cumparatorRegCom: '', cumparatorSediu: '', autoVin: '', autoMarcaModel: '', autoNumarInmatriculare: '', autoPret: '', clientEmail: '', autoAdresaVanzator: '', autoAdresaCumparator: '', pretIncludeTVA: false, autoMoneda: 'RON' });
-  setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon: null });
-};
+    setStep(1);
+    setAutoStep('upload');
+    setFormData({ tipContract: 'prestari', initiatorRol: 'prestator', prestatorNume: '', prestatorCui: '', prestatorEmail: '', prestatorLogo: '', prestatorCuloare: '#8ba888', clientNume: '', clientCui: '', clientEmail: '', clientTelefon: '', obiect: '', valoare: '', moneda: 'RON', emiteFacturaAvans: false, trimitePeWhatsApp: false, estePlatitorTVA: false, clauzaPi: true, clauzaPenalitati: true, clauzaRevizii: false, tarifOrar: '150', clauzaRawFoto: false, clauzaMarketingTerti: false, clauzaAprobareTacita: false, clauzaTaxaAnulare: false, clauzaSplitPayment: false, clauzaRetentie: false });
+    curataCanvas();
+    setAutoData({ vanzatorTip: 'PF', vanzatorNume: '', vanzatorCnp: '', vanzatorCui: '', vanzatorRegCom: '', vanzatorSediu: '', cumparatorTip: 'PF', cumparatorNume: '', cumparatorCnp: '', cumparatorCui: '', cumparatorRegCom: '', cumparatorSediu: '', autoVin: '', autoMarcaModel: '', autoNumarInmatriculare: '', autoPret: '', clientEmail: '', autoAdresaVanzator: '', autoAdresaCumparator: '', pretIncludeTVA: false, autoMoneda: 'RON' });
+    setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon: null });
+  };
 
   useEffect(() => {
     const fetchUserProfile = async (userId, email) => {
@@ -536,7 +522,7 @@ export default function Home() {
         window.URL.revokeObjectURL(urlDownload);
         alert('Succes! Contractul a fost generat dinamic și descărcat automat în format PDF.');
         setFormData({ tipContract: 'prestari', initiatorRol: 'prestator', prestatorNume: '', prestatorCui: '', prestatorEmail: '', prestatorLogo: '', prestatorCuloare: '#8ba888', clientNume: '', clientCui: '', clientEmail: '', clientTelefon: '', obiect: '', valoare: '', moneda: 'RON', emiteFacturaAvans: false, trimitePeWhatsApp: false, estePlatitorTVA: false, clauzaPi: true, clauzaPenalitati: true, clauzaRevizii: false, tarifOrar: '150', clauzaRawFoto: false, clauzaMarketingTerti: false, clauzaAprobareTacita: false, clauzaTaxaAnulare: false, clauzaSplitPayment: false, clauzaRetentie: false });
-curataCanvas();
+        curataCanvas();
       } else {
         const textEroare = await res.json();
         if (textEroare.needsPayment) {
@@ -673,7 +659,7 @@ curataCanvas();
         window.URL.revokeObjectURL(urlDownload);
         setAutoStep('success');
         setAutoData({ vanzatorTip: 'PF', vanzatorNume: '', vanzatorCnp: '', vanzatorCui: '', vanzatorRegCom: '', vanzatorSediu: '', cumparatorTip: 'PF', cumparatorNume: '', cumparatorCnp: '', cumparatorCui: '', cumparatorRegCom: '', cumparatorSediu: '', autoVin: '', autoMarcaModel: '', autoNumarInmatriculare: '', autoPret: '', clientEmail: '', autoAdresaVanzator: '', autoAdresaCumparator: '', pretIncludeTVA: false, autoMoneda: 'RON' });
-setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon: null });
+        setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon: null });
       } else {
         const textEroare = await res.json();
         if (textEroare.needsPayment) {
@@ -888,7 +874,7 @@ setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon
         )}
       </nav>
 
-      {/* AMBIENT BLOBS - FIX PENTRU SAFARI */}
+      {/* AMBIENT BLOBS */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-clip">
         <div className="absolute w-[500px] h-[500px] rounded-full bg-[#8ba888]/5 blur-[100px] transform-gpu" style={{ top: 'calc(10% + (var(--scroll-y) * 0.3))', left: '15%' }} />
         <div className="absolute w-[600px] h-[600px] rounded-full bg-slate-700/5 blur-[120px] transform-gpu" style={{ top: 'calc(50% - (var(--scroll-y) * 0.2))', right: '10%' }} />
@@ -928,7 +914,7 @@ setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon
           </div>
         )}
 
-        {/* MODAL PLĂȚI PER CONTRACT */}
+        {/* MODAL PLĂȚI */}
         {showPaymentModal && (
           <div className="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn">
             <div className="bg-[#12181D] border border-slate-800 p-8 rounded-3xl max-w-md w-full shadow-2xl relative text-center">
@@ -952,15 +938,13 @@ setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon
           </div>
         )}
 
-        {/* DASHBOARD STEP 1 */}
+        {/* STEP 1: DASHBOARD / HOME */}
         {step === 1 && (
           <div className="w-full">
             <div className="max-w-4xl mx-auto text-center py-16 px-4">
               <span className="hidden md:inline-block bg-[#16221A] text-[#8ba888] border border-[#8ba888]/20 text-xs font-bold px-4 py-1.5 rounded-full tracking-wider uppercase">
                 Infrastructură Electronică de Securizare Comercială
               </span>
-
-              {/* Varianta Mobile (două bule perfect rotunjite, vizibilă doar pe telefoane/tablete) */}
               <div className="flex md:hidden flex-wrap justify-center gap-2">
                 <span className="bg-[#16221A] text-[#8ba888] border border-[#8ba888]/20 text-[10px] sm:text-xs font-bold px-4 py-1.5 rounded-full tracking-wider uppercase">
                   Infrastructură Electronică
@@ -981,251 +965,240 @@ setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon
               </div>
             </div>
 
-            {/* BENTO GRID ÎN 3 COLOANE */}
+            {/* BENTO GRID: CALCULATOR FISCAL + QR CODE STUDIO */}
             <div className="max-w-6xl mx-auto px-6 mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-  
-  {/* COLOANA 1: CALCULATOR FISCAL */}
-  <div className="bg-[#12181D] p-5 rounded-2xl border border-slate-800 shadow-xl flex flex-col justify-between">
-    <div>
-      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">Calculator Fiscal Inteligent (Plafoane CASS)</span>
-      <div className="space-y-4 text-xs">
-        <div>
-          <div className="flex justify-between items-center mb-2">
-            <label className="text-slate-400 text-xs">Valoare Factură:</label>
-            <div className="flex items-center gap-1.5">
-              <input
-                type="number"
-                min="0"
-                value={fiscal.venitLunar === 0 ? '' : fiscal.venitLunar}
-                onChange={e => setFiscal({...fiscal, venitLunar: Number(e.target.value)})}
-                className="bg-[#0B0F12] border border-slate-700 rounded-lg px-2 py-1 text-white font-mono font-bold text-xs w-24 text-right outline-none focus:border-[#8ba888] transition-colors"
-                placeholder="0"
-              />
-              <span className="text-slate-400 font-mono text-xs">RON</span>
+              
+              {/* COLOANA 1: CALCULATOR FISCAL */}
+              <div className="bg-[#12181D] p-5 rounded-2xl border border-slate-800 shadow-xl flex flex-col justify-between">
+                <div>
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">Calculator Fiscal Inteligent (Plafoane CASS)</span>
+                  <div className="space-y-4 text-xs">
+                    <div>
+                      <div className="flex justify-between items-center mb-2">
+                        <label className="text-slate-400 text-xs">Valoare Factură:</label>
+                        <div className="flex items-center gap-1.5">
+                          <input
+                            type="number"
+                            min="0"
+                            value={fiscal.venitLunar === 0 ? '' : fiscal.venitLunar}
+                            onChange={e => setFiscal({...fiscal, venitLunar: Number(e.target.value)})}
+                            className="bg-[#0B0F12] border border-slate-700 rounded-lg px-2 py-1 text-white font-mono font-bold text-xs w-24 text-right outline-none focus:border-[#8ba888] transition-colors"
+                            placeholder="0"
+                          />
+                          <span className="text-slate-400 font-mono text-xs">RON</span>
+                        </div>
+                      </div>
+                      <input 
+                        type="range" 
+                        min="0" 
+                        max="50000" 
+                        step="1" 
+                        value={fiscal.venitLunar} 
+                        onChange={e => setFiscal({...fiscal, venitLunar: Number(e.target.value)})} 
+                        className="w-full h-1 bg-slate-800 rounded appearance-none cursor-pointer accent-[#8ba888]" 
+                      />
+                    </div>
+                    <div className="grid grid-cols-1 gap-2">
+                      <div>
+                        <label className="text-slate-400 block mb-1">Formă de Organizare</label>
+                        <select value={fiscal.formaJuridica} onChange={e => setFiscal({...fiscal, formaJuridica: e.target.value})} className="w-full bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-white outline-none text-xs appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.2em_1.2em] bg-[right_0.7rem_center] bg-no-repeat pr-10">
+                          <option value="SRL">SRL (Microîntreprindere)</option>
+                          <option value="PFA_SISTEM_REAL">PFA (Sistem Real)</option>
+                        </select>
+                      </div>
+                    </div>
+                    {fiscal.formaJuridica !== 'PFA_SISTEM_REAL' && (
+                      <div className="grid grid-cols-2 gap-2 pt-1">
+                        <label className="flex items-center p-2 bg-[#0B0F12] rounded-lg border border-slate-800 cursor-pointer">
+                          <input type="checkbox" checked={fiscal.areAngajati} onChange={e => setFiscal({...fiscal, areAngajati: e.target.checked})} className="mr-2 accent-[#8ba888]" />
+                          Are Angajați
+                        </label>
+                        <label className="flex items-center p-2 bg-[#0B0F12] rounded-lg border border-slate-800/60 cursor-pointer">
+                          <input type="checkbox" checked={fiscal.platitorTva} onChange={e => setFiscal({...fiscal, platitorTva: e.target.checked})} className="mr-2 accent-[#8ba888]" />
+                          Plătitor TVA
+                        </label>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="w-full space-y-3 mt-4">
+                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800/80 font-mono text-[11px]">
+                    <div className="bg-[#0B0F12] p-2 rounded-xl border border-slate-800/40">
+                      <span className="text-slate-500 block">Impozit micro/venit:</span>
+                      <span className="text-slate-300 font-bold">{rezultateFiscale.defalcare.impozit} RON</span>
+                    </div>
+                    <div className="bg-[#0B0F12] p-2 rounded-xl border border-slate-800/40">
+                      <span className="text-slate-500 block">Contribuții (CAS/CASS):</span>
+                      <span className="text-slate-300 font-bold">{rezultateFiscale.defalcare.sociale} RON</span>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-2 font-mono text-[11px]">
+                    {fiscal.formaJuridica === 'SRL' && (
+                      <div className="bg-[#0B0F12] p-2 rounded-xl border border-slate-800/40">
+                        <span className="text-slate-500 block">Impozit Dividende (10%):</span>
+                        <span className="text-slate-300 font-bold">{rezultateFiscale.defalcare.dividende} RON</span>
+                      </div>
+                    )}
+                    
+                    {fiscal.platitorTva && (
+                       <div className="bg-[#0B0F12] p-2 rounded-xl border border-slate-800/40">
+                         <span className="text-slate-500 block">TVA Colectat (21%):</span>
+                         <span className="text-slate-300 font-bold">{rezultateFiscale.tvaLunar} RON</span>
+                       </div>
+                    )}
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-800 bg-[#0B0F12] p-3 rounded-xl border border-slate-800/60 flex justify-between items-center text-xs">
+                    <div><span className="text-slate-400 block">Dări Stat (Total): <strong className="text-red-400 font-mono">{rezultateFiscale.taxeLunare} RON</strong></span></div>
+                    <div className="text-right"><span className="text-slate-400 block">Profit Curat Net Lunar: <strong className="text-[#8ba888] font-mono text-sm">{rezultateFiscale.netLunar} RON</strong></span></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* COLOANA 2: QR CODE GENERATOR PRO */}
+              <div className="bg-[#0B0F12] border border-slate-800 rounded-xl p-6 shadow-2xl">
+                <div className="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
+                  <div>
+                    <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                      <span className="text-[#8ba888]">⚡</span> ContractSmart QR Studio
+                    </h3>
+                    <p className="text-slate-400 text-sm mt-1">Generează, personalizează și urmărește codurile tale QR.</p>
+                  </div>
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+                    profil?.subscription_tier === 'founder' ? 'bg-purple-900/30 text-purple-400 border border-purple-500/20' : 
+                    profil?.subscription_tier === 'pro' ? 'bg-blue-900/30 text-blue-400 border border-blue-500/20' : 
+                    'bg-slate-800 text-slate-300'
+                  }`}>
+                    {profil?.subscription_tier || 'Free'} Plan
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 gap-6">
+                  <div className="space-y-5">
+                    
+                    {/* 1. TIPUL DE COD QR */}
+                    <div>
+                      <label className="text-white font-semibold block mb-2 text-sm">1. Selectează tipul codului</label>
+                      <div className="grid grid-cols-3 gap-2">
+                        <button 
+                          onClick={() => setQrType('url')}
+                          className={`p-2 rounded-lg border text-xs font-medium transition-all ${qrType === 'url' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}
+                        >
+                          🌐 URL
+                        </button>
+                        
+                        <button 
+                          onClick={() => {
+                            if (profil?.subscription_tier === 'free' && !profil?.has_qr_vcard) {
+                              handleCheckout('qr_vcard');
+                            } else {
+                              setQrType('vcard');
+                            }
+                          }}
+                          className={`relative p-2 rounded-lg border text-xs font-medium transition-all ${qrType === 'vcard' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}
+                        >
+                          📇 vCard
+                          {(profil?.subscription_tier === 'free' && !profil?.has_qr_vcard) && <span className="absolute -top-2 -right-2 text-[10px] bg-amber-500 text-black px-1.5 rounded-full">9€</span>}
+                        </button>
+
+                        <button 
+                          onClick={() => {
+                            if (profil?.subscription_tier !== 'founder' && !profil?.has_qr_dynamic) {
+                              handleCheckout('qr_dynamic');
+                            } else {
+                              setQrType('dynamic');
+                            }
+                          }}
+                          className={`relative p-2 rounded-lg border text-xs font-medium transition-all flex flex-col justify-center items-center ${qrType === 'dynamic' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}
+                        >
+                          <span>🔄 Dinamic</span>
+                          {(profil?.subscription_tier !== 'founder' && !profil?.has_qr_dynamic) && <span className="absolute -top-2 -right-2 text-[10px] bg-purple-500 text-white px-1.5 rounded-full">VIP</span>}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* 2. CONȚINUT */}
+                    <div>
+                      <label className="text-white font-semibold block mb-2 text-sm">2. Destinație / Conținut</label>
+                      {qrType === 'url' && (
+                        <input 
+                          type="text" 
+                          placeholder="https://site-ul-tau.ro" 
+                          value={qrUrl}
+                          onChange={(e) => setQrUrl(e.target.value)}
+                          className="w-full bg-[#12181D] border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-[#8ba888] outline-none"
+                        />
+                      )}
+                      {qrType === 'vcard' && (
+                        <div className="grid grid-cols-2 gap-2">
+                          <input type="text" placeholder="Nume Complet" className="bg-[#12181D] border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-[#8ba888] outline-none col-span-2" />
+                          <input type="text" placeholder="Telefon" className="bg-[#12181D] border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-[#8ba888] outline-none" />
+                          <input type="email" placeholder="Email" className="bg-[#12181D] border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-[#8ba888] outline-none" />
+                        </div>
+                      )}
+                      {qrType === 'dynamic' && (
+                        <div className="p-3 bg-purple-900/20 border border-purple-500/30 rounded-lg">
+                          <p className="text-purple-300 text-[10px] mb-2 leading-tight">Codul tău va genera un link scurt securizat. Poți modifica destinația mai târziu.</p>
+                          <input type="text" placeholder="Destinația actuală (URL)" className="w-full bg-[#12181D] border border-purple-500/50 rounded-lg p-2 text-white text-sm outline-none" />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 3. BRANDING & PREVIEW ROW */}
+                    <div className="grid grid-cols-2 gap-4 items-end">
+                      <div>
+                        <label className="text-white font-semibold block mb-2 flex items-center justify-between text-sm">
+                          <span>3. Branding Visual</span>
+                          {(profil?.subscription_tier === 'free' && !profil?.has_qr_branding) && (
+                            <button onClick={() => handleCheckout('qr_branding')} className="text-[10px] font-bold text-amber-500 hover:underline">Deblochează (9€)</button>
+                          )}
+                        </label>
+                        <div className={`space-y-2 ${(profil?.subscription_tier === 'free' && !profil?.has_qr_branding) ? 'opacity-50 pointer-events-none' : ''}`}>
+                          <div>
+                            <label className="text-slate-400 text-[10px] mb-1 block">Culoare QR</label>
+                            <input type="color" className="w-full h-8 rounded cursor-pointer" defaultValue="#000000" />
+                          </div>
+                          <div>
+                            <label className="text-slate-400 text-[10px] mb-1 block">Încarcă Logo (Centru)</label>
+                            <input type="file" accept="image/png, image/jpeg" className="w-full text-[10px] text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-[10px] file:font-semibold file:bg-[#8ba888]/10 file:text-[#8ba888] hover:file:bg-[#8ba888]/20" />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="bg-[#16221A] rounded-xl p-4 flex flex-col items-center justify-center border border-slate-800">
+                        <div className="bg-white p-2 rounded-xl shadow-lg mb-3 relative flex justify-center items-center">
+                          <QRCodeCanvas 
+                            id="contract-qr"
+                            value={qrUrl || 'https://contractsmart.ro'} 
+                            size={100} 
+                            level={"H"}
+                            fgColor="#000000"
+                            bgColor="#FFFFFF"
+                          />
+                          {qrType === 'dynamic' && (
+                            <div className="absolute -bottom-2 -right-2 bg-purple-600 p-1 rounded-full shadow-lg">
+                              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            </div>
+                          )}
+                        </div>
+
+                        <button 
+                          onClick={handleDownloadQR}
+                          className="w-full py-2 bg-[#8ba888] hover:bg-[#7a9677] text-[#0B0F12] font-bold rounded-lg transition-colors flex justify-center items-center gap-2 text-xs"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                          Descarcă QR HD
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <input 
-            type="range" 
-            min="0" 
-            max="50000" 
-            step="1" 
-            value={fiscal.venitLunar} 
-            onChange={e => setFiscal({...fiscal, venitLunar: Number(e.target.value)})} 
-            className="w-full h-1 bg-slate-800 rounded appearance-none cursor-pointer accent-[#8ba888]" 
-          />
-        </div>
-        <div className="grid grid-cols-1 gap-2">
-          <div>
-            <label className="text-slate-400 block mb-1">Formă de Organizare</label>
-            <select value={fiscal.formaJuridica} onChange={e => setFiscal({...fiscal, formaJuridica: e.target.value})} className="w-full bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-white outline-none text-xs appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.2em_1.2em] bg-[right_0.7rem_center] bg-no-repeat pr-10">
-              <option value="SRL">SRL (Microîntreprindere)</option>
-              <option value="PFA_SISTEM_REAL">PFA (Sistem Real)</option>
-            </select>
-          </div>
-        </div>
-        {fiscal.formaJuridica !== 'PFA_SISTEM_REAL' && (
-          <div className="grid grid-cols-2 gap-2 pt-1">
-            <label className="flex items-center p-2 bg-[#0B0F12] rounded-lg border border-slate-800 cursor-pointer">
-              <input type="checkbox" checked={fiscal.areAngajati} onChange={e => setFiscal({...fiscal, areAngajati: e.target.checked})} className="mr-2 accent-[#8ba888]" />
-              Are Angajați
-            </label>
-            <label className="flex items-center p-2 bg-[#0B0F12] rounded-lg border border-slate-800/60 cursor-pointer">
-              <input type="checkbox" checked={fiscal.platitorTva} onChange={e => setFiscal({...fiscal, platitorTva: e.target.checked})} className="mr-2 accent-[#8ba888]" />
-              Plătitor TVA
-            </label>
-          </div>
         )}
-      </div>
-    </div>
-    
-    <div className="w-full space-y-3 mt-4">
-      <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800/80 font-mono text-[11px]">
-        <div className="bg-[#0B0F12] p-2 rounded-xl border border-slate-800/40">
-          <span className="text-slate-500 block">Impozit micro/venit:</span>
-          <span className="text-slate-300 font-bold">{rezultateFiscale.defalcare.impozit} RON</span>
-        </div>
-        <div className="bg-[#0B0F12] p-2 rounded-xl border border-slate-800/40">
-          <span className="text-slate-500 block">Contribuții (CAS/CASS):</span>
-          <span className="text-slate-300 font-bold">{rezultateFiscale.defalcare.sociale} RON</span>
-        </div>
-      </div>
-      
-      <div className="grid grid-cols-2 gap-2 font-mono text-[11px]">
-        {fiscal.formaJuridica === 'SRL' && (
-          <div className="bg-[#0B0F12] p-2 rounded-xl border border-slate-800/40">
-            <span className="text-slate-500 block">Impozit Dividende (10%):</span>
-            <span className="text-slate-300 font-bold">{rezultateFiscale.defalcare.dividende} RON</span>
-          </div>
-        )}
-        
-        {fiscal.platitorTva && (
-           <div className="bg-[#0B0F12] p-2 rounded-xl border border-slate-800/40">
-             <span className="text-slate-500 block">TVA Colectat (21%):</span>
-             <span className="text-slate-300 font-bold">{rezultateFiscale.tvaLunar} RON</span>
-           </div>
-        )}
-      </div>
-
-      <div className="pt-2 border-t border-slate-800 bg-[#0B0F12] p-3 rounded-xl border border-slate-800/60 flex justify-between items-center text-xs">
-        <div><span className="text-slate-400 block">Dări Stat (Total): <strong className="text-red-400 font-mono">{rezultateFiscale.taxeLunare} RON</strong></span></div>
-        <div className="text-right"><span className="text-slate-400 block">Profit Curat Net Lunar: <strong className="text-[#8ba888] font-mono text-sm">{rezultateFiscale.netLunar} RON</strong></span></div>
-      </div>
-    </div>
-  </div>
-
-  {/* =========================================================================
-    MODUL: QR CODE GENERATOR PRO (CU INTEGRARE LEMONSQUEEZY)
-    ========================================================================= */}
-<div className="bg-[#0B0F12] border border-slate-800 rounded-xl p-6 shadow-2xl mt-8">
-  <div className="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
-    <div>
-      <h3 className="text-xl font-bold text-white flex items-center gap-2">
-        <span className="text-[#8ba888]">⚡</span> ContractSmart QR Studio
-      </h3>
-      <p className="text-slate-400 text-sm mt-1">Generează, personalizează și urmărește codurile tale QR.</p>
-    </div>
-    {/* Badge Status Tier */}
-    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-      profil?.subscription_tier === 'founder' ? 'bg-purple-900/30 text-purple-400 border border-purple-500/20' : 
-      profil?.subscription_tier === 'pro' ? 'bg-blue-900/30 text-blue-400 border border-blue-500/20' : 
-      'bg-slate-800 text-slate-300'
-    }`}>
-      {profil?.subscription_tier || 'Free'} Plan
-    </span>
-  </div>
-
-  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-    
-    {/* COLOANA STÂNGA: SETĂRI ȘI DATE */}
-    <div className="space-y-6">
-      
-      {/* 1. TIPUL DE COD QR */}
-      <div>
-        <label className="text-white font-semibold block mb-3 text-sm">1. Selectează tipul codului</label>
-        <div className="grid grid-cols-3 gap-2">
-          <button 
-            onClick={() => setQrType('url')}
-            className={`p-2 rounded-lg border text-xs font-medium transition-all ${qrType === 'url' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}
-          >
-            🌐 URL
-          </button>
-          
-          <button 
-            onClick={() => {
-              if (profil?.subscription_tier === 'free' && !profil?.has_qr_vcard) {
-                handleCheckout('qr_vcard');
-              } else {
-                setQrType('vcard');
-              }
-            }}
-            className={`relative p-2 rounded-lg border text-xs font-medium transition-all ${qrType === 'vcard' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}
-          >
-            📇 vCard
-            {(profil?.subscription_tier === 'free' && !profil?.has_qr_vcard) && <span className="absolute -top-2 -right-2 text-[10px] bg-amber-500 text-black px-1.5 rounded-full">9€</span>}
-          </button>
-
-          <button 
-            onClick={() => {
-              if (profil?.subscription_tier !== 'founder' && !profil?.has_qr_dynamic) {
-                handleCheckout('qr_dynamic');
-              } else {
-                setQrType('dynamic');
-              }
-            }}
-            className={`relative p-2 rounded-lg border text-xs font-medium transition-all flex flex-col justify-center items-center ${qrType === 'dynamic' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}
-          >
-            <span>🔄 Dinamic</span>
-            {(profil?.subscription_tier !== 'founder' && !profil?.has_qr_dynamic) && <span className="absolute -top-2 -right-2 text-[10px] bg-purple-500 text-white px-1.5 rounded-full">VIP</span>}
-          </button>
-        </div>
-      </div>
-
-      {/* 2. CONȚINUT */}
-      <div>
-        <label className="text-white font-semibold block mb-3 text-sm">2. Destinație / Conținut</label>
-        {qrType === 'url' && (
-          <input 
-            type="text" 
-            placeholder="https://site-ul-tau.ro" 
-            value={qrUrl}
-            onChange={(e) => setQrUrl(e.target.value)}
-            className="w-full bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-[#8ba888] outline-none"
-          />
-        )}
-        {qrType === 'vcard' && (
-          <div className="grid grid-cols-2 gap-2">
-            <input type="text" placeholder="Nume Complet" className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-[#8ba888] outline-none col-span-2" />
-            <input type="text" placeholder="Telefon" className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-[#8ba888] outline-none" />
-            <input type="email" placeholder="Email" className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-[#8ba888] outline-none" />
-          </div>
-        )}
-        {qrType === 'dynamic' && (
-          <div className="p-3 bg-purple-900/20 border border-purple-500/30 rounded-lg">
-            <p className="text-purple-300 text-[10px] mb-2 leading-tight">Codul tău va genera un link scurt securizat. Poți modifica destinația mai târziu.</p>
-            <input type="text" placeholder="Destinația actuală (URL)" className="w-full bg-[#0B0F12] border border-purple-500/50 rounded-lg p-2 text-white text-sm outline-none" />
-          </div>
-        )}
-      </div>
-
-      {/* 3. BRANDING & PERSONALIZARE */}
-      <div>
-        <label className="text-white font-semibold block mb-2 flex items-center justify-between text-sm">
-          <span>3. Branding Visual</span>
-          {(profil?.subscription_tier === 'free' && !profil?.has_qr_branding) && (
-            <button onClick={() => handleCheckout('qr_branding')} className="text-[10px] font-bold text-amber-500 hover:underline">Deblochează Culori (9€)</button>
-          )}
-        </label>
-        
-        <div className={`grid grid-cols-2 gap-2 ${(profil?.subscription_tier === 'free' && !profil?.has_qr_branding) ? 'opacity-50 pointer-events-none' : ''}`}>
-          <div>
-            <label className="text-slate-400 text-[10px] mb-1 block">Culoare QR</label>
-            <input type="color" className="w-full h-8 rounded cursor-pointer" defaultValue="#000000" />
-          </div>
-          <div>
-            <label className="text-slate-400 text-[10px] mb-1 block">Încarcă Logo (Centru)</label>
-            <input type="file" accept="image/png, image/jpeg" className="w-full text-[10px] text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-[10px] file:font-semibold file:bg-[#8ba888]/10 file:text-[#8ba888] hover:file:bg-[#8ba888]/20" />
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    {/* COLOANA DREAPTA: PREVIEW ȘI DOWNLOAD */}
-    <div className="bg-[#16221A] rounded-xl p-4 flex flex-col items-center justify-center border border-slate-800">
-      <div className="bg-white p-3 rounded-xl shadow-lg mb-4 relative flex justify-center items-center">
-        <QRCodeCanvas 
-          id="contract-qr"
-          value={qrUrl || 'https://contractsmart.ro'} 
-          size={140} 
-          level={"H"}
-          fgColor="#000000"
-          bgColor="#FFFFFF"
-        />
-        {qrType === 'dynamic' && (
-          <div className="absolute -bottom-2 -right-2 bg-purple-600 p-1 rounded-full shadow-lg">
-            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-          </div>
-        )}
-      </div>
-
-      <button 
-        onClick={handleDownloadQR}
-        className="w-full py-2 bg-[#8ba888] hover:bg-[#7a9677] text-[#0B0F12] font-bold rounded-lg transition-colors flex justify-center items-center gap-2 text-sm"
-      >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-        Descarcă QR HD
-      </button>
-
-      {(qrType === 'dynamic' && (profil?.subscription_tier === 'founder' || profil?.has_qr_dynamic)) && (
-        <button className="w-full mt-2 py-1.5 border border-purple-500 text-purple-400 hover:bg-purple-500/10 font-medium rounded-lg text-xs transition-colors">
-          📊 Statistici
-        </button>
-      )}
-    
-
-        </div>
-      </div>
-      </div>
 
         {/* STEP 2: MULTI-FORMULAR SECREȚIONAT STRUCTURAL */}
         {step === 2 && (
@@ -1712,6 +1685,6 @@ setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon
         </footer>
 
       </div>
-    
+    </div>
   );
 }
