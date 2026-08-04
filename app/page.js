@@ -1076,7 +1076,7 @@ setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon
   {/* =========================================================================
     MODUL: QR CODE GENERATOR PRO (CU INTEGRARE LEMONSQUEEZY)
     ========================================================================= */}
-<div className="bg-[#0B0F12] border border-slate-800 rounded-xl p-6 shadow-2xl">
+<div className="bg-[#0B0F12] border border-slate-800 rounded-xl p-6 shadow-2xl mt-8">
   <div className="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
     <div>
       <h3 className="text-xl font-bold text-white flex items-center gap-2">
@@ -1221,11 +1221,11 @@ setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon
           📊 Statistici
         </button>
       )}
-    </div>
+    
 
-  </div>
-</div>
-</div>
+        </div>
+      </div>
+      </div>
 
         {/* STEP 2: MULTI-FORMULAR SECREȚIONAT STRUCTURAL */}
         {step === 2 && (
@@ -1712,6 +1712,6 @@ setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon
         </footer>
 
       </div>
-    </div>
+    
   );
 }
