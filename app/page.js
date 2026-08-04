@@ -74,6 +74,14 @@ export default function Home() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [qrType, setQrType] = useState('url'); 
   const [qrUrl, setQrUrl] = useState('');
+  
+  // Tracking
+  const [dynamicDestUrl, setDynamicDestUrl] = useState('');
+  const [generatedDynamicUrl, setGeneratedDynamicUrl] = useState('');
+  const [isGeneratingShortlink, setIsGeneratingShortlink] = useState(false);
+  const [showStatsModal, setShowStatsModal] = useState(false);
+  const [qrStats, setQrStats] = useState([]);
+
   const [qrData, setQrData] = useState({ nume: '', telefon: '', iban: '', suma: '', url: '', email: '', functie: '', banca: '' });
   const [qrGeneratedUrl, setQrGeneratedUrl] = useState('');
 
@@ -144,13 +152,9 @@ export default function Home() {
     autoAdresaVanzator: '', autoAdresaCumparator: '', pretIncludeTVA: false, autoMoneda: 'RON'
   });
 
-  const genereazaValoareQR = () => {
-    if (qrType === 'vcard') {
-      return `BEGIN:VCARD\nVERSION:3.0\nFN:${qrData.nume}\nTITLE:${qrData.functie}\nTEL:${qrData.telefon}\nEMAIL:${qrData.email}\nEND:VCARD`;
-    }
-    if (qrType === 'iban') {
-      return `BCD\n002\n1\nSCT\n\n${qrData.nume}\n${qrData.iban}\n${qrData.suma}\n\n\n\n${qrData.banca}`;
-    }
+  const getQrValue = () => {
+    if (qrType === 'vcard') return `BEGIN:VCARD\nVERSION:3.0\nFN:${qrData.nume}\nTITLE:${qrData.functie}\nTEL:${qrData.telefon}\nEMAIL:${qrData.email}\nEND:VCARD`;
+    if (qrType === 'dynamic') return generatedDynamicUrl || 'https://contractsmart.ro';
     return qrUrl || 'https://contractsmart.ro';
   };
 
@@ -483,6 +487,46 @@ export default function Home() {
 
   const handleCheckout = (tipProdus) => {
     handleCumparaPremium(tipProdus);
+  };
+
+  const handleGenerateDynamicQr = async () => {
+    if (!user) return alert('Trebuie să fii autentificat pentru a salva linkurile în baza de date.');
+    if (!dynamicDestUrl) return alert('Introdu o adresă de destinație.');
+    setIsGeneratingShortlink(true);
+    try {
+      const res = await fetch('/api/qr/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: dynamicDestUrl, userId: user.id })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setGeneratedDynamicUrl(data.shortUrl);
+        alert('Shortlink creat! Codul QR a fost actualizat.');
+      } else {
+        alert('Eroare la generarea link-ului.');
+      }
+    } catch {
+      alert('Eroare conexiune.');
+    } finally {
+      setIsGeneratingShortlink(false);
+    }
+  };
+
+  const fetchStats = async () => {
+    if (!user) return alert('Te rog autentifică-te.');
+    try {
+      const res = await fetch(`/api/qr/stats?userId=${user.id}`);
+      const data = await res.json();
+      if (data.success) {
+        setQrStats(data.stats);
+        setShowStatsModal(true);
+      } else {
+        alert('Eroare la preluarea statisticilor.');
+      }
+    } catch (e) {
+      alert('Eroare rețea la încărcarea statisticilor.');
+    }
   };
 
   const handleLansareContract = async (e) => {
@@ -938,6 +982,38 @@ export default function Home() {
           </div>
         )}
 
+        {/* MODAL STATISTICI QR */}
+        {showStatsModal && (
+          <div className="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn">
+            <div className="bg-[#12181D] border border-slate-800 p-8 rounded-3xl max-w-lg w-full shadow-2xl relative">
+              <button type="button" onClick={() => setShowStatsModal(false)} className="absolute top-4 right-4 text-slate-500 hover:text-white text-md font-bold transition">✕</button>
+              <h3 className="text-xl font-black text-white mb-2">Panou Analiză QR</h3>
+              <p className="text-xs text-slate-400 mb-6">Urmărește performanța shortlink-urilor tale generate din platformă.</p>
+              
+              <div className="bg-[#0B0F12] rounded-xl border border-slate-800 overflow-hidden">
+                <div className="max-h-60 overflow-y-auto p-4 space-y-3">
+                  {qrStats.length === 0 ? (
+                    <p className="text-xs text-slate-500 text-center py-4">Nu ai coduri dinamice generate încă.</p>
+                  ) : (
+                    qrStats.map((stat, i) => (
+                      <div key={i} className="bg-[#16221A] p-3 rounded-lg border border-slate-800/80 flex justify-between items-center">
+                        <div>
+                          <p className="text-xs text-white font-mono mb-1 truncate max-w-[200px]">{stat.url}</p>
+                          <p className="text-[10px] text-slate-500">ID: {stat.id} | Ultimul scan: {stat.lastScan ? new Date(stat.lastScan).toLocaleString('ro-RO') : 'Niciodată'}</p>
+                        </div>
+                        <div className="text-right">
+                          <span className="block text-lg font-black text-purple-400">{stat.totalScans}</span>
+                          <span className="text-[10px] uppercase text-slate-500">Scanări</span>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* STEP 1: DASHBOARD / HOME */}
         {step === 1 && (
           <div className="w-full">
@@ -1140,8 +1216,13 @@ export default function Home() {
                       )}
                       {qrType === 'dynamic' && (
                         <div className="p-3 bg-purple-900/20 border border-purple-500/30 rounded-lg">
-                          <p className="text-purple-300 text-[10px] mb-2 leading-tight">Codul tău va genera un link scurt securizat. Poți modifica destinația mai târziu.</p>
-                          <input type="text" placeholder="Destinația actuală (URL)" className="w-full bg-[#12181D] border border-purple-500/50 rounded-lg p-2 text-white text-sm outline-none" />
+                          <p className="text-purple-300 text-[10px] mb-2 leading-tight">Codul tău va genera un link scurt securizat. Modificările viitoare nu strică codul tipărit.</p>
+                          <div className="flex flex-col gap-2">
+                            <input type="text" placeholder="Destinația reală (ex: https://emag.ro)" value={dynamicDestUrl} onChange={e => setDynamicDestUrl(e.target.value)} className="w-full bg-[#12181D] border border-purple-500/50 rounded-lg p-2 text-white text-sm outline-none" />
+                            <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="bg-purple-600 text-white font-bold py-2 rounded-lg text-xs hover:bg-purple-500 transition disabled:opacity-50">
+                              {isGeneratingShortlink ? 'Se generează...' : '🔗 Generează & Securizează Link Dinamic'}
+                            </button>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -1171,7 +1252,7 @@ export default function Home() {
                         <div className="bg-white p-2 rounded-xl shadow-lg mb-3 relative flex justify-center items-center">
                           <QRCodeCanvas 
                             id="contract-qr"
-                            value={qrUrl || 'https://contractsmart.ro'} 
+                            value={getQrValue()} 
                             size={100} 
                             level={"H"}
                             fgColor="#000000"
@@ -1191,6 +1272,12 @@ export default function Home() {
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                           Descarcă QR HD
                         </button>
+                        
+                        {(qrType === 'dynamic' && (profil?.subscription_tier === 'founder' || profil?.has_qr_dynamic)) && (
+                          <button onClick={fetchStats} className="w-full mt-2 py-1.5 border border-purple-500 text-purple-400 hover:bg-purple-500/10 font-medium rounded-lg text-xs transition-colors">
+                            📊 Statistici
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
