@@ -8,12 +8,15 @@ export async function POST(req) {
     const API_KEY = process.env.LEMON_SQUEEZY_API_KEY;
     const STORE_ID = process.env.LEMON_SQUEEZY_STORE_ID;
 
-    // MAPARE VARIANTE
+    // MAPARE VARIANTE (am adăugat pachetele QR)
     const variants = {
       'pro': process.env.LEMON_VARIANT_PRO,
       'founder': process.env.LEMON_VARIANT_LIFETIME,
       'one_time_contract': process.env.LEMON_VARIANT_ONE_TIME,
-      'contract_auto': process.env.LEMON_VARIANT_AUTO
+      'contract_auto': process.env.LEMON_VARIANT_AUTO,
+      'qr_branding': process.env.LEMON_VARIANT_QR_BRANDING,
+      'qr_vcard': process.env.LEMON_VARIANT_QR_VCARD,
+      'qr_dynamic': process.env.LEMON_VARIANT_QR_DYNAMIC
     };
 
     const variantId = variants[tipProdus];
@@ -26,7 +29,8 @@ export async function POST(req) {
         data: {
           type: "checkouts",
           attributes: {
-checkout_data: { custom: { user_id: userId ? String(userId) : 'anonim', product_id: tipProdus } }          },
+            checkout_data: { custom: { user_id: userId ? String(userId) : 'anonim', product_id: tipProdus } }
+          },
           relationships: {
             store: { data: { type: "stores", id: STORE_ID } },
             variant: { data: { type: "variants", id: variantId.toString() } }

@@ -2,6 +2,7 @@
 import './globals.css';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { QRCodeSVG } from 'qrcode.react'; // Changed to SVG since canvas is causing issues with LemonSqueezy UI below
 import { QRCodeCanvas } from 'qrcode.react';
 import { createClient } from '@supabase/supabase-js';
 
@@ -73,6 +74,7 @@ export default function Home() {
   const [hydrated, setHydrated] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [qrType, setQrType] = useState('url'); 
+  const [qrUrl, setQrUrl] = useState('');
   const [qrData, setQrData] = useState({ nume: '', telefon: '', iban: '', suma: '', url: '', email: '', functie: '', banca: '' });
   const [qrGeneratedUrl, setQrGeneratedUrl] = useState('');
 
@@ -86,6 +88,7 @@ export default function Home() {
   const [stiriLive, setStiriLive] = useState([]);
 
   const [user, setUser] = useState(null); 
+  const [profil, setProfil] = useState(null);
   const [userTier, setUserTier] = useState('free');
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false); 
@@ -149,7 +152,7 @@ export default function Home() {
     if (qrType === 'iban') {
       return `BCD\n002\n1\nSCT\n\n${qrData.nume}\n${qrData.iban}\n${qrData.suma}\n\n\n\n${qrData.banca}`;
     }
-    return qrData.url || 'https://contractsmart.ro';
+    return qrUrl || 'https://contractsmart.ro';
   };
 
   useEffect(() => {
@@ -341,16 +344,18 @@ export default function Home() {
   useEffect(() => {
     const fetchUserProfile = async (userId, email) => {
       try {
-        const { data: profile } = await supabase.from('profiles').select('subscription_tier, credits_remaining').eq('id', userId).single();
+        const { data: profile } = await supabase.from('profiles').select('subscription_tier, credits_remaining, has_qr_branding, has_qr_vcard, has_qr_dynamic').eq('id', userId).single();
         setUser({ 
           id: userId, 
           email: email, 
           status: profile?.subscription_tier || 'free', 
           credits: profile?.credits_remaining ?? 0 
         });
+        setProfil(profile);
         setUserTier(profile?.subscription_tier || 'free');
       } catch (err) {
         setUser({ id: userId, email: email, status: 'free', credits: 0 });
+        setProfil({ subscription_tier: 'free', has_qr_branding: false, has_qr_vcard: false, has_qr_dynamic: false});
         setUserTier('free');
       }
     };
@@ -372,6 +377,7 @@ export default function Home() {
         fetchUserProfile(session.user.id, session.user.email);
       } else {
         setUser(null);
+        setProfil({ subscription_tier: 'free', has_qr_branding: false, has_qr_vcard: false, has_qr_dynamic: false});
         setUserTier('free');
       }
     });
@@ -487,6 +493,10 @@ export default function Home() {
       alert('A apărut o problemă de conexiune cu procesatorul de plăți.');
     }
     setLoading(false);
+  };
+
+  const handleCheckout = (tipProdus) => {
+    handleCumparaPremium(tipProdus);
   };
 
   const handleLansareContract = async (e) => {
@@ -1007,7 +1017,7 @@ setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon
         <div className="grid grid-cols-1 gap-2">
           <div>
             <label className="text-slate-400 block mb-1">Formă de Organizare</label>
-            <select value={fiscal.formaJuridica} onChange={e => setFiscal({...fiscal, formaJuridica: e.target.value})} className="w-full bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-white outline-none text-xs">
+            <select value={fiscal.formaJuridica} onChange={e => setFiscal({...fiscal, formaJuridica: e.target.value})} className="w-full bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-white outline-none text-xs appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.2em_1.2em] bg-[right_0.7rem_center] bg-no-repeat pr-10">
               <option value="SRL">SRL (Microîntreprindere)</option>
               <option value="PFA_SISTEM_REAL">PFA (Sistem Real)</option>
             </select>
@@ -1063,67 +1073,159 @@ setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon
     </div>
   </div>
 
-  {/* COLOANA 2: WIDGET QR CODE COMPLEX */}
-  <div className="bg-[#12181D] p-5 rounded-2xl border border-slate-800 shadow-xl flex flex-col justify-between">
-    <div className="space-y-4">
-      <div>
-        <span className="text-[#8ba888] text-xs font-bold uppercase tracking-wider block mb-1">Utilitar Rapid</span>
-        <h3 className="text-white font-bold text-lg">Generator Coduri QR</h3>
-        <p className="text-xs text-slate-400 mt-1">Transformă linkuri, cărți de vizită sau conturi IBAN în format scanabil.</p>
-      </div>
-      
-      <div className="flex flex-col gap-3">
-         <select value={qrType} onChange={(e) => setQrType(e.target.value)} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none w-full">
-            <option value="url">Website URL</option>
-            <option value="vcard">Carte de Vizită (vCard)</option>
-            <option value="iban">Cont IBAN (Plată Rapidă)</option>
-         </select>
-
-         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {qrType === 'url' && (
-              <input type="text" placeholder="https://..." value={qrData.url} onChange={(e) => setQrData({...qrData, url: e.target.value})} className="col-span-1 sm:col-span-2 bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none" />
-            )}
-            {qrType === 'vcard' && (
-              <>
-                <input type="text" placeholder="Nume Complet" value={qrData.nume} onChange={(e) => setQrData({...qrData, nume: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none" />
-                <input type="text" placeholder="Funcție / Titlu" value={qrData.functie} onChange={(e) => setQrData({...qrData, functie: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none" />
-                <input type="tel" placeholder="Număr Telefon" value={qrData.telefon} onChange={(e) => setQrData({...qrData, telefon: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none" />
-                <input type="email" placeholder="Adresă Email" value={qrData.email} onChange={(e) => setQrData({...qrData, email: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none" />
-              </>
-            )}
-            {qrType === 'iban' && (
-              <>
-                <input type="text" placeholder="Nume Titular" value={qrData.nume} onChange={(e) => setQrData({...qrData, nume: e.target.value})} className="col-span-1 sm:col-span-2 bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none" />
-                <input type="text" placeholder="RO.. IBAN" value={qrData.iban} onChange={(e) => setQrData({...qrData, iban: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none" />
-                <input type="text" placeholder="Bancă" value={qrData.banca} onChange={(e) => setQrData({...qrData, banca: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none" />
-                <input type="number" placeholder="Suma RON" value={qrData.suma} onChange={(e) => setQrData({...qrData, suma: e.target.value})} className="col-span-1 sm:col-span-2 bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none" />
-              </>
-            )}
-         </div>
-      </div>
+  {/* =========================================================================
+    MODUL: QR CODE GENERATOR PRO (CU INTEGRARE LEMONSQUEEZY)
+    ========================================================================= */}
+<div className="bg-[#0B0F12] border border-slate-800 rounded-xl p-6 shadow-2xl">
+  <div className="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
+    <div>
+      <h3 className="text-xl font-bold text-white flex items-center gap-2">
+        <span className="text-[#8ba888]">⚡</span> ContractSmart QR Studio
+      </h3>
+      <p className="text-slate-400 text-sm mt-1">Generează, personalizează și urmărește codurile tale QR.</p>
     </div>
-
-    <div className="flex items-center justify-between gap-4 pt-4 mt-4 border-t border-slate-800">
-      <div className="bg-white p-2 rounded-xl shrink-0">
-        <QRCodeCanvas 
-            id="contract-qr"
-            value={genereazaValoareQR()} 
-            size={110} 
-            fgColor="#8ba888" 
-            level="H" 
-            includeMargin={true}
-        />
-      </div>
-      <button onClick={handleDownloadQR} className="w-full bg-[#8ba888] hover:bg-[#789575] text-white font-bold py-3 px-4 rounded-xl text-xs transition">
-        Descărcare QR (PNG)
-      </button>
-    </div>
+    {/* Badge Status Tier */}
+    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+      profil?.subscription_tier === 'founder' ? 'bg-purple-900/30 text-purple-400 border border-purple-500/20' : 
+      profil?.subscription_tier === 'pro' ? 'bg-blue-900/30 text-blue-400 border border-blue-500/20' : 
+      'bg-slate-800 text-slate-300'
+    }`}>
+      {profil?.subscription_tier || 'Free'} Plan
+    </span>
   </div>
 
-</div>
+  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    
+    {/* COLOANA STÂNGA: SETĂRI ȘI DATE */}
+    <div className="space-y-6">
+      
+      {/* 1. TIPUL DE COD QR */}
+      <div>
+        <label className="text-white font-semibold block mb-3 text-sm">1. Selectează tipul codului</label>
+        <div className="grid grid-cols-3 gap-2">
+          <button 
+            onClick={() => setQrType('url')}
+            className={`p-2 rounded-lg border text-xs font-medium transition-all ${qrType === 'url' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}
+          >
+            🌐 URL
+          </button>
+          
+          <button 
+            onClick={() => {
+              if (profil?.subscription_tier === 'free' && !profil?.has_qr_vcard) {
+                handleCheckout('qr_vcard');
+              } else {
+                setQrType('vcard');
+              }
+            }}
+            className={`relative p-2 rounded-lg border text-xs font-medium transition-all ${qrType === 'vcard' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}
+          >
+            📇 vCard
+            {(profil?.subscription_tier === 'free' && !profil?.has_qr_vcard) && <span className="absolute -top-2 -right-2 text-[10px] bg-amber-500 text-black px-1.5 rounded-full">9€</span>}
+          </button>
 
-            </div>
+          <button 
+            onClick={() => {
+              if (profil?.subscription_tier !== 'founder' && !profil?.has_qr_dynamic) {
+                handleCheckout('qr_dynamic');
+              } else {
+                setQrType('dynamic');
+              }
+            }}
+            className={`relative p-2 rounded-lg border text-xs font-medium transition-all flex flex-col justify-center items-center ${qrType === 'dynamic' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}
+          >
+            <span>🔄 Dinamic</span>
+            {(profil?.subscription_tier !== 'founder' && !profil?.has_qr_dynamic) && <span className="absolute -top-2 -right-2 text-[10px] bg-purple-500 text-white px-1.5 rounded-full">VIP</span>}
+          </button>
+        </div>
+      </div>
+
+      {/* 2. CONȚINUT */}
+      <div>
+        <label className="text-white font-semibold block mb-3 text-sm">2. Destinație / Conținut</label>
+        {qrType === 'url' && (
+          <input 
+            type="text" 
+            placeholder="https://site-ul-tau.ro" 
+            value={qrUrl}
+            onChange={(e) => setQrUrl(e.target.value)}
+            className="w-full bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-[#8ba888] outline-none"
+          />
         )}
+        {qrType === 'vcard' && (
+          <div className="grid grid-cols-2 gap-2">
+            <input type="text" placeholder="Nume Complet" className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-[#8ba888] outline-none col-span-2" />
+            <input type="text" placeholder="Telefon" className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-[#8ba888] outline-none" />
+            <input type="email" placeholder="Email" className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-[#8ba888] outline-none" />
+          </div>
+        )}
+        {qrType === 'dynamic' && (
+          <div className="p-3 bg-purple-900/20 border border-purple-500/30 rounded-lg">
+            <p className="text-purple-300 text-[10px] mb-2 leading-tight">Codul tău va genera un link scurt securizat. Poți modifica destinația mai târziu.</p>
+            <input type="text" placeholder="Destinația actuală (URL)" className="w-full bg-[#0B0F12] border border-purple-500/50 rounded-lg p-2 text-white text-sm outline-none" />
+          </div>
+        )}
+      </div>
+
+      {/* 3. BRANDING & PERSONALIZARE */}
+      <div>
+        <label className="text-white font-semibold block mb-2 flex items-center justify-between text-sm">
+          <span>3. Branding Visual</span>
+          {(profil?.subscription_tier === 'free' && !profil?.has_qr_branding) && (
+            <button onClick={() => handleCheckout('qr_branding')} className="text-[10px] font-bold text-amber-500 hover:underline">Deblochează Culori (9€)</button>
+          )}
+        </label>
+        
+        <div className={`grid grid-cols-2 gap-2 ${(profil?.subscription_tier === 'free' && !profil?.has_qr_branding) ? 'opacity-50 pointer-events-none' : ''}`}>
+          <div>
+            <label className="text-slate-400 text-[10px] mb-1 block">Culoare QR</label>
+            <input type="color" className="w-full h-8 rounded cursor-pointer" defaultValue="#000000" />
+          </div>
+          <div>
+            <label className="text-slate-400 text-[10px] mb-1 block">Încarcă Logo (Centru)</label>
+            <input type="file" accept="image/png, image/jpeg" className="w-full text-[10px] text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-[10px] file:font-semibold file:bg-[#8ba888]/10 file:text-[#8ba888] hover:file:bg-[#8ba888]/20" />
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    {/* COLOANA DREAPTA: PREVIEW ȘI DOWNLOAD */}
+    <div className="bg-[#16221A] rounded-xl p-4 flex flex-col items-center justify-center border border-slate-800">
+      <div className="bg-white p-3 rounded-xl shadow-lg mb-4 relative flex justify-center items-center">
+        <QRCodeCanvas 
+          id="contract-qr"
+          value={qrUrl || 'https://contractsmart.ro'} 
+          size={140} 
+          level={"H"}
+          fgColor="#000000"
+          bgColor="#FFFFFF"
+        />
+        {qrType === 'dynamic' && (
+          <div className="absolute -bottom-2 -right-2 bg-purple-600 p-1 rounded-full shadow-lg">
+            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          </div>
+        )}
+      </div>
+
+      <button 
+        onClick={handleDownloadQR}
+        className="w-full py-2 bg-[#8ba888] hover:bg-[#7a9677] text-[#0B0F12] font-bold rounded-lg transition-colors flex justify-center items-center gap-2 text-sm"
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+        Descarcă QR HD
+      </button>
+
+      {(qrType === 'dynamic' && (profil?.subscription_tier === 'founder' || profil?.has_qr_dynamic)) && (
+        <button className="w-full mt-2 py-1.5 border border-purple-500 text-purple-400 hover:bg-purple-500/10 font-medium rounded-lg text-xs transition-colors">
+          📊 Statistici
+        </button>
+      )}
+    </div>
+
+  </div>
+</div>
+</div>
 
         {/* STEP 2: MULTI-FORMULAR SECREȚIONAT STRUCTURAL */}
         {step === 2 && (
@@ -1145,7 +1247,7 @@ setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon
                     <select 
                       value={formData.tipContract} 
                       onChange={e => setFormData({...formData, tipContract: e.target.value})} 
-                      className="w-full bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#8ba888]"
+                      className="w-full bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#8ba888] appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.2em_1.2em] bg-[right_0.7rem_center] bg-no-repeat pr-10"
                     >
                       <option value="prestari">Contract de Prestări Servicii (General)</option>
                       <option value="nda">Acord de Confidențialitate (NDA)</option>
@@ -1240,7 +1342,7 @@ setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon
                       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
                         <div className="flex w-full sm:w-1/2 gap-3">
                           <input type="number" placeholder="Valoare Contractuală" autoComplete="new-password" value={formData.valoare} onChange={e => setFormData({...formData, valoare: e.target.value})} className="flex-1 p-2.5 bg-[#0B0F12] border border-slate-700 rounded-lg text-xs text-white" required />
-                          <select value={formData.moneda} onChange={e => setFormData({...formData, moneda: e.target.value})} className="w-24 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#8ba888]">
+                          <select value={formData.moneda} onChange={e => setFormData({...formData, moneda: e.target.value})} className="w-24 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#8ba888] appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.2em_1.2em] bg-[right_0.7rem_center] bg-no-repeat pr-10">
                             <option value="RON">RON</option>
                             <option value="EUR">EUR (€)</option>
                           </select>
@@ -1396,7 +1498,7 @@ setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon
                           <input type="text" placeholder="Marcă și Model" autoComplete="new-password" value={autoData.autoMarcaModel} onChange={e => setAutoData({...autoData, autoMarcaModel: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded-lg text-xs text-white outline-none sm:col-span-1" />
                           <div className="flex gap-1 sm:col-span-1">
                             <input type="number" placeholder="Preț" autoComplete="new-password" value={autoData.autoPret} onChange={e => setAutoData({...autoData, autoPret: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded-lg text-xs text-white outline-none w-full" />
-                            <select value={autoData.autoMoneda} onChange={e => setAutoData({...autoData, autoMoneda: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-1.5 text-xs text-white outline-none">
+                            <select value={autoData.autoMoneda} onChange={e => setAutoData({...autoData, autoMoneda: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-1.5 text-xs text-white outline-none appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.2em_1.2em] bg-[right_0.4rem_center] bg-no-repeat pr-6">
                               <option value="RON">RON</option>
                               <option value="EUR">EUR</option>
                             </select>

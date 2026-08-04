@@ -44,19 +44,26 @@ export async function POST(request) {
         await supabase.rpc('increment_rar_credits', { user_id: userId, quantity: 1 });
       }
       else if (tipProdus === 'one_time_contract') {
-  // Deblochează +1 contract folosind funcția RPC (evită Race Conditions)
-  await supabase.rpc('add_cr', { u: userId });
-}
+        // Deblochează +1 contract folosind funcția RPC (evită Race Conditions)
+        await supabase.rpc('add_cr', { u: userId });
+      }
       else if (tipProdus === 'sabloane' && templateId) {
-        await supabase
-          .from('user_purchases')
-          .insert([{ user_id: userId, product_id: templateId }]);
+        await supabase.from('user_purchases').insert([{ user_id: userId, product_id: templateId }]);
       }
       else if (tipProdus === 'onrc_package') {
-        await supabase
-          .from('user_purchases')
-          .insert([{ user_id: userId, product_id: 'onrc_package' }]);
+        await supabase.from('user_purchases').insert([{ user_id: userId, product_id: 'onrc_package' }]);
       }
+      // ---> AICI SUNT NOILE ADĂUGĂRI PENTRU QR <---
+      else if (tipProdus === 'qr_branding') {
+        await supabase.from('profiles').update({ has_qr_branding: true }).eq('id', userId);
+      }
+      else if (tipProdus === 'qr_vcard') {
+        await supabase.from('profiles').update({ has_qr_vcard: true }).eq('id', userId);
+      }
+      else if (tipProdus === 'qr_dynamic') {
+        await supabase.from('profiles').update({ has_qr_dynamic: true }).eq('id', userId);
+      }
+      // ---------------------------------------------
       else if (tipProdus === 'founder' || tipProdus === 'premium' || tipProdus === 'pro') {
         await supabase
           .from('profiles')
