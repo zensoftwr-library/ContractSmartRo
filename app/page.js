@@ -1242,9 +1242,10 @@ export default function Home() {
                       )}
                       {qrType === 'vcard' && (
                         <div className="grid grid-cols-2 gap-2">
-                          <input type="text" placeholder="Nume Complet" className="bg-[#12181D] border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-[#8ba888] outline-none col-span-2" />
-                          <input type="text" placeholder="Telefon" className="bg-[#12181D] border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-[#8ba888] outline-none" />
-                          <input type="email" placeholder="Email" className="bg-[#12181D] border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-[#8ba888] outline-none" />
+                          <input type="text" placeholder="Nume Complet" value={qrData.nume} onChange={(e) => setQrData({...qrData, nume: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-[#8ba888] outline-none col-span-2" />
+                          <input type="text" placeholder="Funcție / Titlu (ex: Manager)" value={qrData.functie} onChange={(e) => setQrData({...qrData, functie: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-[#8ba888] outline-none col-span-2" />
+                          <input type="text" placeholder="Telefon" value={qrData.telefon} onChange={(e) => setQrData({...qrData, telefon: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-[#8ba888] outline-none" />
+                          <input type="email" placeholder="Email" value={qrData.email} onChange={(e) => setQrData({...qrData, email: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-[#8ba888] outline-none" />
                         </div>
                       )}
                       {qrType === 'dynamic' && (
