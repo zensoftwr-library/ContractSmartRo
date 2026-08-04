@@ -1528,10 +1528,11 @@ export default function Home() {
         <div id="sectiune-preturi" className="max-w-7xl mx-auto px-6 mt-16 scroll-mt-20">
           <div className="border-b border-slate-800 pb-4 mb-8 text-center">
             <span className="text-[#8ba888] text-xs font-black uppercase tracking-widest block mb-1">Standard de Securitate Financiară</span>
-            <h2 className="text-3xl font-black text-white tracking-tight">Planuri de Business, Pachete Auto & Micro-Tranzacții</h2>
+            <h2 className="text-3xl font-black text-white tracking-tight">Planuri de Business & Micro-Tranzacții</h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
-                
+          
+          {/* BENTO GRID: CONTRACTE */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto mb-10">
             <div className="bg-[#12181D] border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
               <div>
                 <span className="text-[10px] font-mono text-emerald-500 font-bold block uppercase">Freemium</span>
@@ -1562,7 +1563,48 @@ export default function Home() {
               </div>
               <button type="button" onClick={() => handleCumparaPremium('founder')} className="w-full mt-4 bg-[#8ba888] text-[#0B0F12] font-black py-2 rounded-xl text-xs transition hover:opacity-90">Cumpără Lifetime</button>
             </div>
+          </div>
 
+          <div className="border-t border-slate-800 pt-8 pb-4 mb-4 text-center">
+            <span className="text-[#8ba888] text-xs font-black uppercase tracking-widest block mb-1">Add-on-uri Platformă</span>
+            <h3 className="text-2xl font-black text-white tracking-tight">ContractSmart QR Studio</h3>
+          </div>
+          
+          {/* BENTO GRID: QR STUDIO */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
+            {/* Card QR Branding (9 EUR) */}
+            <div className="bg-[#12181D] border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
+              <div>
+                <span className="text-[10px] font-mono text-amber-500 font-bold block uppercase">Personalizare</span>
+                <h4 className="text-sm font-bold text-white mt-1">Pachet QR Branding</h4>
+                <div className="text-lg font-black text-white mt-2 mb-3">9 € <span className="text-[10px] text-slate-500 font-normal">/ plată unică</span></div>
+                <p className="text-[11px] text-slate-300 leading-relaxed">Deblochează inserarea logo-ului în centrul codului și personalizarea culorilor pentru aliniere cu brandul tău.</p>
+              </div>
+              <button type="button" onClick={() => handleCumparaPremium('qr_branding')} className="w-full mt-4 bg-[#0B0F12] border border-slate-700 hover:bg-slate-900 text-white font-bold py-2 rounded-xl text-xs transition">Deblochează Funcția</button>
+            </div>
+
+            {/* Card vCard Pro (14 EUR) */}
+            <div className="bg-[#12181D] border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
+              <div>
+                <span className="text-[10px] font-mono text-amber-500 font-bold block uppercase">Networking</span>
+                <h4 className="text-sm font-bold text-white mt-1">Pachet vCard Pro</h4>
+                <div className="text-lg font-black text-white mt-2 mb-3">14 € <span className="text-[10px] text-slate-500 font-normal">/ plată unică</span></div>
+                <p className="text-[11px] text-slate-300 leading-relaxed">Generează cărți de vizită digitale. La scanare, clientul salvează automat datele tale în agenda telefonului.</p>
+              </div>
+              <button type="button" onClick={() => handleCumparaPremium('qr_vcard')} className="w-full mt-4 bg-[#0B0F12] border border-slate-700 hover:bg-slate-900 text-white font-bold py-2 rounded-xl text-xs transition">Deblochează Funcția</button>
+            </div>
+
+            {/* Card Dynamic (7 EUR/luna) */}
+            <div className="bg-[#12181D] border border-slate-800 rounded-2xl p-4 flex flex-col justify-between relative ring-1 ring-purple-500/30">
+              <span className="absolute -top-2 right-4 bg-purple-600 text-white text-[8px] uppercase font-black px-2 py-0.5 rounded">Analytics</span>
+              <div>
+                <span className="text-[10px] font-mono text-purple-400 font-bold block uppercase">Marketing Pro</span>
+                <h4 className="text-sm font-bold text-white mt-1">QR Dinamic & Statistici</h4>
+                <div className="text-lg font-black text-white mt-2 mb-3">7 € <span className="text-[10px] text-slate-500 font-normal">/ lună</span></div>
+                <p className="text-[11px] text-slate-300 leading-relaxed">Modifică linkul oricând după printare. Acces complet la panoul de statistici, scanări și dispozitive utilizate.</p>
+              </div>
+              <button type="button" onClick={() => handleCumparaPremium('qr_dynamic')} className="w-full mt-4 bg-[#8ba888] text-[#0B0F12] font-black py-2 rounded-xl text-xs transition hover:opacity-90">Abonează-te</button>
+            </div>
           </div>
         </div>
 
