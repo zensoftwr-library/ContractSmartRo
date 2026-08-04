@@ -177,15 +177,40 @@ export default function Home() {
       ctx.imageSmoothingEnabled = false;
       ctx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
 
-      const pngUrl = tempCanvas.toDataURL('image/png', 1.0);
-      const downloadLink = document.createElement('a');
-      downloadLink.href = pngUrl;
-      downloadLink.download = 'ContractSmart-QR.png';
-      
-      // FIX-UL: Link-ul trebuie adăugat temporar în pagină pentru ca browserul să permită descărcarea
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
+      try {
+        // 1. Luăm imaginea brută
+        const dataUrl = tempCanvas.toDataURL('image/png', 1.0);
+        
+        // 2. O transformăm sincron într-un fișier fizic virtual (Blob)
+        // Această metodă trece de toate blocajele Safari / iOS WebKit
+        const arr = dataUrl.split(',');
+        const mime = arr[0].match(/:(.*?);/)[1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) {
+          u8arr[n] = bstr.charCodeAt(n);
+        }
+        const blob = new Blob([u8arr], { type: mime });
+        
+        // 3. Generăm un URL scurt, nativ sistemului de operare (blob:http...)
+        const blobUrl = URL.createObjectURL(blob);
+        
+        // 4. Declansam descarcarea
+        const downloadLink = document.createElement('a');
+        downloadLink.href = blobUrl;
+        downloadLink.download = 'ContractSmart-QR.png';
+        
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        
+        // Eliberăm memoria după descărcare
+        setTimeout(() => window.URL.revokeObjectURL(blobUrl), 200);
+        
+      } catch (e) {
+        alert("Codul QR s-a generat, dar browserul acestui telefon blochează descărcarea automată. Folosește un alt browser.");
+      }
     } else {
       alert("Eroare: Codul QR nu a putut fi generat pentru descărcare.");
     }
