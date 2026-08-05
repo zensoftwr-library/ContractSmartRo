@@ -8,15 +8,16 @@ export async function POST(req) {
     const API_KEY = process.env.LEMON_SQUEEZY_API_KEY;
     const STORE_ID = process.env.LEMON_SQUEEZY_STORE_ID;
 
-    // MAPARE VARIANTE (am adăugat pachetele QR)
+    // MAPARE EXACTĂ PE CELE 8 PRODUSE PUBLISHED
     const variants = {
-      'pro': process.env.LEMON_VARIANT_PRO,
-      'founder': process.env.LEMON_VARIANT_LIFETIME,
-      'one_time_contract': process.env.LEMON_VARIANT_ONE_TIME,
-      'contract_auto': process.env.LEMON_VARIANT_AUTO,
-      'qr_branding': process.env.LEMON_VARIANT_QR_BRANDING,
-      'qr_vcard': process.env.LEMON_VARIANT_QR_VCARD,
-      'qr_dynamic': process.env.LEMON_VARIANT_QR_DYNAMIC
+      'one_time_contract': process.env.LEMON_VARIANT_ONE_TIME, // 19 RON
+      'contract_auto': process.env.LEMON_VARIANT_AUTO, // 99 RON
+      'sabloane': process.env.LEMON_VARIANT_SABLON_FIX, // 49 RON
+      'pro': process.env.LEMON_VARIANT_PRO, // 99 RON
+      'founder': process.env.LEMON_VARIANT_LIFETIME, // 999 RON
+      'qr_branding': process.env.LEMON_VARIANT_QR_BRANDING, // 49 RON
+      'qr_vcard': process.env.LEMON_VARIANT_QR_VCARD, // 69 RON
+      'qr_dynamic': process.env.LEMON_VARIANT_QR_DYNAMIC // 39 RON
     };
 
     const variantId = variants[tipProdus];

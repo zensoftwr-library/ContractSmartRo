@@ -29,7 +29,7 @@ export async function POST(request) {
     
     const customData = payload.meta.custom_data; 
     const userId = customData?.user_id;
-    const tipProdus = customData?.product_id; // mapat din checkout
+    const tipProdus = customData?.product_id; 
     const templateId = customData?.template_id; 
 
     if (!userId || userId === 'anonim') {
@@ -37,23 +37,18 @@ export async function POST(request) {
     }
 
     if (eventName === 'order_created' || eventName === 'subscription_created') {
+      // --- CONTRACTE / SĂBLOANE / AUTO ---
       if (tipProdus === 'contract_auto') {
         await supabase.rpc('increment_auto_credits', { user_id: userId, quantity: 1 });
       } 
-      else if (tipProdus === 'auto_report' || tipProdus === 'auto_anaf') {
-        await supabase.rpc('increment_rar_credits', { user_id: userId, quantity: 1 });
-      }
       else if (tipProdus === 'one_time_contract') {
-        // Deblochează +1 contract folosind funcția RPC (evită Race Conditions)
         await supabase.rpc('add_cr', { u: userId });
       }
       else if (tipProdus === 'sabloane' && templateId) {
         await supabase.from('user_purchases').insert([{ user_id: userId, product_id: templateId }]);
       }
-      else if (tipProdus === 'onrc_package') {
-        await supabase.from('user_purchases').insert([{ user_id: userId, product_id: 'onrc_package' }]);
-      }
-      // ---> AICI SUNT NOILE ADĂUGĂRI PENTRU QR <---
+      
+      // --- MEGA-QR STUDIO ---
       else if (tipProdus === 'qr_branding') {
         await supabase.from('profiles').update({ has_qr_branding: true }).eq('id', userId);
       }
@@ -61,14 +56,34 @@ export async function POST(request) {
         await supabase.from('profiles').update({ has_qr_vcard: true }).eq('id', userId);
       }
       else if (tipProdus === 'qr_dynamic') {
-        await supabase.from('profiles').update({ has_qr_dynamic: true }).eq('id', userId);
+        // Pachetul Dynamic & Analytics (39 RON) deblochează și PDF Hosting
+        await supabase.from('profiles').update({ has_qr_dynamic: true, has_qr_pdf: true }).eq('id', userId);
       }
-      // ---------------------------------------------
-      else if (tipProdus === 'founder' || tipProdus === 'premium' || tipProdus === 'pro') {
+
+      // --- ABONAMENTE & LIFETIME ---
+      else if (tipProdus === 'pro') {
         await supabase
           .from('profiles')
           .update({ 
-            subscription_tier: tipProdus, 
+            subscription_tier: 'pro', 
+            is_pro: true,
+            has_qr_dynamic: true,
+            has_qr_pdf: true,
+            subscription_status: 'active',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', userId);
+      }
+      else if (tipProdus === 'founder') {
+        await supabase
+          .from('profiles')
+          .update({ 
+            subscription_tier: 'founder', 
+            is_pro: true,
+            has_qr_branding: true,
+            has_qr_vcard: true,
+            has_qr_dynamic: true,
+            has_qr_pdf: true,
             subscription_status: 'active',
             updated_at: new Date().toISOString()
           })

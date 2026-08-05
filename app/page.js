@@ -72,8 +72,19 @@ export default function Home() {
   const [autoStep, setAutoStep] = useState('upload');
   const [hydrated, setHydrated] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  // STATE-URI MEGA QR
   const [qrType, setQrType] = useState('url'); 
   const [qrUrl, setQrUrl] = useState('');
+  const [wifiData, setWifiData] = useState({ ssid: '', password: '', type: 'WPA' });
+  const [waData, setWaData] = useState({ phone: '', message: '' });
+  const [iosUrl, setIosUrl] = useState('');
+  const [androidUrl, setAndroidUrl] = useState('');
+  const [geoRules, setGeoRules] = useState([{ country: 'RO', url: '' }, { country: 'DE', url: '' }]);
+  const [landingData, setLandingData] = useState({ avatarUrl: '', title: '', desc: '', links: [{ label: 'Website', url: '' }] });
+  
+  const [uploadedPdfUrl, setUploadedPdfUrl] = useState('');
+  const [isUploadingPdf, setIsUploadingPdf] = useState(false);
   
   // Tracking
   const [dynamicDestUrl, setDynamicDestUrl] = useState('');
@@ -119,7 +130,7 @@ export default function Home() {
   const [cursBnr, setCursBnr] = useState({ eur: '4.9752', usd: '4.5820' });
   const [qrColor, setQrColor] = useState('#000000');
   const [qrLogo, setQrLogo] = useState(null);
-  const [qrLogoRatio, setQrLogoRatio] = useState(1); // 1 înseamnă pătrat implicit
+  const [qrLogoRatio, setQrLogoRatio] = useState(1);
 
   const handleQrLogoUpload = (e) => {
     const file = e.target.files[0];
@@ -127,10 +138,9 @@ export default function Home() {
       const reader = new FileReader();
       reader.onload = (event) => {
         const imgResult = event.target.result;
-        // Creăm o imagine virtuală invizibilă pentru a citi proporțiile originale
         const img = new window.Image();
         img.onload = () => {
-          setQrLogoRatio(img.width / img.height); // Aflăm dacă e lat sau înalt
+          setQrLogoRatio(img.width / img.height);
           setQrLogo(imgResult);
         };
         img.src = imgResult;
@@ -138,6 +148,25 @@ export default function Home() {
       reader.readAsDataURL(file);
     }
   };
+
+  const handleUploadGeneric = async (e, setUrlState, bucketName = 'qr_pdfs', loadingStateSetter) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    loadingStateSetter(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}-${Math.random()}.${fileExt}`;
+      let { error: uploadError } = await supabase.storage.from(bucketName).upload(fileName, file);
+      if (uploadError) throw uploadError;
+      const { data } = supabase.storage.from(bucketName).getPublicUrl(fileName);
+      setUrlState(data.publicUrl);
+    } catch (error) {
+      alert("Eroare la încărcare: " + error.message);
+    } finally {
+      loadingStateSetter(false);
+    }
+  };
+
   const [indiciBursa, setIndiciBursa] = useState({
     bet: { puncte: '17,420.50', procent: '+1.24%', vol: '45.2M', high: '17,450.00', low: '17,210.20', trend: [] },
     sp500: { puncte: '5,310.12', procent: '+0.68%', vol: '2.1B', high: '5,325.50', low: '5,280.10', trend: [] },
@@ -205,7 +234,9 @@ export default function Home() {
 
   const getQrValue = () => {
     if (qrType === 'vcard') return `BEGIN:VCARD\nVERSION:3.0\nFN:${qrData.nume}\nTITLE:${qrData.functie}\nTEL:${qrData.telefon}\nEMAIL:${qrData.email}\nEND:VCARD`;
-    if (qrType === 'dynamic') return generatedDynamicUrl || 'https://contractsmart.ro';
+    if (qrType === 'wifi') return `WIFI:T:${wifiData.type};S:${wifiData.ssid};P:${wifiData.password};;`;
+    if (qrType === 'whatsapp') return `https://wa.me/${waData.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(waData.message)}`;
+    if (['dynamic', 'smart', 'geo', 'landing'].includes(qrType)) return generatedDynamicUrl || 'https://contractsmart.ro';
     return qrUrl || 'https://contractsmart.ro';
   };
 
@@ -222,14 +253,10 @@ export default function Home() {
   }, []);
 
   const handleDownloadQR = () => {
-    // Țintim QR-ul invizibil, randat nativ la 1000x1000px
     const canvas = document.getElementById('contract-qr-download');
     if (canvas) {
       try {
         const dataUrl = canvas.toDataURL('image/png', 1.0);
-        
-        // Transformăm imaginea într-un fișier fizic virtual (Blob)
-        // Această metodă trece de toate blocajele Safari / iOS WebKit pe mobil
         const arr = dataUrl.split(',');
         const mime = arr[0].match(/:(.*?);/)[1];
         const bstr = atob(arr[1]);
@@ -240,16 +267,12 @@ export default function Home() {
         }
         const blob = new Blob([u8arr], { type: mime });
         const blobUrl = URL.createObjectURL(blob);
-        
         const downloadLink = document.createElement('a');
         downloadLink.href = blobUrl;
         downloadLink.download = 'ContractSmart-QR-HighRes.png';
-        
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
-        
-        // Curățăm memoria memoriei telefonului
         setTimeout(() => window.URL.revokeObjectURL(blobUrl), 200);
       } catch (e) {
         alert("Codul QR s-a generat, dar browserul acestui telefon blochează descărcarea automată.");
@@ -380,7 +403,7 @@ export default function Home() {
   useEffect(() => {
     const fetchUserProfile = async (userId, email) => {
       try {
-        const { data: profile } = await supabase.from('profiles').select('subscription_tier, credits_remaining, has_qr_branding, has_qr_vcard, has_qr_dynamic').eq('id', userId).single();
+        const { data: profile } = await supabase.from('profiles').select('subscription_tier, credits_remaining, has_qr_branding, has_qr_vcard, has_qr_dynamic, has_qr_pdf, is_pro, is_enterprise').eq('id', userId).single();
         setUser({ 
           id: userId, 
           email: email, 
@@ -391,7 +414,7 @@ export default function Home() {
         setUserTier(profile?.subscription_tier || 'free');
       } catch (err) {
         setUser({ id: userId, email: email, status: 'free', credits: 0 });
-        setProfil({ subscription_tier: 'free', has_qr_branding: false, has_qr_vcard: false, has_qr_dynamic: false});
+        setProfil({ subscription_tier: 'free', has_qr_branding: false, has_qr_vcard: false, has_qr_dynamic: false, has_qr_pdf: false, is_pro: false});
         setUserTier('free');
       }
     };
@@ -413,7 +436,7 @@ export default function Home() {
         fetchUserProfile(session.user.id, session.user.email);
       } else {
         setUser(null);
-        setProfil({ subscription_tier: 'free', has_qr_branding: false, has_qr_vcard: false, has_qr_dynamic: false});
+        setProfil({ subscription_tier: 'free', has_qr_branding: false, has_qr_vcard: false, has_qr_dynamic: false, has_qr_pdf: false, is_pro: false});
         setUserTier('free');
       }
     });
@@ -537,18 +560,35 @@ export default function Home() {
 
   const handleGenerateDynamicQr = async () => {
     if (!user) return alert('Trebuie să fii autentificat pentru a salva linkurile în baza de date.');
-    if (!dynamicDestUrl) return alert('Introdu o adresă de destinație.');
     setIsGeneratingShortlink(true);
+    
+    const payload = {
+      userId: user.id,
+      type: qrType,
+      url: (qrType === 'dynamic' && uploadedPdfUrl) ? uploadedPdfUrl : dynamicDestUrl,
+      ios_url: iosUrl,
+      android_url: androidUrl,
+      geo_rules: geoRules,
+      landing_data: landingData
+    };
+
+    if (qrType === 'dynamic' && !dynamicDestUrl && !uploadedPdfUrl) {
+      setIsGeneratingShortlink(false); return alert('Introdu o adresă de destinație sau încarcă un PDF.');
+    }
+    if (qrType === 'smart' && (!iosUrl || !androidUrl)) {
+      setIsGeneratingShortlink(false); return alert('Sunt necesare ambele link-uri pentru App Store și Google Play.');
+    }
+
     try {
       const res = await fetch('/api/qr/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: dynamicDestUrl, userId: user.id })
+        body: JSON.stringify(payload)
       });
       const data = await res.json();
       if (data.success) {
         setGeneratedDynamicUrl(data.shortUrl);
-        alert('Shortlink creat! Codul QR a fost actualizat.');
+        alert('Codul Mega-QR a fost generat, securizat și salvat cu succes!');
       } else {
         alert('Eroare la generarea link-ului.');
       }
@@ -611,8 +651,7 @@ export default function Home() {
         document.body.removeChild(elementA);
         window.URL.revokeObjectURL(urlDownload);
         alert('Succes! Contractul a fost generat dinamic și descărcat automat în format PDF.');
-        setFormData({ tipContract: 'prestari', initiatorRol: 'prestator', prestatorNume: '', prestatorCui: '', prestatorEmail: '', prestatorLogo: '', prestatorCuloare: '#8ba888', clientNume: '', clientCui: '', clientEmail: '', clientTelefon: '', obiect: '', valoare: '', moneda: 'RON', emiteFacturaAvans: false, trimitePeWhatsApp: false, estePlatitorTVA: false, clauzaPi: true, clauzaPenalitati: true, clauzaRevizii: false, tarifOrar: '150', clauzaRawFoto: false, clauzaMarketingTerti: false, clauzaAprobareTacita: false, clauzaTaxaAnulare: false, clauzaSplitPayment: false, clauzaRetentie: false });
-        curataCanvas();
+        handleInapoiPrincipal();
       } else {
         const textEroare = await res.json();
         if (textEroare.needsPayment) {
@@ -1020,7 +1059,7 @@ export default function Home() {
                 </button>
                 <button onClick={() => { setShowPaymentModal(false); handleCumparaPremium('pro'); }} className="w-full bg-[#8ba888] text-[#0B0F12] font-black py-3 rounded-xl text-sm transition hover:opacity-90 flex justify-between items-center px-4 shadow-lg shadow-[#8ba888]/10">
                   <span>Abonament Pro (Nelimitat)</span>
-                  <span>69 RON / lună</span>
+                  <span>99 RON / lună</span>
                 </button>
               </div>
               <button onClick={() => { setShowPaymentModal(false); const el = document.getElementById('sectiune-preturi'); el?.scrollIntoView({ behavior: 'smooth' }); }} className="text-xs text-slate-500 hover:text-white mt-5 underline">Vezi toate beneficiile planurilor</button>
@@ -1194,18 +1233,18 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* COLOANA 2: QR CODE GENERATOR PRO */}
+              {/* COLOANA 2: MEGA-QR CODE GENERATOR PRO */}
               <div className="bg-[#0B0F12] border border-slate-800 rounded-xl p-5 sm:p-6 shadow-2xl flex flex-col">
                 <div className="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
                   <div>
                     <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">ContractSmart QR Studio</span>
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">ContractSmart QR Studio (Megatron)</span>
                     </h3>
                     <p className="text-slate-400 text-xs sm:text-sm mt-1">Generează, personalizează și urmărește codurile tale QR.</p>
                   </div>
                   <span className={`hidden sm:inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
                     profil?.subscription_tier === 'founder' ? 'bg-purple-900/30 text-purple-400 border border-purple-500/20' : 
-                    profil?.subscription_tier === 'pro' ? 'bg-blue-900/30 text-blue-400 border border-blue-500/20' : 
+                    profil?.is_pro ? 'bg-blue-900/30 text-blue-400 border border-blue-500/20' : 
                     'bg-slate-800 text-slate-300'
                   }`}>
                     {profil?.subscription_tier || 'Free'} Plan
@@ -1214,59 +1253,65 @@ export default function Home() {
 
                 <div className="flex-1 flex flex-col space-y-6">
                   
-                  {/* 1. TIPUL DE COD QR */}
+                  {/* 1. SELECTOR FUNCȚIE QR (SCROLL ORIZONTAL) */}
                   <div>
-                    <label className="text-white font-semibold block mb-3 text-sm">1. Selectează tipul codului</label>
-                    <div className="grid grid-cols-3 gap-2">
-                      <button 
-                        onClick={() => setQrType('url')}
-                        className={`p-2 rounded-lg border text-xs sm:text-sm font-medium transition-all ${qrType === 'url' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}
-                      >
-                        🌐 URL
-                      </button>
+                    <label className="text-white font-semibold block mb-3 text-sm">1. Funcție Cod QR</label>
+                    <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x">
                       
-                      <button 
-                        onClick={() => {
-                          if (profil?.subscription_tier === 'free' && !profil?.has_qr_vcard) {
-                            handleCheckout('qr_vcard');
-                          } else {
-                            setQrType('vcard');
-                          }
-                        }}
-                        className={`relative p-2 rounded-lg border text-xs sm:text-sm font-medium transition-all ${qrType === 'vcard' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}
-                      >
-                        📇 vCard
-                        {(profil?.subscription_tier === 'free' && !profil?.has_qr_vcard) && <span className="absolute -top-2 -right-2 text-[10px] bg-amber-500 text-black px-1.5 rounded-full">49 RON</span>}
+                      <button onClick={() => setQrType('url')} className={`snap-start whitespace-nowrap px-3 py-2 rounded-lg border text-xs sm:text-sm font-medium transition-all ${qrType === 'url' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>🌐 URL</button>
+                      <button onClick={() => setQrType('wifi')} className={`snap-start whitespace-nowrap px-3 py-2 rounded-lg border text-xs sm:text-sm font-medium transition-all ${qrType === 'wifi' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>📶 Wi-Fi</button>
+                      <button onClick={() => setQrType('whatsapp')} className={`snap-start whitespace-nowrap px-3 py-2 rounded-lg border text-xs sm:text-sm font-medium transition-all ${qrType === 'whatsapp' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>💬 WhatsApp</button>
+                      
+                      <button onClick={() => { if(!profil?.is_pro && !profil?.has_qr_vcard) handleCheckout('qr_vcard'); else setQrType('vcard'); }} className={`snap-start whitespace-nowrap relative px-3 py-2 rounded-lg border text-xs sm:text-sm font-medium transition-all ${qrType === 'vcard' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
+                        📇 vCard {(!profil?.is_pro && !profil?.has_qr_vcard) && <span className="absolute -top-2 -right-2 text-[9px] bg-amber-500 text-black px-1.5 rounded-full">69 RON</span>}
                       </button>
 
-                      <button 
-                        onClick={() => {
-                          if (profil?.subscription_tier !== 'founder' && !profil?.has_qr_dynamic) {
-                            handleCheckout('qr_dynamic');
-                          } else {
-                            setQrType('dynamic');
-                          }
-                        }}
-                        className={`relative p-2 rounded-lg border text-xs sm:text-sm font-medium transition-all flex justify-center items-center gap-1 ${qrType === 'dynamic' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}
-                      >
-                        <span>🔄 Dinamic</span>
-                        {(profil?.subscription_tier !== 'founder' && !profil?.has_qr_dynamic) && <span className="absolute -top-2 -right-2 text-[10px] bg-purple-500 text-white px-1.5 rounded-full">VIP</span>}
+                      <button onClick={() => { if(!profil?.is_pro && !profil?.has_qr_pdf) handleCheckout('qr_dynamic'); else setQrType('dynamic'); }} className={`snap-start whitespace-nowrap relative px-3 py-2 rounded-lg border text-xs sm:text-sm font-medium transition-all ${qrType === 'dynamic' ? 'bg-purple-900/30 border-purple-500 text-purple-400' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
+                        📄 Dinamic / PDF {(!profil?.is_pro && !profil?.has_qr_pdf) && <span className="absolute -top-2 -right-2 text-[9px] bg-purple-500 text-white px-1.5 rounded-full">39 RON</span>}
                       </button>
+
+                      <button onClick={() => { if(!profil?.is_pro) handleCheckout('pro'); else setQrType('smart'); }} className={`snap-start whitespace-nowrap relative px-3 py-2 rounded-lg border text-xs sm:text-sm font-medium transition-all ${qrType === 'smart' ? 'bg-blue-900/30 border-blue-500 text-blue-400' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
+                        📱 Smart OS {(!profil?.is_pro) && <span className="absolute -top-2 -right-2 text-[9px] bg-blue-500 text-white px-1.5 rounded-full">PRO</span>}
+                      </button>
+
+                      <button onClick={() => { if(!profil?.is_pro) handleCheckout('pro'); else setQrType('geo'); }} className={`snap-start whitespace-nowrap relative px-3 py-2 rounded-lg border text-xs sm:text-sm font-medium transition-all ${qrType === 'geo' ? 'bg-blue-900/30 border-blue-500 text-blue-400' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
+                        🌍 Geo-Target {(!profil?.is_pro) && <span className="absolute -top-2 -right-2 text-[9px] bg-blue-500 text-white px-1.5 rounded-full">PRO</span>}
+                      </button>
+
+                      <button onClick={() => { if(!profil?.is_pro) handleCheckout('pro'); else setQrType('landing'); }} className={`snap-start whitespace-nowrap relative px-3 py-2 rounded-lg border text-xs sm:text-sm font-medium transition-all ${qrType === 'landing' ? 'bg-blue-900/30 border-blue-500 text-blue-400' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
+                        🔗 Micro-Landing {(!profil?.is_pro) && <span className="absolute -top-2 -right-2 text-[9px] bg-blue-500 text-white px-1.5 rounded-full">PRO</span>}
+                      </button>
+
                     </div>
                   </div>
 
-                  {/* 2. CONȚINUT */}
+                  {/* 2. FORMULARE DINAMICE */}
                   <div>
-                    <label className="text-white font-semibold block mb-3 text-sm">2. Destinație / Conținut</label>
+                    <label className="text-white font-semibold block mb-3 text-sm">2. Configurare Conținut</label>
+                    
                     {qrType === 'url' && (
-                      <input 
-                        type="text" 
-                        placeholder="https://site-ul-tau.ro" 
-                        value={qrUrl}
-                        onChange={(e) => setQrUrl(e.target.value)}
-                        className="w-full bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-sm focus:border-[#8ba888] outline-none"
-                      />
+                      <input type="text" placeholder="https://site-ul-tau.ro" value={qrUrl} onChange={(e) => setQrUrl(e.target.value)} className="w-full bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-sm focus:border-[#8ba888] outline-none" />
                     )}
+
+                    {qrType === 'wifi' && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <input type="text" placeholder="Nume Rețea (SSID)" value={wifiData.ssid} onChange={(e) => setWifiData({...wifiData, ssid: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-sm focus:border-[#8ba888] outline-none" />
+                        <input type="text" placeholder="Parolă Rețea" value={wifiData.password} onChange={(e) => setWifiData({...wifiData, password: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-sm focus:border-[#8ba888] outline-none" />
+                        <select value={wifiData.type} onChange={e => setWifiData({...wifiData, type: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-sm outline-none sm:col-span-2">
+                          <option value="WPA">Securitate WPA/WPA2</option>
+                          <option value="WEP">Securitate WEP</option>
+                          <option value="nopass">Fără parolă (Liber)</option>
+                        </select>
+                      </div>
+                    )}
+
+                    {qrType === 'whatsapp' && (
+                      <div className="grid grid-cols-1 gap-3">
+                        <input type="text" placeholder="Număr telefon (ex: 40712345678)" value={waData.phone} onChange={(e) => setWaData({...waData, phone: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-sm focus:border-[#8ba888] outline-none" />
+                        <textarea placeholder="Mesaj predefinit (opțional)" value={waData.message} onChange={(e) => setWaData({...waData, message: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-sm focus:border-[#8ba888] outline-none resize-none h-16"></textarea>
+                      </div>
+                    )}
+
                     {qrType === 'vcard' && (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <input type="text" placeholder="Nume Complet" value={qrData.nume} onChange={(e) => setQrData({...qrData, nume: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-sm focus:border-[#8ba888] outline-none sm:col-span-2" />
@@ -1275,17 +1320,74 @@ export default function Home() {
                         <input type="email" placeholder="Email" value={qrData.email} onChange={(e) => setQrData({...qrData, email: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-sm focus:border-[#8ba888] outline-none" />
                       </div>
                     )}
+
                     {qrType === 'dynamic' && (
-                      <div className="p-4 bg-purple-900/20 border border-purple-500/30 rounded-lg">
-                        <p className="text-purple-300 text-[11px] mb-3 leading-tight">Codul tău va genera un link scurt securizat. Modificările viitoare nu strică codul tipărit.</p>
-                        <div className="flex flex-col gap-2.5">
-                          <input type="text" placeholder="Destinația reală (ex: https://emag.ro)" value={dynamicDestUrl} onChange={e => setDynamicDestUrl(e.target.value)} className="w-full bg-[#12181D] border border-purple-500/50 rounded-lg p-2.5 text-white text-sm outline-none focus:border-purple-400 transition" />
-                          <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="bg-purple-600 text-white font-bold py-2.5 rounded-lg text-xs hover:bg-purple-500 transition disabled:opacity-50">
-                            {isGeneratingShortlink ? 'Se generează...' : '🔗 Generează & Securizează Link Dinamic'}
-                          </button>
+                      <div className="p-4 bg-purple-900/20 border border-purple-500/30 rounded-lg space-y-4">
+                        <div>
+                          <label className="text-[10px] text-purple-300 uppercase font-bold block mb-1">A. Redirecționare Link Simplu</label>
+                          <input type="text" placeholder="https://site-ul-tau.ro/oferta" value={dynamicDestUrl} onChange={e => setDynamicDestUrl(e.target.value)} className="w-full bg-[#12181D] border border-purple-500/50 rounded-lg p-2 text-white text-sm outline-none" />
+                        </div>
+                        <div className="border-t border-purple-500/20 pt-3">
+                          <label className="text-[10px] text-purple-300 uppercase font-bold block mb-1">B. Sau Încărcare Meniu/Catalog PDF</label>
+                          <input type="file" accept="application/pdf" onChange={(e) => handleUploadGeneric(e, setUploadedPdfUrl, 'qr_pdfs', setIsUploadingPdf)} className="block w-full text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-purple-600 file:text-white cursor-pointer" />
+                          {isUploadingPdf && <span className="text-xs text-purple-400 mt-1 block animate-pulse">Se încarcă PDF-ul în Cloud...</span>}
+                          {uploadedPdfUrl && <span className="text-[10px] text-emerald-400 mt-1 block">✅ PDF Găzduit. Va fi folosit ca destinație.</span>}
+                        </div>
+                        <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="w-full bg-purple-600 text-white font-bold py-2 rounded-lg text-xs hover:bg-purple-500 transition">
+                          {isGeneratingShortlink ? 'Se securizează...' : '🔗 Activează Cod Dinamic'}
+                        </button>
+                      </div>
+                    )}
+
+                    {qrType === 'smart' && (
+                      <div className="p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg">
+                        <p className="text-blue-300 text-[11px] mb-3 leading-tight">Același QR trimite automat la magazinul corect în funcție de OS.</p>
+                        <div className="flex flex-col gap-3">
+                          <input type="url" placeholder="🍏 Link App Store (iOS)" value={iosUrl} onChange={(e) => setIosUrl(e.target.value)} className="w-full bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-sm focus:border-blue-500 outline-none" />
+                          <input type="url" placeholder="🤖 Link Google Play (Android)" value={androidUrl} onChange={(e) => setAndroidUrl(e.target.value)} className="w-full bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-sm focus:border-blue-500 outline-none" />
+                          <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="w-full bg-blue-600 text-white font-bold py-2 rounded-lg text-xs hover:bg-blue-500 transition">Activează Smart Routing</button>
                         </div>
                       </div>
                     )}
+
+                    {qrType === 'geo' && (
+                      <div className="p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg space-y-3">
+                        <p className="text-blue-300 text-[11px] leading-tight">Redirecționează utilizatorii în funcție de țara în care se află fizic (ex. meniuri multi-limbă).</p>
+                        {geoRules.map((rule, idx) => (
+                          <div key={idx} className="flex gap-2">
+                            <input type="text" placeholder="Cod Țară (RO, DE, UK)" value={rule.country} onChange={(e) => { const newRules = [...geoRules]; newRules[idx].country = e.target.value.toUpperCase(); setGeoRules(newRules); }} className="w-24 bg-[#12181D] border border-slate-700 rounded-lg p-2 text-white text-xs text-center font-bold outline-none" disabled={rule.country === 'DEFAULT'} />
+                            <input type="url" placeholder="URL Destinație" value={rule.url} onChange={(e) => { const newRules = [...geoRules]; newRules[idx].url = e.target.value; setGeoRules(newRules); }} className="flex-1 bg-[#12181D] border border-slate-700 rounded-lg p-2 text-white text-xs outline-none" />
+                          </div>
+                        ))}
+                        <button type="button" onClick={() => setGeoRules([...geoRules.slice(0, -1), { country: '', url: '' }, geoRules[geoRules.length-1]])} className="text-[10px] text-blue-400 font-bold underline block">+ Adaugă regulă țară</button>
+                        <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="w-full bg-blue-600 text-white font-bold py-2 rounded-lg text-xs hover:bg-blue-500 transition">Activează Geo-Routing</button>
+                      </div>
+                    )}
+
+                    {qrType === 'landing' && (
+                      <div className="p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg space-y-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <input type="text" placeholder="Titlu (ex: Restaurantul Meu)" value={landingData.title} onChange={(e) => setLandingData({...landingData, title: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2 text-white text-sm outline-none sm:col-span-2" />
+                          <textarea placeholder="Scurtă descriere..." value={landingData.desc} onChange={(e) => setLandingData({...landingData, desc: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2 text-white text-sm outline-none sm:col-span-2 h-16"></textarea>
+                        </div>
+                        <div className="border-t border-blue-500/20 pt-3">
+                          <label className="text-[10px] text-blue-300 uppercase font-bold block mb-1">Încarcă Poză Profil (Avatar)</label>
+                          <input type="file" accept="image/png, image/jpeg" onChange={(e) => handleUploadGeneric(e, (url) => setLandingData({...landingData, avatarUrl: url}), 'landing_images', setIsUploadingPdf)} className="block w-full text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-blue-600 file:text-white cursor-pointer" />
+                        </div>
+                        <div className="border-t border-blue-500/20 pt-3 space-y-2">
+                          <label className="text-[10px] text-blue-300 uppercase font-bold block">Link-uri (Meniu, Social Media, etc)</label>
+                          {landingData.links.map((link, idx) => (
+                            <div key={idx} className="flex gap-2">
+                              <input type="text" placeholder="Nume Buton" value={link.label} onChange={(e) => { const newLinks = [...landingData.links]; newLinks[idx].label = e.target.value; setLandingData({...landingData, links: newLinks}); }} className="w-1/3 bg-[#12181D] border border-slate-700 rounded-lg p-2 text-white text-xs outline-none" />
+                              <input type="url" placeholder="https://..." value={link.url} onChange={(e) => { const newLinks = [...landingData.links]; newLinks[idx].url = e.target.value; setLandingData({...landingData, links: newLinks}); }} className="flex-1 bg-[#12181D] border border-slate-700 rounded-lg p-2 text-white text-xs outline-none" />
+                            </div>
+                          ))}
+                          <button type="button" onClick={() => setLandingData({...landingData, links: [...landingData.links, { label: '', url: '' }]})} className="text-[10px] text-blue-400 font-bold underline block">+ Adaugă Link</button>
+                        </div>
+                        <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="w-full bg-blue-600 text-white font-bold py-2 rounded-lg text-xs hover:bg-blue-500 transition">Generează Micro-Landing</button>
+                      </div>
+                    )}
+
                   </div>
 
                   {/* 3. BRANDING & PREVIEW ROW */}
@@ -1295,11 +1397,11 @@ export default function Home() {
                     <div className="w-full">
                       <label className="text-white font-semibold block mb-3 flex items-center justify-between text-sm">
                         <span>3. Branding Visual</span>
-                        {(profil?.subscription_tier === 'free' && !profil?.has_qr_branding) && (
+                        {(!profil?.is_pro && !profil?.has_qr_branding) && (
                           <button onClick={() => handleCheckout('qr_branding')} className="text-[10px] font-bold text-amber-500 hover:underline">Deblochează (49 RON)</button>
                         )}
                       </label>
-                      <div className={`space-y-4 ${(profil?.subscription_tier === 'free' && !profil?.has_qr_branding) ? 'opacity-50 pointer-events-none' : ''}`}>
+                      <div className={`space-y-4 ${(!profil?.is_pro && !profil?.has_qr_branding) ? 'opacity-50 pointer-events-none' : ''}`}>
                         <div>
                           <label className="text-slate-400 text-[10px] mb-1.5 block uppercase tracking-wider font-bold">Culoare QR</label>
                           <div className="flex items-center gap-2">
@@ -1308,7 +1410,7 @@ export default function Home() {
                           </div>
                         </div>
                         <div>
-                          <label className="text-slate-400 text-[10px] mb-1.5 block uppercase tracking-wider font-bold">Încarcă Logo</label>
+                          <label className="text-slate-400 text-[10px] mb-1.5 block uppercase tracking-wider font-bold">Încarcă Logo Center</label>
                           <input type="file" accept="image/png, image/jpeg, image/svg+xml" onChange={handleQrLogoUpload} className="block w-full text-[11px] text-slate-400 file:mr-3 file:py-1.5 file:px-4 file:rounded-full file:border-0 file:text-[11px] file:font-bold file:bg-[#8ba888]/10 file:text-[#8ba888] hover:file:bg-[#8ba888]/20 cursor-pointer truncate" />
                           {qrLogo && <button type="button" onClick={() => { setQrLogo(null); setQrLogoRatio(1); }} className="text-[10px] text-red-400 mt-2 hover:underline block font-bold">Șterge Logo ❌</button>}
                         </div>
@@ -1352,7 +1454,7 @@ export default function Home() {
                           />
                         </div>
 
-                        {qrType === 'dynamic' && (
+                        {['dynamic', 'smart', 'geo', 'landing'].includes(qrType) && (
                           <div className="absolute -bottom-2 -right-2 bg-purple-600 p-1.5 rounded-full shadow-lg">
                             <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                           </div>
@@ -1367,7 +1469,7 @@ export default function Home() {
                         Descarcă QR
                       </button>
                       
-                      {(qrType === 'dynamic' && (profil?.subscription_tier === 'founder' || profil?.has_qr_dynamic)) && (
+                      {(['dynamic', 'smart', 'geo', 'landing'].includes(qrType) && (profil?.is_pro || profil?.has_qr_dynamic)) && (
                         <button onClick={fetchStats} className="w-full mt-2 py-2 border border-purple-500 text-purple-400 hover:bg-purple-500/10 font-bold rounded-lg text-xs transition-colors uppercase tracking-wide">
                           📊 Statistici
                         </button>
@@ -1705,86 +1807,102 @@ export default function Home() {
           </div>
         )}
 
-        {/* SECȚIUNE PREȚURI - GLOBALĂ */}
+        {/* SECȚIUNE PREȚURI CORECTATĂ */}
         <div id="sectiune-preturi" className="max-w-7xl mx-auto px-6 mt-16 scroll-mt-20">
+          
           <div className="border-b border-slate-800 pb-4 mb-8 text-center">
             <span className="text-[#8ba888] text-xs font-black uppercase tracking-widest block mb-1">Standard de Securitate Financiară</span>
-            <h2 className="text-3xl font-black text-white tracking-tight">Planuri de Business & Micro-Tranzacții</h2>
+            <h2 className="text-3xl font-black text-white tracking-tight">Ecosistem ContractSmart</h2>
           </div>
           
-          {/* BENTO GRID: CONTRACTE */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto mb-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto mb-10">
+            {/* Onetime Contract B2B */}
             <div className="bg-[#12181D] border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
               <div>
-                <span className="text-[10px] font-mono text-emerald-500 font-bold block uppercase">Freemium</span>
-                <h4 className="text-sm font-bold text-white mt-1">Document Comercial B2B</h4>
-                <div className="text-lg font-black text-[#8ba888] mt-2 mb-1">1 Gratuit <span className="text-[10px] text-slate-500 font-normal">/ lună</span></div>
-                <p className="text-[11px] text-slate-400 leading-relaxed mb-3">Ulterior <strong>19 RON</strong> / generare. Fără abonament, plătești strict pe contractul descărcat.</p>
+                <span className="text-[10px] font-mono text-emerald-500 font-bold block uppercase">Plată Unică</span>
+                <h4 className="text-sm font-bold text-white mt-1">1x Contract B2B</h4>
+                <div className="text-lg font-black text-[#8ba888] mt-2 mb-1">19 RON</div>
+                <p className="text-[11px] text-slate-400 leading-relaxed mb-3">Plătești strict pe contractul de servicii descărcat.</p>
               </div>
-              <button type="button" onClick={() => handleCumparaPremium('one_time_contract')} className="w-full mt-4 bg-[#0B0F12] hover:bg-slate-900 border border-slate-700 text-white font-bold py-2 rounded-xl text-xs transition">Cumpără Extra (19 RON)</button>
+              <button type="button" onClick={() => handleCumparaPremium('one_time_contract')} className="w-full mt-4 bg-[#0B0F12] border border-slate-700 hover:bg-slate-900 text-white font-bold py-2 rounded-xl text-xs transition">Cumpără 19 RON</button>
             </div>
 
+            {/* Onetime Auto */}
+            <div className="bg-[#12181D] border border-slate-800 rounded-2xl p-4 flex flex-col justify-between relative ring-1 ring-blue-500/30">
+              <span className="absolute -top-2 right-4 bg-blue-600 text-white text-[8px] uppercase font-black px-2 py-0.5 rounded">Auto</span>
+              <div>
+                <span className="text-[10px] font-mono text-blue-400 font-bold block uppercase">Plată Unică</span>
+                <h4 className="text-sm font-bold text-white mt-1">Pachet Acte Auto</h4>
+                <div className="text-lg font-black text-white mt-2 mb-3">99 RON</div>
+                <p className="text-[11px] text-slate-300 leading-relaxed">Generare pachet complet vânzare auto (contracte, DITL, PV).</p>
+              </div>
+              <button type="button" onClick={() => handleCumparaPremium('contract_auto')} className="w-full mt-4 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded-xl text-xs transition">Cumpără 99 RON</button>
+            </div>
+
+            {/* PRO */}
             <div className="bg-[#12181D] border border-slate-800 rounded-2xl p-4 flex flex-col justify-between relative ring-2 ring-[#8ba888]/20">
-              <span className="absolute -top-2 right-4 bg-[#8ba888] text-[#0B0F12] text-[8px] uppercase font-black px-2 py-0.5 rounded">Recomandat</span>
+              <span className="absolute -top-2 right-4 bg-[#8ba888] text-[#0B0F12] text-[8px] uppercase font-black px-2 py-0.5 rounded">Popular</span>
               <div>
-                <span className="text-[10px] font-mono text-[#8ba888] block uppercase">Hero Product</span>
-                <h4 className="text-sm font-bold text-white mt-1">Membru Pro Recurent</h4>
-                <div className="text-lg font-black text-white mt-2 mb-3">69 RON <span className="text-[10px] text-slate-500 font-normal">/ lună</span></div>
-                <p className="text-[11px] text-slate-300 leading-relaxed">Generare nelimitată contracte comerciale, acces complet la baza legală și audit de clauze automat incluși.</p>
+                <span className="text-[10px] font-mono text-[#8ba888] block uppercase">Abonament</span>
+                <h4 className="text-sm font-bold text-white mt-1">Abonament PRO</h4>
+                <div className="text-lg font-black text-white mt-2 mb-3">99 RON <span className="text-[10px] text-slate-500 font-normal">/ lună</span></div>
+                <p className="text-[11px] text-slate-300 leading-relaxed">Contracte B2B nelimitate + Mega-QR Studio (Smart, Geo, PDF, Landing).</p>
               </div>
-              <button type="button" onClick={() => handleCumparaPremium('pro')} className="w-full mt-4 bg-[#8ba888] text-[#0B0F12] font-black py-2 rounded-xl text-xs transition hover:opacity-90">Abonează-te Pro</button>
+              <button type="button" onClick={() => handleCumparaPremium('pro')} className="w-full mt-4 bg-[#8ba888] text-[#0B0F12] font-black py-2 rounded-xl text-xs transition hover:opacity-90">Abonează-te</button>
             </div>
 
-            <div className="bg-[#16221A] border border-[#8ba888]/40 rounded-2xl p-4 flex flex-col justify-between">
+            {/* FOUNDER LIFETIME */}
+            <div className="bg-[#16221A] border border-[#8ba888]/50 rounded-2xl p-4 flex flex-col justify-between relative shadow-lg shadow-[#8ba888]/10">
+              <span className="absolute -top-2 right-4 bg-gradient-to-r from-amber-200 to-yellow-500 text-black text-[8px] uppercase font-black px-2 py-0.5 rounded">VIP Acces</span>
               <div>
-                <span className="text-[10px] font-mono text-[#8ba888] block uppercase">Lansare Unică</span>
-                <h4 className="text-sm font-bold text-white mt-1">Membru Fondator Lifetime</h4>
-                <div className="text-lg font-black text-white mt-2 mb-3">999 RON <span className="text-[10px] text-slate-500 font-normal">/ pe viață</span></div>
-                <p className="text-[11px] text-slate-300 leading-relaxed">Valabil exclusiv pentru primii 100 de clienți. Deblochează pe viață clauzele premium fără costuri recurente.</p>
+                <span className="text-[10px] font-mono text-amber-500 font-bold block uppercase">Premium</span>
+                <h4 className="text-sm font-bold text-white mt-1">Membru Fondator</h4>
+                <div className="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-500 mt-2 mb-3">999 RON <span className="text-[10px] text-slate-500 font-normal">/ Lifetime</span></div>
+                <p className="text-[11px] text-slate-300 leading-relaxed">Acces pe viață la absolut toate funcțiile platformei. Cumperi o dată, folosești nelimitat.</p>
               </div>
-              <button type="button" onClick={() => handleCumparaPremium('founder')} className="w-full mt-4 bg-[#8ba888] text-[#0B0F12] font-black py-2 rounded-xl text-xs transition hover:opacity-90">Cumpără Lifetime</button>
+              <button type="button" onClick={() => handleCumparaPremium('founder')} className="w-full mt-4 bg-gradient-to-r from-amber-200 to-yellow-500 hover:opacity-90 text-black font-black py-2 rounded-xl text-xs transition">Devino Fondator</button>
             </div>
           </div>
 
           <div className="border-t border-slate-800 pt-8 pb-4 mb-4 text-center">
-            <span className="text-[#8ba888] text-xs font-black uppercase tracking-widest block mb-1">Add-on-uri Platformă</span>
-            <h3 className="text-2xl font-black text-white tracking-tight">ContractSmart QR Studio</h3>
+            <h3 className="text-2xl font-black text-white tracking-tight">Șabloane & Extensii QR (Plată Unică)</h3>
           </div>
-          
-          {/* BENTO GRID: QR STUDIO */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
-            {/* Card QR Branding (49 RON) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
+            
             <div className="bg-[#12181D] border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
               <div>
-                <span className="text-[10px] font-mono text-amber-500 font-bold block uppercase">Personalizare</span>
+                <h4 className="text-sm font-bold text-white mt-1">Șablon Tipizat Legal</h4>
+                <p className="text-[10px] text-slate-400 mt-1">Contracte PDF gata redactate.</p>
+                <div className="text-lg font-black text-white mt-2 mb-3">49 RON</div>
+              </div>
+              <Link href="/modele-contracte" className="w-full block text-center bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded-xl text-xs hover:bg-slate-900">Vezi Șabloanele</Link>
+            </div>
+
+            <div className="bg-[#12181D] border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
+              <div>
                 <h4 className="text-sm font-bold text-white mt-1">Pachet QR Branding</h4>
-                <div className="text-lg font-black text-white mt-2 mb-3">49 RON <span className="text-[10px] text-slate-500 font-normal">/ plată unică</span></div>
-                <p className="text-[11px] text-slate-300 leading-relaxed">Deblochează inserarea logo-ului în centrul codului și personalizarea culorilor pentru aliniere cu brandul tău.</p>
+                <p className="text-[10px] text-slate-400 mt-1">Adaugă logo-ul tău pe centru.</p>
+                <div className="text-lg font-black text-white mt-2 mb-3">49 RON</div>
               </div>
-              <button type="button" onClick={() => handleCumparaPremium('qr_branding')} className="w-full mt-4 bg-[#0B0F12] border border-slate-700 hover:bg-slate-900 text-white font-bold py-2 rounded-xl text-xs transition">Deblochează Funcția</button>
+              <button onClick={() => handleCumparaPremium('qr_branding')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded-xl text-xs hover:bg-slate-900">Cumpără 49 RON</button>
             </div>
 
-            {/* Card vCard Pro ( 69 RON) */}
             <div className="bg-[#12181D] border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
               <div>
-                <span className="text-[10px] font-mono text-amber-500 font-bold block uppercase">Networking</span>
-                <h4 className="text-sm font-bold text-white mt-1">Pachet vCard Pro</h4>
-                <div className="text-lg font-black text-white mt-2 mb-3">69 RON <span className="text-[10px] text-slate-500 font-normal">/ plată unică</span></div>
-                <p className="text-[11px] text-slate-300 leading-relaxed">Generează cărți de vizită digitale. La scanare, clientul salvează automat datele tale în agenda telefonului.</p>
+                <h4 className="text-sm font-bold text-white mt-1">Pachet QR Dynamic</h4>
+                <p className="text-[10px] text-slate-400 mt-1">Schimbă destinația + Găzduire PDF.</p>
+                <div className="text-lg font-black text-white mt-2 mb-3">39 RON</div>
               </div>
-              <button type="button" onClick={() => handleCumparaPremium('qr_vcard')} className="w-full mt-4 bg-[#0B0F12] border border-slate-700 hover:bg-slate-900 text-white font-bold py-2 rounded-xl text-xs transition">Deblochează Funcția</button>
+              <button onClick={() => handleCumparaPremium('qr_dynamic')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded-xl text-xs hover:bg-slate-900">Cumpără 39 RON</button>
             </div>
 
-            {/* Card Dynamic (39 RON/luna) */}
-            <div className="bg-[#12181D] border border-slate-800 rounded-2xl p-4 flex flex-col justify-between relative ring-1 ring-purple-500/30">
-              <span className="absolute -top-2 right-4 bg-purple-600 text-white text-[8px] uppercase font-black px-2 py-0.5 rounded">Analytics</span>
+            <div className="bg-[#12181D] border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
               <div>
-                <span className="text-[10px] font-mono text-purple-400 font-bold block uppercase">Marketing Pro</span>
-                <h4 className="text-sm font-bold text-white mt-1">QR Dinamic & Statistici</h4>
-                <div className="text-lg font-black text-white mt-2 mb-3">39 RON <span className="text-[10px] text-slate-500 font-normal">/ lună</span></div>
-                <p className="text-[11px] text-slate-300 leading-relaxed">Modifică linkul oricând după printare. Acces complet la panoul de statistici, scanări și dispozitive utilizate.</p>
+                <h4 className="text-sm font-bold text-white mt-1">Pachet QR vCard Pro</h4>
+                <p className="text-[10px] text-slate-400 mt-1">Carte de vizită cu salvare în agendă.</p>
+                <div className="text-lg font-black text-white mt-2 mb-3">69 RON</div>
               </div>
-              <button type="button" onClick={() => handleCumparaPremium('qr_dynamic')} className="w-full mt-4 bg-[#8ba888] text-[#0B0F12] font-black py-2 rounded-xl text-xs transition hover:opacity-90">Abonează-te</button>
+              <button onClick={() => handleCumparaPremium('qr_vcard')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded-xl text-xs hover:bg-slate-900">Cumpără 69 RON</button>
             </div>
           </div>
         </div>
