@@ -1231,7 +1231,7 @@ export default function Home() {
                         }}
                         className={`relative p-2 rounded-lg border text-xs sm:text-sm font-medium transition-all flex justify-center items-center gap-1 ${qrType === 'dynamic' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}
                       >
-                        <span>🔄 Dinamic</span></span>
+                        <span>🔄 Dinamic</span>
                         {(profil?.subscription_tier !== 'founder' && !profil?.has_qr_dynamic) && <span className="absolute -top-2 -right-2 text-[10px] bg-purple-500 text-white px-1.5 rounded-full">VIP</span>}
                       </button>
                     </div>
