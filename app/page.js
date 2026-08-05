@@ -222,19 +222,37 @@ export default function Home() {
   }, []);
 
   const handleDownloadQR = () => {
-    // Acum țintim un QR invizibil, randat nativ la 1000x1000px, pentru o claritate absolut perfectă.
+    // Țintim QR-ul invizibil, randat nativ la 1000x1000px
     const canvas = document.getElementById('contract-qr-download');
     if (canvas) {
       try {
         const dataUrl = canvas.toDataURL('image/png', 1.0);
+        
+        // Transformăm imaginea într-un fișier fizic virtual (Blob)
+        // Această metodă trece de toate blocajele Safari / iOS WebKit pe mobil
+        const arr = dataUrl.split(',');
+        const mime = arr[0].match(/:(.*?);/)[1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) {
+          u8arr[n] = bstr.charCodeAt(n);
+        }
+        const blob = new Blob([u8arr], { type: mime });
+        const blobUrl = URL.createObjectURL(blob);
+        
         const downloadLink = document.createElement('a');
-        downloadLink.href = dataUrl;
+        downloadLink.href = blobUrl;
         downloadLink.download = 'ContractSmart-QR-HighRes.png';
+        
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
+        
+        // Curățăm memoria memoriei telefonului
+        setTimeout(() => window.URL.revokeObjectURL(blobUrl), 200);
       } catch (e) {
-        alert("Codul QR s-a generat, dar browserul blochează descărcarea automată.");
+        alert("Codul QR s-a generat, dar browserul acestui telefon blochează descărcarea automată.");
       }
     } else {
       alert("Eroare: Codul QR nu a putut fi generat pentru descărcare.");
