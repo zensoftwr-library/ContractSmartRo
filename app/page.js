@@ -1177,15 +1177,15 @@ export default function Home() {
               </div>
 
               {/* COLOANA 2: QR CODE GENERATOR PRO */}
-              <div className="bg-[#0B0F12] border border-slate-800 rounded-xl p-6 shadow-2xl">
+              <div className="bg-[#0B0F12] border border-slate-800 rounded-xl p-5 sm:p-6 shadow-2xl flex flex-col">
                 <div className="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
                   <div>
                     <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">ContractSmart QR Studio</span> 
+                      <span className="text-[#8ba888]">⚡</span> ContractSmart QR Studio
                     </h3>
-                    <p className="text-slate-400 text-sm mt-1">Generează, personalizează și urmărește codurile tale QR.</p>
+                    <p className="text-slate-400 text-xs sm:text-sm mt-1">Generează, personalizează și urmărește codurile tale QR.</p>
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+                  <span className={`hidden sm:inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
                     profil?.subscription_tier === 'founder' ? 'bg-purple-900/30 text-purple-400 border border-purple-500/20' : 
                     profil?.subscription_tier === 'pro' ? 'bg-blue-900/30 text-blue-400 border border-blue-500/20' : 
                     'bg-slate-800 text-slate-300'
@@ -1194,165 +1194,168 @@ export default function Home() {
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 gap-6">
-                  <div className="space-y-5">
+                <div className="flex-1 flex flex-col space-y-6">
+                  
+                  {/* 1. TIPUL DE COD QR */}
+                  <div>
+                    <label className="text-white font-semibold block mb-3 text-sm">1. Selectează tipul codului</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      <button 
+                        onClick={() => setQrType('url')}
+                        className={`p-2 rounded-lg border text-xs sm:text-sm font-medium transition-all ${qrType === 'url' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}
+                      >
+                        🌐 URL
+                      </button>
+                      
+                      <button 
+                        onClick={() => {
+                          if (profil?.subscription_tier === 'free' && !profil?.has_qr_vcard) {
+                            handleCheckout('qr_vcard');
+                          } else {
+                            setQrType('vcard');
+                          }
+                        }}
+                        className={`relative p-2 rounded-lg border text-xs sm:text-sm font-medium transition-all ${qrType === 'vcard' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}
+                      >
+                        📇 vCard
+                        {(profil?.subscription_tier === 'free' && !profil?.has_qr_vcard) && <span className="absolute -top-2 -right-2 text-[10px] bg-amber-500 text-black px-1.5 rounded-full">9€</span>}
+                      </button>
+
+                      <button 
+                        onClick={() => {
+                          if (profil?.subscription_tier !== 'founder' && !profil?.has_qr_dynamic) {
+                            handleCheckout('qr_dynamic');
+                          } else {
+                            setQrType('dynamic');
+                          }
+                        }}
+                        className={`relative p-2 rounded-lg border text-xs sm:text-sm font-medium transition-all flex justify-center items-center gap-1 ${qrType === 'dynamic' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}
+                      >
+                        <span>🔄<span className="hidden sm:inline"> Dinamic</span></span>
+                        {(profil?.subscription_tier !== 'founder' && !profil?.has_qr_dynamic) && <span className="absolute -top-2 -right-2 text-[10px] bg-purple-500 text-white px-1.5 rounded-full">VIP</span>}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* 2. CONȚINUT */}
+                  <div>
+                    <label className="text-white font-semibold block mb-3 text-sm">2. Destinație / Conținut</label>
+                    {qrType === 'url' && (
+                      <input 
+                        type="text" 
+                        placeholder="https://site-ul-tau.ro" 
+                        value={qrUrl}
+                        onChange={(e) => setQrUrl(e.target.value)}
+                        className="w-full bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-sm focus:border-[#8ba888] outline-none"
+                      />
+                    )}
+                    {qrType === 'vcard' && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <input type="text" placeholder="Nume Complet" value={qrData.nume} onChange={(e) => setQrData({...qrData, nume: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-sm focus:border-[#8ba888] outline-none sm:col-span-2" />
+                        <input type="text" placeholder="Funcție / Titlu (ex: Manager)" value={qrData.functie} onChange={(e) => setQrData({...qrData, functie: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-sm focus:border-[#8ba888] outline-none sm:col-span-2" />
+                        <input type="text" placeholder="Telefon" value={qrData.telefon} onChange={(e) => setQrData({...qrData, telefon: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-sm focus:border-[#8ba888] outline-none" />
+                        <input type="email" placeholder="Email" value={qrData.email} onChange={(e) => setQrData({...qrData, email: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-sm focus:border-[#8ba888] outline-none" />
+                      </div>
+                    )}
+                    {qrType === 'dynamic' && (
+                      <div className="p-4 bg-purple-900/20 border border-purple-500/30 rounded-lg">
+                        <p className="text-purple-300 text-[11px] mb-3 leading-tight">Codul tău va genera un link scurt securizat. Modificările viitoare nu strică codul tipărit.</p>
+                        <div className="flex flex-col gap-2.5">
+                          <input type="text" placeholder="Destinația reală (ex: https://emag.ro)" value={dynamicDestUrl} onChange={e => setDynamicDestUrl(e.target.value)} className="w-full bg-[#12181D] border border-purple-500/50 rounded-lg p-2.5 text-white text-sm outline-none focus:border-purple-400 transition" />
+                          <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="bg-purple-600 text-white font-bold py-2.5 rounded-lg text-xs hover:bg-purple-500 transition disabled:opacity-50">
+                            {isGeneratingShortlink ? 'Se generează...' : '🔗 Generează & Securizează Link Dinamic'}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 3. BRANDING & PREVIEW ROW */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end mt-auto">
                     
-                    {/* 1. TIPUL DE COD QR */}
-                    <div>
-                      <label className="text-white font-semibold block mb-2 text-sm">1. Selectează tipul codului</label>
-                      <div className="grid grid-cols-3 gap-2">
-                        <button 
-                          onClick={() => setQrType('url')}
-                          className={`p-2 rounded-lg border text-xs font-medium transition-all ${qrType === 'url' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}
-                        >
-                          🌐 URL
-                        </button>
-                        
-                        <button 
-                          onClick={() => {
-                            if (profil?.subscription_tier === 'free' && !profil?.has_qr_vcard) {
-                              handleCheckout('qr_vcard');
-                            } else {
-                              setQrType('vcard');
-                            }
-                          }}
-                          className={`relative p-2 rounded-lg border text-xs font-medium transition-all ${qrType === 'vcard' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}
-                        >
-                          📇 vCard
-                          {(profil?.subscription_tier === 'free' && !profil?.has_qr_vcard) && <span className="absolute -top-2 -right-2 text-[10px] bg-amber-500 text-black px-1.5 rounded-full">9€</span>}
-                        </button>
-
-                        <button 
-                          onClick={() => {
-                            if (profil?.subscription_tier !== 'founder' && !profil?.has_qr_dynamic) {
-                              handleCheckout('qr_dynamic');
-                            } else {
-                              setQrType('dynamic');
-                            }
-                          }}
-                          className={`relative p-2 rounded-lg border text-xs font-medium transition-all flex flex-col justify-center items-center ${qrType === 'dynamic' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}
-                        >
-                          <span>🔄 Dinamic</span>
-                          {(profil?.subscription_tier !== 'founder' && !profil?.has_qr_dynamic) && <span className="absolute -top-2 -right-2 text-[10px] bg-purple-500 text-white px-1.5 rounded-full">VIP</span>}
-                        </button>
+                    {/* Left: Branding */}
+                    <div className="w-full">
+                      <label className="text-white font-semibold block mb-3 flex items-center justify-between text-sm">
+                        <span>3. Branding Visual</span>
+                        {(profil?.subscription_tier === 'free' && !profil?.has_qr_branding) && (
+                          <button onClick={() => handleCheckout('qr_branding')} className="text-[10px] font-bold text-amber-500 hover:underline">Deblochează (9€)</button>
+                        )}
+                      </label>
+                      <div className={`space-y-4 ${(profil?.subscription_tier === 'free' && !profil?.has_qr_branding) ? 'opacity-50 pointer-events-none' : ''}`}>
+                        <div>
+                          <label className="text-slate-400 text-[10px] mb-1.5 block uppercase tracking-wider font-bold">Culoare QR</label>
+                          <div className="flex items-center gap-2">
+                            <input type="color" value={qrColor} onChange={(e) => setQrColor(e.target.value)} className="w-10 h-8 rounded cursor-pointer shrink-0 bg-transparent border-0 p-0" />
+                            <input type="text" maxLength={7} value={qrColor} onChange={(e) => setQrColor(e.target.value)} placeholder="#000000" className="w-20 text-center bg-[#12181D] border border-slate-700 rounded-lg p-1.5 text-white text-xs font-mono outline-none focus:border-[#8ba888] transition-colors shrink-0" />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-slate-400 text-[10px] mb-1.5 block uppercase tracking-wider font-bold">Încarcă Logo</label>
+                          <input type="file" accept="image/png, image/jpeg, image/svg+xml" onChange={handleQrLogoUpload} className="block w-full text-[11px] text-slate-400 file:mr-3 file:py-1.5 file:px-4 file:rounded-full file:border-0 file:text-[11px] file:font-bold file:bg-[#8ba888]/10 file:text-[#8ba888] hover:file:bg-[#8ba888]/20 cursor-pointer truncate" />
+                          {qrLogo && <button type="button" onClick={() => { setQrLogo(null); setQrLogoRatio(1); }} className="text-[10px] text-red-400 mt-2 hover:underline block font-bold">Șterge Logo ❌</button>}
+                        </div>
                       </div>
                     </div>
 
-                    {/* 2. CONȚINUT */}
-                    <div>
-                      <label className="text-white font-semibold block mb-2 text-sm">2. Destinație / Conținut</label>
-                      {qrType === 'url' && (
-                        <input 
-                          type="text" 
-                          placeholder="https://site-ul-tau.ro" 
-                          value={qrUrl}
-                          onChange={(e) => setQrUrl(e.target.value)}
-                          className="w-full bg-[#12181D] border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-[#8ba888] outline-none"
+                    {/* Right: Preview & Download */}
+                    <div className="bg-[#16221A] rounded-xl p-4 flex flex-col items-center justify-center border border-slate-800 w-full">
+                      <div className="bg-white p-2 rounded-xl shadow-lg mb-4 relative flex justify-center items-center overflow-hidden">
+                        {/* 1. QR-ul Vizibil în Interfață */}
+                        <QRCodeCanvas 
+                          id="contract-qr"
+                          value={getQrValue()} 
+                          size={130} 
+                          level={"H"}
+                          fgColor={qrColor}
+                          bgColor="#FFFFFF"
+                          imageSettings={qrLogo ? { 
+                            src: qrLogo, 
+                            height: qrLogoRatio > 1 ? 35 / qrLogoRatio : 35, 
+                            width: qrLogoRatio > 1 ? 35 : 35 * qrLogoRatio, 
+                            excavate: true 
+                          } : undefined}
                         />
-                      )}
-                      {qrType === 'vcard' && (
-                        <div className="grid grid-cols-2 gap-2">
-                          <input type="text" placeholder="Nume Complet" value={qrData.nume} onChange={(e) => setQrData({...qrData, nume: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-[#8ba888] outline-none col-span-2" />
-                          <input type="text" placeholder="Funcție / Titlu (ex: Manager)" value={qrData.functie} onChange={(e) => setQrData({...qrData, functie: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-[#8ba888] outline-none col-span-2" />
-                          <input type="text" placeholder="Telefon" value={qrData.telefon} onChange={(e) => setQrData({...qrData, telefon: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-[#8ba888] outline-none" />
-                          <input type="email" placeholder="Email" value={qrData.email} onChange={(e) => setQrData({...qrData, email: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-[#8ba888] outline-none" />
-                        </div>
-                      )}
-                      {qrType === 'dynamic' && (
-                        <div className="p-3 bg-purple-900/20 border border-purple-500/30 rounded-lg">
-                          <p className="text-purple-300 text-[10px] mb-2 leading-tight">Codul tău va genera un link scurt securizat. Modificările viitoare nu strică codul tipărit.</p>
-                          <div className="flex flex-col gap-2">
-                            <input type="text" placeholder="Destinația reală (ex: https://emag.ro)" value={dynamicDestUrl} onChange={e => setDynamicDestUrl(e.target.value)} className="w-full bg-[#12181D] border border-purple-500/50 rounded-lg p-2 text-white text-sm outline-none" />
-                            <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="bg-purple-600 text-white font-bold py-2 rounded-lg text-xs hover:bg-purple-500 transition disabled:opacity-50">
-                              {isGeneratingShortlink ? 'Se generează...' : '🔗 Generează & Securizează Link Dinamic'}
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
 
-                    {/* 3. BRANDING & PREVIEW ROW */}
-                    <div className="grid grid-cols-2 gap-4 items-end">
-                      <div>
-                        <label className="text-white font-semibold block mb-2 flex items-center justify-between text-sm">
-                          <span>3. Branding Visual</span>
-                          {(profil?.subscription_tier === 'free' && !profil?.has_qr_branding) && (
-                            <button onClick={() => handleCheckout('qr_branding')} className="text-[10px] font-bold text-amber-500 hover:underline">Deblochează (9€)</button>
-                          )}
-                        </label>
-                        <div className={`space-y-3 ${(profil?.subscription_tier === 'free' && !profil?.has_qr_branding) ? 'opacity-50 pointer-events-none' : ''}`}>
-                          <div>
-                            <label className="text-slate-400 text-[10px] mb-1 block">Culoare QR (Alege sau Hex)</label>
-                            <div className="flex items-center gap-2">
-                              <input type="color" value={qrColor} onChange={(e) => setQrColor(e.target.value)} className="w-10 h-8 rounded cursor-pointer shrink-0 bg-transparent border-0 p-0" />
-                              <input type="text" value={qrColor} onChange={(e) => setQrColor(e.target.value)} placeholder="#000000" className="flex-1 bg-[#12181D] border border-slate-700 rounded-lg p-1.5 text-white text-xs font-mono outline-none focus:border-[#8ba888] transition-colors" />
-                            </div>
-                          </div>
-                          <div>
-                            <label className="text-slate-400 text-[10px] mb-1 block">Încarcă Logo (Centru)</label>
-                            <input type="file" accept="image/png, image/jpeg, image/svg+xml" onChange={handleQrLogoUpload} className="w-full text-[10px] text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-[10px] file:font-semibold file:bg-[#8ba888]/10 file:text-[#8ba888] hover:file:bg-[#8ba888]/20" />
-                            {qrLogo && <button type="button" onClick={() => { setQrLogo(null); setQrLogoRatio(1); }} className="text-[10px] text-red-400 mt-1 hover:underline block">Șterge Logo ❌</button>}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="bg-[#16221A] rounded-xl p-4 flex flex-col items-center justify-center border border-slate-800">
-                        <div className="bg-white p-2 rounded-xl shadow-lg mb-3 relative flex justify-center items-center overflow-hidden">
-                          {/* 1. QR-ul Vizibil în Interfață (Mic, pentru Preview) */}
+                        {/* 2. QR-ul Ascuns (Randat nativ la 1000px HD) */}
+                        <div className="hidden">
                           <QRCodeCanvas 
-                            id="contract-qr"
+                            id="contract-qr-download"
                             value={getQrValue()} 
-                            size={130} 
+                            size={1000} 
                             level={"H"}
                             fgColor={qrColor}
                             bgColor="#FFFFFF"
                             imageSettings={qrLogo ? { 
                               src: qrLogo, 
-                              height: qrLogoRatio > 1 ? 35 / qrLogoRatio : 35, 
-                              width: qrLogoRatio > 1 ? 35 : 35 * qrLogoRatio, 
+                              height: qrLogoRatio > 1 ? 250 / qrLogoRatio : 250, 
+                              width: qrLogoRatio > 1 ? 250 : 250 * qrLogoRatio, 
                               excavate: true 
                             } : undefined}
                           />
-
-                          {/* 2. QR-ul Ascuns (Randat nativ la 1000px HD pentru un Export Perfect) */}
-                          <div className="hidden">
-                            <QRCodeCanvas 
-                              id="contract-qr-download"
-                              value={getQrValue()} 
-                              size={1000} 
-                              level={"H"}
-                              fgColor={qrColor}
-                              bgColor="#FFFFFF"
-                              imageSettings={qrLogo ? { 
-                                src: qrLogo, 
-                                height: qrLogoRatio > 1 ? 250 / qrLogoRatio : 250, 
-                                width: qrLogoRatio > 1 ? 250 : 250 * qrLogoRatio, 
-                                excavate: true 
-                              } : undefined}
-                            />
-                          </div>
-                          {qrType === 'dynamic' && (
-                            <div className="absolute -bottom-2 -right-2 bg-purple-600 p-1 rounded-full shadow-lg">
-                              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                            </div>
-                          )}
                         </div>
 
-                        <button 
-                          onClick={handleDownloadQR}
-                          className="w-full py-2 bg-[#8ba888] hover:bg-[#7a9677] text-[#0B0F12] font-bold rounded-lg transition-colors flex justify-center items-center gap-2 text-xs"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                          Descarcă QR HD
-                        </button>
-                        
-                        {(qrType === 'dynamic' && (profil?.subscription_tier === 'founder' || profil?.has_qr_dynamic)) && (
-                          <button onClick={fetchStats} className="w-full mt-2 py-1.5 border border-purple-500 text-purple-400 hover:bg-purple-500/10 font-medium rounded-lg text-xs transition-colors">
-                            📊 Statistici
-                          </button>
+                        {qrType === 'dynamic' && (
+                          <div className="absolute -bottom-2 -right-2 bg-purple-600 p-1.5 rounded-full shadow-lg">
+                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                          </div>
                         )}
                       </div>
+
+                      <button 
+                        onClick={handleDownloadQR}
+                        className="w-full py-2.5 bg-[#8ba888] hover:bg-[#7a9677] text-[#0B0F12] font-black rounded-lg transition-colors flex justify-center items-center gap-2 text-xs uppercase tracking-wide"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        Descarcă QR
+                      </button>
+                      
+                      {(qrType === 'dynamic' && (profil?.subscription_tier === 'founder' || profil?.has_qr_dynamic)) && (
+                        <button onClick={fetchStats} className="w-full mt-2 py-2 border border-purple-500 text-purple-400 hover:bg-purple-500/10 font-bold rounded-lg text-xs transition-colors uppercase tracking-wide">
+                          📊 Statistici
+                        </button>
+                      )}
                     </div>
+
                   </div>
                 </div>
               </div>
