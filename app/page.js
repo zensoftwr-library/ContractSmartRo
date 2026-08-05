@@ -119,12 +119,22 @@ export default function Home() {
   const [cursBnr, setCursBnr] = useState({ eur: '4.9752', usd: '4.5820' });
   const [qrColor, setQrColor] = useState('#000000');
   const [qrLogo, setQrLogo] = useState(null);
+  const [qrLogoRatio, setQrLogoRatio] = useState(1); // 1 înseamnă pătrat implicit
 
   const handleQrLogoUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (event) => setQrLogo(event.target.result);
+      reader.onload = (event) => {
+        const imgResult = event.target.result;
+        // Creăm o imagine virtuală invizibilă pentru a citi proporțiile originale
+        const img = new window.Image();
+        img.onload = () => {
+          setQrLogoRatio(img.width / img.height); // Aflăm dacă e lat sau înalt
+          setQrLogo(imgResult);
+        };
+        img.src = imgResult;
+      };
       reader.readAsDataURL(file);
     }
   };
@@ -1171,7 +1181,7 @@ export default function Home() {
                 <div className="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
                   <div>
                     <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                      <span className="text-[#8ba888]">⚡</span> ContractSmart QR Studio
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">ContractSmart QR Studio</span> 
                     </h3>
                     <p className="text-slate-400 text-sm mt-1">Generează, personalizează și urmărește codurile tale QR.</p>
                   </div>
@@ -1281,7 +1291,7 @@ export default function Home() {
                           <div>
                             <label className="text-slate-400 text-[10px] mb-1 block">Încarcă Logo (Centru)</label>
                             <input type="file" accept="image/png, image/jpeg, image/svg+xml" onChange={handleQrLogoUpload} className="w-full text-[10px] text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-[10px] file:font-semibold file:bg-[#8ba888]/10 file:text-[#8ba888] hover:file:bg-[#8ba888]/20" />
-                            {qrLogo && <button type="button" onClick={() => setQrLogo(null)} className="text-[10px] text-red-400 mt-1 hover:underline block">Șterge Logo ❌</button>}
+                            {qrLogo && <button type="button" onClick={() => { setQrLogo(null); setQrLogoRatio(1); }} className="text-[10px] text-red-400 mt-1 hover:underline block">Șterge Logo ❌</button>}
                           </div>
                         </div>
                       </div>
@@ -1296,7 +1306,12 @@ export default function Home() {
                             level={"H"}
                             fgColor={qrColor}
                             bgColor="#FFFFFF"
-                            imageSettings={qrLogo ? { src: qrLogo, height: 30, width: 30, excavate: true } : undefined}
+                            imageSettings={qrLogo ? { 
+                              src: qrLogo, 
+                              height: qrLogoRatio > 1 ? 35 / qrLogoRatio : 35, 
+                              width: qrLogoRatio > 1 ? 35 : 35 * qrLogoRatio, 
+                              excavate: true 
+                            } : undefined}
                           />
 
                           {/* 2. QR-ul Ascuns (Randat nativ la 1000px HD pentru un Export Perfect) */}
@@ -1308,7 +1323,12 @@ export default function Home() {
                               level={"H"}
                               fgColor={qrColor}
                               bgColor="#FFFFFF"
-                              imageSettings={qrLogo ? { src: qrLogo, height: 250, width: 250, excavate: true } : undefined}
+                              imageSettings={qrLogo ? { 
+                                src: qrLogo, 
+                                height: qrLogoRatio > 1 ? 250 / qrLogoRatio : 250, 
+                                width: qrLogoRatio > 1 ? 250 : 250 * qrLogoRatio, 
+                                excavate: true 
+                              } : undefined}
                             />
                           </div>
                           {qrType === 'dynamic' && (
