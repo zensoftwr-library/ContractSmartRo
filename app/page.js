@@ -85,8 +85,8 @@ export default function Home() {
   
   const [uploadedPdfUrl, setUploadedPdfUrl] = useState('');
   const [isUploadingPdf, setIsUploadingPdf] = useState(false);
-  
-  // Tracking
+
+  // Tracking & Analytics QR
   const [dynamicDestUrl, setDynamicDestUrl] = useState('');
   const [generatedDynamicUrl, setGeneratedDynamicUrl] = useState('');
   const [isGeneratingShortlink, setIsGeneratingShortlink] = useState(false);
@@ -124,13 +124,14 @@ export default function Home() {
       }
     } catch(e) {}
   };
+
   const [qrData, setQrData] = useState({ nume: '', telefon: '', iban: '', suma: '', url: '', email: '', functie: '', banca: '' });
   const [qrGeneratedUrl, setQrGeneratedUrl] = useState('');
 
   const [cursBnr, setCursBnr] = useState({ eur: '4.9752', usd: '4.5820' });
   const [qrColor, setQrColor] = useState('#000000');
   const [qrLogo, setQrLogo] = useState(null);
-  const [qrLogoRatio, setQrLogoRatio] = useState(1);
+  const [qrLogoRatio, setQrLogoRatio] = useState(1); // 1 înseamnă pătrat implicit
 
   const handleQrLogoUpload = (e) => {
     const file = e.target.files[0];
@@ -140,7 +141,7 @@ export default function Home() {
         const imgResult = event.target.result;
         const img = new window.Image();
         img.onload = () => {
-          setQrLogoRatio(img.width / img.height);
+          setQrLogoRatio(img.width / img.height); // Aflăm dacă e lat sau înalt
           setQrLogo(imgResult);
         };
         img.src = imgResult;
@@ -177,6 +178,10 @@ export default function Home() {
   const [user, setUser] = useState(null); 
   const [profil, setProfil] = useState(null);
   const [userTier, setUserTier] = useState('free');
+  
+  // VARIABILĂ SIGURĂ PENTRU A DETECTA DACA E FOUNDER SAU PRO FARA SA DEA CRASH
+  const isPremium = ['founder', 'pro'].includes(profil?.subscription_tier) || profil?.is_pro;
+
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false); 
   
@@ -403,15 +408,15 @@ export default function Home() {
   useEffect(() => {
     const fetchUserProfile = async (userId, email) => {
       try {
-        const { data: profile } = await supabase.from('profiles').select('subscription_tier, credits_remaining, has_qr_branding, has_qr_vcard, has_qr_dynamic, has_qr_pdf, is_pro, is_enterprise').eq('id', userId).single();
-        setUser({ 
-          id: userId, 
-          email: email, 
-          status: profile?.subscription_tier || 'free', 
-          credits: profile?.credits_remaining ?? 0 
-        });
-        setProfil(profile);
-        setUserTier(profile?.subscription_tier || 'free');
+        const { data: profile } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle();
+        
+        if (profile) {
+          setUser({ id: userId, email: email, status: profile.subscription_tier || 'free', credits: profile.credits_remaining ?? 0 });
+          setProfil(profile);
+          setUserTier(profile.subscription_tier || 'free');
+        } else {
+          throw new Error("No profile");
+        }
       } catch (err) {
         setUser({ id: userId, email: email, status: 'free', credits: 0 });
         setProfil({ subscription_tier: 'free', has_qr_branding: false, has_qr_vcard: false, has_qr_dynamic: false, has_qr_pdf: false, is_pro: false});
@@ -419,28 +424,14 @@ export default function Home() {
       }
     };
 
-    const restaureazaSesiunea = async () => {
-      try {
-        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) return;
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          await fetchUserProfile(session.user.id, session.user.email);
-        }
-      } catch (e) { }
-    };
-
-    restaureazaSesiunea();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        fetchUserProfile(session.user.id, session.user.email);
-      } else {
-        setUser(null);
-        setProfil({ subscription_tier: 'free', has_qr_branding: false, has_qr_vcard: false, has_qr_dynamic: false, has_qr_pdf: false, is_pro: false});
-        setUserTier('free');
-      }
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) fetchUserProfile(session.user.id, session.user.email);
     });
 
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) fetchUserProfile(session.user.id, session.user.email);
+      else { setUser(null); setProfil(null); setUserTier('free'); }
+    });
     return () => subscription?.unsubscribe?.();
   }, []);
 
@@ -1244,7 +1235,7 @@ export default function Home() {
                   </div>
                   <span className={`hidden sm:inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
                     profil?.subscription_tier === 'founder' ? 'bg-purple-900/30 text-purple-400 border border-purple-500/20' : 
-                    profil?.is_pro ? 'bg-blue-900/30 text-blue-400 border border-blue-500/20' : 
+                    isPremium ? 'bg-blue-900/30 text-blue-400 border border-blue-500/20' : 
                     'bg-slate-800 text-slate-300'
                   }`}>
                     {profil?.subscription_tier || 'Free'} Plan
@@ -1253,35 +1244,33 @@ export default function Home() {
 
                 <div className="flex-1 flex flex-col space-y-6">
                   
-                  {/* 1. SELECTOR FUNCȚIE QR (SCROLL ORIZONTAL) */}
+                  {/* 1. SELECTOR FUNCȚIE QR (GRID CORECTAT, NU IESE DIN CHENAR) */}
                   <div>
                     <label className="text-white font-semibold block mb-3 text-sm">1. Funcție Cod QR</label>
-                    <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                      <button onClick={() => setQrType('url')} className={`p-2 rounded-lg border text-[11px] font-bold transition-all ${qrType === 'url' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>🌐 URL</button>
+                      <button onClick={() => setQrType('wifi')} className={`p-2 rounded-lg border text-[11px] font-bold transition-all ${qrType === 'wifi' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>📶 Wi-Fi</button>
+                      <button onClick={() => setQrType('whatsapp')} className={`p-2 rounded-lg border text-[11px] font-bold transition-all ${qrType === 'whatsapp' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>💬 WhatsApp</button>
                       
-                      <button onClick={() => setQrType('url')} className={`snap-start whitespace-nowrap px-3 py-2 rounded-lg border text-xs sm:text-sm font-medium transition-all ${qrType === 'url' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>🌐 URL</button>
-                      <button onClick={() => setQrType('wifi')} className={`snap-start whitespace-nowrap px-3 py-2 rounded-lg border text-xs sm:text-sm font-medium transition-all ${qrType === 'wifi' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>📶 Wi-Fi</button>
-                      <button onClick={() => setQrType('whatsapp')} className={`snap-start whitespace-nowrap px-3 py-2 rounded-lg border text-xs sm:text-sm font-medium transition-all ${qrType === 'whatsapp' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>💬 WhatsApp</button>
+                      <button onClick={() => { if(!isPremium && !profil?.has_qr_vcard) handleCheckout('qr_vcard'); else setQrType('vcard'); }} className={`relative p-2 rounded-lg border text-[11px] font-bold transition-all ${qrType === 'vcard' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
+                        📇 vCard {(!isPremium && !profil?.has_qr_vcard) && <span className="absolute -top-2 -right-2 text-[9px] bg-amber-500 text-black px-1.5 rounded-full shadow-lg">69 RON</span>}
+                      </button>
+
+                      <button onClick={() => { if(!isPremium && !profil?.has_qr_pdf) handleCheckout('qr_dynamic'); else setQrType('dynamic'); }} className={`relative p-2 rounded-lg border text-[11px] font-bold transition-all ${qrType === 'dynamic' ? 'bg-purple-900/30 border-purple-500 text-purple-400' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
+                        📄 Dinamic {(!isPremium && !profil?.has_qr_pdf) && <span className="absolute -top-2 -right-2 text-[9px] bg-purple-500 text-white px-1.5 rounded-full shadow-lg">39 RON</span>}
+                      </button>
+
+                      <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('smart'); }} className={`relative p-2 rounded-lg border text-[11px] font-bold transition-all ${qrType === 'smart' ? 'bg-blue-900/30 border-blue-500 text-blue-400' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
+                        📱 Smart OS {(!isPremium) && <span className="absolute -top-2 -right-2 text-[9px] bg-blue-500 text-white px-1.5 rounded-full shadow-lg">PRO</span>}
+                      </button>
                       
-                      <button onClick={() => { if(!profil?.is_pro && !profil?.has_qr_vcard) handleCheckout('qr_vcard'); else setQrType('vcard'); }} className={`snap-start whitespace-nowrap relative px-3 py-2 rounded-lg border text-xs sm:text-sm font-medium transition-all ${qrType === 'vcard' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
-                        📇 vCard {(!profil?.is_pro && !profil?.has_qr_vcard) && <span className="absolute -top-2 -right-2 text-[9px] bg-amber-500 text-black px-1.5 rounded-full">69 RON</span>}
+                      <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('geo'); }} className={`relative p-2 rounded-lg border text-[11px] font-bold transition-all ${qrType === 'geo' ? 'bg-blue-900/30 border-blue-500 text-blue-400' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
+                        🌍 Geo-Target {(!isPremium) && <span className="absolute -top-2 -right-2 text-[9px] bg-blue-500 text-white px-1.5 rounded-full shadow-lg">PRO</span>}
                       </button>
-
-                      <button onClick={() => { if(!profil?.is_pro && !profil?.has_qr_pdf) handleCheckout('qr_dynamic'); else setQrType('dynamic'); }} className={`snap-start whitespace-nowrap relative px-3 py-2 rounded-lg border text-xs sm:text-sm font-medium transition-all ${qrType === 'dynamic' ? 'bg-purple-900/30 border-purple-500 text-purple-400' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
-                        📄 Dinamic / PDF {(!profil?.is_pro && !profil?.has_qr_pdf) && <span className="absolute -top-2 -right-2 text-[9px] bg-purple-500 text-white px-1.5 rounded-full">39 RON</span>}
+                      
+                      <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('landing'); }} className={`relative p-2 rounded-lg border text-[11px] font-bold transition-all ${qrType === 'landing' ? 'bg-blue-900/30 border-blue-500 text-blue-400' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
+                        🔗 Landing {(!isPremium) && <span className="absolute -top-2 -right-2 text-[9px] bg-blue-500 text-white px-1.5 rounded-full shadow-lg">PRO</span>}
                       </button>
-
-                      <button onClick={() => { if(!profil?.is_pro) handleCheckout('pro'); else setQrType('smart'); }} className={`snap-start whitespace-nowrap relative px-3 py-2 rounded-lg border text-xs sm:text-sm font-medium transition-all ${qrType === 'smart' ? 'bg-blue-900/30 border-blue-500 text-blue-400' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
-                        📱 Smart OS {(!profil?.is_pro) && <span className="absolute -top-2 -right-2 text-[9px] bg-blue-500 text-white px-1.5 rounded-full">PRO</span>}
-                      </button>
-
-                      <button onClick={() => { if(!profil?.is_pro) handleCheckout('pro'); else setQrType('geo'); }} className={`snap-start whitespace-nowrap relative px-3 py-2 rounded-lg border text-xs sm:text-sm font-medium transition-all ${qrType === 'geo' ? 'bg-blue-900/30 border-blue-500 text-blue-400' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
-                        🌍 Geo-Target {(!profil?.is_pro) && <span className="absolute -top-2 -right-2 text-[9px] bg-blue-500 text-white px-1.5 rounded-full">PRO</span>}
-                      </button>
-
-                      <button onClick={() => { if(!profil?.is_pro) handleCheckout('pro'); else setQrType('landing'); }} className={`snap-start whitespace-nowrap relative px-3 py-2 rounded-lg border text-xs sm:text-sm font-medium transition-all ${qrType === 'landing' ? 'bg-blue-900/30 border-blue-500 text-blue-400' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
-                        🔗 Micro-Landing {(!profil?.is_pro) && <span className="absolute -top-2 -right-2 text-[9px] bg-blue-500 text-white px-1.5 rounded-full">PRO</span>}
-                      </button>
-
                     </div>
                   </div>
 
@@ -1387,7 +1376,6 @@ export default function Home() {
                         <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="w-full bg-blue-600 text-white font-bold py-2 rounded-lg text-xs hover:bg-blue-500 transition">Generează Micro-Landing</button>
                       </div>
                     )}
-
                   </div>
 
                   {/* 3. BRANDING & PREVIEW ROW */}
@@ -1397,11 +1385,11 @@ export default function Home() {
                     <div className="w-full">
                       <label className="text-white font-semibold block mb-3 flex items-center justify-between text-sm">
                         <span>3. Branding Visual</span>
-                        {(!profil?.is_pro && !profil?.has_qr_branding) && (
+                        {(!isPremium && !profil?.has_qr_branding) && (
                           <button onClick={() => handleCheckout('qr_branding')} className="text-[10px] font-bold text-amber-500 hover:underline">Deblochează (49 RON)</button>
                         )}
                       </label>
-                      <div className={`space-y-4 ${(!profil?.is_pro && !profil?.has_qr_branding) ? 'opacity-50 pointer-events-none' : ''}`}>
+                      <div className={`space-y-4 ${(!isPremium && !profil?.has_qr_branding) ? 'opacity-50 pointer-events-none' : ''}`}>
                         <div>
                           <label className="text-slate-400 text-[10px] mb-1.5 block uppercase tracking-wider font-bold">Culoare QR</label>
                           <div className="flex items-center gap-2">
@@ -1469,7 +1457,7 @@ export default function Home() {
                         Descarcă QR
                       </button>
                       
-                      {(['dynamic', 'smart', 'geo', 'landing'].includes(qrType) && (profil?.is_pro || profil?.has_qr_dynamic)) && (
+                      {(['dynamic', 'smart', 'geo', 'landing'].includes(qrType) && (isPremium || profil?.has_qr_dynamic)) && (
                         <button onClick={fetchStats} className="w-full mt-2 py-2 border border-purple-500 text-purple-400 hover:bg-purple-500/10 font-bold rounded-lg text-xs transition-colors uppercase tracking-wide">
                           📊 Statistici
                         </button>
@@ -1807,15 +1795,16 @@ export default function Home() {
           </div>
         )}
 
-        {/* SECȚIUNE PREȚURI CORECTATĂ */}
+        {/* SECȚIUNE PREȚURI PERFECTĂ */}
         <div id="sectiune-preturi" className="max-w-7xl mx-auto px-6 mt-16 scroll-mt-20">
           
+          {/* Partea 1: Servicii Complete / Abonamente */}
           <div className="border-b border-slate-800 pb-4 mb-8 text-center">
-            <span className="text-[#8ba888] text-xs font-black uppercase tracking-widest block mb-1">Standard de Securitate Financiară</span>
-            <h2 className="text-3xl font-black text-white tracking-tight">Ecosistem ContractSmart</h2>
+            <span className="text-[#8ba888] text-xs font-black uppercase tracking-widest block mb-1">Ecosistem ContractSmart</span>
+            <h2 className="text-3xl font-black text-white tracking-tight">Planuri de Business & Tranzacții</h2>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto mb-10">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-5xl mx-auto mb-10">
             {/* Onetime Contract B2B */}
             <div className="bg-[#12181D] border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
               <div>
@@ -1850,20 +1839,25 @@ export default function Home() {
               </div>
               <button type="button" onClick={() => handleCumparaPremium('pro')} className="w-full mt-4 bg-[#8ba888] text-[#0B0F12] font-black py-2 rounded-xl text-xs transition hover:opacity-90">Abonează-te</button>
             </div>
-
+          </div>
+          
+          <div className="max-w-5xl mx-auto mb-12">
             {/* FOUNDER LIFETIME */}
-            <div className="bg-[#16221A] border border-[#8ba888]/50 rounded-2xl p-4 flex flex-col justify-between relative shadow-lg shadow-[#8ba888]/10">
-              <span className="absolute -top-2 right-4 bg-gradient-to-r from-amber-200 to-yellow-500 text-black text-[8px] uppercase font-black px-2 py-0.5 rounded">VIP Acces</span>
-              <div>
-                <span className="text-[10px] font-mono text-amber-500 font-bold block uppercase">Premium</span>
-                <h4 className="text-sm font-bold text-white mt-1">Membru Fondator</h4>
-                <div className="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-500 mt-2 mb-3">999 RON <span className="text-[10px] text-slate-500 font-normal">/ Lifetime</span></div>
-                <p className="text-[11px] text-slate-300 leading-relaxed">Acces pe viață la absolut toate funcțiile platformei. Cumperi o dată, folosești nelimitat.</p>
+            <div className="bg-[#16221A] border border-[#8ba888]/50 rounded-2xl p-6 flex flex-col sm:flex-row justify-between items-center relative shadow-lg shadow-[#8ba888]/10 text-center sm:text-left">
+              <span className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-amber-200 to-yellow-500 text-black text-[10px] uppercase font-black px-3 py-1 rounded shadow-lg">Oferta Limitata</span>
+              <div className="w-full sm:w-2/3 pt-2">
+                <span className="text-[10px] font-mono text-amber-500 font-bold block uppercase">VIP Acces pe Viață</span>
+                <h4 className="text-xl font-black text-white mt-1">Membru Fondator - Lifetime</h4>
+                <p className="text-xs text-slate-300 leading-relaxed mt-2 max-w-lg">Cumperi o singură dată și ai acces nelimitat pe viață la absolut toate funcțiile platformei curente și viitoare: contracte, pachet auto, module QR, hosting, totul.</p>
               </div>
-              <button type="button" onClick={() => handleCumparaPremium('founder')} className="w-full mt-4 bg-gradient-to-r from-amber-200 to-yellow-500 hover:opacity-90 text-black font-black py-2 rounded-xl text-xs transition">Devino Fondator</button>
+              <div className="w-full sm:w-1/3 flex flex-col items-center sm:items-end mt-4 sm:mt-0">
+                <div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-500 mb-2">999 RON</div>
+                <button type="button" onClick={() => handleCumparaPremium('founder')} className="bg-gradient-to-r from-amber-200 to-yellow-500 hover:opacity-90 text-black font-black py-3 px-8 rounded-xl text-sm transition">Devino Fondator</button>
+              </div>
             </div>
           </div>
 
+          {/* Partea 2: Șabloane & QR Individual */}
           <div className="border-t border-slate-800 pt-8 pb-4 mb-4 text-center">
             <h3 className="text-2xl font-black text-white tracking-tight">Șabloane & Extensii QR (Plată Unică)</h3>
           </div>
