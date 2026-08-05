@@ -1328,8 +1328,8 @@ export default function Home() {
                           bgColor="#FFFFFF"
                           imageSettings={qrLogo ? { 
                             src: qrLogo, 
-                            height: qrLogoRatio > 1 ? 35 / qrLogoRatio : 35, 
-                            width: qrLogoRatio > 1 ? 35 : 35 * qrLogoRatio, 
+                            height: qrLogoRatio > 1 ? 45 / qrLogoRatio : 45, 
+                            width: qrLogoRatio > 1 ? 45 : 45 * qrLogoRatio, 
                             excavate: true 
                           } : undefined}
                         />
@@ -1345,8 +1345,8 @@ export default function Home() {
                             bgColor="#FFFFFF"
                             imageSettings={qrLogo ? { 
                               src: qrLogo, 
-                              height: qrLogoRatio > 1 ? 250 / qrLogoRatio : 250, 
-                              width: qrLogoRatio > 1 ? 250 : 250 * qrLogoRatio, 
+                              height: qrLogoRatio > 1 ? 320 / qrLogoRatio : 320, 
+                              width: qrLogoRatio > 1 ? 320 : 320 * qrLogoRatio, 
                               excavate: true 
                             } : undefined}
                           />
