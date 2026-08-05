@@ -1236,7 +1236,7 @@ export default function Home() {
                         className={`relative p-2 rounded-lg border text-xs sm:text-sm font-medium transition-all ${qrType === 'vcard' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}
                       >
                         📇 vCard
-                        {(profil?.subscription_tier === 'free' && !profil?.has_qr_vcard) && <span className="absolute -top-2 -right-2 text-[10px] bg-amber-500 text-black px-1.5 rounded-full">9€</span>}
+                        {(profil?.subscription_tier === 'free' && !profil?.has_qr_vcard) && <span className="absolute -top-2 -right-2 text-[10px] bg-amber-500 text-black px-1.5 rounded-full">49 RON</span>}
                       </button>
 
                       <button 
@@ -1296,7 +1296,7 @@ export default function Home() {
                       <label className="text-white font-semibold block mb-3 flex items-center justify-between text-sm">
                         <span>3. Branding Visual</span>
                         {(profil?.subscription_tier === 'free' && !profil?.has_qr_branding) && (
-                          <button onClick={() => handleCheckout('qr_branding')} className="text-[10px] font-bold text-amber-500 hover:underline">Deblochează (9€)</button>
+                          <button onClick={() => handleCheckout('qr_branding')} className="text-[10px] font-bold text-amber-500 hover:underline">Deblochează (49 RON)</button>
                         )}
                       </label>
                       <div className={`space-y-4 ${(profil?.subscription_tier === 'free' && !profil?.has_qr_branding) ? 'opacity-50 pointer-events-none' : ''}`}>
