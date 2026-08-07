@@ -64,7 +64,7 @@ export default function Contact() {
                 <div className="w-10 h-10 bg-[#16221A] rounded-lg flex items-center justify-center text-[#8ba888] shrink-0">🏛️</div>
                 <div>
                   <span className="block text-[10px] uppercase font-bold text-slate-500">Denumire Companie</span>
-                  <span className="block text-sm text-white font-medium">[ZenSoftware]</span>
+                  <span className="block text-sm text-white font-medium">ZenSoftware</span>
                 </div>
               </div>
 
@@ -80,7 +80,7 @@ export default function Contact() {
                 <div className="w-10 h-10 bg-[#16221A] rounded-lg flex items-center justify-center text-[#8ba888] shrink-0">📞</div>
                 <div>
                   <span className="block text-[10px] uppercase font-bold text-slate-500">Telefon Call-Center</span>
-                  <a href="tel:+40700000000" className="block text-sm text-white hover:text-[#8ba888] font-medium">[+40757895746]</a>
+                  <a href="tel:+40700000000" className="block text-sm text-white hover:text-[#8ba888] font-medium">+40757895746</a>
                   <span className="block text-[10px] text-slate-500 mt-1">Luni - Vineri: 09:00 - 18:00</span>
                 </div>
               </div>
