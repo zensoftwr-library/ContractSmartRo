@@ -925,7 +925,7 @@ export default function Home() {
       </div>
 
       {/* NAVBAR */}
-      <nav className="sticky top-0 z-40 backdrop-blur-md bg-[#0B0F12]/90 border-b border-slate-800 py-4 px-6 shadow-lg transition-all">
+      <nav className="sticky top-0 z-40 backdrop-blur-md bg-[#0B0F12]/90 border-b border-slate-800 py-4 px-6 shadow-md transition-all">
         <div className="flex justify-between items-center">
           <div className="w-[180px] h-[30px] flex items-center cursor-pointer" onClick={handleInapoiPrincipal}>
             <svg viewBox="0 0 240 40" className="w-full h-full">
@@ -953,6 +953,8 @@ export default function Home() {
             <span className="text-slate-800">|</span>
             <Link href="/termeni-si-conditii" className="text-xs text-slate-400 hover:text-white transition">Termeni și Condiții</Link>
             <span className="text-slate-800">|</span>
+            <Link href="/contact" className="text-xs text-slate-400 hover:text-white transition">Contact</Link>
+            <span className="text-slate-800">|</span>
             
             {!user ? (
               <button type="button" onClick={() => { setIsSignUp(false); setShowAuthModal(true); }} className="text-xs font-bold text-slate-300 hover:text-[#8ba888] transition">Autentificare / Cont Nou</button>
@@ -968,7 +970,7 @@ export default function Home() {
                 <button type="button" onClick={stergeCont} className="text-red-500 font-bold hover:underline">Șterge Cont</button>
               </div>
             )}
-            <button onClick={() => { const el = document.getElementById('sectiune-preturi'); el?.scrollIntoView({ behavior: 'smooth' }); }} className="bg-[#8ba888] hover:opacity-90 text-[#0B0F12] font-black text-xs px-4 py-2 rounded-xl transition shadow-lg shadow-[#8ba888]/10">Vezi Oferte</button>
+            <button onClick={() => { const el = document.getElementById('sectiune-preturi'); el?.scrollIntoView({ behavior: 'smooth' }); }} className="bg-[#8ba888] hover:opacity-90 text-[#0B0F12] font-black text-xs px-4 py-2 rounded-md transition shadow-md shadow-[#8ba888]/10">Vezi Oferte</button>
           </div>
         </div>
 
@@ -977,6 +979,7 @@ export default function Home() {
             <Link href="/modele-contracte" className="text-sm text-slate-300 hover:text-white">Modele Contracte Standard</Link>
             <Link href="/baza-legala" className="text-sm text-slate-300 hover:text-white">Articole Validitate Juridică</Link>
             <Link href="/termeni-si-conditii" className="text-sm text-slate-300 hover:text-white">Termeni și Condiții</Link>
+            <Link href="/contact" className="text-sm text-slate-300 hover:text-white">Contact</Link>
             
             {!user ? (
               <button type="button" onClick={() => { setIsMobileMenuOpen(false); setIsSignUp(false); setShowAuthModal(true); }} className="text-sm font-bold text-[#8ba888] text-left">Autentificare / Cont Nou</button>
@@ -989,7 +992,7 @@ export default function Home() {
                 </div>
               </div>
             )}
-            <button onClick={() => { setIsMobileMenuOpen(false); const el = document.getElementById('sectiune-preturi'); el?.scrollIntoView({ behavior: 'smooth' }); }} className="bg-[#8ba888] text-[#0B0F12] font-black text-sm px-4 py-3 rounded-xl text-center">Vezi Oferte</button>
+            <button onClick={() => { setIsMobileMenuOpen(false); const el = document.getElementById('sectiune-preturi'); el?.scrollIntoView({ behavior: 'smooth' }); }} className="bg-[#8ba888] text-[#0B0F12] font-black text-sm px-4 py-3 rounded-md text-center">Vezi Oferte</button>
           </div>
         )}
       </nav>
@@ -1004,26 +1007,26 @@ export default function Home() {
         {/* MODAL AUTH */}
         {showAuthModal && (
           <div className="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn">
-            <div className="bg-[#12181D] border border-slate-800 p-8 rounded-3xl max-w-sm w-full shadow-2xl relative">
+            <div className="bg-[#12181D] border border-slate-800 p-8 rounded-xl max-w-sm w-full shadow-lg relative">
               <button type="button" onClick={() => { setShowAuthModal(false); setIsSignUp(false); setAuthPassword(''); setAuthConfirmPassword(''); }} className="absolute top-4 right-4 text-slate-500 hover:text-white text-md font-bold transition">✕</button>
               <h3 className="text-xl font-black text-white mb-1">{isSignUp ? 'Creează un Cont Nou' : 'Autentificare Portabilitate'}</h3>
               <p className="text-xs text-slate-500 mb-6">Securizează documentele în serverele Supabase.</p>
               <form onSubmit={handleAuthSubmit} className="space-y-4">
                 <div>
                   <label className="text-[10px] text-slate-400 uppercase font-bold block mb-1">Adresă de Email</label>
-                  <input type="email" required placeholder="nume@companie.ro" value={authEmail} onChange={e => setAuthEmail(e.target.value)} className="w-full p-3 bg-[#0B0F12] border border-slate-700 rounded-xl text-xs text-white outline-none focus:border-[#8ba888]" />
+                  <input type="email" required placeholder="nume@companie.ro" value={authEmail} onChange={e => setAuthEmail(e.target.value)} className="w-full p-3 bg-[#0B0F12] border border-slate-700 rounded-md text-xs text-white outline-none focus:border-[#8ba888]" />
                 </div>
                 <div>
                   <label className="text-[10px] text-slate-400 uppercase font-bold block mb-1">Parolă Validă</label>
-                  <input type="password" required placeholder="••••••••" value={authPassword} onChange={e => setAuthPassword(e.target.value)} className="w-full p-3 bg-[#0B0F12] border border-slate-700 rounded-xl text-xs text-white outline-none focus:border-[#8ba888]" />
+                  <input type="password" required placeholder="••••••••" value={authPassword} onChange={e => setAuthPassword(e.target.value)} className="w-full p-3 bg-[#0B0F12] border border-slate-700 rounded-md text-xs text-white outline-none focus:border-[#8ba888]" />
                 </div>
                 {isSignUp && (
                   <div>
                     <label className="text-[10px] text-slate-400 uppercase font-bold block mb-1">Confirmă Parola</label>
-                    <input type="password" required placeholder="••••••••" value={authConfirmPassword} onChange={e => setAuthConfirmPassword(e.target.value)} className="w-full p-3 bg-[#0B0F12] border border-slate-700 rounded-xl text-xs text-white outline-none focus:border-[#8ba888]" />
+                    <input type="password" required placeholder="••••••••" value={authConfirmPassword} onChange={e => setAuthConfirmPassword(e.target.value)} className="w-full p-3 bg-[#0B0F12] border border-slate-700 rounded-md text-xs text-white outline-none focus:border-[#8ba888]" />
                   </div>
                 )}
-                <button type="submit" disabled={loading} className="w-full bg-[#8ba888] text-[#0B0F12] font-black py-3 rounded-xl text-xs tracking-tight transition hover:opacity-90 mt-2">
+                <button type="submit" disabled={loading} className="w-full bg-[#8ba888] text-[#0B0F12] font-black py-3 rounded-md text-xs tracking-tight transition hover:opacity-90 mt-2">
                   {loading ? 'Se procesează...' : isSignUp ? 'Confirmă Înregistrarea' : 'Conectare Securizată'}
                 </button>
               </form>
@@ -1037,18 +1040,18 @@ export default function Home() {
         {/* MODAL PLĂȚI */}
         {showPaymentModal && (
           <div className="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn">
-            <div className="bg-[#12181D] border border-slate-800 p-8 rounded-3xl max-w-md w-full shadow-2xl relative text-center">
+            <div className="bg-[#12181D] border border-slate-800 p-8 rounded-xl max-w-md w-full shadow-lg relative text-center">
               <button type="button" onClick={() => setShowPaymentModal(false)} className="absolute top-4 right-4 text-slate-500 hover:text-white text-md font-bold transition">✕</button>
               <div className="w-16 h-16 bg-amber-500/10 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">🔒</div>
               <h3 className="text-xl font-black text-white mb-2">Plafon Gratuit Atins</h3>
               <p className="text-sm text-slate-400 mb-6">Ai utilizat generarea gratuită din această lună. Deblochează documentul actual sau treci la Premium pentru generări nelimitate.</p>
               
               <div className="space-y-3">
-                <button onClick={() => { setShowPaymentModal(false); handleCumparaPremium('one_time_contract'); }} className="w-full bg-[#0B0F12] hover:bg-slate-900 border border-slate-700 text-white font-bold py-3 rounded-xl text-sm transition flex justify-between items-center px-4">
+                <button onClick={() => { setShowPaymentModal(false); handleCumparaPremium('one_time_contract'); }} className="w-full bg-[#0B0F12] hover:bg-slate-900 border border-slate-700 text-white font-bold py-3 rounded-md text-sm transition flex justify-between items-center px-4">
                   <span>Cumpără 1 Contract Acum</span>
                   <span className="text-[#8ba888]">19 RON</span>
                 </button>
-                <button onClick={() => { setShowPaymentModal(false); handleCumparaPremium('pro'); }} className="w-full bg-[#8ba888] text-[#0B0F12] font-black py-3 rounded-xl text-sm transition hover:opacity-90 flex justify-between items-center px-4 shadow-lg shadow-[#8ba888]/10">
+                <button onClick={() => { setShowPaymentModal(false); handleCumparaPremium('pro'); }} className="w-full bg-[#8ba888] text-[#0B0F12] font-black py-3 rounded-md text-sm transition hover:opacity-90 flex justify-between items-center px-4 shadow-md shadow-[#8ba888]/10">
                   <span>Abonament Pro (Nelimitat)</span>
                   <span>99 RON / lună</span>
                 </button>
@@ -1061,18 +1064,18 @@ export default function Home() {
         {/* MODAL STATISTICI QR */}
         {showStatsModal && (
           <div className="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn">
-            <div className="bg-[#12181D] border border-slate-800 p-8 rounded-3xl max-w-2xl w-full shadow-2xl relative">
+            <div className="bg-[#12181D] border border-slate-800 p-8 rounded-xl max-w-2xl w-full shadow-lg relative">
               <button type="button" onClick={() => { setShowStatsModal(false); setEditingQrId(null); }} className="absolute top-4 right-4 text-slate-500 hover:text-white text-md font-bold transition">✕</button>
               <h3 className="text-xl font-black text-white mb-2">Panou Analiză și Gestiune QR</h3>
               <p className="text-xs text-slate-400 mb-6">Modifică destinația codurilor tipărite în timp real sau urmărește conversiile.</p>
               
-              <div className="bg-[#0B0F12] rounded-xl border border-slate-800 overflow-hidden">
+              <div className="bg-[#0B0F12] rounded-md border border-slate-800 overflow-hidden">
                 <div className="max-h-80 overflow-y-auto p-4 space-y-3">
                   {qrStats.length === 0 ? (
                     <p className="text-xs text-slate-500 text-center py-4">Nu ai coduri dinamice generate încă.</p>
                   ) : (
                     qrStats.map((stat, i) => (
-                      <div key={i} className="bg-[#16221A] p-4 rounded-lg border border-slate-800/80 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                      <div key={i} className="bg-[#16221A] p-4 rounded text-xs border border-slate-800/80 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <div className="flex-1 w-full">
                           {editingQrId === stat.id ? (
                             <div className="flex gap-2 w-full mb-2">
@@ -1123,10 +1126,10 @@ export default function Home() {
               <h1 className="text-5xl md:text-6xl font-black text-white mt-6 leading-tight tracking-tighter">Asigurarea Încasărilor <br/><span className="text-[#8ba888]">Privitor La Management de Clauze</span></h1>
               
               <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto px-4">
-                <button type="button" onClick={() => { setFormData(prev => ({ ...prev, tipContract: 'prestari' })); setStep(2); }} className="bg-[#8ba888] hover:opacity-90 text-[#0B0F12] font-black px-4 py-4 rounded-xl shadow-xl shadow-[#8ba888]/5 transition text-xs tracking-tight flex items-center justify-center gap-2">
+                <button type="button" onClick={() => { setFormData(prev => ({ ...prev, tipContract: 'prestari' })); setStep(2); }} className="bg-[#8ba888] hover:opacity-90 text-[#0B0F12] font-black px-4 py-4 rounded-md shadow-md shadow-[#8ba888]/5 transition text-xs tracking-tight flex items-center justify-center gap-2">
                     Generator Contracte Servicii & B2B
                 </button>
-                <button type="button" onClick={() => { setFormData(prev => ({ ...prev, tipContract: 'auto' })); setStep(2); }} className="bg-[#12181D] border border-slate-700 text-white font-bold px-4 py-4 rounded-xl hover:border-[#8ba888]/50 transition text-xs tracking-tight flex items-center justify-center gap-2">
+                <button type="button" onClick={() => { setFormData(prev => ({ ...prev, tipContract: 'auto' })); setStep(2); }} className="bg-[#12181D] border border-slate-700 text-white font-bold px-4 py-4 rounded-md hover:border-[#8ba888]/50 transition text-xs tracking-tight flex items-center justify-center gap-2">
                     Generator Pachet Acte Tranzacții Auto
                 </button>
               </div>
@@ -1136,7 +1139,7 @@ export default function Home() {
             <div className="max-w-6xl mx-auto px-6 mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
               
               {/* COLOANA 1: CALCULATOR FISCAL */}
-              <div className="bg-[#12181D] p-5 rounded-2xl border border-slate-800 shadow-xl flex flex-col justify-between">
+              <div className="bg-[#12181D] p-5 rounded-lg border border-slate-800 shadow-lg flex flex-col justify-between">
                 <div>
                   <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">Calculator Fiscal Inteligent (Plafoane CASS)</span>
                   <div className="space-y-4 text-xs">
@@ -1149,7 +1152,7 @@ export default function Home() {
                             min="0"
                             value={fiscal.venitLunar === 0 ? '' : fiscal.venitLunar}
                             onChange={e => setFiscal({...fiscal, venitLunar: Number(e.target.value)})}
-                            className="bg-[#0B0F12] border border-slate-700 rounded-lg px-2 py-1 text-white font-mono font-bold text-xs w-24 text-right outline-none focus:border-[#8ba888] transition-colors"
+                            className="bg-[#0B0F12] border border-slate-700 rounded px-2 py-1 text-white font-mono font-bold text-xs w-24 text-right outline-none focus:border-[#8ba888] transition-colors"
                             placeholder="0"
                           />
                           <span className="text-slate-400 font-mono text-xs">RON</span>
@@ -1168,7 +1171,7 @@ export default function Home() {
                     <div className="grid grid-cols-1 gap-2">
                       <div>
                         <label className="text-slate-400 block mb-1">Formă de Organizare</label>
-                        <select value={fiscal.formaJuridica} onChange={e => setFiscal({...fiscal, formaJuridica: e.target.value})} className="w-full bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-white outline-none text-xs appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.2em_1.2em] bg-[right_0.7rem_center] bg-no-repeat pr-10">
+                        <select value={fiscal.formaJuridica} onChange={e => setFiscal({...fiscal, formaJuridica: e.target.value})} className="w-full bg-[#0B0F12] border border-slate-700 rounded p-2 text-white outline-none text-xs appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.2em_1.2em] bg-[right_0.7rem_center] bg-no-repeat pr-10">
                           <option value="SRL">SRL (Microîntreprindere)</option>
                           <option value="PFA_SISTEM_REAL">PFA (Sistem Real)</option>
                         </select>
@@ -1176,11 +1179,11 @@ export default function Home() {
                     </div>
                     {fiscal.formaJuridica !== 'PFA_SISTEM_REAL' && (
                       <div className="grid grid-cols-2 gap-2 pt-1">
-                        <label className="flex items-center p-2 bg-[#0B0F12] rounded-lg border border-slate-800 cursor-pointer">
+                        <label className="flex items-center p-2 bg-[#0B0F12] rounded border border-slate-800 cursor-pointer">
                           <input type="checkbox" checked={fiscal.areAngajati} onChange={e => setFiscal({...fiscal, areAngajati: e.target.checked})} className="mr-2 accent-[#8ba888]" />
                           Are Angajați
                         </label>
-                        <label className="flex items-center p-2 bg-[#0B0F12] rounded-lg border border-slate-800/60 cursor-pointer">
+                        <label className="flex items-center p-2 bg-[#0B0F12] rounded border border-slate-800/60 cursor-pointer">
                           <input type="checkbox" checked={fiscal.platitorTva} onChange={e => setFiscal({...fiscal, platitorTva: e.target.checked})} className="mr-2 accent-[#8ba888]" />
                           Plătitor TVA
                         </label>
@@ -1191,11 +1194,11 @@ export default function Home() {
                 
                 <div className="w-full space-y-3 mt-4">
                   <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800/80 font-mono text-[11px]">
-                    <div className="bg-[#0B0F12] p-2 rounded-xl border border-slate-800/40">
+                    <div className="bg-[#0B0F12] p-2 rounded-md border border-slate-800/40">
                       <span className="text-slate-500 block">Impozit micro/venit:</span>
                       <span className="text-slate-300 font-bold">{rezultateFiscale.defalcare.impozit} RON</span>
                     </div>
-                    <div className="bg-[#0B0F12] p-2 rounded-xl border border-slate-800/40">
+                    <div className="bg-[#0B0F12] p-2 rounded-md border border-slate-800/40">
                       <span className="text-slate-500 block">Contribuții (CAS/CASS):</span>
                       <span className="text-slate-300 font-bold">{rezultateFiscale.defalcare.sociale} RON</span>
                     </div>
@@ -1203,21 +1206,21 @@ export default function Home() {
                   
                   <div className="grid grid-cols-2 gap-2 font-mono text-[11px]">
                     {fiscal.formaJuridica === 'SRL' && (
-                      <div className="bg-[#0B0F12] p-2 rounded-xl border border-slate-800/40">
+                      <div className="bg-[#0B0F12] p-2 rounded-md border border-slate-800/40">
                         <span className="text-slate-500 block">Impozit Dividende (10%):</span>
                         <span className="text-slate-300 font-bold">{rezultateFiscale.defalcare.dividende} RON</span>
                       </div>
                     )}
                     
                     {fiscal.platitorTva && (
-                       <div className="bg-[#0B0F12] p-2 rounded-xl border border-slate-800/40">
+                       <div className="bg-[#0B0F12] p-2 rounded-md border border-slate-800/40">
                          <span className="text-slate-500 block">TVA Colectat (21%):</span>
                          <span className="text-slate-300 font-bold">{rezultateFiscale.tvaLunar} RON</span>
                        </div>
                     )}
                   </div>
 
-                  <div className="pt-2 border-t border-slate-800 bg-[#0B0F12] p-3 rounded-xl border border-slate-800/60 flex justify-between items-center text-xs">
+                  <div className="pt-2 border-t border-slate-800 bg-[#0B0F12] p-3 rounded-md border border-slate-800/60 flex justify-between items-center text-xs">
                     <div><span className="text-slate-400 block">Dări Stat (Total): <strong className="text-red-400 font-mono">{rezultateFiscale.taxeLunare} RON</strong></span></div>
                     <div className="text-right"><span className="text-slate-400 block">Profit Curat Net Lunar: <strong className="text-[#8ba888] font-mono text-sm">{rezultateFiscale.netLunar} RON</strong></span></div>
                   </div>
@@ -1225,7 +1228,7 @@ export default function Home() {
               </div>
 
               {/* COLOANA 2: MEGA-QR CODE GENERATOR PRO */}
-              <div className="bg-[#0B0F12] border border-slate-800 rounded-xl p-5 sm:p-6 shadow-2xl flex flex-col">
+              <div className="bg-[#0B0F12] border border-slate-800 rounded-md p-5 sm:p-6 shadow-lg flex flex-col">
                 <div className="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
                   <div>
                     <h3 className="text-xl font-bold text-white flex items-center gap-2">
@@ -1244,32 +1247,32 @@ export default function Home() {
 
                 <div className="flex-1 flex flex-col space-y-6">
                   
-                  {/* 1. SELECTOR FUNCȚIE QR (GRID CORECTAT, NU IESE DIN CHENAR) */}
+                  {/* 1. SELECTOR FUNCȚIE QR */}
                   <div>
                     <label className="text-white font-semibold block mb-3 text-sm">1. Funcție Cod QR</label>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                      <button onClick={() => setQrType('url')} className={`p-2 rounded-lg border text-[11px] font-bold transition-all ${qrType === 'url' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>🌐 URL</button>
-                      <button onClick={() => setQrType('wifi')} className={`p-2 rounded-lg border text-[11px] font-bold transition-all ${qrType === 'wifi' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>📶 Wi-Fi</button>
-                      <button onClick={() => setQrType('whatsapp')} className={`p-2 rounded-lg border text-[11px] font-bold transition-all ${qrType === 'whatsapp' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>💬 WhatsApp</button>
+                      <button onClick={() => setQrType('url')} className={`p-2 rounded border text-[11px] font-bold transition-all ${qrType === 'url' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>🌐 URL</button>
+                      <button onClick={() => setQrType('wifi')} className={`p-2 rounded border text-[11px] font-bold transition-all ${qrType === 'wifi' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>📶 Wi-Fi</button>
+                      <button onClick={() => setQrType('whatsapp')} className={`p-2 rounded border text-[11px] font-bold transition-all ${qrType === 'whatsapp' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>💬 WhatsApp</button>
                       
-                      <button onClick={() => { if(!isPremium && !profil?.has_qr_vcard) handleCheckout('qr_vcard'); else setQrType('vcard'); }} className={`relative p-2 rounded-lg border text-[11px] font-bold transition-all ${qrType === 'vcard' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
-                        📇 vCard {(!isPremium && !profil?.has_qr_vcard) && <span className="absolute -top-2 -right-2 text-[9px] bg-amber-500 text-black px-1.5 rounded-full shadow-lg">69 RON</span>}
+                      <button onClick={() => { if(!isPremium && !profil?.has_qr_vcard) handleCheckout('qr_vcard'); else setQrType('vcard'); }} className={`relative p-2 rounded border text-[11px] font-bold transition-all ${qrType === 'vcard' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
+                        📇 vCard {(!isPremium && !profil?.has_qr_vcard) && <span className="absolute -top-2 -right-2 text-[9px] bg-amber-500 text-black px-1.5 rounded-full shadow-md">69 RON</span>}
                       </button>
 
-                      <button onClick={() => { if(!isPremium && !profil?.has_qr_pdf) handleCheckout('qr_dynamic'); else setQrType('dynamic'); }} className={`relative p-2 rounded-lg border text-[11px] font-bold transition-all ${qrType === 'dynamic' ? 'bg-purple-900/30 border-purple-500 text-purple-400' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
-                        📄 Dinamic {(!isPremium && !profil?.has_qr_pdf) && <span className="absolute -top-2 -right-2 text-[9px] bg-purple-500 text-white px-1.5 rounded-full shadow-lg">39 RON</span>}
+                      <button onClick={() => { if(!isPremium && !profil?.has_qr_pdf) handleCheckout('qr_dynamic'); else setQrType('dynamic'); }} className={`relative p-2 rounded border text-[11px] font-bold transition-all ${qrType === 'dynamic' ? 'bg-purple-900/30 border-purple-500 text-purple-400' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
+                        📄 Dinamic {(!isPremium && !profil?.has_qr_pdf) && <span className="absolute -top-2 -right-2 text-[9px] bg-purple-500 text-white px-1.5 rounded-full shadow-md">39 RON</span>}
                       </button>
 
-                      <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('smart'); }} className={`relative p-2 rounded-lg border text-[11px] font-bold transition-all ${qrType === 'smart' ? 'bg-blue-900/30 border-blue-500 text-blue-400' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
-                        📱 Smart OS {(!isPremium) && <span className="absolute -top-2 -right-2 text-[9px] bg-blue-500 text-white px-1.5 rounded-full shadow-lg">PRO</span>}
+                      <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('smart'); }} className={`relative p-2 rounded border text-[11px] font-bold transition-all ${qrType === 'smart' ? 'bg-blue-900/30 border-blue-500 text-blue-400' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
+                        📱 Smart OS {(!isPremium) && <span className="absolute -top-2 -right-2 text-[9px] bg-blue-500 text-white px-1.5 rounded-full shadow-md">PRO</span>}
                       </button>
                       
-                      <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('geo'); }} className={`relative p-2 rounded-lg border text-[11px] font-bold transition-all ${qrType === 'geo' ? 'bg-blue-900/30 border-blue-500 text-blue-400' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
-                        🌍 Geo-Target {(!isPremium) && <span className="absolute -top-2 -right-2 text-[9px] bg-blue-500 text-white px-1.5 rounded-full shadow-lg">PRO</span>}
+                      <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('geo'); }} className={`relative p-2 rounded border text-[11px] font-bold transition-all ${qrType === 'geo' ? 'bg-blue-900/30 border-blue-500 text-blue-400' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
+                        🌍 Geo-Target {(!isPremium) && <span className="absolute -top-2 -right-2 text-[9px] bg-blue-500 text-white px-1.5 rounded-full shadow-md">PRO</span>}
                       </button>
                       
-                      <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('landing'); }} className={`relative p-2 rounded-lg border text-[11px] font-bold transition-all ${qrType === 'landing' ? 'bg-blue-900/30 border-blue-500 text-blue-400' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
-                        🔗 Landing {(!isPremium) && <span className="absolute -top-2 -right-2 text-[9px] bg-blue-500 text-white px-1.5 rounded-full shadow-lg">PRO</span>}
+                      <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('landing'); }} className={`relative p-2 rounded border text-[11px] font-bold transition-all ${qrType === 'landing' ? 'bg-blue-900/30 border-blue-500 text-blue-400' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
+                        🔗 Landing {(!isPremium) && <span className="absolute -top-2 -right-2 text-[9px] bg-blue-500 text-white px-1.5 rounded-full shadow-md">PRO</span>}
                       </button>
                     </div>
                   </div>
@@ -1279,14 +1282,14 @@ export default function Home() {
                     <label className="text-white font-semibold block mb-3 text-sm">2. Configurare Conținut</label>
                     
                     {qrType === 'url' && (
-                      <input type="text" placeholder="https://site-ul-tau.ro" value={qrUrl} onChange={(e) => setQrUrl(e.target.value)} className="w-full bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-sm focus:border-[#8ba888] outline-none" />
+                      <input type="text" placeholder="https://site-ul-tau.ro" value={qrUrl} onChange={(e) => setQrUrl(e.target.value)} className="w-full bg-[#12181D] border border-slate-700 rounded p-2.5 text-white text-sm focus:border-[#8ba888] outline-none" />
                     )}
 
                     {qrType === 'wifi' && (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <input type="text" placeholder="Nume Rețea (SSID)" value={wifiData.ssid} onChange={(e) => setWifiData({...wifiData, ssid: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-sm focus:border-[#8ba888] outline-none" />
-                        <input type="text" placeholder="Parolă Rețea" value={wifiData.password} onChange={(e) => setWifiData({...wifiData, password: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-sm focus:border-[#8ba888] outline-none" />
-                        <select value={wifiData.type} onChange={e => setWifiData({...wifiData, type: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-sm outline-none sm:col-span-2">
+                        <input type="text" placeholder="Nume Rețea (SSID)" value={wifiData.ssid} onChange={(e) => setWifiData({...wifiData, ssid: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded p-2.5 text-white text-sm focus:border-[#8ba888] outline-none" />
+                        <input type="text" placeholder="Parolă Rețea" value={wifiData.password} onChange={(e) => setWifiData({...wifiData, password: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded p-2.5 text-white text-sm focus:border-[#8ba888] outline-none" />
+                        <select value={wifiData.type} onChange={e => setWifiData({...wifiData, type: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded p-2.5 text-white text-sm outline-none sm:col-span-2">
                           <option value="WPA">Securitate WPA/WPA2</option>
                           <option value="WEP">Securitate WEP</option>
                           <option value="nopass">Fără parolă (Liber)</option>
@@ -1296,84 +1299,84 @@ export default function Home() {
 
                     {qrType === 'whatsapp' && (
                       <div className="grid grid-cols-1 gap-3">
-                        <input type="text" placeholder="Număr telefon (ex: 40712345678)" value={waData.phone} onChange={(e) => setWaData({...waData, phone: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-sm focus:border-[#8ba888] outline-none" />
-                        <textarea placeholder="Mesaj predefinit (opțional)" value={waData.message} onChange={(e) => setWaData({...waData, message: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-sm focus:border-[#8ba888] outline-none resize-none h-16"></textarea>
+                        <input type="text" placeholder="Număr telefon (ex: 40712345678)" value={waData.phone} onChange={(e) => setWaData({...waData, phone: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded p-2.5 text-white text-sm focus:border-[#8ba888] outline-none" />
+                        <textarea placeholder="Mesaj predefinit (opțional)" value={waData.message} onChange={(e) => setWaData({...waData, message: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded p-2.5 text-white text-sm focus:border-[#8ba888] outline-none resize-none h-16"></textarea>
                       </div>
                     )}
 
                     {qrType === 'vcard' && (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <input type="text" placeholder="Nume Complet" value={qrData.nume} onChange={(e) => setQrData({...qrData, nume: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-sm focus:border-[#8ba888] outline-none sm:col-span-2" />
-                        <input type="text" placeholder="Funcție / Titlu (ex: Manager)" value={qrData.functie} onChange={(e) => setQrData({...qrData, functie: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-sm focus:border-[#8ba888] outline-none sm:col-span-2" />
-                        <input type="text" placeholder="Telefon" value={qrData.telefon} onChange={(e) => setQrData({...qrData, telefon: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-sm focus:border-[#8ba888] outline-none" />
-                        <input type="email" placeholder="Email" value={qrData.email} onChange={(e) => setQrData({...qrData, email: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-sm focus:border-[#8ba888] outline-none" />
+                        <input type="text" placeholder="Nume Complet" value={qrData.nume} onChange={(e) => setQrData({...qrData, nume: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded p-2.5 text-white text-sm focus:border-[#8ba888] outline-none sm:col-span-2" />
+                        <input type="text" placeholder="Funcție / Titlu (ex: Manager)" value={qrData.functie} onChange={(e) => setQrData({...qrData, functie: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded p-2.5 text-white text-sm focus:border-[#8ba888] outline-none sm:col-span-2" />
+                        <input type="text" placeholder="Telefon" value={qrData.telefon} onChange={(e) => setQrData({...qrData, telefon: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded p-2.5 text-white text-sm focus:border-[#8ba888] outline-none" />
+                        <input type="email" placeholder="Email" value={qrData.email} onChange={(e) => setQrData({...qrData, email: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded p-2.5 text-white text-sm focus:border-[#8ba888] outline-none" />
                       </div>
                     )}
 
                     {qrType === 'dynamic' && (
-                      <div className="p-4 bg-purple-900/20 border border-purple-500/30 rounded-lg space-y-4">
+                      <div className="p-4 bg-purple-900/20 border border-purple-500/30 rounded space-y-4">
                         <div>
                           <label className="text-[10px] text-purple-300 uppercase font-bold block mb-1">A. Redirecționare Link Simplu</label>
-                          <input type="text" placeholder="https://site-ul-tau.ro/oferta" value={dynamicDestUrl} onChange={e => setDynamicDestUrl(e.target.value)} className="w-full bg-[#12181D] border border-purple-500/50 rounded-lg p-2 text-white text-sm outline-none" />
+                          <input type="text" placeholder="https://site-ul-tau.ro/oferta" value={dynamicDestUrl} onChange={e => setDynamicDestUrl(e.target.value)} className="w-full bg-[#12181D] border border-purple-500/50 rounded p-2 text-white text-sm outline-none" />
                         </div>
                         <div className="border-t border-purple-500/20 pt-3">
                           <label className="text-[10px] text-purple-300 uppercase font-bold block mb-1">B. Sau Încărcare Meniu/Catalog PDF</label>
-                          <input type="file" accept="application/pdf" onChange={(e) => handleUploadGeneric(e, setUploadedPdfUrl, 'qr_pdfs', setIsUploadingPdf)} className="block w-full text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-purple-600 file:text-white cursor-pointer" />
+                          <input type="file" accept="application/pdf" onChange={(e) => handleUploadGeneric(e, setUploadedPdfUrl, 'qr_pdfs', setIsUploadingPdf)} className="block w-full text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-purple-600 file:text-white cursor-pointer" />
                           {isUploadingPdf && <span className="text-xs text-purple-400 mt-1 block animate-pulse">Se încarcă PDF-ul în Cloud...</span>}
                           {uploadedPdfUrl && <span className="text-[10px] text-emerald-400 mt-1 block">✅ PDF Găzduit. Va fi folosit ca destinație.</span>}
                         </div>
-                        <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="w-full bg-purple-600 text-white font-bold py-2 rounded-lg text-xs hover:bg-purple-500 transition">
+                        <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="w-full bg-purple-600 text-white font-bold py-2 rounded text-xs hover:bg-purple-500 transition">
                           {isGeneratingShortlink ? 'Se securizează...' : '🔗 Activează Cod Dinamic'}
                         </button>
                       </div>
                     )}
 
                     {qrType === 'smart' && (
-                      <div className="p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg">
+                      <div className="p-4 bg-blue-900/20 border border-blue-500/30 rounded">
                         <p className="text-blue-300 text-[11px] mb-3 leading-tight">Același QR trimite automat la magazinul corect în funcție de OS.</p>
                         <div className="flex flex-col gap-3">
-                          <input type="url" placeholder="🍏 Link App Store (iOS)" value={iosUrl} onChange={(e) => setIosUrl(e.target.value)} className="w-full bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-sm focus:border-blue-500 outline-none" />
-                          <input type="url" placeholder="🤖 Link Google Play (Android)" value={androidUrl} onChange={(e) => setAndroidUrl(e.target.value)} className="w-full bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-sm focus:border-blue-500 outline-none" />
-                          <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="w-full bg-blue-600 text-white font-bold py-2 rounded-lg text-xs hover:bg-blue-500 transition">Activează Smart Routing</button>
+                          <input type="url" placeholder="🍏 Link App Store (iOS)" value={iosUrl} onChange={(e) => setIosUrl(e.target.value)} className="w-full bg-[#12181D] border border-slate-700 rounded p-2.5 text-white text-sm focus:border-blue-500 outline-none" />
+                          <input type="url" placeholder="🤖 Link Google Play (Android)" value={androidUrl} onChange={(e) => setAndroidUrl(e.target.value)} className="w-full bg-[#12181D] border border-slate-700 rounded p-2.5 text-white text-sm focus:border-blue-500 outline-none" />
+                          <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="w-full bg-blue-600 text-white font-bold py-2 rounded text-xs hover:bg-blue-500 transition">Activează Smart Routing</button>
                         </div>
                       </div>
                     )}
 
                     {qrType === 'geo' && (
-                      <div className="p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg space-y-3">
+                      <div className="p-4 bg-blue-900/20 border border-blue-500/30 rounded space-y-3">
                         <p className="text-blue-300 text-[11px] leading-tight">Redirecționează utilizatorii în funcție de țara în care se află fizic (ex. meniuri multi-limbă).</p>
                         {geoRules.map((rule, idx) => (
                           <div key={idx} className="flex gap-2">
-                            <input type="text" placeholder="Cod Țară (RO, DE, UK)" value={rule.country} onChange={(e) => { const newRules = [...geoRules]; newRules[idx].country = e.target.value.toUpperCase(); setGeoRules(newRules); }} className="w-24 bg-[#12181D] border border-slate-700 rounded-lg p-2 text-white text-xs text-center font-bold outline-none" disabled={rule.country === 'DEFAULT'} />
-                            <input type="url" placeholder="URL Destinație" value={rule.url} onChange={(e) => { const newRules = [...geoRules]; newRules[idx].url = e.target.value; setGeoRules(newRules); }} className="flex-1 bg-[#12181D] border border-slate-700 rounded-lg p-2 text-white text-xs outline-none" />
+                            <input type="text" placeholder="Cod Țară (RO, DE, UK)" value={rule.country} onChange={(e) => { const newRules = [...geoRules]; newRules[idx].country = e.target.value.toUpperCase(); setGeoRules(newRules); }} className="w-24 bg-[#12181D] border border-slate-700 rounded p-2 text-white text-xs text-center font-bold outline-none" disabled={rule.country === 'DEFAULT'} />
+                            <input type="url" placeholder="URL Destinație" value={rule.url} onChange={(e) => { const newRules = [...geoRules]; newRules[idx].url = e.target.value; setGeoRules(newRules); }} className="flex-1 bg-[#12181D] border border-slate-700 rounded p-2 text-white text-xs outline-none" />
                           </div>
                         ))}
                         <button type="button" onClick={() => setGeoRules([...geoRules.slice(0, -1), { country: '', url: '' }, geoRules[geoRules.length-1]])} className="text-[10px] text-blue-400 font-bold underline block">+ Adaugă regulă țară</button>
-                        <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="w-full bg-blue-600 text-white font-bold py-2 rounded-lg text-xs hover:bg-blue-500 transition">Activează Geo-Routing</button>
+                        <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="w-full bg-blue-600 text-white font-bold py-2 rounded text-xs hover:bg-blue-500 transition">Activează Geo-Routing</button>
                       </div>
                     )}
 
                     {qrType === 'landing' && (
-                      <div className="p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg space-y-4">
+                      <div className="p-4 bg-blue-900/20 border border-blue-500/30 rounded space-y-4">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <input type="text" placeholder="Titlu (ex: Restaurantul Meu)" value={landingData.title} onChange={(e) => setLandingData({...landingData, title: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2 text-white text-sm outline-none sm:col-span-2" />
-                          <textarea placeholder="Scurtă descriere..." value={landingData.desc} onChange={(e) => setLandingData({...landingData, desc: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2 text-white text-sm outline-none sm:col-span-2 h-16"></textarea>
+                          <input type="text" placeholder="Titlu (ex: Restaurantul Meu)" value={landingData.title} onChange={(e) => setLandingData({...landingData, title: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded p-2 text-white text-sm outline-none sm:col-span-2" />
+                          <textarea placeholder="Scurtă descriere..." value={landingData.desc} onChange={(e) => setLandingData({...landingData, desc: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded p-2 text-white text-sm outline-none sm:col-span-2 h-16"></textarea>
                         </div>
                         <div className="border-t border-blue-500/20 pt-3">
                           <label className="text-[10px] text-blue-300 uppercase font-bold block mb-1">Încarcă Poză Profil (Avatar)</label>
-                          <input type="file" accept="image/png, image/jpeg" onChange={(e) => handleUploadGeneric(e, (url) => setLandingData({...landingData, avatarUrl: url}), 'landing_images', setIsUploadingPdf)} className="block w-full text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-blue-600 file:text-white cursor-pointer" />
+                          <input type="file" accept="image/png, image/jpeg" onChange={(e) => handleUploadGeneric(e, (url) => setLandingData({...landingData, avatarUrl: url}), 'landing_images', setIsUploadingPdf)} className="block w-full text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-blue-600 file:text-white cursor-pointer" />
                         </div>
                         <div className="border-t border-blue-500/20 pt-3 space-y-2">
                           <label className="text-[10px] text-blue-300 uppercase font-bold block">Link-uri (Meniu, Social Media, etc)</label>
                           {landingData.links.map((link, idx) => (
                             <div key={idx} className="flex gap-2">
-                              <input type="text" placeholder="Nume Buton" value={link.label} onChange={(e) => { const newLinks = [...landingData.links]; newLinks[idx].label = e.target.value; setLandingData({...landingData, links: newLinks}); }} className="w-1/3 bg-[#12181D] border border-slate-700 rounded-lg p-2 text-white text-xs outline-none" />
-                              <input type="url" placeholder="https://..." value={link.url} onChange={(e) => { const newLinks = [...landingData.links]; newLinks[idx].url = e.target.value; setLandingData({...landingData, links: newLinks}); }} className="flex-1 bg-[#12181D] border border-slate-700 rounded-lg p-2 text-white text-xs outline-none" />
+                              <input type="text" placeholder="Nume Buton" value={link.label} onChange={(e) => { const newLinks = [...landingData.links]; newLinks[idx].label = e.target.value; setLandingData({...landingData, links: newLinks}); }} className="w-1/3 bg-[#12181D] border border-slate-700 rounded p-2 text-white text-xs outline-none" />
+                              <input type="url" placeholder="https://..." value={link.url} onChange={(e) => { const newLinks = [...landingData.links]; newLinks[idx].url = e.target.value; setLandingData({...landingData, links: newLinks}); }} className="flex-1 bg-[#12181D] border border-slate-700 rounded p-2 text-white text-xs outline-none" />
                             </div>
                           ))}
                           <button type="button" onClick={() => setLandingData({...landingData, links: [...landingData.links, { label: '', url: '' }]})} className="text-[10px] text-blue-400 font-bold underline block">+ Adaugă Link</button>
                         </div>
-                        <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="w-full bg-blue-600 text-white font-bold py-2 rounded-lg text-xs hover:bg-blue-500 transition">Generează Micro-Landing</button>
+                        <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="w-full bg-blue-600 text-white font-bold py-2 rounded text-xs hover:bg-blue-500 transition">Generează Micro-Landing</button>
                       </div>
                     )}
                   </div>
@@ -1394,7 +1397,7 @@ export default function Home() {
                           <label className="text-slate-400 text-[10px] mb-1.5 block uppercase tracking-wider font-bold">Culoare QR</label>
                           <div className="flex items-center gap-2">
                             <input type="color" value={qrColor} onChange={(e) => setQrColor(e.target.value)} className="w-10 h-8 rounded cursor-pointer shrink-0 bg-transparent border-0 p-0" />
-                            <input type="text" maxLength={7} value={qrColor} onChange={(e) => setQrColor(e.target.value)} placeholder="#000000" className="w-20 text-center bg-[#12181D] border border-slate-700 rounded-lg p-1.5 text-white text-xs font-mono outline-none focus:border-[#8ba888] transition-colors shrink-0" />
+                            <input type="text" maxLength={7} value={qrColor} onChange={(e) => setQrColor(e.target.value)} placeholder="#000000" className="w-20 text-center bg-[#12181D] border border-slate-700 rounded p-1.5 text-white text-xs font-mono outline-none focus:border-[#8ba888] transition-colors shrink-0" />
                           </div>
                         </div>
                         <div>
@@ -1406,8 +1409,8 @@ export default function Home() {
                     </div>
 
                     {/* Right: Preview & Download */}
-                    <div className="bg-[#16221A] rounded-xl p-4 flex flex-col items-center justify-center border border-slate-800 w-full">
-                      <div className="bg-white p-2 rounded-xl shadow-lg mb-4 relative flex justify-center items-center overflow-hidden">
+                    <div className="bg-[#16221A] rounded p-4 flex flex-col items-center justify-center border border-slate-800 w-full">
+                      <div className="bg-white p-2 rounded shadow-md mb-4 relative flex justify-center items-center overflow-hidden">
                         {/* 1. QR-ul Vizibil în Interfață */}
                         <QRCodeCanvas 
                           id="contract-qr"
@@ -1443,7 +1446,7 @@ export default function Home() {
                         </div>
 
                         {['dynamic', 'smart', 'geo', 'landing'].includes(qrType) && (
-                          <div className="absolute -bottom-2 -right-2 bg-purple-600 p-1.5 rounded-full shadow-lg">
+                          <div className="absolute -bottom-2 -right-2 bg-purple-600 p-1.5 rounded-full shadow-md">
                             <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                           </div>
                         )}
@@ -1451,14 +1454,14 @@ export default function Home() {
 
                       <button 
                         onClick={handleDownloadQR}
-                        className="w-full py-2.5 bg-[#8ba888] hover:bg-[#7a9677] text-[#0B0F12] font-black rounded-lg transition-colors flex justify-center items-center gap-2 text-xs uppercase tracking-wide"
+                        className="w-full py-2.5 bg-[#8ba888] hover:bg-[#7a9677] text-[#0B0F12] font-black rounded transition-colors flex justify-center items-center gap-2 text-xs uppercase tracking-wide"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                         Descarcă QR
                       </button>
                       
                       {(['dynamic', 'smart', 'geo', 'landing'].includes(qrType) && (isPremium || profil?.has_qr_dynamic)) && (
-                        <button onClick={fetchStats} className="w-full mt-2 py-2 border border-purple-500 text-purple-400 hover:bg-purple-500/10 font-bold rounded-lg text-xs transition-colors uppercase tracking-wide">
+                        <button onClick={fetchStats} className="w-full mt-2 py-2 border border-purple-500 text-purple-400 hover:bg-purple-500/10 font-bold rounded text-xs transition-colors uppercase tracking-wide">
                           📊 Statistici
                         </button>
                       )}
@@ -1474,24 +1477,24 @@ export default function Home() {
         {/* STEP 2: MULTI-FORMULAR SECREȚIONAT STRUCTURAL */}
         {step === 2 && (
           <div className="max-w-3xl mx-auto py-6 px-4">
-            <div className="mb-4 flex items-center justify-between bg-[#12181D] border border-slate-800/80 px-5 py-3 rounded-xl shadow-lg">
+            <div className="mb-4 flex items-center justify-between bg-[#12181D] border border-slate-800/80 px-5 py-3 rounded shadow-md">
               <button type="button" onClick={handleInapoiPrincipal} className="text-xs font-bold text-[#8ba888] hover:text-white flex items-center gap-1.5 transition">
                 &larr; Înapoi la Panoul Principal
               </button>
               <span className="text-[10px] font-mono text-slate-500 uppercase">Configurare Securizată v2.0</span>
             </div>
 
-            <div className="bg-[#12181D] p-8 rounded-2xl border border-slate-800 shadow-2xl">
+            <div className="bg-[#12181D] p-8 rounded-lg border border-slate-800 shadow-lg">
               
               {formData.tipContract !== 'auto' ? (
                 <form onSubmit={handleLansareContract} className="space-y-6">
                   <h2 className="text-2xl font-bold text-white mb-2">Configurator Document Comercial Electronic</h2>
-                  <div className="bg-[#0B0F12] p-4 rounded-xl border border-slate-800">
+                  <div className="bg-[#0B0F12] p-4 rounded border border-slate-800">
                     <label className="text-xs font-bold text-slate-400 uppercase block mb-1">Tipul Documentului Generat</label>
                     <select 
                       value={formData.tipContract} 
                       onChange={e => setFormData({...formData, tipContract: e.target.value})} 
-                      className="w-full bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#8ba888] appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.2em_1.2em] bg-[right_0.7rem_center] bg-no-repeat pr-10"
+                      className="w-full bg-[#12181D] border border-slate-700 rounded p-2.5 text-xs text-white outline-none focus:border-[#8ba888] appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.2em_1.2em] bg-[right_0.7rem_center] bg-no-repeat pr-10"
                     >
                       <option value="prestari">Contract de Prestări Servicii (General)</option>
                       <option value="nda">Acord de Confidențialitate (NDA)</option>
@@ -1501,7 +1504,7 @@ export default function Home() {
                     </select>
                   </div>
 
-                  <div className="bg-[#0B0F12] p-4 rounded-xl border border-slate-800 space-y-2">
+                  <div className="bg-[#0B0F12] p-4 rounded border border-slate-800 space-y-2">
                     <label className="text-xs font-bold text-slate-400 uppercase block">Calitatea ta în acest Contract (Rol Semnatar)</label>
                     <div className="flex gap-4 text-xs">
                       <label className="flex items-center text-white cursor-pointer select-none">
@@ -1515,22 +1518,22 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="bg-[#0B0F12] p-5 rounded-xl border border-slate-800 space-y-4 mb-6">
+                  <div className="bg-[#0B0F12] p-5 rounded border border-slate-800 space-y-4 mb-6">
                     <span className="text-xs font-bold text-[#8ba888] uppercase block tracking-wider">Identitate Vizuală (Branding Prestator)</span>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="flex flex-col space-y-1">
                         <label className="text-[10px] text-slate-500 font-bold uppercase">CUI / CNP Prestator</label>
-                        <input type="text" placeholder="CUI / CNP Prestator" autoComplete="new-password" value={formData.prestatorCui} onChange={e => setFormData({...formData, prestatorCui: e.target.value})} className="w-full p-2.5 bg-[#12181D] border border-slate-700 rounded-lg text-xs text-white outline-none focus:border-[#8ba888]" />
+                        <input type="text" placeholder="CUI / CNP Prestator" autoComplete="new-password" value={formData.prestatorCui} onChange={e => setFormData({...formData, prestatorCui: e.target.value})} className="w-full p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none focus:border-[#8ba888]" />
                       </div>
                       <div className="flex flex-col space-y-1">
                         <label className="text-[10px] text-slate-500 font-bold uppercase">Denumire Furnizor / Nume</label>
-                        <input type="text" placeholder="Denumire Firma / Nume Complet" autoComplete="new-password" value={formData.prestatorNume} onChange={e => setFormData({...formData, prestatorNume: e.target.value})} className="p-2.5 bg-[#12181D] border border-slate-700 rounded-lg text-xs text-white outline-none" />
+                        <input type="text" placeholder="Denumire Firma / Nume Complet" autoComplete="new-password" value={formData.prestatorNume} onChange={e => setFormData({...formData, prestatorNume: e.target.value})} className="p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none" />
                       </div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center pt-2">
                       <div className="flex flex-col space-y-1">
                         <label className="text-[10px] text-slate-400 font-bold uppercase">Link Siglă (.png)</label>
-                        <input type="text" placeholder="Link Siglă (.png)" value={formData.prestatorLogo} onChange={e => setFormData({...formData, prestatorLogo: e.target.value})} className="p-2.5 bg-[#12181D] border border-slate-700 rounded-lg text-xs text-white outline-none" />
+                        <input type="text" placeholder="Link Siglă (.png)" value={formData.prestatorLogo} onChange={e => setFormData({...formData, prestatorLogo: e.target.value})} className="p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none" />
                       </div>
                       <div className="flex flex-col">
                         <label className="text-[10px] text-slate-400 font-bold mb-1 uppercase">Culoare Elements Portal</label>
@@ -1542,16 +1545,16 @@ export default function Home() {
                   <div className="space-y-4 pt-6 border-t border-slate-800/80 mt-6 block clear-both">
                     <span className="text-xs font-bold text-slate-400 uppercase block tracking-wider">Identificare Beneficiar Contract</span>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <input type="text" placeholder="CUI / CNP Client" autoComplete="new-password" value={formData.clientCui} onChange={e => setFormData({...formData, clientCui: e.target.value})} className="w-full p-2.5 bg-[#0B0F12] border border-slate-700 rounded-lg text-xs text-white outline-none focus:border-[#8ba888]" />
-                      <input type="text" placeholder="Companie Client / Nume" autoComplete="new-password" value={formData.clientNume} onChange={e => setFormData({...formData, clientNume: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded-lg text-xs text-white" />
+                      <input type="text" placeholder="CUI / CNP Client" autoComplete="new-password" value={formData.clientCui} onChange={e => setFormData({...formData, clientCui: e.target.value})} className="w-full p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white outline-none focus:border-[#8ba888]" />
+                      <input type="text" placeholder="Companie Client / Nume" autoComplete="new-password" value={formData.clientNume} onChange={e => setFormData({...formData, clientNume: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white" />
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <input type="email" placeholder="Email Client" autoComplete="new-password" value={formData.clientEmail} onChange={e => setFormData({...formData, clientEmail: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded-lg text-xs text-white focus:border-[#8ba888]" required />
-                      <input type="text" placeholder="WhatsApp Client" autoComplete="new-password" value={formData.clientTelefon} onChange={e => setFormData({...formData, clientTelefon: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded-lg text-xs text-white focus:border-[#8ba888]" />
+                      <input type="email" placeholder="Email Client" autoComplete="new-password" value={formData.clientEmail} onChange={e => setFormData({...formData, clientEmail: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white focus:border-[#8ba888]" required />
+                      <input type="text" placeholder="WhatsApp Client" autoComplete="new-password" value={formData.clientTelefon} onChange={e => setFormData({...formData, clientTelefon: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white focus:border-[#8ba888]" />
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                      <label className="flex items-center p-3 bg-[#0B0F12] rounded-xl border border-slate-800/60 cursor-pointer select-none text-xs text-slate-300">
+                      <label className="flex items-center p-3 bg-[#0B0F12] rounded border border-slate-800/60 cursor-pointer select-none text-xs text-slate-300">
                         <input 
                           type="checkbox" 
                           checked={formData.trimitePeWhatsApp || false} 
@@ -1564,7 +1567,7 @@ export default function Home() {
                         </div>
                       </label>
 
-                      <label className="flex items-center p-3 bg-[#0B0F12] rounded-xl border border-slate-800 cursor-pointer select-none text-xs text-slate-300">
+                      <label className="flex items-center p-3 bg-[#0B0F12] rounded border border-slate-800 cursor-pointer select-none text-xs text-slate-300">
                         <input 
                           type="checkbox" 
                           checked={formData.emiteFacturaAvans || false} 
@@ -1581,17 +1584,17 @@ export default function Home() {
 
                   <div className="space-y-4">
                     <span className="text-xs font-bold text-slate-400 uppercase block">Obiectul Serviciilor / Tranzacției și Remunerație</span>
-                    <textarea placeholder="Descrierea explicită a sarcinilor, termenelor și obiectivelor..." value={formData.obiect} onChange={e => setFormData({...formData, obiect: e.target.value})} className="w-full p-3 bg-[#0B0F12] border border-slate-700 rounded-lg text-xs h-16 text-white resize-none" required></textarea>
+                    <textarea placeholder="Descrierea explicită a sarcinilor, termenelor și obiectivelor..." value={formData.obiect} onChange={e => setFormData({...formData, obiect: e.target.value})} className="w-full p-3 bg-[#0B0F12] border border-slate-700 rounded text-xs h-16 text-white resize-none" required></textarea>
                     {formData.tipContract !== 'nda' && (
                       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
                         <div className="flex w-full sm:w-1/2 gap-3">
-                          <input type="number" placeholder="Valoare Contractuală" autoComplete="new-password" value={formData.valoare} onChange={e => setFormData({...formData, valoare: e.target.value})} className="flex-1 p-2.5 bg-[#0B0F12] border border-slate-700 rounded-lg text-xs text-white" required />
-                          <select value={formData.moneda} onChange={e => setFormData({...formData, moneda: e.target.value})} className="w-24 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#8ba888] appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.2em_1.2em] bg-[right_0.7rem_center] bg-no-repeat pr-10">
+                          <input type="number" placeholder="Valoare Contractuală" autoComplete="new-password" value={formData.valoare} onChange={e => setFormData({...formData, valoare: e.target.value})} className="flex-1 p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white" required />
+                          <select value={formData.moneda} onChange={e => setFormData({...formData, moneda: e.target.value})} className="w-24 bg-[#0B0F12] border border-slate-700 rounded p-2.5 text-xs text-white outline-none focus:border-[#8ba888] appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.2em_1.2em] bg-[right_0.7rem_center] bg-no-repeat pr-10">
                             <option value="RON">RON</option>
                             <option value="EUR">EUR (€)</option>
                           </select>
                         </div>
-                        <label className="flex items-center w-full sm:w-1/2 text-xs text-slate-400 cursor-pointer select-none p-2.5 bg-[#0B0F12] border border-slate-800 rounded-lg">
+                        <label className="flex items-center w-full sm:w-1/2 text-xs text-slate-400 cursor-pointer select-none p-2.5 bg-[#0B0F12] border border-slate-800 rounded">
                           <input type="checkbox" checked={formData.estePlatitorTVA} onChange={e => setFormData({...formData, estePlatitorTVA: e.target.checked})} className="mr-3 accent-[#8ba888]" />
                           <span className="truncate">Firma e plătitoare de TVA (+21%)</span>
                         </label>
@@ -1603,7 +1606,7 @@ export default function Home() {
                     <span className="text-xs font-bold text-amber-400 uppercase block">Activare Clauze Specifice de Asigurare Plată</span>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
                       {(nomenclatorClauze[formData.tipContract] || nomenclatorClauze.prestari).map((clauza) => (
-                        <label key={clauza.id} className="flex items-start p-3 bg-[#0B0F12] border border-slate-800 rounded-xl cursor-pointer">
+                        <label key={clauza.id} className="flex items-start p-3 bg-[#0B0F12] border border-slate-800 rounded cursor-pointer">
                           <input type="checkbox" checked={!!formData[clauza.id]} onChange={e => setFormData({...formData, [clauza.id]: e.target.checked})} className="mt-0.5 mr-3 accent-[#8ba888]" />
                           <div>
                             <span className="font-bold text-white block">{clauza.titlu}</span>
@@ -1614,14 +1617,14 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="bg-[#0B0F12] p-4 rounded-xl border border-slate-800 space-y-2">
-                    <canvas ref={canvasRef} width={600} height={150} onTouchStart={pornesteDesenul} onTouchMove={deseneaza} onTouchEnd={opresteDesenul} onMouseDown={pornesteDesenul} onMouseMove={deseneaza} onMouseUp={opresteDesenul} onMouseLeave={opresteDesenul} className="w-full h-32 bg-white rounded-lg border border-slate-700 cursor-crosshair block touch-none" />
+                  <div className="bg-[#0B0F12] p-4 rounded border border-slate-800 space-y-2">
+                    <canvas ref={canvasRef} width={600} height={150} onTouchStart={pornesteDesenul} onTouchMove={deseneaza} onTouchEnd={opresteDesenul} onMouseDown={pornesteDesenul} onMouseMove={deseneaza} onMouseUp={opresteDesenul} onMouseLeave={opresteDesenul} className="w-full h-32 bg-white rounded border border-slate-700 cursor-crosshair block touch-none" />
                     <button type="button" onClick={curataCanvas} className="text-[10px] text-red-400 hover:underline block text-right w-full">Șterge / Resemnează</button>
                   </div>
 
                   <div className="flex justify-between items-center pt-6 border-t border-slate-800">
                     <button type="button" onClick={handleInapoiPrincipal} className="text-xs text-slate-400 underline">Înapoi</button>
-                    <button type="submit" disabled={loading} className="bg-[#8ba888] text-[#0B0F12] font-black px-8 py-4 rounded-xl text-sm transition hover:opacity-90">
+                    <button type="submit" disabled={loading} className="bg-[#8ba888] text-[#0B0F12] font-black px-8 py-4 rounded text-sm transition hover:opacity-90">
                       {loading ? 'Se înregistrează...' : 'Descărcare PDF directă'}
                     </button>
                   </div>
@@ -1635,10 +1638,10 @@ export default function Home() {
 
                   {autoStep === 'upload' && (
                     <div className="space-y-4">
-                      <div className="p-4 bg-[#0B0F12] border border-slate-800 rounded-xl space-y-4">
+                      <div className="p-4 bg-[#0B0F12] border border-slate-800 rounded space-y-4">
                         <div className="flex justify-between items-center border-b border-slate-800 pb-2">
                           <span className="text-xs font-bold text-[#8ba888] uppercase tracking-wide">1. Identitate Persoană Vânzător</span>
-                          <div className="flex gap-2 bg-[#12181D] p-1 rounded-lg border border-slate-800">
+                          <div className="flex gap-2 bg-[#12181D] p-1 rounded border border-slate-800">
                             <button type="button" onClick={() => setAutoData({...autoData, vanzatorTip: 'PF'})} className={`px-2 py-0.5 rounded text-[10px] font-bold ${autoData.vanzatorTip === 'PF' ? 'bg-[#8ba888] text-black' : 'text-slate-400'}`}>Fizică (PF)</button>
                             <button type="button" onClick={() => setAutoData({...autoData, vanzatorTip: 'PJ'})} className={`px-2 py-0.5 rounded text-[10px] font-bold ${autoData.vanzatorTip === 'PJ' ? 'bg-[#8ba888] text-black' : 'text-slate-400'}`}>Firmă/PFA (PJ)</button>
                           </div>
@@ -1659,10 +1662,10 @@ export default function Home() {
                         )}
                       </div>
 
-                      <div className="p-4 bg-[#0B0F12] border border-slate-800 rounded-xl space-y-4">
+                      <div className="p-4 bg-[#0B0F12] border border-slate-800 rounded space-y-4">
                         <div className="flex justify-between items-center border-b border-slate-800 pb-2">
                           <span className="text-xs font-bold text-[#8ba888] uppercase tracking-wide">2. Identitate Persoană Cumpărător</span>
-                          <div className="flex gap-2 bg-[#12181D] p-1 rounded-lg border border-slate-800">
+                          <div className="flex gap-2 bg-[#12181D] p-1 rounded border border-slate-800">
                             <button type="button" onClick={() => { setAutoData({...autoData, cumparatorTip: 'PF'}) }} className={`px-2 py-0.5 rounded text-[10px] font-bold ${autoData.cumparatorTip === 'PF' ? 'bg-[#8ba888] text-black' : 'text-slate-400'}`}>Fizică (PF)</button>
                             <button type="button" onClick={() => { setAutoData({...autoData, cumparatorTip: 'PJ'}) }} className={`px-2 py-0.5 rounded text-[10px] font-bold ${autoData.cumparatorTip === 'PJ' ? 'bg-[#8ba888] text-black' : 'text-slate-400'}`}>Firmă/PFA (PJ)</button>
                           </div>
@@ -1684,7 +1687,7 @@ export default function Home() {
                       <span className="text-xs font-bold text-[#8ba888] uppercase block pt-2">Pasul 3: Încărcare Acte pentru Citire Optică OCR [ Acest pas este optional ]</span>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         
-                        <div className="bg-[#0B0F12] p-4 border border-slate-800 rounded-xl text-center flex flex-col justify-between min-h-[140px]">
+                        <div className="bg-[#0B0F12] p-4 border border-slate-800 rounded text-center flex flex-col justify-between min-h-[140px]">
                           <label className="text-xs text-slate-300 block mb-2 font-bold">Carte Identitate Vehicul (CIV)</label>
                           {!autoDocs.civ ? (
                             <input type="file" id="file-input-civ" accept="image/*,application/pdf" disabled={isUploading} onChange={(e) => handleAutoFileUpload(e, 'civ')} className="text-xs block w-full text-slate-500 file:bg-[#16221A] file:text-[#8ba888]" />
@@ -1696,7 +1699,7 @@ export default function Home() {
                           )}
                         </div>
 
-                        <div className="bg-[#0B0F12] p-4 border border-slate-800 rounded-xl text-center flex flex-col justify-between min-h-[140px]">
+                        <div className="bg-[#0B0F12] p-4 border border-slate-800 rounded text-center flex flex-col justify-between min-h-[140px]">
                           <label className="text-xs text-slate-300 block mb-2 font-bold">Certificat Înmatriculare (Talon)</label>
                           {!autoDocs.talon ? (
                             <input type="file" id="file-input-talon" accept="image/*,application/pdf" disabled={isUploading} onChange={(e) => handleAutoFileUpload(e, 'talon')} className="text-xs block w-full text-slate-500 file:bg-[#16221A] file:text-[#8ba888]" />
@@ -1708,7 +1711,7 @@ export default function Home() {
                           )}
                         </div>
 
-                        <div className="bg-[#0B0F12] p-4 border border-slate-800 rounded-xl text-center flex flex-col justify-between min-h-[140px]">
+                        <div className="bg-[#0B0F12] p-4 border border-slate-800 rounded text-center flex flex-col justify-between min-h-[140px]">
                           <label className="text-xs text-slate-300 block mb-2 font-bold">Act Identitate Vânzător</label>
                           {!autoDocs.buletin_vanzator ? (
                             <input type="file" id="file-input-buletin_vanzator" accept="image/*,application/pdf" disabled={isUploading} onChange={(e) => handleAutoFileUpload(e, 'buletin_vanzator')} className="text-xs block w-full text-slate-500 file:bg-[#16221A] file:text-[#8ba888]" />
@@ -1720,7 +1723,7 @@ export default function Home() {
                           )}
                         </div>
 
-                        <div className="bg-[#0B0F12] p-4 border border-slate-800 rounded-xl text-center flex flex-col justify-between min-h-[140px]">
+                        <div className="bg-[#0B0F12] p-4 border border-slate-800 rounded text-center flex flex-col justify-between min-h-[140px]">
                           <label className="text-xs text-slate-300 block mb-2 font-bold">Act Identitate Cumpărător</label>
                           {!autoDocs.buletin_cumparator ? (
                             <input type="file" id="file-input-buletin_cumparator" accept="image/*,application/pdf" disabled={isUploading} onChange={(e) => handleAutoFileUpload(e, 'buletin_cumparator')} className="text-xs block w-full text-slate-500 file:bg-[#16221A] file:text-[#8ba888]" />
@@ -1737,12 +1740,12 @@ export default function Home() {
                       <div className="space-y-3 pt-2">
                         <span className="text-xs font-bold text-slate-400 uppercase block">Date Vehicul Extrase:</span>
                         <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-                          <input type="text" placeholder="Serie Șasiu / VIN" autoComplete="new-password" required value={autoData.autoVin} onChange={e => setAutoData({...autoData, autoVin: e.target.value.toUpperCase()})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded-lg text-xs text-white uppercase font-mono outline-none sm:col-span-1" />
-                          <input type="text" placeholder="Număr Înmatriculare" autoComplete="new-password" value={autoData.autoNumarInmatriculare} onChange={e => setAutoData({...autoData, autoNumarInmatriculare: e.target.value.toUpperCase()})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded-lg text-xs text-white uppercase font-mono outline-none sm:col-span-1" />
-                          <input type="text" placeholder="Marcă și Model" autoComplete="new-password" value={autoData.autoMarcaModel} onChange={e => setAutoData({...autoData, autoMarcaModel: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded-lg text-xs text-white outline-none sm:col-span-1" />
+                          <input type="text" placeholder="Serie Șasiu / VIN" autoComplete="new-password" required value={autoData.autoVin} onChange={e => setAutoData({...autoData, autoVin: e.target.value.toUpperCase()})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white uppercase font-mono outline-none sm:col-span-1" />
+                          <input type="text" placeholder="Număr Înmatriculare" autoComplete="new-password" value={autoData.autoNumarInmatriculare} onChange={e => setAutoData({...autoData, autoNumarInmatriculare: e.target.value.toUpperCase()})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white uppercase font-mono outline-none sm:col-span-1" />
+                          <input type="text" placeholder="Marcă și Model" autoComplete="new-password" value={autoData.autoMarcaModel} onChange={e => setAutoData({...autoData, autoMarcaModel: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white outline-none sm:col-span-1" />
                           <div className="flex gap-1 sm:col-span-1">
-                            <input type="number" placeholder="Preț" autoComplete="new-password" value={autoData.autoPret} onChange={e => setAutoData({...autoData, autoPret: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded-lg text-xs text-white outline-none w-full" />
-                            <select value={autoData.autoMoneda} onChange={e => setAutoData({...autoData, autoMoneda: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-1.5 text-xs text-white outline-none appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.2em_1.2em] bg-[right_0.4rem_center] bg-no-repeat pr-6">
+                            <input type="number" placeholder="Preț" autoComplete="new-password" value={autoData.autoPret} onChange={e => setAutoData({...autoData, autoPret: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white outline-none w-full" />
+                            <select value={autoData.autoMoneda} onChange={e => setAutoData({...autoData, autoMoneda: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded p-1.5 text-xs text-white outline-none appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.2em_1.2em] bg-[right_0.4rem_center] bg-no-repeat pr-6">
                               <option value="RON">RON</option>
                               <option value="EUR">EUR</option>
                             </select>
@@ -1750,8 +1753,8 @@ export default function Home() {
                         </div>
                         
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                           <input type="email" placeholder="Email Contracte Finalizate" autoComplete="new-password" required value={autoData.clientEmail} onChange={e => setAutoData({...autoData, clientEmail: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded-lg text-xs text-white outline-none" />
-                           <label className="flex items-center text-xs text-slate-400 cursor-pointer select-none border border-slate-800 rounded-lg p-2.5 bg-[#0B0F12]">
+                           <input type="email" placeholder="Email Contracte Finalizate" autoComplete="new-password" required value={autoData.clientEmail} onChange={e => setAutoData({...autoData, clientEmail: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white outline-none" />
+                           <label className="flex items-center text-xs text-slate-400 cursor-pointer select-none border border-slate-800 rounded p-2.5 bg-[#0B0F12]">
                              <input type="checkbox" checked={autoData.pretIncludeTVA} onChange={e => setAutoData({...autoData, pretIncludeTVA: e.target.checked})} className="mr-2 accent-[#8ba888]" />
                              <span>Prețul include TVA (Dacă Vânzătorul e PJ plătitor)</span>
                            </label>
@@ -1759,7 +1762,7 @@ export default function Home() {
                         
                         <div className="flex justify-between items-center pt-2">
                           <button type="button" onClick={handleInapoiPrincipal} className="text-xs text-slate-400 underline">Înapoi la panou</button>
-                          <button type="submit" disabled={isUploading || loading} className="bg-[#8ba888] text-black font-black px-6 py-2.5 rounded-xl text-xs tracking-tight transition hover:opacity-90">
+                          <button type="submit" disabled={isUploading || loading} className="bg-[#8ba888] text-black font-black px-6 py-2.5 rounded text-xs tracking-tight transition hover:opacity-90">
                             {loading ? 'Se procesează...' : `Generează Pachet Securizat Auto .ZIP (${autoData.autoMoneda === 'EUR' ? `${Math.round(99 / cursBnr.eur)} EUR` : '99 RON'})`}
                           </button>
                         </div>
@@ -1768,7 +1771,7 @@ export default function Home() {
                   )}
 
                   {autoStep === 'success' && (
-                    <div className="bg-[#0B0F12] border border-slate-800 p-5 rounded-2xl text-center space-y-4">
+                    <div className="bg-[#0B0F12] border border-slate-800 p-5 rounded-lg text-center space-y-4">
                       <div className="w-12 h-12 bg-emerald-900/40 text-emerald-400 rounded-full flex items-center justify-center mx-auto text-xl font-bold">✓</div>
                       <div>
                         <h4 className="text-sm font-bold text-white">Pachetul Auto a fost descărcat!</h4>
@@ -1785,10 +1788,10 @@ export default function Home() {
 
         {/* QR CODE REDIRECT STEP 2 */}
         {step === 2 && qrGeneratedUrl && qrGeneratedUrl.includes('/semneaza/') && (
-          <div className="max-w-3xl mx-auto mt-6 p-6 bg-[#12181D] border border-slate-800 rounded-2xl flex flex-col items-center justify-center text-center shadow-xl">
+          <div className="max-w-3xl mx-auto mt-6 p-6 bg-[#12181D] border border-slate-800 rounded-lg flex flex-col items-center justify-center text-center shadow-lg">
             <h3 className="text-lg font-bold text-[#8ba888] mb-2">Contractul a fost publicat</h3>
             <p className="text-xs text-slate-400 mb-4">Scanează codul QR pentru a deschide direct fluxul electronic de semnare:</p>
-            <div className="p-4 bg-white border rounded-xl shadow-lg">
+            <div className="p-4 bg-white border rounded shadow-md">
               <QRCodeSVG value={qrGeneratedUrl} size={150} />
             </div>
             <p className="text-xs text-slate-500 mt-3 font-mono">URL Securizat: <a href={qrGeneratedUrl} target="_blank" rel="noreferrer" className="underline text-[#8ba888]">{qrGeneratedUrl}</a></p>
@@ -1806,18 +1809,18 @@ export default function Home() {
           
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-5xl mx-auto mb-10">
             {/* Onetime Contract B2B */}
-            <div className="bg-[#12181D] border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
+            <div className="bg-[#12181D] border border-slate-800 rounded-lg p-4 flex flex-col justify-between">
               <div>
                 <span className="text-[10px] font-mono text-emerald-500 font-bold block uppercase">Plată Unică</span>
                 <h4 className="text-sm font-bold text-white mt-1">1x Contract B2B</h4>
                 <div className="text-lg font-black text-[#8ba888] mt-2 mb-1">19 RON</div>
                 <p className="text-[11px] text-slate-400 leading-relaxed mb-3">Plătești strict pe contractul de servicii descărcat.</p>
               </div>
-              <button type="button" onClick={() => handleCumparaPremium('one_time_contract')} className="w-full mt-4 bg-[#0B0F12] border border-slate-700 hover:bg-slate-900 text-white font-bold py-2 rounded-xl text-xs transition">Cumpără 19 RON</button>
+              <button type="button" onClick={() => handleCumparaPremium('one_time_contract')} className="w-full mt-4 bg-[#0B0F12] border border-slate-700 hover:bg-slate-900 text-white font-bold py-2 rounded text-xs transition">Cumpără 19 RON</button>
             </div>
 
             {/* Onetime Auto */}
-            <div className="bg-[#12181D] border border-slate-800 rounded-2xl p-4 flex flex-col justify-between relative ring-1 ring-blue-500/30">
+            <div className="bg-[#12181D] border border-slate-800 rounded-lg p-4 flex flex-col justify-between relative ring-1 ring-blue-500/30">
               <span className="absolute -top-2 right-4 bg-blue-600 text-white text-[8px] uppercase font-black px-2 py-0.5 rounded">Auto</span>
               <div>
                 <span className="text-[10px] font-mono text-blue-400 font-bold block uppercase">Plată Unică</span>
@@ -1825,11 +1828,11 @@ export default function Home() {
                 <div className="text-lg font-black text-white mt-2 mb-3">99 RON</div>
                 <p className="text-[11px] text-slate-300 leading-relaxed">Generare pachet complet vânzare auto (contracte, DITL, PV).</p>
               </div>
-              <button type="button" onClick={() => handleCumparaPremium('contract_auto')} className="w-full mt-4 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded-xl text-xs transition">Cumpără 99 RON</button>
+              <button type="button" onClick={() => handleCumparaPremium('contract_auto')} className="w-full mt-4 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded text-xs transition">Cumpără 99 RON</button>
             </div>
 
             {/* PRO */}
-            <div className="bg-[#12181D] border border-slate-800 rounded-2xl p-4 flex flex-col justify-between relative ring-2 ring-[#8ba888]/20">
+            <div className="bg-[#12181D] border border-slate-800 rounded-lg p-4 flex flex-col justify-between relative ring-2 ring-[#8ba888]/20">
               <span className="absolute -top-2 right-4 bg-[#8ba888] text-[#0B0F12] text-[8px] uppercase font-black px-2 py-0.5 rounded">Popular</span>
               <div>
                 <span className="text-[10px] font-mono text-[#8ba888] block uppercase">Abonament</span>
@@ -1837,14 +1840,14 @@ export default function Home() {
                 <div className="text-lg font-black text-white mt-2 mb-3">99 RON <span className="text-[10px] text-slate-500 font-normal">/ lună</span></div>
                 <p className="text-[11px] text-slate-300 leading-relaxed">Contracte B2B nelimitate + Mega-QR Studio (Smart, Geo, PDF, Landing).</p>
               </div>
-              <button type="button" onClick={() => handleCumparaPremium('pro')} className="w-full mt-4 bg-[#8ba888] text-[#0B0F12] font-black py-2 rounded-xl text-xs transition hover:opacity-90">Abonează-te</button>
+              <button type="button" onClick={() => handleCumparaPremium('pro')} className="w-full mt-4 bg-[#8ba888] text-[#0B0F12] font-black py-2 rounded text-xs transition hover:opacity-90">Abonează-te</button>
             </div>
           </div>
           
           <div className="max-w-5xl mx-auto mb-12">
             {/* FOUNDER LIFETIME */}
-            <div className="bg-[#16221A] border border-[#8ba888]/50 rounded-2xl p-6 flex flex-col sm:flex-row justify-between items-center relative shadow-lg shadow-[#8ba888]/10 text-center sm:text-left">
-              <span className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-amber-200 to-yellow-500 text-black text-[10px] uppercase font-black px-3 py-1 rounded shadow-lg">Oferta Limitata</span>
+            <div className="bg-[#16221A] border border-[#8ba888]/50 rounded-lg p-6 flex flex-col sm:flex-row justify-between items-center relative shadow-md shadow-[#8ba888]/10 text-center sm:text-left">
+              <span className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-amber-200 to-yellow-500 text-black text-[10px] uppercase font-black px-3 py-1 rounded shadow-md">Oferta Limitata</span>
               <div className="w-full sm:w-2/3 pt-2">
                 <span className="text-[10px] font-mono text-amber-500 font-bold block uppercase">VIP Acces pe Viață</span>
                 <h4 className="text-xl font-black text-white mt-1">Membru Fondator - Lifetime</h4>
@@ -1852,7 +1855,7 @@ export default function Home() {
               </div>
               <div className="w-full sm:w-1/3 flex flex-col items-center sm:items-end mt-4 sm:mt-0">
                 <div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-500 mb-2">999 RON</div>
-                <button type="button" onClick={() => handleCumparaPremium('founder')} className="bg-gradient-to-r from-amber-200 to-yellow-500 hover:opacity-90 text-black font-black py-3 px-8 rounded-xl text-sm transition">Devino Fondator</button>
+                <button type="button" onClick={() => handleCumparaPremium('founder')} className="bg-gradient-to-r from-amber-200 to-yellow-500 hover:opacity-90 text-black font-black py-3 px-8 rounded text-sm transition">Devino Fondator</button>
               </div>
             </div>
           </div>
@@ -1863,40 +1866,40 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
             
-            <div className="bg-[#12181D] border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
+            <div className="bg-[#12181D] border border-slate-800 rounded-lg p-4 flex flex-col justify-between">
               <div>
                 <h4 className="text-sm font-bold text-white mt-1">Șablon Tipizat Legal</h4>
                 <p className="text-[10px] text-slate-400 mt-1">Contracte PDF gata redactate.</p>
                 <div className="text-lg font-black text-white mt-2 mb-3">49 RON</div>
               </div>
-              <Link href="/modele-contracte" className="w-full block text-center bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded-xl text-xs hover:bg-slate-900">Vezi Șabloanele</Link>
+              <Link href="/modele-contracte" className="w-full block text-center bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded text-xs hover:bg-slate-900">Vezi Șabloanele</Link>
             </div>
 
-            <div className="bg-[#12181D] border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
+            <div className="bg-[#12181D] border border-slate-800 rounded-lg p-4 flex flex-col justify-between">
               <div>
                 <h4 className="text-sm font-bold text-white mt-1">Pachet QR Branding</h4>
                 <p className="text-[10px] text-slate-400 mt-1">Adaugă logo-ul tău pe centru.</p>
                 <div className="text-lg font-black text-white mt-2 mb-3">49 RON</div>
               </div>
-              <button onClick={() => handleCumparaPremium('qr_branding')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded-xl text-xs hover:bg-slate-900">Cumpără 49 RON</button>
+              <button onClick={() => handleCumparaPremium('qr_branding')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded text-xs hover:bg-slate-900">Cumpără 49 RON</button>
             </div>
 
-            <div className="bg-[#12181D] border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
+            <div className="bg-[#12181D] border border-slate-800 rounded-lg p-4 flex flex-col justify-between">
               <div>
                 <h4 className="text-sm font-bold text-white mt-1">Pachet QR Dynamic</h4>
                 <p className="text-[10px] text-slate-400 mt-1">Schimbă destinația + Găzduire PDF.</p>
                 <div className="text-lg font-black text-white mt-2 mb-3">39 RON</div>
               </div>
-              <button onClick={() => handleCumparaPremium('qr_dynamic')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded-xl text-xs hover:bg-slate-900">Cumpără 39 RON</button>
+              <button onClick={() => handleCumparaPremium('qr_dynamic')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded text-xs hover:bg-slate-900">Cumpără 39 RON</button>
             </div>
 
-            <div className="bg-[#12181D] border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
+            <div className="bg-[#12181D] border border-slate-800 rounded-lg p-4 flex flex-col justify-between">
               <div>
                 <h4 className="text-sm font-bold text-white mt-1">Pachet QR vCard Pro</h4>
                 <p className="text-[10px] text-slate-400 mt-1">Carte de vizită cu salvare în agendă.</p>
                 <div className="text-lg font-black text-white mt-2 mb-3">69 RON</div>
               </div>
-              <button onClick={() => handleCumparaPremium('qr_vcard')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded-xl text-xs hover:bg-slate-900">Cumpără 69 RON</button>
+              <button onClick={() => handleCumparaPremium('qr_vcard')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded text-xs hover:bg-slate-900">Cumpără 69 RON</button>
             </div>
           </div>
         </div>
@@ -1906,7 +1909,7 @@ export default function Home() {
           <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-4">Flux Monitorizare Mediativă Legală Real-Time</span>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {stiriLive.slice(0, 6).map((stire, i) => (
-              <div key={i} className="bg-[#12181D] border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-slate-700 transition">
+              <div key={i} className="bg-[#12181D] border border-slate-800 rounded-lg p-5 flex flex-col justify-between hover:border-slate-700 transition">
                 <div>
                   <span className="text-[10px] font-bold text-[#8ba888] bg-[#16221A] px-2 py-0.5 rounded border border-emerald-900/50 uppercase">{stire.sursa || "Presă Economică"}</span>
                   <h3 className="text-sm font-bold text-white mt-3 leading-snug">{stire.titlu || stire.title}</h3>
@@ -1923,7 +1926,7 @@ export default function Home() {
         {/* WIDGET CONSILIER AI */}
         <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
           {isAiOpen && (
-            <div className="bg-[#12181D] border border-slate-800 shadow-2xl rounded-2xl w-[320px] sm:w-[380px] h-[500px] mb-4 flex flex-col overflow-hidden animate-fadeIn">
+            <div className="bg-[#12181D] border border-slate-800 shadow-lg rounded-lg w-[320px] sm:w-[380px] h-[500px] mb-4 flex flex-col overflow-hidden animate-fadeIn">
               <div className="bg-[#16221A] border-b border-[#8ba888]/20 p-4 flex justify-between items-center">
                 <div>
                   <h3 className="text-white font-bold text-sm">Consilier Smart AI</h3>
@@ -1943,8 +1946,8 @@ export default function Home() {
                     <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                       <div className={`max-w-[85%] p-3 text-xs shadow-md ${
                         msg.role === 'user' 
-                          ? 'bg-[#8ba888] text-[#0B0F12] rounded-2xl rounded-tr-sm' 
-                          : 'bg-[#12181D] border border-slate-800 text-slate-300 rounded-2xl rounded-tl-sm'
+                          ? 'bg-[#8ba888] text-[#0B0F12] rounded-lg rounded-tr-sm' 
+                          : 'bg-[#12181D] border border-slate-800 text-slate-300 rounded-lg rounded-tl-sm'
                       }`}>
                         {msg.content}
                       </div>
@@ -1953,7 +1956,7 @@ export default function Home() {
                 )}
                 {aiLoading && (
                   <div className="flex justify-start">
-                    <div className="bg-[#12181D] border border-slate-800 text-slate-400 p-3 rounded-xl text-xs flex gap-1 items-center">
+                    <div className="bg-[#12181D] border border-slate-800 text-slate-400 p-3 rounded text-xs flex gap-1 items-center">
                       <div className="w-1.5 h-1.5 bg-slate-500 rounded-full animate-bounce"></div>
                       <div className="w-1.5 h-1.5 bg-slate-500 rounded-full animate-bounce delay-75"></div>
                       <div className="w-1.5 h-1.5 bg-slate-500 rounded-full animate-bounce delay-150"></div>
@@ -1969,9 +1972,9 @@ export default function Home() {
                     value={aiInputMessage}
                     onChange={(e) => setAiInputMessage(e.target.value)}
                     placeholder="Scrie o întrebare..."
-                    className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#8ba888]"
+                    className="flex-1 bg-[#0B0F12] border border-slate-700 rounded px-3 py-2 text-xs text-white outline-none focus:border-[#8ba888]"
                   />
-                  <button type="submit" disabled={aiLoading || !aiInputMessage.trim()} className="bg-[#8ba888] text-black px-3 py-2 rounded-lg font-bold disabled:opacity-50 hover:opacity-90">
+                  <button type="submit" disabled={aiLoading || !aiInputMessage.trim()} className="bg-[#8ba888] text-black px-3 py-2 rounded font-bold disabled:opacity-50 hover:opacity-90">
                     ➤
                   </button>
                 </form>
@@ -1981,7 +1984,7 @@ export default function Home() {
           
           <button 
             onClick={() => setIsAiOpen(!isAiOpen)} 
-            className="w-14 h-14 bg-[#8ba888] rounded-full shadow-xl flex items-center justify-center hover:scale-105 transition-transform border-4 border-[#0B0F12]"
+            className="w-14 h-14 bg-[#8ba888] rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-transform border-4 border-[#0B0F12]"
           >
             <span className="text-2xl">{isAiOpen ? '✕' : '💬'}</span>
           </button>
@@ -2012,6 +2015,8 @@ export default function Home() {
               <Link href="/modele-contracte" className="hover:text-[#8ba888] transition">Modele Predefinite</Link>
               <span>•</span>
               <Link href="/baza-legala" className="hover:text-[#8ba888] transition">Articole Validitate Juridică & Cod Civil</Link>
+              <span>•</span>
+              <Link href="/contact" className="hover:text-[#8ba888] transition">Contact</Link>
             </div>
             <div className="pt-6 border-t border-slate-800/40 text-[11px] text-slate-500 font-mono">
               <p>© 2026 ContractSmart. Powered by ZenSoftware. Toate drepturile rezervate legal.</p>
