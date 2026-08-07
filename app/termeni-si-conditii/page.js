@@ -3,82 +3,91 @@ import Link from 'next/link';
 
 export default function TermeniSiConditii() {
   return (
-    <div className="min-h-screen bg-[#0B0F12] text-slate-300 font-sans py-12 px-6">
-      <div className="max-w-4xl mx-auto bg-[#12181D] border border-slate-800 p-8 md:p-12 rounded-2xl shadow-2xl space-y-8">
-        
-        {/* HEADER */}
-        <div className="border-b border-slate-800 pb-6 flex justify-between items-center flex-wrap gap-4">
-          <div>
-            <h1 className="text-3xl font-black text-white tracking-tight">Termeni și Condiții de Utilizare</h1>
-            <p className="text-xs text-slate-500 mt-1">Platforma Legal-Tech ContractSmart.ro | Ediția Relații Comerciale & Auto 2026</p>
-          </div>
-          <Link 
-            href="/" 
-            className="text-xs font-bold text-[#8ba888] hover:text-white transition bg-[#16221A] border border-[#8ba888]/20 px-4 py-2 rounded-xl"
-          >
-            &larr; Înapoi la Panoul Principal
+    <div className="min-h-screen bg-[#0B0F12] text-slate-200 font-sans pb-16 relative overflow-clip">
+      
+      {/* NAVBAR SIMPLIFICAT */}
+      <nav className="sticky top-0 z-40 backdrop-blur-md bg-[#0B0F12]/90 border-b border-slate-800 py-4 px-6 shadow-lg">
+        <div className="flex justify-between items-center max-w-7xl mx-auto">
+          <Link href="/" className="w-[180px] h-[30px] flex items-center cursor-pointer">
+            <svg viewBox="0 0 240 40" className="w-full h-full">
+              <g transform="translate(0, 2)">
+                <path d="M24 6 C15 6, 8 13, 8 22 C8 31, 15 38, 24 38 C31 38, 37 33, 39 27" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round"/>
+                <path d="M16 21 L21 26 L32 12" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+              </g>
+              <text x="48" y="26" fontFamily="system-ui, -apple-system, sans-serif" fontWeight="900" fontSize="20" fill="#FFFFFF" letterSpacing="-0.5">
+                Contract<tspan fill="#8ba888">Smart</tspan>
+              </text>
+            </svg>
           </Link>
+          <div className="hidden md:flex space-x-5">
+            <Link href="/" className="text-xs text-slate-400 hover:text-white transition">Înapoi la Home</Link>
+            <Link href="/contact" className="text-xs text-slate-400 hover:text-white transition">Contact</Link>
+          </div>
+        </div>
+      </nav>
+
+      {/* AMBIENT BLOBS */}
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-clip">
+        <div className="absolute w-[500px] h-[500px] rounded-full bg-[#8ba888]/5 blur-[100px] transform-gpu top-[10%] left-[15%]" />
+      </div>
+
+      <div className="relative z-10 max-w-4xl mx-auto px-6 py-12">
+        <div className="text-center mb-10">
+          <span className="text-[#8ba888] text-xs font-black uppercase tracking-widest block mb-2">Legal</span>
+          <h1 className="text-3xl md:text-4xl font-black text-white">Termeni și Condiții de Utilizare</h1>
+          <p className="text-slate-400 text-sm mt-2">Ultima actualizare: August 2026</p>
         </div>
 
-        {/* CONȚINUT REGLEMENTAT INTEGRAL */}
-        <div className="space-y-6 text-xs leading-relaxed text-slate-400">
+        <div className="bg-[#12181D] border border-slate-800 rounded-xl p-6 md:p-10 shadow-2xl space-y-8 text-sm text-slate-300 leading-relaxed">
           
-          <section className="space-y-2">
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider text-[#8ba888]">1. Obiectul Platformei și Domeniul de Aplicare</h2>
+          <section>
+            <h2 className="text-xl font-bold text-white mb-3">1. Introducere</h2>
             <p>
-              Platforma <strong>ContractSmart.ro</strong> pune la dispoziția utilizatorilor o infrastructură avansată de automatizare legal-tech destinată generării instanțiale de contracte comerciale (Prestări Servicii, NDA, CDA, Închiriere Imobile, Promisiuni de Vânzare) și simplificării tranzacțiilor din sectorul auto (Generare pachete tipizate Model ITĂ-014 DITL, Procese-Verbale de predare-primire, Cereri DRPCIV și rapoarte tehnice RAR).
+              Prezentul document reprezintă un contract legal între dumneavoastră (în calitate de "Utilizator" sau "Client") și platforma ContractSmart.ro ("Platforma", "noi"). Utilizarea serviciilor noastre de generare contracte, audit fiscal, citire optică a documentelor auto (OCR), soluții Mega-QR Studio și găzduire a fișierelor PDF reprezintă acordul dumneavoastră ferm cu privire la acești termeni.
             </p>
           </section>
 
-          <section className="space-y-2">
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider text-[#8ba888]">2. Protecția Datelor cu Caracter Personal (Arhitectură Unică & Sesiuni Ephemere)</h2>
+          <section>
+            <h2 className="text-xl font-bold text-white mb-3">2. Descrierea Serviciilor Oferite</h2>
+            <ul className="list-disc pl-5 space-y-2">
+              <li><strong>Generatoare de Contracte:</strong> Crearea dinamică a documentelor B2B și a pachetelor de acte auto în format PDF, pe baza inputului utilizatorului.</li>
+              <li><strong>Mega-QR Studio:</strong> Crearea de coduri QR dinamice, rute inteligente (Smart OS / Geo-Targeting), găzduire fișiere (Meniuri PDF) și crearea de pagini Micro-Landing.</li>
+              <li><strong>Tehnologie AI / OCR:</strong> Platforma oferă funcționalități de citire automată a documentelor auto și consultanță AI. Rezultatele trebuie verificate de utilizator, având rol orientativ.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-bold text-white mb-3">3. Plăți, Abonamente și Facturare</h2>
             <p>
-              În conformitate cu Regulamentul European GDPR 2016/679, ContractSmart.ro este conceput după principiul <em>Data Protection by Design</em>. Toate datele cu caracter personal colectate pentru redactarea actelor (Nume, Prenume, CNP, Seri de Buletin, Serii de Șasiu/VIN, Adrese) sunt procesate <strong>exclusiv în memoria volatilă pe durata sesiunii curente</strong>.
-            </p>
-            <p>
-              Sistemul <strong>NU stochează și NU persistă</strong> datele de identificare ale părților în baze de date permanente post-generare. La reîmprospătarea paginii, închiderea browserului sau finalizarea descărcării pachetului documentar (.ZIP/PDF), datele din sesiunea respectivă sunt distruse ireversibil.
+              Plățile sunt procesate în siguranță prin intermediul partenerului nostru autorizat, <strong>LemonSqueezy</strong>. Oferim produse cu plată unică (Micro-tranzacții) și abonamente recurente (PRO, Enterprise). Abonamentele se reînnoiesc automat până la anularea explicită din contul utilizatorului. Licența "Membru Fondator" oferă acces pe durata de viață a platformei.
             </p>
           </section>
 
-          <section className="space-y-2">
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider text-[#8ba888]">3. Specificații Module: Contracte B2B și Tranzacții Auto</h2>
+          <section>
+            <h2 className="text-xl font-bold text-amber-400 mb-3">4. Politica de Retur și Renunțarea la Dreptul de Retragere</h2>
             <p>
-              <strong>3.1. Generatorul Comercial B2B:</strong> Permite configurarea clauzelor avansate de asigurare a încasărilor (clauze penale simetrice, suspendare drepturi IP, plafonare revizii, drept de retenție conform Codului Civil).
+              Conform legislației europene și a OUG 34/2014, art. 16, lit. m), <strong>consumatorul își pierde dreptul de retragere (refund)</strong> în cazul furnizării de conținut digital care nu este livrat pe un suport material (cum ar fi descărcarea de PDF-uri, arhive ZIP, generarea de coduri QR, sau activarea instantă a abonamentelor premium). 
             </p>
-            <p>
-              <strong>3.2. Asistentul Automatizat Auto:</strong> Emite integral dosarul constituit din cele 5 exemplare ale contractului oficial de înstrăinare-dobândire (Model ITĂ-014), Procesul-Verbal de exonerare de răspundere (transfer răspundere civilă/contravențională la data și ora exactă), Cererile DRPCIV de radiere/înmatriculare și extrasul din registrul tehnic RAR. Utilizatorul garantează veridicitatea datelor privind starea kilometrajului și opozabilitatea garanției pentru vicii ascunse (Art. 1707 Cod Civil).
-            </p>
-          </section>
-
-          <section className="space-y-2">
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider text-[#8ba888]">4. Interogări Externe (Widgets ANAF & RAR)</h2>
-            <p>
-              Serviciile de interogare rapidă a stării fiscale a companiilor (ANAF) și a cazierului tehnic/ITP per serie de șasiu (RAR) preiau date publice din registre oficiale. ContractSmart.ro asigură afișarea tehnică a acestora, nefiind răspunzător de eventualele neconcordanțe din bazele de date de stat de proveniență.
+            <p className="mt-2 text-slate-400">
+              Prin plasarea comenzii și inițierea procesului de generare/descărcare a fișierelor sau prin accesarea mediului PRO, <strong>vă exprimați acordul prealabil și asumați explicit faptul că veți pierde dreptul la rambursarea sumei plătite</strong> din cauza naturii digitale și de consum instantaneu a serviciilor ContractSmart. Sumele aferente abonamentelor deja începute nu pot fi rambursate parțial.
             </p>
           </section>
 
-          <section className="space-y-2">
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider text-[#8ba888]">5. Exonerare de Răspundere Juridică</h2>
+          <section>
+            <h2 className="text-xl font-bold text-white mb-3">5. Exonerarea de Răspundere Legală (Disclaimer Juridic)</h2>
             <p>
-              Livrabilele generate automat reprezintă modele profesionale standardizate. ContractSmart.ro nu acordă consultanță juridică sau avocățească individualizată în sensul Legii 51/1995. Responsabilitatea verificării conținutului final al actelor înainte de semnare revine părților contractante.
+              Șabloanele de contracte și explicațiile asistentului AI oferite de ContractSmart.ro au caracter pur <strong>orientativ și informațional</strong>. Platforma noastră NU oferă consultanță juridică autorizată. Nu ne asumăm răspunderea pentru pierderile financiare, refuzul dosarelor la DITL/RAR sau litigiile rezultate din utilizarea clauzelor generate. Recomandăm revizuirea documentelor complexe de către un avocat înscris în Barou.
             </p>
           </section>
 
-          <section className="space-y-2">
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider text-[#8ba888]">6. Condiții de Plată și Politică de Returnare</h2>
+          <section>
+            <h2 className="text-xl font-bold text-white mb-3">6. Protecția Datelor și a Fișierelor (Storage)</h2>
             <p>
-              Plățile pentru pachetele unice, micro-rapoarte sau abonamente se procesează securizat prin intermediul procesatorilor autorizați. Având în vedere livrarea digitală instantanee și compilarea fișierelor binare în timp real, serviciul se consideră complet executat la punerea la dispoziție a link-ului/fișierului de descărcare.
+              Fișierele încărcate voluntar de dumneavoastră (ex: Poze de profil pentru landing pages, meniuri PDF pentru QR Dinamic, documente auto scanate) sunt găzduite securizat pe infrastructura cloud Supabase. Ne angajăm să nu folosim aceste fișiere în scopuri terțe. Sunteți unicul responsabil pentru obținerea drepturilor de autor asupra materialelor pe care le încărcați prin intermediul QR Studio.
             </p>
           </section>
 
         </div>
-
-        {/* FOOTER MODAL */}
-        <div className="pt-6 border-t border-slate-800 flex justify-between items-center text-[11px] text-slate-500 font-mono">
-          <span>© 2026 ContractSmart.ro | ZenSoftware</span>
-          <span className="text-emerald-500 font-bold">✓ Zero-Data Retention Verified</span>
-        </div>
-
       </div>
     </div>
   );
