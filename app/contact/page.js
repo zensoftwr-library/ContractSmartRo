@@ -72,7 +72,7 @@ export default function Contact() {
                 <div className="w-10 h-10 bg-[#16221A] rounded-lg flex items-center justify-center text-[#8ba888] shrink-0">✉️</div>
                 <div>
                   <span className="block text-[10px] uppercase font-bold text-slate-500">Suport Email</span>
-                  <a href="mailto:contact@contractsmart.ro" className="block text-sm text-[#8ba888] hover:underline font-medium">zensofwr@gmail.com</a>
+                  <a href="mailto:contact@contractsmart.ro" className="block text-sm text-[#8ba888] hover:underline font-medium">zensoftwr@gmail.com</a>
                 </div>
               </div>
 

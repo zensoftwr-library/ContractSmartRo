@@ -1232,7 +1232,7 @@ export default function Home() {
                 <div className="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
                   <div>
                     <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">ContractSmart QR Studio (Megatron)</span>
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">ContractSmart QR ProStudio</span>
                     </h3>
                     <p className="text-slate-400 text-xs sm:text-sm mt-1">Generează, personalizează și urmărește codurile tale QR.</p>
                   </div>
