@@ -319,7 +319,7 @@ export async function POST(request) {
         </div>
     `;
 
-    // ADAUGĂ PROCES VERBAL DACĂ E BIFAT (REPARAT CU INLINE CSS ABSOLUT)
+    // ADAUGĂ PROCES VERBAL DACĂ E BIFAT (REPARAT CU INLINE CSS ABSOLUT ȘI SEMNĂTURI DINAMICE)
     if (adaugaProcesVerbal === true || adaugaProcesVerbal === "true") {
       htmlContract += `
         <div style="page-break-before: always; clear: both; padding-top: 40px;"></div>
@@ -331,10 +331,10 @@ export async function POST(request) {
           Încheiat astăzi, ${dataCurenta}, între:
         </div>
         <div class="text-paragraph">
-          1. <strong>${fieldHtml(prestatorNume, "220px")}</strong> (în calitate de Prestator/Predător)
+          1. <strong>${fieldHtml(prestatorNume, "220px")}</strong> (în calitate de Prestator / Vânzător)
         </div>
         <div class="text-paragraph">
-          2. <strong>${fieldHtml(clientNume, "220px")}</strong> (în calitate de Beneficiar/Primitor)
+          2. <strong>${fieldHtml(clientNume, "220px")}</strong> (în calitate de Beneficiar / Cumpărător)
         </div>
         
         <div class="text-paragraph">
@@ -348,8 +348,20 @@ export async function POST(request) {
         </div>
 
         <div class="signature-layout">
-          <div class="signature-column">PREDĂTOR<br><br><div class="signature-placeholder">Semnătură</div></div>
-          <div class="signature-column">PRIMITOR<br><br><div class="signature-placeholder">Semnătură</div></div>
+          <div class="signature-column">
+            PENTRU PRESTATOR / VÂNZĂTOR (PREDARE)<br><br>
+            ${initiatorRol === 'prestator' && semnăturaBase64 ? `
+              <img src="${semnăturaBase64}" class="signature-image" alt="Semnatura Prestator" />
+              <span style="font-size: 10px; font-weight: normal; color: #16a34a; display:block;">Semnat digital creator</span>
+            ` : `<div class="signature-placeholder">[Validat Electronic]</div>`}
+          </div>
+          <div class="signature-column">
+            PENTRU BENEFICIAR / CUMPĂRĂTOR (PRIMIRE)<br><br>
+            ${initiatorRol === 'client' && semnăturaBase64 ? `
+              <img src="${semnăturaBase64}" class="signature-image" alt="Semnatura Beneficiar" />
+              <span style="font-size: 10px; font-weight: normal; color: #16a34a; display:block;">Semnat digital creator</span>
+            ` : `<div class="signature-placeholder" style="color: #ef4444;">Așteaptă semnare partener</div>`}
+          </div>
         </div>
       `;
     }
