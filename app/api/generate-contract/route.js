@@ -4,6 +4,7 @@ import puppeteer from 'puppeteer';
 
 export const dynamic = 'force-dynamic';
 
+// Unificarea variabilelor de mediu pentru a preveni erorile de tip 400 Bad Request
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
 const supabase = createClient(supabaseUrl, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
@@ -101,79 +102,34 @@ export async function POST(request) {
 
     let clauzeInjectateHtml = '';
     
-    if (body.clauzaPi) {
-      if (tipContract === 'inchiriere_imobil') {
-        clauzeInjectateHtml += `<li><strong>ART. 4.1. CLAUZĂ DE INVESTIRE CU TITLU EXECUTORIU:</strong> În conformitate cu art. 1798 Cod Civil, prezentul contract constituie titlu executoriu de drept pentru recuperarea chiriilor restante și pentru evacuarea rapidă a Locatarului la expirarea termenului sau în caz de neplată, fără somație și fără procedură judecătorească prealabilă.</li>`;
-      } else if (tipContract === 'cda') {
-        clauzeInjectateHtml += `<li><strong>ART. 4.1. TRANSFER CONDIȚIONAT DE REMUNERAȚIE:</strong> Drepturile patrimoniale de exploatare a operei se transferă exclusiv condiționat de decontarea integrală, efectivă și confirmată bancar a prețului. Orice utilizare anterioară constituie delict civil și încălcare a drepturilor de autor.</li>`;
-      } else {
-        clauzeInjectateHtml += `<li><strong>ART. 4.1. REȚINERE DE PROPRIETATE INTELECTUALĂ:</strong> Toate livrabilele, planurile, codul sursă și materialele de proiect rămân în proprietatea exclusivă a Prestatorului până la momentul stingerii integrale a tuturor obligațiilor de plată.</li>`;
-      }
-    }
+    // CLAUZE GENERICE - EXTINSE
+    const rules = [
+      { cond: body.clauzaPi && tipContract === 'inchiriere_imobil', html: `<li><strong>ART. 4.1. CLAUZĂ DE INVESTIRE CU TITLU EXECUTORIU:</strong> În conformitate cu art. 1798 Cod Civil, prezentul contract constituie titlu executoriu de drept pentru recuperarea chiriilor restante și pentru evacuarea rapidă a Locatarului la expirarea termenului sau în caz de neplată, fără somație și fără procedură judecătorească prealabilă.</li>` },
+      { cond: body.clauzaPi && tipContract === 'cda', html: `<li><strong>ART. 4.1. TRANSFER CONDIȚIONAT DE REMUNERAȚIE:</strong> Drepturile patrimoniale de exploatare a operei se transferă exclusiv condiționat de decontarea integrală, efectivă și confirmată bancar a prețului. Orice utilizare anterioară constituie delict civil și încălcare a drepturilor de autor.</li>` },
+      { cond: body.clauzaPi && tipContract !== 'inchiriere_imobil' && tipContract !== 'cda', html: `<li><strong>ART. 4.1. REȚINERE DE PROPRIETATE INTELECTUALĂ:</strong> Toate livrabilele, planurile, codul sursă și materialele de proiect rămân în proprietatea exclusivă a Prestatorului până la momentul stingerii integrale a tuturor obligațiilor de plată.</li>` },
+      { cond: body.clauzaPenalitati, html: `<li><strong>ART. 4.2. REGIM PENALIZATOR ȘI DAUNE INTERESE:</strong> Depășirea scadenței facturilor atrage penalități de întârziere în cuantum de 0.5% pe zi calendaristică, calculate din suma restantă.</li>` },
+      { cond: body.clauzaLimitareRaspundere, html: `<li><strong>ART. 4.3. LIMITAREA RĂSPUNDERII COMERCIALE:</strong> Sub nicio formă și indiferent de natura litigiului, răspunderea financiară totală a Prestatorului pentru orice daune dovedite nu va depăși valoarea netă încasată efectiv pentru serviciile prestate în cadrul acestui contract.</li>` },
+      { cond: body.clauzaInflatie, html: `<li><strong>ART. 4.4. INDEXARE ANTI-INFLAȚIONISTĂ (EUR/BNR):</strong> Pentru a menține echilibrul prestațiilor, prețul contractului va fi actualizat/indexat automat raportat la evoluția cursului EUR/RON comunicat de BNR sau la indicele inflației comunicat de INS, aplicându-se valoarea cea mai favorabilă Prestatorului.</li>` },
+      { cond: body.clauzaRevizii, html: `<li><strong>ART. 4.5. PLAFONARE STRUCTURALĂ FEEDBACK:</strong> Modificările sau revizile sunt limitate la maximum 2 runde incluse în buget. Orice solicitare ulterioară va fi tarifată suplimentar prin act adițional.</li>` },
+      { cond: body.clauzaTaxaAnulare && tipContract === 'promisiune_vanzare', html: `<li><strong>ART. 4.6. EXECUTARE ARVUNĂ CONFIRMATORIE:</strong> În caz de reziliere din culpa Promitentului Cumpărător, sumele predate cu titlu de avans vor fi reținute integral. În caz de renunțare a Promitentului Vânzător, acesta este obligat de drept la restituirea dublului sumei încasate.</li>` },
+      { cond: body.clauzaTaxaAnulare && tipContract === 'evenimente', html: `<li><strong>ART. 4.6. REȚINERE AVANS (NON-REFUNDABLE RETAINER):</strong> Avansul încasat reprezintă rezervarea fermă a datei și a resurselor. În cazul în care Beneficiarul anulează evenimentul cu mai puțin de 90 de zile înainte, avansul este considerat daune-interese compensatorii nereturnabile.</li>` },
+      { cond: body.clauzaTaxaAnulare && tipContract !== 'promisiune_vanzare' && tipContract !== 'evenimente', html: `<li><strong>ART. 4.6. PENALITATE DE ANULARE (KILL FEE):</strong> În cazul denunțării unilaterale a contractului din culpa exclusivă a Beneficiarului, sumele achitate cu titlu de avans rămân integral în posesia Prestatorului pentru blocarea resurselor operaționale.</li>` },
+      { cond: body.clauzaSplitPayment, html: `<li><strong>ART. 4.7. PLĂȚI FRACȚIONATE (MILESTONES):</strong> Decontarea și recepția fiecărei etape intermediare (milestones) condiționează în mod direct și imperativ deblocarea execuției pentru fazele de lucru subsecvente.</li>` },
+      { cond: body.clauzaRetentie, html: `<li><strong>ART. 4.8. DREPT DE RETENȚIE TEHNICĂ:</strong> În caz de neplată a oricărei facturi scadente în termen de 15 zile, Prestatorul are facultatea legală de a sista serviciile, de a revoca permisiunile de acces sau de a suspenda instanțele de server și activele digitale.</li>` },
+      { cond: body.clauzaItNonSolicit, html: `<li><strong>ART. 4.9. CLAUZĂ DE NON-SOLICITARE PERSONAL:</strong> Beneficiarul se obligă ferm să nu recruteze, direct sau indirect prin interpuși, angajații sau subcontractorii Prestatorului pe o perioadă de 24 de luni de la încetarea contractului.</li>` },
+      { cond: body.clauzaAntiRecalificare, html: `<li><strong>ART. 4.10. INDEPENDEȚĂ OPERAȚIONALĂ ȘI FISCALĂ:</strong> Relația este strict comercială (B2B). Prestatorul dispune de libertate absolută în organizare, utilizarea echipamentelor proprii și stabilirea programului, fiind eliminat orice element de subordonare (Art. 7 Cod Fiscal).</li>` },
+      { cond: body.clauzaSuspendareFeedback, html: `<li><strong>ART. 4.11. SUSPENDARE PENTRU LIPSĂ FEEDBACK:</strong> Orice întârziere a Beneficiarului în furnizarea materialelor ce depășește 5 zile lucrătoare atrage decalarea automată a predării. Depășirea a 15 zile dă dreptul facturării integrale a stadiului curent.</li>` },
+      { cond: body.clauzaLogisticaHoreca, html: `<li><strong>ART. 4.12. ASIGURARE LOGISTICĂ EVENIMENT:</strong> Beneficiarul se obligă să asigure Prestatorului acces la curent electric stabil (220V), mese calde pe durata evenimentelor ce depășesc 4 ore, și loc de parcare garantat pentru echipamente.</li>` },
+      { cond: body.clauzaOriginalitate, html: `<li><strong>ART. 4.13. GARANȚIA ORIGINALITĂȚII:</strong> Autorul garantează absolut și sub sancțiunea legii penale că opera este 100% creație originală, nu încalcă drepturile terților (fără plagiat) și nu a mai fost cedată anterior.</li>` },
+      { cond: body.clauzaDauneTerti, html: `<li><strong>ART. 4.14. RĂSPUNDEREA PENTRU DAUNE PROVOCATE TERȚILOR:</strong> Locatarul este 100% solidar responsabil pentru orice distrugeri (inundații, incendii din culpă, vandalism) provocate vecinilor sau spațiilor comune, degrevând total Locatorul de orice acțiune în regres.</li>` },
+      { cond: body.clauzaRiscPieire, html: `<li><strong>ART. 4.15. RISCUL PIEIRII BUNULUI:</strong> Până la semnarea formei autentice, riscul pieirii fortuite a imobilului rămâne în sarcina Promitentului-Vânzător. Orice degradare a stării fizice dă dreptul Cumpărătorului să ceară reducerea prețului sau rezilierea de drept.</li>` }
+    ];
 
-    if (body.clauzaPenalitati) {
-      clauzeInjectateHtml += `<li><strong>ART. 4.2. REGIM PENALIZATOR ȘI DAUNE INTERESE:</strong> Depășirea scadenței facturilor atrage penalități de întârziere în cuantum de 0.5% pe zi calendaristică, calculate din suma restantă. Pentru contractele confidențiale (NDA/CDA), încălcarea atrage daune-interese preevaluate la suma de 50.000 EUR, exigibile imediat.</li>`;
-    }
+    rules.forEach(r => {
+      if (r.cond) clauzeInjectateHtml += r.html;
+    });
 
-    if (body.clauzaLimitareRaspundere) {
-      clauzeInjectateHtml += `<li><strong>ART. 4.3. LIMITAREA RĂSPUNDERII COMERCIALE:</strong> Sub nicio formă și indiferent de natura litigiului, răspunderea financiară totală a Prestatorului pentru orice daune dovedite nu va depăși valoarea netă încasată efectiv pentru serviciile prestate în cadrul acestui contract. Prestatorul nu răspunde pentru pierderi de profit sau date.</li>`;
-    }
-
-    if (body.clauzaInflatie) {
-      clauzeInjectateHtml += `<li><strong>ART. 4.4. INDEXARE ANTI-INFLAȚIONISTĂ (EUR/BNR):</strong> Pentru a menține echilibrul prestațiilor, prețul contractului va fi actualizat/indexat automat raportat la evoluția cursului EUR/RON comunicat de BNR sau la indicele inflației comunicat de INS, aplicându-se valoarea cea mai favorabilă Prestatorului.</li>`;
-    }
-
-    if (body.clauzaRevizii) {
-      clauzeInjectateHtml += `<li><strong>ART. 4.5. PLAFONARE STRUCTURALĂ FEEDBACK:</strong> Modificările sau revizile sunt limitate la maximum 2 runde incluse în buget. Orice solicitare ulterioară va fi tarifată suplimentar prin act adițional.</li>`;
-    }
-
-    if (body.clauzaTaxaAnulare) {
-      if (tipContract === 'promisiune_vanzare') {
-        clauzeInjectateHtml += `<li><strong>ART. 4.6. EXECUTARE ARVUNĂ CONFIRMATORIE:</strong> În caz de reziliere din culpa Promitentului Cumpărător, sumele predate cu titlu de avans vor fi reținute integral. În caz de renunțare a Promitentului Vânzător, acesta este obligat de drept la restituirea dublului sumei încasate.</li>`;
-      } else if (tipContract === 'evenimente') {
-        clauzeInjectateHtml += `<li><strong>ART. 4.6. REȚINERE AVANS (NON-REFUNDABLE RETAINER):</strong> Avansul încasat reprezintă rezervarea fermă a datei și a resurselor. În cazul în care Beneficiarul anulează evenimentul cu mai puțin de 90 de zile înainte, avansul este considerat daune-interese compensatorii nereturnabile.</li>`;
-      } else {
-        clauzeInjectateHtml += `<li><strong>ART. 4.6. PENALITATE DE ANULARE (KILL FEE):</strong> În cazul denunțării unilaterale a contractului din culpa exclusivă a Beneficiarului, sumele achitate cu titlu de avans rămân integral în posesia Prestatorului pentru blocarea resurselor operaționale.</li>`;
-      }
-    }
-
-    if (body.clauzaSplitPayment) {
-      clauzeInjectateHtml += `<li><strong>ART. 4.7. PLĂȚI FRACȚIONATE (MILESTONES):</strong> Decontarea și recepția fiecărei etape intermediare (milestones) condiționează în mod direct și imperativ deblocarea execuției pentru fazele de lucru subsecvente.</li>`;
-    }
-
-    if (body.clauzaRetentie) {
-      clauzeInjectateHtml += `<li><strong>ART. 4.8. DREPT DE RETENȚIE TEHNICĂ:</strong> În caz de neplată a oricărei facturi scadente în termen de 15 zile, Prestatorul are facultatea legală de a sista serviciile, de a revoca permisiunile de acces sau de a suspenda instanțele de server și activele digitale.</li>`;
-    }
-
-    if (body.clauzaItNonSolicit) {
-      clauzeInjectateHtml += `<li><strong>ART. 4.9. CLAUZĂ DE NON-SOLICITARE PERSONAL:</strong> Beneficiarul se obligă ferm să nu recruteze, direct sau indirect prin interpuși, angajații sau subcontractorii Prestatorului pe o perioadă de 24 de luni de la încetarea contractului.</li>`;
-    }
-
-    if (body.clauzaAntiRecalificare) {
-      clauzeInjectateHtml += `<li><strong>ART. 4.10. INDEPENDEȚĂ OPERAȚIONALĂ ȘI FISCALĂ:</strong> Relația este strict comercială (B2B). Prestatorul dispune de libertate absolută în organizare, utilizarea echipamentelor proprii și stabilirea programului, fiind eliminat orice element de subordonare (Art. 7 Cod Fiscal).</li>`;
-    }
-
-    if (body.clauzaSuspendareFeedback) {
-      clauzeInjectateHtml += `<li><strong>ART. 4.11. SUSPENDARE PENTRU LIPSĂ FEEDBACK:</strong> Orice întârziere a Beneficiarului în furnizarea materialelor ce depășește 5 zile lucrătoare atrage decalarea automată a predării. Depășirea a 15 zile dă dreptul facturării integrale a stadiului curent.</li>`;
-    }
-
-    if (body.clauzaLogisticaHoreca) {
-      clauzeInjectateHtml += `<li><strong>ART. 4.12. ASIGURARE LOGISTICĂ EVENIMENT:</strong> Beneficiarul se obligă să asigure Prestatorului acces la curent electric stabil (220V), mese calde pe durata evenimentelor ce depășesc 4 ore, și loc de parcare garantat pentru echipamente.</li>`;
-    }
-
-    if (body.clauzaOriginalitate) {
-      clauzeInjectateHtml += `<li><strong>ART. 4.13. GARANȚIA ORIGINALITĂȚII:</strong> Autorul garantează absolut și sub sancțiunea legii penale că opera este 100% creație originală, nu încalcă drepturile terților (fără plagiat) și nu a mai fost cedată anterior.</li>`;
-    }
-
-    if (body.clauzaDauneTerti) {
-      clauzeInjectateHtml += `<li><strong>ART. 4.14. RĂSPUNDEREA PENTRU DAUNE PROVOCATE TERȚILOR:</strong> Locatarul este 100% solidar responsabil pentru orice distrugeri (inundații, incendii din culpă, vandalism) provocate vecinilor sau spațiilor comune, degrevând total Locatorul de orice acțiune în regres.</li>`;
-    }
-
-    if (body.clauzaRiscPieire) {
-      clauzeInjectateHtml += `<li><strong>ART. 4.15. RISCUL PIEIRII BUNULUI:</strong> Până la semnarea formei autentice, riscul pieirii fortuite a imobilului rămâne în sarcina Promitentului-Vânzător. Orice degradare a stării fizice dă dreptul Cumpărătorului să ceară reducerea prețului sau rezilierea de drept.</li>`;
-    }
-
-    const field = (valoare, minWidth = "120px") => {
+    const fieldHtml = (valoare, minWidth = "120px") => {
       if (valoare && valoare.toString().trim() !== '') {
         return `<span class="valoare-importata">${valoare.toString().trim()}</span>`;
       }
@@ -182,6 +138,7 @@ export async function POST(request) {
 
     const dataCurenta = new Date().toLocaleDateString('ro-RO');
 
+    // CONSTRUCȚIA HTML 
     let htmlContract = `
       <!DOCTYPE html>
       <html>
@@ -292,9 +249,6 @@ export async function POST(request) {
             display: inline; 
             padding: 0 2px; 
           }
-          .page-break { 
-            page-break-before: always; 
-          }
         </style>
       </head>
       <body>
@@ -305,11 +259,11 @@ export async function POST(request) {
         
         <div class="capitol-title">CAPITOLUL I. PĂRȚILE CONTRACTANTE</div>
         <div class="text-paragraph">
-          <strong>SOCIETATEA COMERCIALĂ / ENTITATEA JURIDICĂ:</strong> ${field(prestatorNume, "220px")}, având date de identificare fiscală CUI/CNP: ${field(prestatorCui, "120px")}, reprezentată legal în capacitate juridică deplină, denumită <strong>PRESTATOR / LOCATOR / VÂNZĂTOR</strong>, pe de o parte,
+          <strong>SOCIETATEA COMERCIALĂ / ENTITATEA JURIDICĂ:</strong> ${fieldHtml(prestatorNume, "220px")}, având date de identificare fiscală CUI/CNP: ${fieldHtml(prestatorCui, "120px")}, reprezentată legal în capacitate juridică deplină, denumită <strong>PRESTATOR / LOCATOR / VÂNZĂTOR</strong>, pe de o parte,
         </div>
         <div class="text-paragraph" style="text-align: center; text-indent: 0;">și</div>
         <div class="text-paragraph">
-          <strong>SOCIETATEA COMERCIALĂ / ENTITATEA JURIDICĂ:</strong> ${field(clientNume, "220px")}, având date de identificare fiscală CUI/CNP: ${field(clientCui, "120px")}, reprezentată legal, denumită <strong>BENEFICIAR / LOCATAR / CUMPĂRĂTOR</strong>, pe altă parte.
+          <strong>SOCIETATEA COMERCIALĂ / ENTITATEA JURIDICĂ:</strong> ${fieldHtml(clientNume, "220px")}, având date de identificare fiscală CUI/CNP: ${fieldHtml(clientCui, "120px")}, reprezentată legal, denumită <strong>BENEFICIAR / LOCATAR / CUMPĂRĂTOR</strong>, pe altă parte.
         </div>
 
         <div class="capitol-title">CAPITOLUL II. OBIECTUL CONTRACTULUI ȘI TEMEIUL LEGAL</div>
@@ -317,12 +271,12 @@ export async function POST(request) {
           <strong>ART. 2.1. TEMEIUL JURIDIC:</strong> ${temeiJuridicHtml}
         </div>
         <div class="text-paragraph">
-          <strong>ART. 2.2. SPECIFICAȚII TEHNICE:</strong> Obiectul contractului este stabilit în mod expres prin convenția părților și constă în: ${field(obiect, "350px")}.
+          <strong>ART. 2.2. SPECIFICAȚII TEHNICE:</strong> Obiectul contractului este stabilit în mod expres prin convenția părților și constă în: ${fieldHtml(obiect, "350px")}.
         </div>
 
         <div class="capitol-title">CAPITOLUL III. OBLIGAȚII FINANCIARE ȘI SCADENȚĂ</div>
         <div class="text-paragraph">
-          <strong>ART. 3.1. ONORARIU NOMINAL:</strong> Prețul stabilit de către Părți este în cuantum total de: <strong>${field(valoare, "80px")} ${field(moneda, "50px")}</strong>.
+          <strong>ART. 3.1. ONORARIU NOMINAL:</strong> Prețul stabilit de către Părți este în cuantum total de: <strong>${fieldHtml(valoare, "80px")} ${fieldHtml(moneda, "50px")}</strong>.
         </div>
         <div class="text-paragraph">
           <strong>ART. 3.2. DECONTARE:</strong> Stingerea obligațiilor de plată se va efectua prin virament bancar, termenele stipulate în facturi fiind esențiale și de decădere.
@@ -365,9 +319,10 @@ export async function POST(request) {
         </div>
     `;
 
-    if (adaugaProcesVerbal) {
+    // ADAUGĂ PROCES VERBAL DACĂ E BIFAT (REPARAT CU INLINE CSS ABSOLUT)
+    if (adaugaProcesVerbal === true || adaugaProcesVerbal === "true") {
       htmlContract += `
-        <div class="page-break"></div>
+        <div style="page-break-before: always; clear: both; padding-top: 40px;"></div>
         <div class="brand-header">Sistem de Certificare și Audit Criptografic // ContractSmart 2026</div>
         <div class="contract-title">ANEXA 1: PROCES-VERBAL DE PREDARE-PRIMIRE</div>
         <div class="contract-subtitle">Anexă la Contractul nr. CS-${Math.floor(10000 + Math.random() * 90000)} / ${dataCurenta}</div>
@@ -376,14 +331,14 @@ export async function POST(request) {
           Încheiat astăzi, ${dataCurenta}, între:
         </div>
         <div class="text-paragraph">
-          1. <strong>${field(prestatorNume, "220px")}</strong> (în calitate de Prestator/Predător)
+          1. <strong>${fieldHtml(prestatorNume, "220px")}</strong> (în calitate de Prestator/Predător)
         </div>
         <div class="text-paragraph">
-          2. <strong>${field(clientNume, "220px")}</strong> (în calitate de Beneficiar/Primitor)
+          2. <strong>${fieldHtml(clientNume, "220px")}</strong> (în calitate de Beneficiar/Primitor)
         </div>
         
         <div class="text-paragraph">
-          Obiectul predării a constat în recepționarea fizică și calitativă a următoarelor bunuri/lucrări/servicii: ${field(obiect, "350px")}.
+          Obiectul predării a constat în recepționarea fizică și calitativă a următoarelor bunuri/lucrări/servicii: ${fieldHtml(obiect, "350px")}.
         </div>
         <div class="text-paragraph">
           Prin semnarea prezentului proces-verbal, Beneficiarul declară în mod expres, ferm și neechivoc că a primit și recepționat bunurile/serviciile mai sus menționate. Beneficiarul confirmă că acestea sunt în stare perfectă de funcționare, cantitativ și calitativ conform standardelor agreate, și că <strong>nu are absolut nicio obiecțiune vizibilă sau ascunsă</strong> cu privire la acestea.
@@ -412,14 +367,14 @@ export async function POST(request) {
     await browser.close();
 
     // -------------------------------------------------------------------------
-    // TRIMITE EMAIL VIA RESEND (Fără Twilio)
+    // TRIMITE EMAIL VIA RESEND CU LOG-URI CLARE
     // -------------------------------------------------------------------------
     if (process.env.RESEND_API_KEY && clientEmail) {
       try {
         const { Resend } = await import('resend');
         const resend = new Resend(process.env.RESEND_API_KEY);
 
-        await resend.emails.send({
+        const emailResponse = await resend.emails.send({
           from: 'ContractSmart <contact@contractsmart.ro>',
           to: clientEmail,
           subject: `Document Securizat - ${titluContractOficial}`,
@@ -431,12 +386,13 @@ export async function POST(request) {
             },
           ],
         });
-        console.log("E-mail expediat cu succes către:", clientEmail);
+        console.log("E-mail procesat de Resend:", emailResponse);
       } catch (emailErr) {
         console.error("❌ EROARE RESEND DETALIATĂ:", emailErr);
       }
     }
 
+    // SCĂDERE CREDITE DOAR DACA E FREE
     if (!isPremium && availableCredits > 0) {
       await supabase.from('profiles').update({ credits_remaining: availableCredits - 1 }).eq('id', userId);
     }

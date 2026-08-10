@@ -1079,6 +1079,22 @@ export default function Home() {
       </div>
 
       <div className="relative z-10">
+        
+        {/* OVERLAY ELEGANT DE LOADING */}
+        {loading && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#0B0F12]/80 backdrop-blur-md animate-fadeIn">
+            <div className="flex flex-col items-center bg-[#12181D] p-8 rounded-2xl border border-slate-800 shadow-2xl">
+              <div className="relative w-16 h-16 mb-6 flex items-center justify-center">
+                <div className="absolute inset-0 rounded-full border-4 border-t-[#8ba888] border-b-[#8ba888]/20 border-r-transparent border-l-transparent animate-spin"></div>
+                <div className="absolute w-10 h-10 rounded-full border-4 border-l-[#8ba888]/80 border-r-[#8ba888]/20 border-t-transparent border-b-transparent animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.2s' }}></div>
+                <span className="text-xl">🔒</span>
+              </div>
+              <h3 className="text-sm font-black text-white tracking-widest uppercase mb-2">Securizare în curs...</h3>
+              <p className="text-xs text-slate-400 text-center max-w-[250px]">Generăm documentul și aplicăm auditul criptografic. Te rugăm să aștepți.</p>
+            </div>
+          </div>
+        )}
+
         {/* MODAL AUTH */}
         {showAuthModal && (
           <div className="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn">
@@ -1884,7 +1900,11 @@ export default function Home() {
                         <h4 className="text-sm font-bold text-white">Pachetul Auto a fost descărcat!</h4>
                         <p className="text-xs text-slate-400 mt-1">Arhiva conține cele 5 exemplare oficiale DITL, procesul-verbal avocațial cu km garantați și ghidul procedural post-vânzare.</p>
                       </div>
-                      <button onClick={() => { setAutoStep('upload'); setStep(1); }} className="text-xs text-[#8ba888] underline pt-2 block mx-auto">Înapoi la panou</button>
+                      <div className="flex justify-center mt-4">
+                        <button type="button" onClick={() => { setAutoStep('upload'); setStep(1); }} className="text-xs font-bold text-[#8ba888] hover:text-white flex items-center gap-1.5 transition underline">
+                          &larr; Înapoi la Panoul Principal
+                        </button>
+                      </div>
                     </div>
                   )}
                 </form>
