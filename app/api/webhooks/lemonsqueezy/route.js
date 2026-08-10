@@ -4,7 +4,8 @@ import { createClient } from '@supabase/supabase-js';
 
 export const dynamic = 'force-dynamic';
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+const supabase = createClient(supabaseUrl, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
 export async function POST(request) {
   try {
@@ -45,6 +46,7 @@ export async function POST(request) {
         await supabase.rpc('add_cr', { u: userId });
       }
       else if (tipProdus === 'sabloane' && templateId) {
+        // Aici e reparația: Salvăm 'templateId' direct, nu stringul "sabloane"
         await supabase.from('user_purchases').insert([{ user_id: userId, product_id: templateId }]);
       }
       

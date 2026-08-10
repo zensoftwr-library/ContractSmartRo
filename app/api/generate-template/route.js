@@ -4,10 +4,8 @@ import { createClient } from '@supabase/supabase-js';
 
 export const dynamic = 'force-dynamic';
 
-const supabase = createClient(
-  process.env.SUPABASE_URL || '',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+const supabase = createClient(supabaseUrl, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
 export async function POST(request) {
   try {
@@ -25,7 +23,7 @@ export async function POST(request) {
 
       const { data: profil } = await supabase
         .from('profiles')
-        .select('subscription_tier, subscription_status')
+        .select('subscription_tier, subscription_status, is_pro')
         .eq('id', userId)
         .single();
 
@@ -35,11 +33,10 @@ export async function POST(request) {
         .eq('user_id', userId)
         .eq('product_id', templateId);
 
-      const esteAbonatActiv = profil && profil.subscription_status === 'active' && 
-                             (profil.subscription_tier === 'founder' || profil.subscription_tier === 'pro');
+      const isPremium = profil && (profil.subscription_tier === 'founder' || profil.subscription_tier === 'pro' || profil.is_pro);
       const areAchizitieIndividuala = achizitii && achizitii.length > 0;
 
-      if (!esteAbonatActiv && !areAchizitieIndividuala) {
+      if (!isPremium && !areAchizitieIndividuala) {
         return NextResponse.json({ 
           success: false, 
           message: 'Acces refuzat. Acest șablon academic necesită un abonament Pro / Lifetime activ sau achiziție individuală (49 RON).' 
@@ -85,15 +82,6 @@ export async function POST(request) {
         `;
         break;
 
-      case 'inchiriere_auto_premium':
-        titluOficial = "CONTRACT DE LOCAȚIUNE ȘI EXPLOATARE BUNURI MOBILE (AUTO/ECHIPAMENTE)";
-        temeiLegal = "În conformitate cu normele dreptului comun din materia locațiunii mobile reglementate de Codul Civil român.";
-        articoleSpecificeHtml = `
-          <div class="art-title">ARTICOLUL 3. STAREA BUNULUI ȘI REȚINERE GARANȚII</div>
-          <div class="paragraph">3.1. Locatarul preia bunul mobil în stare perfectă de funcționare și constituie un fond de garanție valoric pentru acoperirii eventualelor avarii sau uzuri anormale.</div>
-        `;
-        break;
-
       case 'inchiriere_imobil_premium':
         titluOficial = "CONTRACT DE LOCAȚIUNE ȘI EXPLOATARE SPAȚIU IMOBILIAR (LOCUINȚĂ)";
         temeiLegal = "În conformitate cu Art. 1777 - Art. 1835 din Codul Civil român privitoare la locațiunea imobilelor rezidențiale.";
@@ -103,26 +91,35 @@ export async function POST(request) {
         `;
         break;
 
-      case 'comercial_premium':
-        titluOficial = "CONTRACT DE LOCAȚIUNE SPAȚIU COMERCIAL ȘI BIROURI (TITLU EXECUTORIU)";
-        temeiLegal = "Guvernat de Art. 1777 și Art. 1798 din Codul Civil român, înscrisul comercial constituind de drept un instrument cu valoare executorie directă.";
+      case 'promisiune_vanzare_premium':
+        titluOficial = "ANTECONTRACT / PROMISIUNE BILATERALĂ DE VÂNZARE-CUMPĂRARE IMOBIL";
+        temeiLegal = "Guvernat de Art. 1279 și Art. 1669 din Codul Civil român referitoare la promisiunea de a contracta și executarea silită a obligațiilor corelative.";
         articoleSpecificeHtml = `
-          <div class="art-title">ARTICOLUL 3. CARACTERUL EXECUTORIU DIRECT</div>
-          <div class="paragraph">3.1. În conformitate cu art. 1798 Cod Civil, prezentul contract constituie TITLU EXECUTORIU pentru recuperarea chiriilor restante și pentru evacuarea rapidă a Locatarului, fără procedură judecătorească.</div>
+          <div class="art-title">ARTICOLUL 3. ARVUNĂ CONFIRMATORIE</div>
+          <div class="paragraph">3.1. În caz de reziliere din culpa sau răzgândirea Promitentului Cumpărător, sumele predate cu titlu de avans vor fi reținute integral de către Vânzător. În caz de renunțare din partea Promitentului Vânzător, acesta este obligat de drept la restituirea dublului sumei încasate.</div>
+        `;
+        break;
+
+      case 'inchiriere_auto_premium':
+        titluOficial = "CONTRACT DE LOCAȚIUNE VEHICULE ȘI ECHIPAMENTE MOBILIERE";
+        temeiLegal = "În conformitate cu normele dreptului comun din materia locațiunii bunurilor mobile reglementate de Codul Civil român.";
+        articoleSpecificeHtml = `
+          <div class="art-title">ARTICOLUL 3. STAREA BUNULUI ȘI REȚINERE GARANȚII</div>
+          <div class="paragraph">3.1. Locatarul preia bunul mobil în stare perfectă de funcționare și constituie un fond de garanție valoric pentru acoperirea eventualelor avarii, francize CASCO sau uzuri anormale.</div>
         `;
         break;
 
       case 'management_premium':
         titluOficial = "CONTRACT COMERCIAL DE MANAGEMENT ȘI CONSULTANȚĂ B2B";
-        temeiLegal = "Încheiat în baza dispozițiilor Codului Civil român privind libertatea contractuală și contractele de prestări servicii strategice.";
+        temeiLegal = "Încheiat în baza dispozițiilor Codului Civil român și a Legii 31/1990 privind libertatea contractuală și contractele de prestări servicii executive.";
         articoleSpecificeHtml = `
           <div class="art-title">ARTICOLUL 3. INDICATORI KEY DE PERFORMANȚĂ (KPI)</div>
-          <div class="paragraph">3.1. Managerul se obligă la monitorizarea activității operaționale și atingerea obiectivelor specifice de profitabilitate industrială detaliate în anexă.</div>
+          <div class="paragraph">3.1. Managerul se obligă la monitorizarea activității operaționale și atingerea obiectivelor specifice de profitabilitate industrială, orice bonusare fiind condiționată de acești indicatori.</div>
         `;
         break;
 
       case 'sponsorizare_premium':
-        titluOficial = "CONTRACT DE SPONSORIZARE STRATEGICĂ COMPANIE";
+        titluOficial = "CONTRACT DE SPONSORIZARE STRATEGICĂ";
         temeiLegal = "Încheiat în strictă conformitate cu prevederile Legii nr. 32/1994 privind sponsorizarea, cu aplicarea deductibilităților prevăzute de Codul Fiscal român.";
         articoleSpecificeHtml = `
           <div class="art-title">ARTICOLUL 3. DEDUCTIBILITATE ȘI TRANSMISIE DIRECTĂ</div>
@@ -132,25 +129,26 @@ export async function POST(request) {
 
       case 'asociere_premium':
         titluOficial = "ACORD COMERCIAL DE ASOCIERE ÎN PARTICIPAȚIUNE";
-        temeiLegal = "Încheiat în baza prevederilor Art. 1949 - Art. 1954 din Codul Civil român privitoare la asocierea în participațiune dintre două entități.";
+        temeiLegal = "Încheiat în baza prevederilor Art. 1949 - Art. 1954 din Codul Civil român privitoare la asocierea în participațiune dintre două sau mai multe entități.";
         articoleSpecificeHtml = `
           <div class="art-title">ARTICOLUL 3. DISTRIBUIREA PROFITULUI ȘI A PIERDERILOR</div>
-          <div class="paragraph">3.1. Părțile convin ca asocierea să nu dea naștere unei noi persoane juridice la ONRC, cota de participare la beneficii și pierderi fiind reglementată la un procent fix agreat.</div>
+          <div class="paragraph">3.1. Părțile convin ca asocierea să nu dea naștere unei noi persoane juridice la ONRC, cota de participare la beneficii și pierderi fiind reglementată la un procent fix agreat și asumat.</div>
         `;
         break;
 
       case 'comodat_premium':
-        titluOficial = "CONTRACT DE COMODAT / ÎMPRUMUT DE FOLOSINȚĂ GRATUITĂ SPAȚIU SEDIU";
+        titluOficial = "CONTRACT DE COMODAT / ÎMPRUMUT DE FOLOSINȚĂ GRATUITĂ";
         temeiLegal = "Guvernat de prevederile Art. 2146 - Art. 2157 din Codul Civil român privitoare la împrumutul de folosință gratuită.";
         articoleSpecificeHtml = `
           <div class="art-title">ARTICOLUL 3. DESTINAȚIA BUNULUI ȘI STABILIRE SEDIU SOCIAL</div>
-          <div class="paragraph">3.1. Comodantul împrumută în mod gratuit Comodatarului spațiul imobiliar identificat în procesul-verbal, cu destinația exclusivă de stabilire a sediului social al societății comerciale.</div>
+          <div class="paragraph">3.1. Comodantul împrumută în mod gratuit Comodatarului spațiul imobiliar identificat în procesul-verbal, cu destinația exclusivă de stabilire a sediului social al societății comerciale sau al punctului de lucru.</div>
         `;
         break;
 
       default:
         titluOficial = "MODEL DE CONTRACT COMERCIAL STANDARD";
         temeiLegal = "Dispozițiile generale comerciale în conformitate cu Codul Civil român.";
+        articoleSpecificeHtml = "";
     }
 
     const htmlTemplateBlank = `
@@ -159,17 +157,84 @@ export async function POST(request) {
       <head>
         <meta charset="utf-8">
         <style>
-          body { font-family: 'Times New Roman', Times, serif; padding: 50px; color: #000000; line-height: 1.6; font-size: 14px; }
-          .official-header { font-family: Arial, sans-serif; color: #64748b; font-size: 10px; text-transform: uppercase; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px; margin-bottom: 40px; text-align: center; }
-          .title { text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
-          .subtitle { text-align: center; font-size: 11px; margin-bottom: 35px; font-style: italic; }
-          .capitol-title { font-weight: bold; margin-top: 25px; margin-bottom: 10px; text-transform: uppercase; font-size: 14px; }
-          .art-title { font-weight: bold; margin-top: 15px; margin-bottom: 5px; text-transform: uppercase; font-size: 13px; }
-          .paragraph { text-align: justify; margin-bottom: 12px; text-indent: 30px; }
-          .signature-layout { margin-top: 60px; display: flex; justify-content: space-between; page-break-inside: avoid; }
-          .signature-column { width: 45%; text-align: center; border-top: 1px solid #000000; padding-top: 8px; font-size: 13px; font-weight: bold; }
-          .footer { margin-top: 80px; border-top: 1px solid #e2e8f0; padding-top: 10px; font-size: 10px; color: #64748b; text-align: center; font-family: Arial, sans-serif; }
-          .linia-dinamica { display: inline-block; border-bottom: 1px solid #000000; height: 16px; vertical-align: bottom; }
+          body { 
+            font-family: 'Times New Roman', Times, serif; 
+            padding: 50px; 
+            color: #000000; 
+            line-height: 1.6; 
+            font-size: 14px; 
+          }
+          .official-header { 
+            font-family: Arial, sans-serif; 
+            color: #64748b; 
+            font-size: 10px; 
+            text-transform: uppercase; 
+            border-bottom: 1px solid #cbd5e1; 
+            padding-bottom: 5px; 
+            margin-bottom: 40px; 
+            text-align: center; 
+          }
+          .title { 
+            text-align: center; 
+            font-size: 16px; 
+            font-weight: bold; 
+            margin-bottom: 5px; 
+            text-transform: uppercase; 
+          }
+          .subtitle { 
+            text-align: center; 
+            font-size: 11px; 
+            margin-bottom: 35px; 
+            font-style: italic; 
+          }
+          .capitol-title { 
+            font-weight: bold; 
+            margin-top: 25px; 
+            margin-bottom: 10px; 
+            text-transform: uppercase; 
+            font-size: 14px; 
+          }
+          .art-title { 
+            font-weight: bold; 
+            margin-top: 15px; 
+            margin-bottom: 5px; 
+            text-transform: uppercase; 
+            font-size: 13px; 
+          }
+          .paragraph { 
+            text-align: justify; 
+            margin-bottom: 12px; 
+            text-indent: 30px; 
+          }
+          .signature-layout { 
+            margin-top: 60px; 
+            display: flex; 
+            justify-content: space-between; 
+            page-break-inside: avoid; 
+          }
+          .signature-column { 
+            width: 45%; 
+            text-align: center; 
+            border-top: 1px solid #000000; 
+            padding-top: 8px; 
+            font-size: 13px; 
+            font-weight: bold; 
+          }
+          .footer { 
+            margin-top: 80px; 
+            border-top: 1px solid #e2e8f0; 
+            padding-top: 10px; 
+            font-size: 10px; 
+            color: #64748b; 
+            text-align: center; 
+            font-family: Arial, sans-serif; 
+          }
+          .linia-dinamica { 
+            display: inline-block; 
+            border-bottom: 1px solid #000000; 
+            height: 16px; 
+            vertical-align: bottom; 
+          }
         </style>
       </head>
       <body>
@@ -180,11 +245,11 @@ export async function POST(request) {
         
         <div class="capitol-title">CAPITOLUL I. PĂRȚILE CONTRACTANTE</div>
         <div class="paragraph">
-          <strong>PARTEA PRIMĂ (DENUMITĂ LEGAL FURNIZOR / LOCATOR / COMODANT):</strong> Întreprinderea / Subsemnatul <span class="linia-dinamica" style="min-width: 250px;">&nbsp;</span>, cu sediul în <span class="linia-dinamica" style="min-width: 250px;">&nbsp;</span>, cod fiscal / CUI / CNP <span class="linia-dinamica" style="min-width: 140px;">&nbsp;</span>, reprezentată legal prin <span class="linia-dinamica" style="min-width: 150px;">&nbsp;</span> în calitate de reprezentant.
+          <strong>PARTEA PRIMĂ (DENUMITĂ LEGAL FURNIZOR / LOCATOR / COMODANT / PROMITENT-VÂNZĂTOR):</strong> Întreprinderea / Subsemnatul <span class="linia-dinamica" style="min-width: 250px;">&nbsp;</span>, cu sediul în <span class="linia-dinamica" style="min-width: 250px;">&nbsp;</span>, cod fiscal / CUI / CNP <span class="linia-dinamica" style="min-width: 140px;">&nbsp;</span>, reprezentată legal prin <span class="linia-dinamica" style="min-width: 150px;">&nbsp;</span>.
         </div>
         <div class="paragraph" style="text-align: center; text-indent: 0;">și</div>
         <div class="paragraph">
-          <strong>PARTEA SECUNDĂ (DENUMITĂ LEGAL BENEFICIAR / LOCATAR / COMODATAR):</strong> Întreprinderea / Subsemnatul <span class="linia-dinamica" style="min-width: 250px;">&nbsp;</span>, cu sediul în <span class="linia-dinamica" style="min-width: 250px;">&nbsp;</span>, cod fiscal / CUI / CNP <span class="linia-dinamica" style="min-width: 140px;">&nbsp;</span>, reprezentată legal prin <span class="linia-dinamica" style="min-width: 150px;">&nbsp;</span> în calitate de reprezentant.
+          <strong>PARTEA SECUNDĂ (DENUMITĂ LEGAL BENEFICIAR / LOCATAR / COMODATAR / PROMITENT-CUMPĂRĂTOR):</strong> Întreprinderea / Subsemnatul <span class="linia-dinamica" style="min-width: 250px;">&nbsp;</span>, cu sediul în <span class="linia-dinamica" style="min-width: 250px;">&nbsp;</span>, cod fiscal / CUI / CNP <span class="linia-dinamica" style="min-width: 140px;">&nbsp;</span>, reprezentată legal prin <span class="linia-dinamica" style="min-width: 150px;">&nbsp;</span>.
         </div>
 
         <div class="capitol-title">CAPITOLUL II. OBIECTUL CONTRACTULUI ȘI TEMEIUL DE DREPT</div>
@@ -195,8 +260,8 @@ export async function POST(request) {
         ${articoleSpecificeHtml}
 
         <div class="capitol-title">CAPITOLUL IV. FORȚĂ MAJORĂ ȘI LITIGII COMERCIALE</div>
-        <div class="paragraph"><strong>ARTICOLUL 5:</strong> Forța majoră exonerează de răspundere partea care o invocă conform legislației române, cu obligația transmiterii unei notificări scrise în termen de maximum 5 zile de la apariția evenimentului fortuit.</div>
-        <div class="paragraph"><strong>ARTICOLUL 6:</strong> Orice diferend comercial decurgând din interpretarea prezentului contract se va soluționa pe cale amiabilă. În caz contrar, competența teritorială de judecată revine instanțelor de drept comun competente.</div>
+        <div class="paragraph"><strong>ARTICOLUL X:</strong> Forța majoră exonerează de răspundere partea care o invocă conform legislației române, cu obligația transmiterii unei notificări scrise în termen de maximum 5 zile de la apariția evenimentului fortuit.</div>
+        <div class="paragraph"><strong>ARTICOLUL Y:</strong> Orice diferend comercial decurgând din interpretarea prezentului contract se va soluționa pe cale amiabilă. În caz contrar, competența teritorială de judecată revine instanțelor de drept comun competente.</div>
 
         <div class="signature-layout">
           <div class="signature-column">SEMNĂTURĂ PRIMA PARTE<br><br><br><span style="font-size:10px; font-weight:normal; color:#94a3b8;">[L.S. / Ștampilă Manuală / Olograf]</span></div>

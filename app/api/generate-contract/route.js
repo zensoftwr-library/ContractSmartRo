@@ -3,7 +3,9 @@ import { createClient } from '@supabase/supabase-js';
 import puppeteer from 'puppeteer';
 
 export const dynamic = 'force-dynamic';
-const supabase = createClient(process.env.SUPABASE_URL || '', process.env.SUPABASE_SERVICE_ROLE_KEY || '');
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+const supabase = createClient(supabaseUrl, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
 export async function POST(request) {
   try {
@@ -16,8 +18,23 @@ export async function POST(request) {
     const { 
       tipContract, initiatorRol, obiect, valoare, moneda, 
       prestatorNume, prestatorCui, clientNume, clientCui, 
-      clientEmail, semnăturaBase64, userId, adaugaProcesVerbal
+      clientEmail, semnăturaBase64, userId, adaugaProcesVerbal, captchaToken
     } = body;
+
+    // -------------------------------------------------------------------------
+    // VALIDARE ANTI-SPAM CLOUDFLARE TURNSTILE PE BACKEND
+    // -------------------------------------------------------------------------
+    if (process.env.TURNSTILE_SECRET_KEY && captchaToken) {
+      const verifyRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `secret=${process.env.TURNSTILE_SECRET_KEY}&response=${captchaToken}`
+      });
+      const verifyData = await verifyRes.json();
+      if (!verifyData.success) {
+        return NextResponse.json({ success: false, message: 'Validare anti-spam (Cloudflare) eșuată. Reîncărcați pagina.' }, { status: 403 });
+      }
+    }
 
     if (!userId) {
       return NextResponse.json({ success: false, message: 'Utilizator neautentificat.' }, { status: 401 });
@@ -25,12 +42,12 @@ export async function POST(request) {
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('subscription_tier, subscription_status, credits_remaining')
+      .select('subscription_tier, subscription_status, credits_remaining, is_pro')
       .eq('id', userId)
       .single();
 
     const tier = (profile?.subscription_tier || 'free').toLowerCase().trim();
-    const isPremium = tier.includes('founder') || tier.includes('pro');
+    const isPremium = tier.includes('founder') || tier.includes('pro') || profile?.is_pro;
     const availableCredits = profile?.credits_remaining || 0;
 
     if (!isPremium && availableCredits <= 0) {
@@ -51,31 +68,31 @@ export async function POST(request) {
         break;
       case 'nda':
         titluContractOficial = "ACORD PRIVIND NEPROMOVAREA ȘI PROTECȚIA SECRETELOR COMERCIALE (NDA)";
-        temeiJuridicHtml = `Prezentul înscris se fundamentează pe dispozițiile <strong>Art. 1184 și Art. 1200 din Codul Civil român</strong> referitoare la obligația de confidențialitate în cadrul negocierilor precontractuale.`;
+        temeiJuridicHtml = `Prezentul înscris se fundamentează pe dispozițiile <strong>Art. 1184 și Art. 1200 din Codul Civil român</strong> referitoare la obligația de confidențialitate în cadrul negocierilor precontractuale, coroborat cu reglementările stricte privind protecția secretelor de afaceri.`;
         break;
       case 'cda':
         titluContractOficial = "CONTRACT DE CESIUNE EXCLUSIVĂ A DREPTURILOR PATRIMONIALE DE AUTOR";
-        temeiJuridicHtml = `Raportul juridic este reglementat de normele imperative ale <strong>Legii nr. 8/1996 privind dreptul de autor și drepturile conexe</strong>, republicată și actualizată.`;
+        temeiJuridicHtml = `Raportul juridic este reglementat de normele imperative ale <strong>Legii nr. 8/1996 privind dreptul de autor și drepturile conexe</strong>, republicată și actualizată, operând o distincție absolută între drepturile nepatrimoniale (morale) și exploatarea patrimonială a operei.`;
         break;
       case 'inchiriere_imobil':
         titluContractOficial = "CONTRACT DE LOCAȚIUNE ȘI EXPLOATARE SPAȚIU IMOBILIAR";
-        temeiJuridicHtml = `Încheiat conform <strong>Art. 1777 - Art. 1835 din Codul Civil român</strong>. Raportul este supus dispozițiilor <strong>Art. 1798 din Codul Civil</strong>, constituind un instrument cu valoare de <strong>TITLU EXECUTORIU</strong>.`;
+        temeiJuridicHtml = `Încheiat conform <strong>Art. 1777 - Art. 1835 din Codul Civil român</strong>. Raportul este supus dispozițiilor <strong>Art. 1798 din Codul Civil</strong>, constituind un instrument cu valoare de <strong>TITLU EXECUTORIU</strong> pentru evacuare la termen și debite restante.`;
         break;
       case 'promisiune_vanzare':
         titluContractOficial = "ANTECONTRACT / PROMISIUNE BILATERALĂ DE VÂNZARE-CUMPĂRARE IMOBIL";
-        temeiJuridicHtml = `Guvernat de normele cuprinse în <strong>Art. 1669 și Art. 1279 din Codul Civil român</strong> referitoare la promisiunea de a contracta și executarea silită a obligațiilor corelative.`;
+        temeiJuridicHtml = `Guvernat de normele cuprinse în <strong>Art. 1669 și Art. 1279 din Codul Civil român</strong> (promisiunea de a contracta și executarea silită a obligațiilor corelative), cu aplicarea strictă a regimului juridic penalizator al arvunei confirmatorii.`;
         break;
       case 'colaborare_b2b':
         titluContractOficial = "CONTRACT DE COLABORARE COMERCIALĂ INDEPENDENTĂ";
-        temeiJuridicHtml = `Guvernat de prevederile generale ale Codului Civil privind obligațiile. Prestatorul acționează pe riscul și cu mijloacele sale proprii, nefiind integrat în organigrama Beneficiarului.`;
+        temeiJuridicHtml = `Guvernat de prevederile generale ale Codului Civil privind obligațiile. Prestatorul acționează pe riscul și cu mijloacele sale proprii, nefiind integrat în organigrama Beneficiarului, preîntâmpinând astfel recalificarea fiscală.`;
         break;
       case 'design_arhitectura':
         titluContractOficial = "CONTRACT DE ANTREPRIZĂ PENTRU DESIGN ȘI ARHITECTURĂ";
-        temeiJuridicHtml = `Supus normelor speciale de antrepriză (Art. 1851 Cod Civil) și Legii nr. 8/1996. Proiectul arhitectural reprezintă operă de creație intelectuală.`;
+        temeiJuridicHtml = `Supus normelor speciale de antrepriză (Art. 1851 Cod Civil) și Legii nr. 8/1996. Proiectul arhitectural reprezintă operă de creație intelectuală, a cărei implementare faptică este condiționată de recepția finală.`;
         break;
       case 'evenimente':
         titluContractOficial = "CONTRACT PRESTĂRI SERVICII EVENIMENTE (ENTERTAINMENT)";
-        temeiJuridicHtml = `Încheiat în baza principiului libertății contractuale. Obligația asumată este una de mijloace, nu de rezultat. Suma achitată poartă regim de "Non-Refundable Retainer".`;
+        temeiJuridicHtml = `Încheiat în baza principiului libertății contractuale. Obligația asumată este una de mijloace, nu de rezultat. Suma achitată cu titlu de avans poartă regim de "Non-Refundable Retainer" pentru blocarea calendarului.`;
         break;
       default:
         titluContractOficial = "CONTRACT COMERCIAL GENERAL";
@@ -84,65 +101,76 @@ export async function POST(request) {
 
     let clauzeInjectateHtml = '';
     
-    // CLAUZE GENERICE
     if (body.clauzaPi) {
       if (tipContract === 'inchiriere_imobil') {
-        clauzeInjectateHtml += `<li><strong>ART. X. CLAUZĂ DE INVESTIRE CU TITLU EXECUTORIU:</strong> În conformitate cu art. 1798 Cod Civil, prezentul contract constituie titlu executoriu de drept pentru recuperarea chiriilor restante și pentru evacuarea rapidă a Locatarului, fără somație.</li>`;
+        clauzeInjectateHtml += `<li><strong>ART. 4.1. CLAUZĂ DE INVESTIRE CU TITLU EXECUTORIU:</strong> În conformitate cu art. 1798 Cod Civil, prezentul contract constituie titlu executoriu de drept pentru recuperarea chiriilor restante și pentru evacuarea rapidă a Locatarului la expirarea termenului sau în caz de neplată, fără somație și fără procedură judecătorească prealabilă.</li>`;
       } else if (tipContract === 'cda') {
-        clauzeInjectateHtml += `<li><strong>ART. X. TRANSFER CONDIȚIONAT DE REMUNERAȚIE:</strong> Drepturile patrimoniale se transferă exclusiv condiționat de decontarea integrală a prețului. Orice utilizare anterioară constituie delict civil.</li>`;
+        clauzeInjectateHtml += `<li><strong>ART. 4.1. TRANSFER CONDIȚIONAT DE REMUNERAȚIE:</strong> Drepturile patrimoniale de exploatare a operei se transferă exclusiv condiționat de decontarea integrală, efectivă și confirmată bancar a prețului. Orice utilizare anterioară constituie delict civil și încălcare a drepturilor de autor.</li>`;
       } else {
-        clauzeInjectateHtml += `<li><strong>ART. X. REȚINERE DE PROPRIETATE INTELECTUALĂ:</strong> Toate livrabilele și materialele de proiect rămân în proprietatea exclusivă a Prestatorului până la momentul stingerii integrale a tuturor obligațiilor de plată.</li>`;
+        clauzeInjectateHtml += `<li><strong>ART. 4.1. REȚINERE DE PROPRIETATE INTELECTUALĂ:</strong> Toate livrabilele, planurile, codul sursă și materialele de proiect rămân în proprietatea exclusivă a Prestatorului până la momentul stingerii integrale a tuturor obligațiilor de plată.</li>`;
       }
-    }
-    if (body.clauzaPenalitati) {
-      clauzeInjectateHtml += `<li><strong>ART. X. REGIM PENALIZATOR ȘI DAUNE INTERESE:</strong> Depășirea scadenței atrage penalități de 0.5% pe zi calendaristică. Pentru contractele confidențiale, încălcarea atrage daune-interese preevaluate la suma de 50.000 EUR, exigibile imediat.</li>`;
-    }
-    if (body.clauzaLimitareRaspundere) {
-      clauzeInjectateHtml += `<li><strong>ART. X. LIMITAREA RĂSPUNDERII COMERCIALE:</strong> Sub nicio formă și indiferent de natura litigiului, răspunderea financiară totală a Prestatorului pentru orice daune dovedite nu va depăși valoarea netă încasată efectiv.</li>`;
-    }
-    if (body.clauzaInflatie) {
-      clauzeInjectateHtml += `<li><strong>ART. X. INDEXARE ANTI-INFLAȚIONISTĂ (EUR/BNR):</strong> Pentru a menține echilibrul prestațiilor, prețul va fi actualizat/indexat automat raportat la evoluția cursului EUR/RON comunicat de BNR la data emiterii facturii.</li>`;
-    }
-    if (body.clauzaRevizii) {
-      clauzeInjectateHtml += `<li><strong>ART. X. PLAFONARE STRUCTURALĂ FEEDBACK:</strong> Modificările sau revizile sunt limitate la maximum 2 runde incluse în buget. Orice solicitare ulterioară va fi tarifată suplimentar prin act adițional.</li>`;
-    }
-    if (body.clauzaTaxaAnulare) {
-      if (tipContract === 'promisiune_vanzare') {
-        clauzeInjectateHtml += `<li><strong>ART. X. EXECUTARE ARVUNĂ CONFIRMATORIE:</strong> În caz de reziliere din culpa Promitentului Cumpărător, sumele predate se rețin integral. În caz de renunțare a Vânzătorului, se restituie dublul sumei.</li>`;
-      } else if (tipContract === 'evenimente') {
-        clauzeInjectateHtml += `<li><strong>ART. X. REȚINERE AVANS (NON-REFUNDABLE RETAINER):</strong> Avansul încasat reprezintă rezervarea fermă a datei. Anularea evenimentului cu mai puțin de 90 de zile înainte transformă avansul în daune-interese nereturnabile.</li>`;
-      } else {
-        clauzeInjectateHtml += `<li><strong>ART. X. PENALITATE DE ANULARE (KILL FEE):</strong> În cazul denunțării din culpa exclusivă a Beneficiarului, avansul rămâne în posesia Prestatorului pentru blocarea resurselor operaționale.</li>`;
-      }
-    }
-    if (body.clauzaSplitPayment) {
-      clauzeInjectateHtml += `<li><strong>ART. X. PLĂȚI FRACȚIONATE (MILESTONES):</strong> Decontarea și recepția fiecărei etape intermediare condiționează imperativ deblocarea execuției pentru fazele de lucru subsecvente.</li>`;
-    }
-    if (body.clauzaRetentie) {
-      clauzeInjectateHtml += `<li><strong>ART. X. DREPT DE RETENȚIE TEHNICĂ:</strong> În caz de neplată în termen de 15 zile, Prestatorul are facultatea legală de a sista serviciile, revoca accesul sau de a suspenda instanțele de server și activele digitale.</li>`;
-    }
-    if (body.clauzaItNonSolicit) {
-      clauzeInjectateHtml += `<li><strong>ART. X. NON-SOLICITARE PERSONAL:</strong> Părțile se obligă să nu recruteze angajații celeilalte părți pe o perioadă de 24 de luni de la încetarea contractului.</li>`;
     }
 
-    // CLAUZE AVOCĂȚEȘTI (SPECIFICE NIȘELOR)
+    if (body.clauzaPenalitati) {
+      clauzeInjectateHtml += `<li><strong>ART. 4.2. REGIM PENALIZATOR ȘI DAUNE INTERESE:</strong> Depășirea scadenței facturilor atrage penalități de întârziere în cuantum de 0.5% pe zi calendaristică, calculate din suma restantă. Pentru contractele confidențiale (NDA/CDA), încălcarea atrage daune-interese preevaluate la suma de 50.000 EUR, exigibile imediat.</li>`;
+    }
+
+    if (body.clauzaLimitareRaspundere) {
+      clauzeInjectateHtml += `<li><strong>ART. 4.3. LIMITAREA RĂSPUNDERII COMERCIALE:</strong> Sub nicio formă și indiferent de natura litigiului, răspunderea financiară totală a Prestatorului pentru orice daune dovedite nu va depăși valoarea netă încasată efectiv pentru serviciile prestate în cadrul acestui contract. Prestatorul nu răspunde pentru pierderi de profit sau date.</li>`;
+    }
+
+    if (body.clauzaInflatie) {
+      clauzeInjectateHtml += `<li><strong>ART. 4.4. INDEXARE ANTI-INFLAȚIONISTĂ (EUR/BNR):</strong> Pentru a menține echilibrul prestațiilor, prețul contractului va fi actualizat/indexat automat raportat la evoluția cursului EUR/RON comunicat de BNR sau la indicele inflației comunicat de INS, aplicându-se valoarea cea mai favorabilă Prestatorului.</li>`;
+    }
+
+    if (body.clauzaRevizii) {
+      clauzeInjectateHtml += `<li><strong>ART. 4.5. PLAFONARE STRUCTURALĂ FEEDBACK:</strong> Modificările sau revizile sunt limitate la maximum 2 runde incluse în buget. Orice solicitare ulterioară va fi tarifată suplimentar prin act adițional.</li>`;
+    }
+
+    if (body.clauzaTaxaAnulare) {
+      if (tipContract === 'promisiune_vanzare') {
+        clauzeInjectateHtml += `<li><strong>ART. 4.6. EXECUTARE ARVUNĂ CONFIRMATORIE:</strong> În caz de reziliere din culpa Promitentului Cumpărător, sumele predate cu titlu de avans vor fi reținute integral. În caz de renunțare a Promitentului Vânzător, acesta este obligat de drept la restituirea dublului sumei încasate.</li>`;
+      } else if (tipContract === 'evenimente') {
+        clauzeInjectateHtml += `<li><strong>ART. 4.6. REȚINERE AVANS (NON-REFUNDABLE RETAINER):</strong> Avansul încasat reprezintă rezervarea fermă a datei și a resurselor. În cazul în care Beneficiarul anulează evenimentul cu mai puțin de 90 de zile înainte, avansul este considerat daune-interese compensatorii nereturnabile.</li>`;
+      } else {
+        clauzeInjectateHtml += `<li><strong>ART. 4.6. PENALITATE DE ANULARE (KILL FEE):</strong> În cazul denunțării unilaterale a contractului din culpa exclusivă a Beneficiarului, sumele achitate cu titlu de avans rămân integral în posesia Prestatorului pentru blocarea resurselor operaționale.</li>`;
+      }
+    }
+
+    if (body.clauzaSplitPayment) {
+      clauzeInjectateHtml += `<li><strong>ART. 4.7. PLĂȚI FRACȚIONATE (MILESTONES):</strong> Decontarea și recepția fiecărei etape intermediare (milestones) condiționează în mod direct și imperativ deblocarea execuției pentru fazele de lucru subsecvente.</li>`;
+    }
+
+    if (body.clauzaRetentie) {
+      clauzeInjectateHtml += `<li><strong>ART. 4.8. DREPT DE RETENȚIE TEHNICĂ:</strong> În caz de neplată a oricărei facturi scadente în termen de 15 zile, Prestatorul are facultatea legală de a sista serviciile, de a revoca permisiunile de acces sau de a suspenda instanțele de server și activele digitale.</li>`;
+    }
+
+    if (body.clauzaItNonSolicit) {
+      clauzeInjectateHtml += `<li><strong>ART. 4.9. CLAUZĂ DE NON-SOLICITARE PERSONAL:</strong> Beneficiarul se obligă ferm să nu recruteze, direct sau indirect prin interpuși, angajații sau subcontractorii Prestatorului pe o perioadă de 24 de luni de la încetarea contractului.</li>`;
+    }
+
     if (body.clauzaAntiRecalificare) {
-      clauzeInjectateHtml += `<li><strong>ART. X. INDEPENDEȚĂ OPERAȚIONALĂ ȘI FISCALĂ:</strong> Relația este strict comercială (B2B). Prestatorul dispune de libertate absolută în organizare, utilizarea echipamentelor proprii și stabilirea programului, fiind eliminat orice element de subordonare (Art. 7 Cod Fiscal).</li>`;
+      clauzeInjectateHtml += `<li><strong>ART. 4.10. INDEPENDEȚĂ OPERAȚIONALĂ ȘI FISCALĂ:</strong> Relația este strict comercială (B2B). Prestatorul dispune de libertate absolută în organizare, utilizarea echipamentelor proprii și stabilirea programului, fiind eliminat orice element de subordonare (Art. 7 Cod Fiscal).</li>`;
     }
+
     if (body.clauzaSuspendareFeedback) {
-      clauzeInjectateHtml += `<li><strong>ART. X. SUSPENDARE PENTRU LIPSĂ FEEDBACK:</strong> Orice întârziere a Beneficiarului în furnizarea materialelor ce depășește 5 zile lucrătoare atrage decalarea automată a predării. Depășirea a 15 zile dă dreptul facturării integrale a stadiului curent.</li>`;
+      clauzeInjectateHtml += `<li><strong>ART. 4.11. SUSPENDARE PENTRU LIPSĂ FEEDBACK:</strong> Orice întârziere a Beneficiarului în furnizarea materialelor ce depășește 5 zile lucrătoare atrage decalarea automată a predării. Depășirea a 15 zile dă dreptul facturării integrale a stadiului curent.</li>`;
     }
+
     if (body.clauzaLogisticaHoreca) {
-      clauzeInjectateHtml += `<li><strong>ART. X. ASIGURARE LOGISTICĂ EVENIMENT:</strong> Beneficiarul se obligă să asigure Prestatorului acces la curent electric stabil (220V), mese calde pe durata evenimentelor ce depășesc 4 ore, și loc de parcare garantat pentru echipamente.</li>`;
+      clauzeInjectateHtml += `<li><strong>ART. 4.12. ASIGURARE LOGISTICĂ EVENIMENT:</strong> Beneficiarul se obligă să asigure Prestatorului acces la curent electric stabil (220V), mese calde pe durata evenimentelor ce depășesc 4 ore, și loc de parcare garantat pentru echipamente.</li>`;
     }
+
     if (body.clauzaOriginalitate) {
-      clauzeInjectateHtml += `<li><strong>ART. X. GARANȚIA ORIGINALITĂȚII:</strong> Autorul garantează absolut și sub sancțiunea legii penale că opera este 100% creație originală, nu încalcă drepturile terților (fără plagiat) și nu a mai fost cedată anterior.</li>`;
+      clauzeInjectateHtml += `<li><strong>ART. 4.13. GARANȚIA ORIGINALITĂȚII:</strong> Autorul garantează absolut și sub sancțiunea legii penale că opera este 100% creație originală, nu încalcă drepturile terților (fără plagiat) și nu a mai fost cedată anterior.</li>`;
     }
+
     if (body.clauzaDauneTerti) {
-      clauzeInjectateHtml += `<li><strong>ART. X. RĂSPUNDEREA PENTRU DAUNE PROVOCATE TERȚILOR:</strong> Locatarul este 100% solidar responsabil pentru orice distrugeri (inundații, incendii din culpă, vandalism) provocate vecinilor sau spațiilor comune, degrevând total Locatorul de orice acțiune în regres.</li>`;
+      clauzeInjectateHtml += `<li><strong>ART. 4.14. RĂSPUNDEREA PENTRU DAUNE PROVOCATE TERȚILOR:</strong> Locatarul este 100% solidar responsabil pentru orice distrugeri (inundații, incendii din culpă, vandalism) provocate vecinilor sau spațiilor comune, degrevând total Locatorul de orice acțiune în regres.</li>`;
     }
+
     if (body.clauzaRiscPieire) {
-      clauzeInjectateHtml += `<li><strong>ART. X. RISCUL PIEIRII BUNULUI:</strong> Până la semnarea formei autentice, riscul pieirii fortuite a imobilului rămâne în sarcina Promitentului-Vânzător. Orice degradare a stării fizice dă dreptul Cumpărătorului să ceară reducerea prețului.</li>`;
+      clauzeInjectateHtml += `<li><strong>ART. 4.15. RISCUL PIEIRII BUNULUI:</strong> Până la semnarea formei autentice, riscul pieirii fortuite a imobilului rămâne în sarcina Promitentului-Vânzător. Orice degradare a stării fizice dă dreptul Cumpărătorului să ceară reducerea prețului sau rezilierea de drept.</li>`;
     }
 
     const field = (valoare, minWidth = "120px") => {
@@ -160,23 +188,113 @@ export async function POST(request) {
       <head>
         <meta charset="utf-8">
         <style>
-          body { font-family: 'Times New Roman', Times, serif; padding: 50px; color: #000000; line-height: 1.6; font-size: 14px; }
-          .brand-header { font-family: Arial, sans-serif; color: #64748b; font-size: 11px; text-transform: uppercase; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px; margin-bottom: 35px; letter-spacing: 0.5px; }
-          .contract-title { text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
-          .contract-subtitle { text-align: center; font-size: 12px; font-weight: normal; margin-bottom: 35px; font-style: italic; }
-          .capitol-title { font-weight: bold; margin-top: 25px; margin-bottom: 10px; text-transform: uppercase; text-align: justify; font-size: 14px; }
-          .text-paragraph { text-align: justify; margin-bottom: 12px; text-indent: 30px; }
-          .clauze-list { list-style-type: none; padding: 0; margin: 0; }
-          .clauze-list li { text-align: justify; margin-bottom: 12px; padding-left: 0; }
-          .signature-layout { margin-top: 50px; display: flex; justify-content: space-between; page-break-inside: avoid; }
-          .signature-column { width: 45%; text-align: center; border-top: 1px solid #000000; padding-top: 8px; font-size: 13px; font-weight: bold; }
-          .signature-image { max-height: 80px; margin-bottom: 5px; display: block; margin-left: auto; margin-right: auto; }
-          .signature-placeholder { height: 60px; font-size: 11px; color: #94a3b8; font-weight: normal; font-style: italic; padding-top: 20px; }
-          .legal-footer { margin-top: 70px; border-top: 1px solid #e2e8f0; padding-top: 10px; font-size: 10px; color: #64748b; text-align: center; font-family: Arial, sans-serif; }
-          
-          .linia-dinamica { display: inline-block; border-bottom: 1px solid #000000; vertical-align: bottom; height: 18px; }
-          .valoare-importata { font-weight: bold; border-bottom: 1px transparent solid; display: inline; padding: 0 2px; }
-          .page-break { page-break-before: always; }
+          body { 
+            font-family: 'Times New Roman', Times, serif; 
+            padding: 50px; 
+            color: #000000; 
+            line-height: 1.6; 
+            font-size: 14px; 
+          }
+          .brand-header { 
+            font-family: Arial, sans-serif; 
+            color: #64748b; 
+            font-size: 11px; 
+            text-transform: uppercase; 
+            border-bottom: 1px solid #cbd5e1; 
+            padding-bottom: 5px; 
+            margin-bottom: 35px; 
+            letter-spacing: 0.5px; 
+          }
+          .contract-title { 
+            text-align: center; 
+            font-size: 16px; 
+            font-weight: bold; 
+            margin-bottom: 5px; 
+            text-transform: uppercase; 
+          }
+          .contract-subtitle { 
+            text-align: center; 
+            font-size: 12px; 
+            font-weight: normal; 
+            margin-bottom: 35px; 
+            font-style: italic; 
+          }
+          .capitol-title { 
+            font-weight: bold; 
+            margin-top: 25px; 
+            margin-bottom: 10px; 
+            text-transform: uppercase; 
+            text-align: justify; 
+            font-size: 14px; 
+          }
+          .text-paragraph { 
+            text-align: justify; 
+            margin-bottom: 12px; 
+            text-indent: 30px; 
+          }
+          .clauze-list { 
+            list-style-type: none; 
+            padding: 0; 
+            margin: 0; 
+          }
+          .clauze-list li { 
+            text-align: justify; 
+            margin-bottom: 12px; 
+            padding-left: 0; 
+          }
+          .signature-layout { 
+            margin-top: 50px; 
+            display: flex; 
+            justify-content: space-between; 
+            page-break-inside: avoid; 
+          }
+          .signature-column { 
+            width: 45%; 
+            text-align: center; 
+            border-top: 1px solid #000000; 
+            padding-top: 8px; 
+            font-size: 13px; 
+            font-weight: bold; 
+          }
+          .signature-image { 
+            max-height: 80px; 
+            margin-bottom: 5px; 
+            display: block; 
+            margin-left: auto; 
+            margin-right: auto; 
+          }
+          .signature-placeholder { 
+            height: 60px; 
+            font-size: 11px; 
+            color: #94a3b8; 
+            font-weight: normal; 
+            font-style: italic; 
+            padding-top: 20px; 
+          }
+          .legal-footer { 
+            margin-top: 70px; 
+            border-top: 1px solid #e2e8f0; 
+            padding-top: 10px; 
+            font-size: 10px; 
+            color: #64748b; 
+            text-align: center; 
+            font-family: Arial, sans-serif; 
+          }
+          .linia-dinamica { 
+            display: inline-block; 
+            border-bottom: 1px solid #000000; 
+            vertical-align: bottom; 
+            height: 18px; 
+          }
+          .valoare-importata { 
+            font-weight: bold; 
+            border-bottom: 1px transparent solid; 
+            display: inline; 
+            padding: 0 2px; 
+          }
+          .page-break { 
+            page-break-before: always; 
+          }
         </style>
       </head>
       <body>
@@ -189,7 +307,7 @@ export async function POST(request) {
         <div class="text-paragraph">
           <strong>SOCIETATEA COMERCIALĂ / ENTITATEA JURIDICĂ:</strong> ${field(prestatorNume, "220px")}, având date de identificare fiscală CUI/CNP: ${field(prestatorCui, "120px")}, reprezentată legal în capacitate juridică deplină, denumită <strong>PRESTATOR / LOCATOR / VÂNZĂTOR</strong>, pe de o parte,
         </div>
-        <div class="text-paragraph">și</div>
+        <div class="text-paragraph" style="text-align: center; text-indent: 0;">și</div>
         <div class="text-paragraph">
           <strong>SOCIETATEA COMERCIALĂ / ENTITATEA JURIDICĂ:</strong> ${field(clientNume, "220px")}, având date de identificare fiscală CUI/CNP: ${field(clientCui, "120px")}, reprezentată legal, denumită <strong>BENEFICIAR / LOCATAR / CUMPĂRĂTOR</strong>, pe altă parte.
         </div>
@@ -222,7 +340,7 @@ export async function POST(request) {
 
         <div class="capitol-title">CAPITOLUL VI. CONCILIERE ȘI LITIGII</div>
         <div class="text-paragraph">
-          <strong>ART. 6.1. JURISDICȚIE:</strong> În lipsa soluționării amiabile în 15 zile, litigiile vor fi deduse exclusiv instanțelor de la sediul Prestatorului.
+          <strong>ART. 6.1. JURISDICȚIE:</strong> În lipsa soluționării amiabile în 15 zile, litigiile vor fi deduse exclusiv instanțelor de la sediul Prestatorului sau Locatorului.
         </div>
 
         <div class="signature-layout">
@@ -247,7 +365,6 @@ export async function POST(request) {
         </div>
     `;
 
-    // ADAUGĂ PROCES VERBAL DACĂ E BIFAT
     if (adaugaProcesVerbal) {
       htmlContract += `
         <div class="page-break"></div>
@@ -294,22 +411,32 @@ export async function POST(request) {
     const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true, margin: { top: '40px', bottom: '40px', left: '40px', right: '40px' } });
     await browser.close();
 
-    // EMAIL RESEND (Păstrat)
+    // -------------------------------------------------------------------------
+    // TRIMITE EMAIL VIA RESEND (Fără Twilio)
+    // -------------------------------------------------------------------------
     if (process.env.RESEND_API_KEY && clientEmail) {
       try {
         const { Resend } = await import('resend');
         const resend = new Resend(process.env.RESEND_API_KEY);
+
         await resend.emails.send({
-          from: 'ContractSmart <onboarding@resend.dev>',
+          from: 'ContractSmart <contact@contractsmart.ro>',
           to: clientEmail,
           subject: `Document Securizat - ${titluContractOficial}`,
-          text: `Regăsiți atașat contractul comercial generat prin ContractSmart.\n\nO zi excelentă!`,
-          attachments: [ { filename: `contract_${tipContract}_securizat.pdf`, content: Buffer.from(pdfBuffer) } ],
+          text: `Salutare!\n\nRegăsiți atașat contractul comercial generat securizat prin intermediul platformei ContractSmart.\n\nO zi excelentă!`,
+          attachments: [
+            {
+              filename: `contract_${tipContract}_securizat.pdf`,
+              content: Buffer.from(pdfBuffer),
+            },
+          ],
         });
-      } catch (emailErr) {}
+        console.log("E-mail expediat cu succes către:", clientEmail);
+      } catch (emailErr) {
+        console.error("❌ EROARE RESEND DETALIATĂ:", emailErr);
+      }
     }
 
-    // SCĂDERE CREDITE DOAR DACA E FREE
     if (!isPremium && availableCredits > 0) {
       await supabase.from('profiles').update({ credits_remaining: availableCredits - 1 }).eq('id', userId);
     }

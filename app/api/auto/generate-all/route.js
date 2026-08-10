@@ -4,7 +4,9 @@ import puppeteer from 'puppeteer';
 import JSZip from 'jszip';
 
 export const dynamic = 'force-dynamic';
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+const supabase = createClient(supabaseUrl, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
 async function randeazaHtmlInPdf(htmlContent) {
   const launchOptions = {
@@ -37,6 +39,21 @@ export async function POST(req) {
     const rawData = formData.get('autoDataJson');
     const data = rawData ? JSON.parse(rawData) : {};
 
+    // -------------------------------------------------------------------------
+    // VALIDARE ANTI-SPAM CLOUDFLARE TURNSTILE
+    // -------------------------------------------------------------------------
+    if (process.env.TURNSTILE_SECRET_KEY && data.captchaToken) {
+      const verifyRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `secret=${process.env.TURNSTILE_SECRET_KEY}&response=${data.captchaToken}`
+      });
+      const verifyData = await verifyRes.json();
+      if (!verifyData.success) {
+        return NextResponse.json({ success: false, message: 'Validare anti-spam (Cloudflare) eșuată. Reîncărcați pagina.' }, { status: 403 });
+      }
+    }
+
     const fisierTalon = formData.get('talon');
     const fisierCiv = formData.get('civ');
     const fisierBv = formData.get('buletin_vanzator');
@@ -46,11 +63,11 @@ export async function POST(req) {
       return NextResponse.json({ success: false, message: 'Neautentificat' }, { status: 401 });
     }
     
-    const { data: profile } = await supabase.from('profiles').select('subscription_tier').eq('id', data.userId).single();
+    const { data: profile } = await supabase.from('profiles').select('subscription_tier, is_pro').eq('id', data.userId).single();
     const tier = (profile?.subscription_tier || '').toLowerCase().trim();
-    const isFounder = tier === 'founder';
+    const isPremium = tier.includes('founder') || tier.includes('pro') || profile?.is_pro;
 
-    if (!isFounder) {
+    if (!isPremium) {
       const { data: achizitie } = await supabase.from('user_purchases')
         .select('id')
         .eq('user_id', data.userId)
@@ -120,10 +137,20 @@ export async function POST(req) {
     ];
 
     const stiluriSidequestComune = `
-      .linia-dinamica { display: inline-block; border-bottom: 1px solid #000000; vertical-align: bottom; height: 16px; }
-      .valoare-importata { font-weight: bold; padding: 0 3px; border-bottom: 1px transparent solid; }
+      .linia-dinamica { 
+        display: inline-block; 
+        border-bottom: 1px solid #000000; 
+        vertical-align: bottom; 
+        height: 16px; 
+      }
+      .valoare-importata { 
+        font-weight: bold; 
+        padding: 0 3px; 
+        border-bottom: 1px transparent solid; 
+      }
     `;
 
+    // 1. CONTRACTUL DE VÂNZARE-CUMPĂRARE (Model ITĂ-014 cu clauze extinse)
     for (const ex of tipuriExemplare) {
       const htmlContractOficial = `
         <!DOCTYPE html>
@@ -132,15 +159,66 @@ export async function POST(req) {
           <meta charset="utf-8">
           <style>
             @page { margin: 20mm 15mm; }
-            body { font-family: 'Times New Roman', Times, serif; color: #000; font-size: 11.5px; line-height: 1.4; }
-            .official-box { border: 2px solid #000; padding: 8px; margin-bottom: 15px; text-align: center; font-weight: bold; font-family: Arial, sans-serif; font-size: 10px; background-color: #f9f9f9; }
-            .title { text-align: center; font-size: 15px; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; }
-            .section-title { font-weight: bold; margin-top: 15px; margin-bottom: 5px; text-transform: uppercase; border-bottom: 1px solid #000; font-size: 12px; background-color: #f0f0f0; padding: 2px 5px; }
-            .row-data { margin-bottom: 8px; text-align: justify; }
-            .legal-clause { font-size: 10px; text-align: justify; margin-bottom: 6px; color: #111; }
-            .legal-clause strong { color: #000; }
-            .signature-area { margin-top: 35px; display: flex; justify-content: space-between; page-break-inside: avoid; }
-            .sig-box { width: 40%; border-top: 1px solid #000; text-align: center; padding-top: 5px; font-weight: bold; font-size: 11px; }
+            body { 
+              font-family: 'Times New Roman', Times, serif; 
+              color: #000; 
+              font-size: 11.5px; 
+              line-height: 1.4; 
+            }
+            .official-box { 
+              border: 2px solid #000; 
+              padding: 8px; 
+              margin-bottom: 15px; 
+              text-align: center; 
+              font-weight: bold; 
+              font-family: Arial, sans-serif; 
+              font-size: 10px; 
+              background-color: #f9f9f9; 
+            }
+            .title { 
+              text-align: center; 
+              font-size: 15px; 
+              font-weight: bold; 
+              margin-bottom: 15px; 
+              text-transform: uppercase; 
+            }
+            .section-title { 
+              font-weight: bold; 
+              margin-top: 15px; 
+              margin-bottom: 5px; 
+              text-transform: uppercase; 
+              border-bottom: 1px solid #000; 
+              font-size: 12px; 
+              background-color: #f0f0f0; 
+              padding: 2px 5px; 
+            }
+            .row-data { 
+              margin-bottom: 8px; 
+              text-align: justify; 
+            }
+            .legal-clause { 
+              font-size: 10px; 
+              text-align: justify; 
+              margin-bottom: 6px; 
+              color: #111; 
+            }
+            .legal-clause strong { 
+              color: #000; 
+            }
+            .signature-area { 
+              margin-top: 35px; 
+              display: flex; 
+              justify-content: space-between; 
+              page-break-inside: avoid; 
+            }
+            .sig-box { 
+              width: 40%; 
+              border-top: 1px solid #000; 
+              text-align: center; 
+              padding-top: 5px; 
+              font-weight: bold; 
+              font-size: 11px; 
+            }
             ${stiluriSidequestComune}
           </style>
         </head>
@@ -186,6 +264,7 @@ export async function POST(req) {
       zip.file(`01_Contract_Auto_Model_ITA014_Exemplar_${ex.nr}.pdf`, pdfBuffer);
     }
 
+    // 2. PROCESUL-VERBAL DE PREDARE-PRIMIRE (Transferul de răspundere)
     const htmlProcesVerbal = `
       <!DOCTYPE html>
       <html lang="ro">
@@ -193,13 +272,54 @@ export async function POST(req) {
         <meta charset="utf-8">
         <style>
           @page { margin: 25mm 20mm; }
-          body { font-family: 'Times New Roman', Times, serif; color: #000; font-size: 13px; line-height: 1.6; }
-          .header-pv { text-align: center; font-weight: bold; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 30px; text-transform: uppercase; font-size: 12px; }
-          .title-pv { text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 25px; text-decoration: underline; }
-          .paragraph { text-align: justify; margin-bottom: 15px; text-indent: 20px;}
-          .highlight-box { border: 2px solid #b91c1c; background-color: #fef2f2; padding: 15px; margin: 20px 0; font-size: 12px; text-align: justify; }
-          .sig-layout { margin-top: 70px; display: flex; justify-content: space-between; page-break-inside: avoid; }
-          .sig-box { width: 40%; border-top: 1px solid #000; text-align: center; padding-top: 5px; font-weight: bold; }
+          body { 
+            font-family: 'Times New Roman', Times, serif; 
+            color: #000; 
+            font-size: 13px; 
+            line-height: 1.6; 
+          }
+          .header-pv { 
+            text-align: center; 
+            font-weight: bold; 
+            border-bottom: 2px solid #000; 
+            padding-bottom: 10px; 
+            margin-bottom: 30px; 
+            text-transform: uppercase; 
+            font-size: 12px; 
+          }
+          .title-pv { 
+            text-align: center; 
+            font-size: 16px; 
+            font-weight: bold; 
+            margin-bottom: 25px; 
+            text-decoration: underline; 
+          }
+          .paragraph { 
+            text-align: justify; 
+            margin-bottom: 15px; 
+            text-indent: 20px;
+          }
+          .highlight-box { 
+            border: 2px solid #b91c1c; 
+            background-color: #fef2f2; 
+            padding: 15px; 
+            margin: 20px 0; 
+            font-size: 12px; 
+            text-align: justify; 
+          }
+          .sig-layout { 
+            margin-top: 70px; 
+            display: flex; 
+            justify-content: space-between; 
+            page-break-inside: avoid; 
+          }
+          .sig-box { 
+            width: 40%; 
+            border-top: 1px solid #000; 
+            text-align: center; 
+            padding-top: 5px; 
+            font-weight: bold; 
+          }
           ${stiluriSidequestComune}
         </style>
       </head>
@@ -237,6 +357,7 @@ export async function POST(req) {
     const pdfPvBuffer = await randeazaHtmlInPdf(htmlProcesVerbal);
     zip.file(`06_Proces_Verbal_Predare_Primire_Exonerare_Raspundere.pdf`, pdfPvBuffer);
 
+    // 3. CERERILE OFICIALE DRPCIV / DITL
     const htmlCereriOficiale = `
       <!DOCTYPE html>
       <html lang="ro">
@@ -244,11 +365,33 @@ export async function POST(req) {
         <meta charset="utf-8">
         <style>
           @page { margin: 20mm; }
-          body { font-family: Arial, sans-serif; color: #000; font-size: 12px; line-height: 1.6; }
-          .form-title { text-align: center; font-size: 14px; font-weight: bold; text-transform: uppercase; margin-bottom: 30px; }
-          .form-subtitle { text-align: center; font-size: 12px; font-weight: bold; margin-bottom: 20px; }
-          .field-row { margin-bottom: 15px; border-bottom: 1px dotted #888; padding-bottom: 3px; }
-          .page-break { page-break-before: always; }
+          body { 
+            font-family: Arial, sans-serif; 
+            color: #000; 
+            font-size: 12px; 
+            line-height: 1.6; 
+          }
+          .form-title { 
+            text-align: center; 
+            font-size: 14px; 
+            font-weight: bold; 
+            text-transform: uppercase; 
+            margin-bottom: 30px; 
+          }
+          .form-subtitle { 
+            text-align: center; 
+            font-size: 12px; 
+            font-weight: bold; 
+            margin-bottom: 20px; 
+          }
+          .field-row { 
+            margin-bottom: 15px; 
+            border-bottom: 1px dotted #888; 
+            padding-bottom: 3px; 
+          }
+          .page-break { 
+            page-break-before: always; 
+          }
           ${stiluriSidequestComune}
         </style>
       </head>
@@ -295,6 +438,7 @@ export async function POST(req) {
     const pdfCereriBuffer = await randeazaHtmlInPdf(htmlCereriOficiale);
     zip.file(`07_Cereri_Oficiale_Inmatriculare_si_Radiere_DRPCIV.pdf`, pdfCereriBuffer);
 
+    // ATAȘARE ACTE SCANATE
     if (fisierTalon && fisierTalon.size > 0) {
       zip.file(`Acte_Originale_Client/Copie_Certificat_Inmatriculare_Talon.jpg`, Buffer.from(await fisierTalon.arrayBuffer()));
     }
@@ -308,6 +452,7 @@ export async function POST(req) {
       zip.file(`Acte_Originale_Client/Copie_Act_Identitate_Cumparator.jpg`, Buffer.from(await fisierBc.arrayBuffer()));
     }
 
+    // GHID PROCEDURAL
     const continutGhidTxt = `CONTRACTSMART LEGAL-TECH // INSTRUCTAJ PROCEDURAL DOSAR AUTO
 ================================================================================
 Vehicul: ${data.autoMarcaModel || 'Mijloc Transport'} | VIN: ${data.autoVin || 'Nespecificat'}
@@ -384,14 +529,14 @@ Infrastructură operată automat prin platforma securizată ContractSmart 2026.
 
     const zipContent = await zip.generateAsync({ type: "uint8array" });
 
-    // EMAIL RESEND
+    // EMAIL RESEND (Fără Twilio)
     if (process.env.RESEND_API_KEY && data.clientEmail) {
       try {
         const { Resend } = await import('resend');
         const resend = new Resend(process.env.RESEND_API_KEY);
 
         await resend.emails.send({
-          from: 'ContractSmart <onboarding@resend.dev>',
+          from: 'ContractSmart <contact@contractsmart.ro>',
           to: data.clientEmail,
           subject: `Pachet Securizat Auto - ${data.autoMarcaModel || 'Vehicul'} (${data.autoVin || ''})`,
           text: `Salutare!\n\nGăsești atașat pachetul tău complet auto în format .ZIP generat prin ContractSmart.\n\nO zi excelentă!`,
@@ -402,7 +547,10 @@ Infrastructură operată automat prin platforma securizată ContractSmart 2026.
             },
           ],
         });
-      } catch (emailErr) {}
+        console.log("E-mail transmis cu succes către:", data.clientEmail);
+      } catch (emailErr) {
+        console.error("Eroare trimitere e-mail Resend:", emailErr.message);
+      }
     }
 
     return new NextResponse(zipContent, {
@@ -415,6 +563,7 @@ Infrastructură operată automat prin platforma securizată ContractSmart 2026.
     });
 
   } catch (err) {
+    console.error("Crash la emiterea pachetului auto arhivatal:", err);
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
 }
