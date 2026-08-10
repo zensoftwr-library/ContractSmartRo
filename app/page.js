@@ -181,6 +181,7 @@ export default function Home() {
   const [user, setUser] = useState(null); 
   const [profil, setProfil] = useState(null);
   const [userTier, setUserTier] = useState('free');
+  const isPremium = ['founder', 'pro'].includes(profil?.subscription_tier) || profil?.is_pro;
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false); 
   
