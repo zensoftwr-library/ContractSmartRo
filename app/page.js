@@ -4,13 +4,13 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { QRCodeSVG, QRCodeCanvas } from 'qrcode.react';
 import { createClient } from '@supabase/supabase-js';
+import { Turnstile } from '@marsidev/react-turnstile';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 );
 
-// NOMENCLATOR COMPLET CU TOATE CLAUZELE (VECHI INTEGRALE + NOI)
 const nomenclatorClauze = {
   prestari: [
     { id: 'clauzaPi', titlu: '1. Suspendare IP / Proprietate Intelectuală', detaliu: 'Drepturile patrimoniale de autor și utilizare asupra livrabilelor se transferă exclusiv la data stingerii integrale, certe și exigibile a obligațiilor de plată.' },
@@ -35,26 +35,6 @@ const nomenclatorClauze = {
     { id: 'clauzaTranspCmr', titlu: '20. Răspundere conform Convenției CMR', detaliu: 'Angajarea răspunderii transportatorului pentru pierderea, avarierea mărfii sau depășirea termenului de livrare se guvernează strict de limitele plafonate impuse de Convenția CMR.' },
     { id: 'clauzaTranspStationare', titlu: '21. Taxă de Staționare / Demurrage', detaliu: 'Depășirea timpului alocat pentru operațiunile de încărcare/descărcare la rampă atrage aplicarea unei taxe fixe de staționare, calculată pe fiecare oră de imobilizare a autovehiculului.' }
   ],
-  colaborare_b2b: [
-    { id: 'clauzaPi', titlu: '1. Suspendare IP / Proprietate Intelectuală', detaliu: 'Drepturile patrimoniale de autor se transferă exclusiv la data stingerii integrale a obligațiilor de plată.' },
-    { id: 'clauzaAntiRecalificare', titlu: '2. Anti-Recalificare Fiscală (ANAF)', detaliu: 'Contractul elimină total subordonarea (Art. 7 Cod Fiscal), Prestatorul lucrând independent, cu program și mijloace proprii.' },
-    { id: 'clauzaPenalitati', titlu: '3. Majorări Penalizatoare Zilnice', detaliu: 'Întârzierea executării obligațiilor atrage penalități zilnice din valoarea debitului restant.' },
-    { id: 'clauzaItNonSolicit', titlu: '4. Clauză de Non-Solicitare Personal', detaliu: 'Părțile se interzic reciproc de a racola personalul sau clienții celeilalte părți pe o durată de 2 ani.' },
-    { id: 'clauzaTaxaAnulare', titlu: '5. Taxă Anulare Proiect (Kill Fee)', detaliu: 'Denunțarea unilaterală din culpa Beneficiarului determină pierderea integrală a avansului încasat.' }
-  ],
-  design_arhitectura: [
-    { id: 'clauzaPi', titlu: '1. Suspendare IP / Proprietate Intelectuală', detaliu: 'Drepturile de utilizare asupra livrabilelor arhitecturale se transferă la data plății integrale.' },
-    { id: 'clauzaSuspendareFeedback', titlu: '2. Suspendare pentru Lipsă Feedback', detaliu: 'Întârzierea aprobărilor de către client decalează automat predarea și permite facturarea muncii la stadiul curent.' },
-    { id: 'clauzaRevizii', titlu: '3. Plafonare Feedback / Revizii', detaliu: 'Prețul include maximum 2 runde limitate de modificări structurale.' },
-    { id: 'clauzaSplitPayment', titlu: '4. Plăți Fracționate (Milestones)', detaliu: 'Decontarea și recepția fiecărei etape intermediare condiționează deblocarea execuției pentru fazele subsecvente.' },
-    { id: 'clauzaMarketingTerti', titlu: '5. Drept Portofoliu & Marketing', detaliu: 'Prestatorul își rezervă dreptul de a utiliza elemente din lucrare în portofoliul public.' }
-  ],
-  evenimente: [
-    { id: 'clauzaTaxaAnulare', titlu: '1. Reținere Avans (Non-Refundable Retainer)', detaliu: 'Sumele achitate cu titlu de avans rămân integral la Prestator dacă evenimentul este anulat.' },
-    { id: 'clauzaLogisticaHoreca', titlu: '2. Asigurare Logistică (Masă & Curent)', detaliu: 'Beneficiarul e obligat să asigure curent stabil, masă caldă pentru echipa tehnică și parcare.' },
-    { id: 'clauzaHorecaForceMajeure', titlu: '3. Forță Majoră Specială (Reprogramare)', detaliu: 'Contractul se suspendă fără penalități în caz de stare de urgență/restricții, obligând la reprogramare.' },
-    { id: 'clauzaMarketingTerti', titlu: '4. Drept Portofoliu & Marketing', detaliu: 'Prestatorul își rezervă dreptul inalienabil de a utiliza materiale foto/video în portofoliul de clienți.' }
-  ],
   nda: [
     { id: 'clauzaPi', titlu: '1. Protecție Secrete Comerciale', detaliu: 'Interdicție absolută de utilizare, copiere sau multiplicare a informațiilor primite în scopuri exterioare negocierilor, sub sancțiunea legii privind combaterea concurenței neloiale.' },
     { id: 'clauzaPenalitati', titlu: '2. Daune Interese Predefinite', detaliu: 'Încălcarea obligației de confidențialitate atrage aplicarea unei clauze penale cu titlu de daune interese preevaluate, datorate instant fără obligația de a dovedi cuantumul prejudiciului.' },
@@ -64,29 +44,26 @@ const nomenclatorClauze = {
   ],
   cda: [
     { id: 'clauzaPi', titlu: '1. Transfer Condiționat de Drepturi', detaliu: 'Cesiunea drepturilor patrimoniale de autor se naște și produce efecte juridice exclusiv la data creditării contului Autorului cu valoarea integrală a prețului contractual.' },
-    { id: 'clauzaOriginalitate', titlu: '2. Garanția Originalității (Anti-Plagiat)', detaliu: 'Autorul garantează absolut că opera este 100% creație proprie și nu încalcă drepturile altor autori.' },
-    { id: 'clauzaPenalitati', titlu: '3. Penalități de Utilizare Neautorizată', detaliu: 'Utilizarea, difuzarea sau exploatarea operei înainte de achitarea integrală a prețului sau cu depășirea limitelor convenite atrage aplicarea unui tarif penalizator dublu per incidență.' },
-    { id: 'clauzaMarketingTerti', titlu: '4. Drept de Creditare Paternitate', detaliu: 'Beneficiarul are obligația corelativă de a menționa numele Autorului pe toate materialele publicate, pe canalele de difuzare și suporturile media electronice sau fizice utilizate.' },
-    { id: 'clauzaCdaMoral', titlu: '5. Inalienabilitatea Drepturilor Morale', detaliu: 'Drepturile morale de autor (paternitatea operei, dreptul de a se opune oricărei deformări sau modificări aduse operei) rămân atașate Autorului în mod perpetuu, inalienabil și imprescriptibil.' },
-    { id: 'clauzaCdaTeritoriu', titlu: '6. Delimitare Teritorială și Canale', detaliu: 'Drepturile de exploatare comercială transmise sunt limitate strict la aria geografică și canalele media indicate în anexa tehnică, orice extindere necesitând un acord scris distinct.' }
+    { id: 'clauzaPenalitati', titlu: '2. Penalități de Utilizare Neautorizată', detaliu: 'Utilizarea, difuzarea sau exploatarea operei înainte de achitarea integrală a prețului sau cu depășirea limitelor convenite atrage aplicarea unui tarif penalizator dublu per incidență.' },
+    { id: 'clauzaMarketingTerti', titlu: '3. Drept de Creditare Paternitate', detaliu: 'Beneficiarul are obligația corelativă de a menționa numele Autorului pe toate materialele publicate, pe canalele de difuzare și suporturile media electronice sau fizice utilizate.' },
+    { id: 'clauzaCdaMoral', titlu: '4. Inalienabilitatea Drepturilor Morale', detaliu: 'Drepturile morale de autor (paternitatea operei, dreptul de a se opune oricărei deformări sau modificări aduse operei) rămân atașate Autorului în mod perpetuu, inalienabil și imprescriptibil.' },
+    { id: 'clauzaCdaTeritoriu', titlu: '5. Delimitare Teritorială și Canale', detaliu: 'Drepturile de exploatare comercială transmise sunt limitate strict la aria geografică și canalele media indicate în anexa tehnică, orice extindere necesitând un acord scris distinct.' }
   ],
   inchiriere_imobil: [
     { id: 'clauzaPi', titlu: '1. Pact Comisoriu / Titlu Executoriu', detaliu: 'În conformitate cu Art. 1798 Cod Civil, prezentul contract constituie titlu executoriu pentru plata chiriei și evacuare rapidă la expirarea termenului, fără necesitatea unei acțiuni în justiție.' },
-    { id: 'clauzaDauneTerti', titlu: '2. Răspundere Daune Terți', detaliu: 'Locatarul răspunde 100% pentru distrugerile (inundații/incendii) provocate vecinilor din culpa sa.' },
-    { id: 'clauzaPenalitati', titlu: '3. Penalități pentru Întârziere Chirie', detaliu: 'Neplata chiriei la termenul fixat atrage majorări zilnice penalizatoare. Depășirea scadenței cu mai mult de 15 zile activează de drept pactul comisoriu și rezilierea unilaterală.' },
-    { id: 'clauzaRawFoto', titlu: '4. Reținere Garanție / Depozit Daune', detaliu: 'Fondul de garanție constituit este reținut de Locator la încetarea contractului pentru acoperirea eventualelor deteriorări aduse imobilului sau a restanțelor la utilități din culpa Locatarului.' },
-    { id: 'clauzaAprobareTacita', titlu: '5. Drept de Inspecție Proprietar', detaliu: 'Locatorul își rezervă dreptul de a inspecta starea tehnică a imobilului o dată pe lună, în prezența Locatarului, în baza unei notificări scrise prealabile transmise cu minimum 24 de ore înainte.' },
-    { id: 'clauzaTaxaAnulare', titlu: '6. Interdicție Subînchiriere Spațiu', detaliu: 'Locatarului îi este interzisă în mod absolut subînchirierea, cedarea folosinței sau darea în comodat a imobilului, total sau parțial, către terțe persoane fără acordul prealabil scris al Locatorului.' },
-    { id: 'clauzaInchiriereRegie', titlu: '7. Dovada Plății Utilităților la Zi', detaliu: 'Locatarul are obligația de a transmite lunar către Locator dovezile de plată ale utilităților. Acumularea de restanțe pe mai mult de 45 de zile dă dreptul la rezilierea de drept a contractului.' },
-    { id: 'clauzaInchiriereDest', titlu: '8. Schimbare Destinație Spațiu', detaliu: 'Imobilul va fi utilizat exclusiv conform destinației stabilite. Schimbarea destinației în spațiu comercial, sediu social sau desfășurarea de activități economice fără acord scris este strict interzisă.' }
+    { id: 'clauzaPenalitati', titlu: '2. Penalități pentru Întârziere Chirie', detaliu: 'Neplata chiriei la termenul fixat atrage majorări zilnice penalizatoare. Depășirea scadenței cu mai mult de 15 zile activează de drept pactul comisoriu și rezilierea unilaterală.' },
+    { id: 'clauzaRawFoto', titlu: '3. Reținere Garanție / Depozit Daune', detaliu: 'Fondul de garanție constituit este reținut de Locator la încetarea contractului pentru acoperirea eventualelor deteriorări aduse imobilului sau a restanțelor la utilități din culpa Locatarului.' },
+    { id: 'clauzaAprobareTacita', titlu: '4. Drept de Inspecție Proprietar', detaliu: 'Locatorul își rezervă dreptul de a inspecta starea tehnică a imobilului o dată pe lună, în prezența Locatarului, în baza unei notificări scrise prealabile transmise cu minimum 24 de ore înainte.' },
+    { id: 'clauzaTaxaAnulare', titlu: '5. Interdicție Subînchiriere Spațiu', detaliu: 'Locatarului îi este interzisă în mod absolut subînchirierea, cedarea folosinței sau darea în comodat a imobilului, total sau parțial, către terțe persoane fără acordul prealabil scris al Locatorului.' },
+    { id: 'clauzaInchiriereRegie', titlu: '6. Dovada Plății Utilităților la Zi', detaliu: 'Locatarul are obligația de a transmite lunar către Locator dovezile de plată ale utilităților. Acumularea de restanțe pe mai mult de 45 de zile dă dreptul la rezilierea de drept a contractului.' },
+    { id: 'clauzaInchiriereDest', titlu: '7. Schimbare Destinație Spațiu', detaliu: 'Imobilul va fi utilizat exclusiv conform destinației stabilite. Schimbarea destinației în spațiu comercial, sediu social sau desfășurarea de activități economice fără acord scris este strict interzisă.' }
   ],
   promisiune_vanzare: [
     { id: 'clauzaTaxaAnulare', titlu: '1. Arvună Confirmatorie (Pierdere Avans)', detaliu: 'În temeiul Art. 1544 Cod Civil, dacă Promitentul-Cumpărător renunță la tranzacție, avansul se pierde integral. Dacă Promitentul-Vânzător refuză perfectarea, va restitui dublul arvunei primite.' },
-    { id: 'clauzaRiscPieire', titlu: '2. Riscul Pieirii Bunului', detaliu: 'Până la semnarea la notar, riscul degradării bunului e la Vânzător, generând scăderea prețului.' },
-    { id: 'clauzaPenalitati', titlu: '3. Penalități Zi de Întârziere Act Notarial', detaliu: 'Refuzul nejustificat sau neprezentarea uneia dintre părți la biroul notarial la data fixată atrage o penalitate simetrică pe fiecare zi de întârziere, datorată cu titlu de daune interese moratorii.' },
-    { id: 'clauzaAprobareTacita', titlu: '4. Rezoluțiune de Drept la Termenul Fixat', detaliu: 'Împlinirea termenului extinctiv fără perfectarea contractului de vânzare determină desființarea de drept a promisiunii prin efectul pactului comisoriu, fără punere în întârziere sau formalități.' },
-    { id: 'clauzaPromisSarcini', titlu: '5. Garanție Evicțiune și Sarcini Imobil', detaliu: 'Promitentul-Vânzător garantează pe propria răspundere că imobilul este liber de orice sarcini, ipoteci, privileges, procese de revendicare sau litigii aflate pe rolul instanțelor judecătorești.' },
-    { id: 'clauzaPromisCheltuieli', titlu: '6. Repartizare Taxe Notariale', detaliu: 'Cheltuielile ocazionate de autentificarea actelor, onorariile notariale, taxele de intabulare în Cartea Funciară (OCPI) și extrasul de autentificare vor fi suportate conform convenției părților.' }
+    { id: 'clauzaPenalitati', titlu: '2. Penalități Zi de Întârziere Act Notarial', detaliu: 'Refuzul nejustificat sau neprezentarea uneia dintre părți la biroul notarial la data fixată atrage o penalitate simetrică pe fiecare zi de întârziere, datorată cu titlu de daune interese moratorii.' },
+    { id: 'clauzaAprobareTacita', titlu: '3. Rezoluțiune de Drept la Termenul Fixat', detaliu: 'Împlinirea termenului extinctiv fără perfectarea contractului de vânzare determină desființarea de drept a promisiunii prin efectul pactului comisoriu, fără punere în întârziere sau formalități.' },
+    { id: 'clauzaPromisSarcini', titlu: '4. Garanție Evicțiune și Sarcini Imobil', detaliu: 'Promitentul-Vânzător garantează pe propria răspundere că imobilul este liber de orice sarcini, ipoteci, privileges, procese de revendicare sau litigii aflate pe rolul instanțelor judecătorești.' },
+    { id: 'clauzaPromisCheltuieli', titlu: '5. Repartizare Taxe Notariale', detaliu: 'Cheltuielile ocazionate de autentificarea actelor, onorariile notariale, taxele de intabulare în Cartea Funciară (OCPI) și extrasul de autentificare vor fi suportate conform convenției părților.' }
   ]
 };
 
@@ -97,6 +74,9 @@ export default function Home() {
   const [hydrated, setHydrated] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
+  const [captchaToken, setCaptchaToken] = useState(null); // PENTRU TURNSTILE
+  const isProcessingForm = useRef(false); // ANTI-SPAM CLICK
+
   // STATE-URI MEGA QR
   const [qrType, setQrType] = useState('url'); 
   const [qrUrl, setQrUrl] = useState('');
@@ -109,8 +89,8 @@ export default function Home() {
   
   const [uploadedPdfUrl, setUploadedPdfUrl] = useState('');
   const [isUploadingPdf, setIsUploadingPdf] = useState(false);
-
-  // Tracking & Analytics QR
+  
+  // Tracking
   const [dynamicDestUrl, setDynamicDestUrl] = useState('');
   const [generatedDynamicUrl, setGeneratedDynamicUrl] = useState('');
   const [isGeneratingShortlink, setIsGeneratingShortlink] = useState(false);
@@ -148,14 +128,13 @@ export default function Home() {
       }
     } catch(e) {}
   };
-
   const [qrData, setQrData] = useState({ nume: '', telefon: '', iban: '', suma: '', url: '', email: '', functie: '', banca: '' });
   const [qrGeneratedUrl, setQrGeneratedUrl] = useState('');
 
   const [cursBnr, setCursBnr] = useState({ eur: '4.9752', usd: '4.5820' });
   const [qrColor, setQrColor] = useState('#000000');
   const [qrLogo, setQrLogo] = useState(null);
-  const [qrLogoRatio, setQrLogoRatio] = useState(1); // 1 înseamnă pătrat implicit
+  const [qrLogoRatio, setQrLogoRatio] = useState(1);
 
   const handleQrLogoUpload = (e) => {
     const file = e.target.files[0];
@@ -165,7 +144,7 @@ export default function Home() {
         const imgResult = event.target.result;
         const img = new window.Image();
         img.onload = () => {
-          setQrLogoRatio(img.width / img.height); // Aflăm dacă e lat sau înalt
+          setQrLogoRatio(img.width / img.height);
           setQrLogo(imgResult);
         };
         img.src = imgResult;
@@ -202,10 +181,6 @@ export default function Home() {
   const [user, setUser] = useState(null); 
   const [profil, setProfil] = useState(null);
   const [userTier, setUserTier] = useState('free');
-  
-  // VARIABILĂ SIGURĂ PENTRU A DETECTA DACA E FOUNDER SAU PRO FARA SA DEA CRASH
-  const isPremium = ['founder', 'pro'].includes(profil?.subscription_tier) || profil?.is_pro;
-
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false); 
   
@@ -228,7 +203,6 @@ export default function Home() {
     normaRegiune: 45000
   });
 
-  // STATE CONTRACT
   const [formData, setFormData] = useState({
     tipContract: 'prestari', 
     initiatorRol: 'prestator', 
@@ -238,8 +212,7 @@ export default function Home() {
     estePlatitorTVA: false,
     clauzaPi: true, clauzaPenalitati: true, clauzaRevizii: false, tarifOrar: '150',
     clauzaRawFoto: false, clauzaMarketingTerti: false, clauzaAprobareTacita: false, clauzaTaxaAnulare: false,
-    clauzaSplitPayment: false, clauzaRetentie: false,
-    clauzaLimitareRaspundere: false, clauzaInflatie: false, adaugaProcesVerbal: false
+    clauzaSplitPayment: false, clauzaRetentie: false
   });
 
   const [autoDocs, setAutoDocs] = useState({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon: null });
@@ -425,7 +398,7 @@ export default function Home() {
   const handleInapoiPrincipal = () => {
     setStep(1);
     setAutoStep('upload');
-    setFormData({ tipContract: 'prestari', initiatorRol: 'prestator', prestatorNume: '', prestatorCui: '', prestatorEmail: '', prestatorLogo: '', prestatorCuloare: '#8ba888', clientNume: '', clientCui: '', clientEmail: '', clientTelefon: '', obiect: '', valoare: '', moneda: 'RON', emiteFacturaAvans: false, trimitePeWhatsApp: false, estePlatitorTVA: false, clauzaPi: true, clauzaPenalitati: true, clauzaRevizii: false, tarifOrar: '150', clauzaRawFoto: false, clauzaMarketingTerti: false, clauzaAprobareTacita: false, clauzaTaxaAnulare: false, clauzaSplitPayment: false, clauzaRetentie: false, clauzaLimitareRaspundere: false, clauzaInflatie: false, adaugaProcesVerbal: false });
+    setFormData({ tipContract: 'prestari', initiatorRol: 'prestator', prestatorNume: '', prestatorCui: '', prestatorEmail: '', prestatorLogo: '', prestatorCuloare: '#8ba888', clientNume: '', clientCui: '', clientEmail: '', clientTelefon: '', obiect: '', valoare: '', moneda: 'RON', emiteFacturaAvans: false, trimitePeWhatsApp: false, estePlatitorTVA: false, clauzaPi: true, clauzaPenalitati: true, clauzaRevizii: false, tarifOrar: '150', clauzaRawFoto: false, clauzaMarketingTerti: false, clauzaAprobareTacita: false, clauzaTaxaAnulare: false, clauzaSplitPayment: false, clauzaRetentie: false });
     curataCanvas();
     setAutoData({ vanzatorTip: 'PF', vanzatorNume: '', vanzatorCnp: '', vanzatorCui: '', vanzatorRegCom: '', vanzatorSediu: '', cumparatorTip: 'PF', cumparatorNume: '', cumparatorCnp: '', cumparatorCui: '', cumparatorRegCom: '', cumparatorSediu: '', autoVin: '', autoMarcaModel: '', autoNumarInmatriculare: '', autoPret: '', clientEmail: '', autoAdresaVanzator: '', autoAdresaCumparator: '', pretIncludeTVA: false, autoMoneda: 'RON' });
     setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon: null });
@@ -434,15 +407,15 @@ export default function Home() {
   useEffect(() => {
     const fetchUserProfile = async (userId, email) => {
       try {
-        const { data: profile } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle();
-        
-        if (profile) {
-          setUser({ id: userId, email: email, status: profile.subscription_tier || 'free', credits: profile.credits_remaining ?? 0 });
-          setProfil(profile);
-          setUserTier(profile.subscription_tier || 'free');
-        } else {
-          throw new Error("No profile");
-        }
+        const { data: profile } = await supabase.from('profiles').select('subscription_tier, credits_remaining, has_qr_branding, has_qr_vcard, has_qr_dynamic, has_qr_pdf, is_pro, is_enterprise').eq('id', userId).single();
+        setUser({ 
+          id: userId, 
+          email: email, 
+          status: profile?.subscription_tier || 'free', 
+          credits: profile?.credits_remaining ?? 0 
+        });
+        setProfil(profile);
+        setUserTier(profile?.subscription_tier || 'free');
       } catch (err) {
         setUser({ id: userId, email: email, status: 'free', credits: 0 });
         setProfil({ subscription_tier: 'free', has_qr_branding: false, has_qr_vcard: false, has_qr_dynamic: false, has_qr_pdf: false, is_pro: false});
@@ -450,14 +423,28 @@ export default function Home() {
       }
     };
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) fetchUserProfile(session.user.id, session.user.email);
-    });
+    const restaureazaSesiunea = async () => {
+      try {
+        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) return;
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          await fetchUserProfile(session.user.id, session.user.email);
+        }
+      } catch (e) { }
+    };
+
+    restaureazaSesiunea();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) fetchUserProfile(session.user.id, session.user.email);
-      else { setUser(null); setProfil(null); setUserTier('free'); }
+      if (session?.user) {
+        fetchUserProfile(session.user.id, session.user.email);
+      } else {
+        setUser(null);
+        setProfil({ subscription_tier: 'free', has_qr_branding: false, has_qr_vcard: false, has_qr_dynamic: false, has_qr_pdf: false, is_pro: false});
+        setUserTier('free');
+      }
     });
+
     return () => subscription?.unsubscribe?.();
   }, []);
 
@@ -551,6 +538,8 @@ export default function Home() {
   };
 
   const handleCumparaPremium = async (tipProdus = 'founder') => {
+    if (isProcessingForm.current) return;
+    isProcessingForm.current = true;
     setLoading(true);
     try {
       const res = await fetch('/api/checkout', {
@@ -567,8 +556,10 @@ export default function Home() {
       }
     } catch (e) {
       alert('A apărut o problemă de conexiune cu procesatorul de plăți.');
+    } finally {
+      isProcessingForm.current = false;
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleCheckout = (tipProdus) => {
@@ -577,6 +568,9 @@ export default function Home() {
 
   const handleGenerateDynamicQr = async () => {
     if (!user) return alert('Trebuie să fii autentificat pentru a salva linkurile în baza de date.');
+    if (isProcessingForm.current) return;
+    
+    isProcessingForm.current = true;
     setIsGeneratingShortlink(true);
     
     const payload = {
@@ -586,14 +580,15 @@ export default function Home() {
       ios_url: iosUrl,
       android_url: androidUrl,
       geo_rules: geoRules,
-      landing_data: landingData
+      landing_data: landingData,
+      captchaToken // TRIMITEM TOKEN-UL TURNSTILE
     };
 
     if (qrType === 'dynamic' && !dynamicDestUrl && !uploadedPdfUrl) {
-      setIsGeneratingShortlink(false); return alert('Introdu o adresă de destinație sau încarcă un PDF.');
+      setIsGeneratingShortlink(false); isProcessingForm.current = false; return alert('Introdu o adresă de destinație sau încarcă un PDF.');
     }
     if (qrType === 'smart' && (!iosUrl || !androidUrl)) {
-      setIsGeneratingShortlink(false); return alert('Sunt necesare ambele link-uri pentru App Store și Google Play.');
+      setIsGeneratingShortlink(false); isProcessingForm.current = false; return alert('Sunt necesare ambele link-uri pentru App Store și Google Play.');
     }
 
     try {
@@ -613,6 +608,7 @@ export default function Home() {
       alert('Eroare conexiune.');
     } finally {
       setIsGeneratingShortlink(false);
+      isProcessingForm.current = false;
     }
   };
 
@@ -634,6 +630,8 @@ export default function Home() {
 
   const handleLansareContract = async (e) => {
     e.preventDefault();
+    if (isProcessingForm.current) return;
+    
     if (!user) {
       alert('Pentru a descărca documentul direct în format binar, creează un cont rapid în 10 secunde.');
       setIsSignUp(false);
@@ -644,17 +642,19 @@ export default function Home() {
       return;
     }
 
+    isProcessingForm.current = true;
+    setLoading(true);
+
     let imagineSemnaturaText = '';
     if (canvasRef.current) {
       imagineSemnaturaText = canvasRef.current.toDataURL('image/png');
     }
 
-    setLoading(true);
     try {
       const res = await fetch('/api/generate-contract', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, prestatorEmail: user.email, semnăturaBase64: imagineSemnaturaText, userId: user.id })
+        body: JSON.stringify({ ...formData, prestatorEmail: user.email, semnăturaBase64: imagineSemnaturaText, userId: user.id, captchaToken })
       });
       
       if (res.ok) {
@@ -680,6 +680,7 @@ export default function Home() {
     } catch {
       alert('Eroare de comunicare rețea cu serverele de producție.');
     } finally {
+      isProcessingForm.current = false;
       setLoading(false);
     }
   };
@@ -756,6 +757,8 @@ export default function Home() {
 
   const handleGenereazaPachetAuto = async (e) => {
     e.preventDefault();
+    if (isProcessingForm.current) return;
+    
     if (!user) {
       alert('Creează un cont rapid pentru a securiza și descărca documentele auto.');
       setIsSignUp(false);
@@ -765,6 +768,8 @@ export default function Home() {
       setShowAuthModal(true);
       return;
     }
+    
+    isProcessingForm.current = true;
     setLoading(true);
 
     try {
@@ -773,7 +778,8 @@ export default function Home() {
         ...autoData,
         clientEmail: user.email,
         userId: user.id, 
-        pretIncludeTVA: autoData.pretIncludeTVA
+        pretIncludeTVA: autoData.pretIncludeTVA,
+        captchaToken
       };
       
       binarFormData.append('autoDataJson', JSON.stringify(secureAutoDataPayload));
@@ -817,6 +823,7 @@ export default function Home() {
     } catch {
       alert('Eroare de rețea la descărcarea pachetului auto.');
     } finally {
+      isProcessingForm.current = false;
       setLoading(false);
     }
   };
@@ -875,12 +882,14 @@ export default function Home() {
 
   const handleAuthSubmit = async (e) => {
     e.preventDefault();
-    if (!authEmail || !authPassword) return alert('Introdu datele complete.');
+    if (isProcessingForm.current) return;
     
+    if (!authEmail || !authPassword) return alert('Introdu datele complete.');
     if (isSignUp && authPassword !== authConfirmPassword) {
       return alert('Eroare: Parolele introduse nu coincid!');
     }
 
+    isProcessingForm.current = true;
     setLoading(true); 
     try {
       if (isSignUp) {
@@ -918,6 +927,7 @@ export default function Home() {
     } catch (err) {
       alert(err.message || "Eroare la autentificare. Verificați datele introduse.");
     } finally {
+      isProcessingForm.current = false;
       setLoading(false);
     }
   };
@@ -1037,6 +1047,7 @@ export default function Home() {
               <button type="button" onClick={() => { setShowAuthModal(false); setIsSignUp(false); setAuthPassword(''); setAuthConfirmPassword(''); }} className="absolute top-4 right-4 text-slate-500 hover:text-white text-md font-bold transition">✕</button>
               <h3 className="text-xl font-black text-white mb-1">{isSignUp ? 'Creează un Cont Nou' : 'Autentificare Portabilitate'}</h3>
               <p className="text-xs text-slate-500 mb-6">Securizează documentele în serverele Supabase.</p>
+              
               <form onSubmit={handleAuthSubmit} className="space-y-4">
                 <div>
                   <label className="text-[10px] text-slate-400 uppercase font-bold block mb-1">Adresă de Email</label>
@@ -1152,11 +1163,11 @@ export default function Home() {
               <h1 className="text-5xl md:text-6xl font-black text-white mt-6 leading-tight tracking-tighter">Asigurarea Încasărilor <br/><span className="text-[#8ba888]">Privitor La Management de Clauze</span></h1>
               
               <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto px-4">
-                <button type="button" onClick={() => { setFormData(prev => ({ ...prev, tipContract: 'prestari' })); setStep(2); }} className="bg-[#8ba888] hover:opacity-90 text-[#0B0F12] font-black px-4 py-4 rounded-md shadow-md shadow-[#8ba888]/5 transition text-xs tracking-tight flex items-center justify-center gap-2">
+                <button type="button" onClick={() => { setFormData(prev => ({ ...prev, tipContract: 'prestari' })); setStep(2); }} className="bg-[#8ba888] text-[#0B0F12] font-black px-4 py-4 rounded-md shadow-md shadow-[#8ba888]/5 transition text-xs tracking-tight flex items-center justify-center gap-2">
                     Generator Contracte B2B / Servicii
                 </button>
                 <button type="button" onClick={() => { setFormData(prev => ({ ...prev, tipContract: 'auto' })); setStep(2); }} className="bg-[#12181D] border border-slate-700 text-white font-bold px-4 py-4 rounded-md hover:border-[#8ba888]/50 transition text-xs tracking-tight flex items-center justify-center gap-2">
-                    Generator Pachet Acte Tranzacții Auto
+                    Generator Pachet Acte Auto
                 </button>
               </div>
             </div>
@@ -1351,6 +1362,10 @@ export default function Home() {
                           {isUploadingPdf && <span className="text-xs text-purple-400 mt-1 block animate-pulse">Se încarcă PDF-ul în Cloud...</span>}
                           {uploadedPdfUrl && <span className="text-[10px] text-emerald-400 mt-1 block">✅ PDF Găzduit. Va fi folosit ca destinație.</span>}
                         </div>
+                        
+                        {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
+                          <Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} />
+                        )}
                         <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="w-full bg-purple-600 text-white font-bold py-2 rounded text-xs hover:bg-purple-500 transition">
                           {isGeneratingShortlink ? 'Se securizează...' : '🔗 Activează Cod Dinamic'}
                         </button>
@@ -1363,6 +1378,10 @@ export default function Home() {
                         <div className="flex flex-col gap-3">
                           <input type="url" placeholder="🍏 Link App Store (iOS)" value={iosUrl} onChange={(e) => setIosUrl(e.target.value)} className="w-full bg-[#12181D] border border-slate-700 rounded p-2.5 text-white text-sm focus:border-blue-500 outline-none" />
                           <input type="url" placeholder="🤖 Link Google Play (Android)" value={androidUrl} onChange={(e) => setAndroidUrl(e.target.value)} className="w-full bg-[#12181D] border border-slate-700 rounded p-2.5 text-white text-sm focus:border-blue-500 outline-none" />
+                          
+                          {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
+                            <Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} />
+                          )}
                           <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="w-full bg-blue-600 text-white font-bold py-2 rounded text-xs hover:bg-blue-500 transition">Activează Smart Routing</button>
                         </div>
                       </div>
@@ -1378,6 +1397,10 @@ export default function Home() {
                           </div>
                         ))}
                         <button type="button" onClick={() => setGeoRules([...geoRules.slice(0, -1), { country: '', url: '' }, geoRules[geoRules.length-1]])} className="text-[10px] text-blue-400 font-bold underline block">+ Adaugă regulă țară</button>
+                        
+                        {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
+                          <Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} />
+                        )}
                         <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="w-full bg-blue-600 text-white font-bold py-2 rounded text-xs hover:bg-blue-500 transition">Activează Geo-Routing</button>
                       </div>
                     )}
@@ -1402,6 +1425,10 @@ export default function Home() {
                           ))}
                           <button type="button" onClick={() => setLandingData({...landingData, links: [...landingData.links, { label: '', url: '' }]})} className="text-[10px] text-blue-400 font-bold underline block">+ Adaugă Link</button>
                         </div>
+                        
+                        {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
+                          <Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} />
+                        )}
                         <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="w-full bg-blue-600 text-white font-bold py-2 rounded text-xs hover:bg-blue-500 transition">Generează Micro-Landing</button>
                       </div>
                     )}
@@ -1670,6 +1697,10 @@ export default function Home() {
                     <button type="button" onClick={curataCanvas} className="text-[10px] text-red-400 hover:underline block text-right w-full">Șterge / Resemnează</button>
                   </div>
 
+                  {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
+                    <Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} />
+                  )}
+
                   <div className="flex justify-between items-center pt-6 border-t border-slate-800">
                     <button type="button" onClick={handleInapoiPrincipal} className="text-xs text-slate-400 underline">Înapoi</button>
                     <button type="submit" disabled={loading} className="bg-[#8ba888] text-[#0B0F12] font-black px-8 py-4 rounded text-sm transition hover:opacity-90">
@@ -1808,6 +1839,9 @@ export default function Home() {
                            </label>
                         </div>
                         
+                        {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
+                          <Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} />
+                        )}
                         <div className="flex justify-between items-center pt-2">
                           <button type="button" onClick={handleInapoiPrincipal} className="text-xs text-slate-400 underline">Înapoi la panou</button>
                           <button type="submit" disabled={isUploading || loading} className="bg-[#8ba888] text-black font-black px-6 py-2.5 rounded text-xs tracking-tight transition hover:opacity-90">

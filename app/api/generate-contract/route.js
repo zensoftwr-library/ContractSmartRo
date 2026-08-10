@@ -1,15 +1,9 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import puppeteer from 'puppeteer';
-import twilio from 'twilio';
 
 export const dynamic = 'force-dynamic';
 const supabase = createClient(process.env.SUPABASE_URL || '', process.env.SUPABASE_SERVICE_ROLE_KEY || '');
-
-const twilioClient = twilio(
-  process.env.TWILIO_ACCOUNT_SID || '',
-  process.env.TWILIO_AUTH_TOKEN || ''
-);
 
 export async function POST(request) {
   try {
@@ -22,8 +16,7 @@ export async function POST(request) {
     const { 
       tipContract, initiatorRol, obiect, valoare, moneda, 
       prestatorNume, prestatorCui, clientNume, clientCui, 
-      clientEmail, clientTelefon, trimitePeWhatsApp, 
-      semnăturaBase64, userId, adaugaProcesVerbal
+      clientEmail, semnăturaBase64, userId, adaugaProcesVerbal
     } = body;
 
     if (!userId) {
@@ -91,7 +84,7 @@ export async function POST(request) {
 
     let clauzeInjectateHtml = '';
     
-    // CLAUZE GENERICE/GLOBAL (PI, Penalități, etc.)
+    // CLAUZE GENERICE
     if (body.clauzaPi) {
       if (tipContract === 'inchiriere_imobil') {
         clauzeInjectateHtml += `<li><strong>ART. X. CLAUZĂ DE INVESTIRE CU TITLU EXECUTORIU:</strong> În conformitate cu art. 1798 Cod Civil, prezentul contract constituie titlu executoriu de drept pentru recuperarea chiriilor restante și pentru evacuarea rapidă a Locatarului, fără somație.</li>`;
@@ -132,7 +125,7 @@ export async function POST(request) {
       clauzeInjectateHtml += `<li><strong>ART. X. NON-SOLICITARE PERSONAL:</strong> Părțile se obligă să nu recruteze angajații celeilalte părți pe o perioadă de 24 de luni de la încetarea contractului.</li>`;
     }
 
-    // CLAUZE NOI AVOCĂȚEȘTI (SPECIFICE NIȘELOR)
+    // CLAUZE AVOCĂȚEȘTI (SPECIFICE NIȘELOR)
     if (body.clauzaAntiRecalificare) {
       clauzeInjectateHtml += `<li><strong>ART. X. INDEPENDEȚĂ OPERAȚIONALĂ ȘI FISCALĂ:</strong> Relația este strict comercială (B2B). Prestatorul dispune de libertate absolută în organizare, utilizarea echipamentelor proprii și stabilirea programului, fiind eliminat orice element de subordonare (Art. 7 Cod Fiscal).</li>`;
     }
@@ -254,6 +247,7 @@ export async function POST(request) {
         </div>
     `;
 
+    // ADAUGĂ PROCES VERBAL DACĂ E BIFAT
     if (adaugaProcesVerbal) {
       htmlContract += `
         <div class="page-break"></div>
@@ -300,6 +294,7 @@ export async function POST(request) {
     const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true, margin: { top: '40px', bottom: '40px', left: '40px', right: '40px' } });
     await browser.close();
 
+    // EMAIL RESEND (Păstrat)
     if (process.env.RESEND_API_KEY && clientEmail) {
       try {
         const { Resend } = await import('resend');
@@ -314,17 +309,7 @@ export async function POST(request) {
       } catch (emailErr) {}
     }
 
-    if (trimitePeWhatsApp && clientTelefon && process.env.TWILIO_WHATSAPP_FROM) {
-      try {
-        const formatE164 = clientTelefon.trim().startsWith('+') ? clientTelefon.trim() : `+4${clientTelefon.trim()}`;
-        await twilioClient.messages.create({
-          from: process.env.TWILIO_WHATSAPP_FROM,
-          to: `whatsapp:${formatE164}`,
-          body: `Salutare! Documentul dvs. a fost emis și transmis în siguranță pe e-mail via ContractSmart.`
-        });
-      } catch (twilioError) {}
-    }
-
+    // SCĂDERE CREDITE DOAR DACA E FREE
     if (!isPremium && availableCredits > 0) {
       await supabase.from('profiles').update({ credits_remaining: availableCredits - 1 }).eq('id', userId);
     }

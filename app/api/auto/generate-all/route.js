@@ -2,15 +2,9 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import puppeteer from 'puppeteer';
 import JSZip from 'jszip';
-import twilio from 'twilio';
 
 export const dynamic = 'force-dynamic';
-
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
-const twilioClient = twilio(
-  process.env.TWILIO_ACCOUNT_SID || '',
-  process.env.TWILIO_AUTH_TOKEN || ''
-);
 
 async function randeazaHtmlInPdf(htmlContent) {
   const launchOptions = {
@@ -48,7 +42,6 @@ export async function POST(req) {
     const fisierBv = formData.get('buletin_vanzator');
     const fisierBc = formData.get('buletin_cumparator');
 
-    // VERIFICARE DREPTURI ACCES AUTO
     if (!data.userId) {
       return NextResponse.json({ success: false, message: 'Neautentificat' }, { status: 401 });
     }
@@ -131,7 +124,6 @@ export async function POST(req) {
       .valoare-importata { font-weight: bold; padding: 0 3px; border-bottom: 1px transparent solid; }
     `;
 
-    // 1. CONTRACTUL DE VÂNZARE-CUMPĂRARE (Model ITĂ-014 cu clauze extinse)
     for (const ex of tipuriExemplare) {
       const htmlContractOficial = `
         <!DOCTYPE html>
@@ -194,7 +186,6 @@ export async function POST(req) {
       zip.file(`01_Contract_Auto_Model_ITA014_Exemplar_${ex.nr}.pdf`, pdfBuffer);
     }
 
-    // 2. PROCESUL-VERBAL DE PREDARE-PRIMIRE (Transferul de răspundere)
     const htmlProcesVerbal = `
       <!DOCTYPE html>
       <html lang="ro">
@@ -246,7 +237,6 @@ export async function POST(req) {
     const pdfPvBuffer = await randeazaHtmlInPdf(htmlProcesVerbal);
     zip.file(`06_Proces_Verbal_Predare_Primire_Exonerare_Raspundere.pdf`, pdfPvBuffer);
 
-    // 3. CERERILE OFICIALE DRPCIV / DITL
     const htmlCereriOficiale = `
       <!DOCTYPE html>
       <html lang="ro">
@@ -305,7 +295,6 @@ export async function POST(req) {
     const pdfCereriBuffer = await randeazaHtmlInPdf(htmlCereriOficiale);
     zip.file(`07_Cereri_Oficiale_Inmatriculare_si_Radiere_DRPCIV.pdf`, pdfCereriBuffer);
 
-    // ATAȘARE ACTE SCANATE
     if (fisierTalon && fisierTalon.size > 0) {
       zip.file(`Acte_Originale_Client/Copie_Certificat_Inmatriculare_Talon.jpg`, Buffer.from(await fisierTalon.arrayBuffer()));
     }
@@ -319,7 +308,6 @@ export async function POST(req) {
       zip.file(`Acte_Originale_Client/Copie_Act_Identitate_Cumparator.jpg`, Buffer.from(await fisierBc.arrayBuffer()));
     }
 
-    // GHID PROCEDURAL
     const continutGhidTxt = `CONTRACTSMART LEGAL-TECH // INSTRUCTAJ PROCEDURAL DOSAR AUTO
 ================================================================================
 Vehicul: ${data.autoMarcaModel || 'Mijloc Transport'} | VIN: ${data.autoVin || 'Nespecificat'}
@@ -394,23 +382,6 @@ Infrastructură operată automat prin platforma securizată ContractSmart 2026.
 
     zip.file(`Ghid_Post_Vanzare.txt`, continutGhidTxt);
 
-    // NOTIFICARE WHATSAPP TWILIO
-    if (data.clientTelefon || data.clientEmail) {
-      try {
-        const numarDestinatar = data.clientTelefon ? data.clientTelefon.trim() : '';
-        if (numarDestinatar && process.env.TWILIO_WHATSAPP_FROM) {
-          const formatE164 = numarDestinatar.startsWith('+') ? numarDestinatar : `+4${numarDestinatar}`;
-          await twilioClient.messages.create({
-            from: process.env.TWILIO_WHATSAPP_FROM,
-            to: `whatsapp:${formatE164}`,
-            body: `Salutare! Pachetul tau auto securizat (.ZIP) pentru masina cu seria sasiu ${data.autoVin || ''} a fost compilat cu succes de serverele ContractSmart si transmis automat pe e-mail.`
-          });
-        }
-      } catch (twilioError) {
-        console.error("Notificare prin Twilio WhatsApp Business a eșuat structural:", twilioError.message);
-      }
-    }
-
     const zipContent = await zip.generateAsync({ type: "uint8array" });
 
     // EMAIL RESEND
@@ -431,10 +402,7 @@ Infrastructură operată automat prin platforma securizată ContractSmart 2026.
             },
           ],
         });
-        console.log("E-mail transmis cu succes către:", data.clientEmail);
-      } catch (emailErr) {
-        console.error("Eroare trimitere e-mail Resend:", emailErr.message);
-      }
+      } catch (emailErr) {}
     }
 
     return new NextResponse(zipContent, {
@@ -447,7 +415,6 @@ Infrastructură operată automat prin platforma securizată ContractSmart 2026.
     });
 
   } catch (err) {
-    console.error("Crash la emiterea pachetului auto arhivatal:", err);
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
 }
