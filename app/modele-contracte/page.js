@@ -22,13 +22,13 @@ export default function ModeleContracte() {
         
         const { data: profile } = await supabase
           .from('profiles')
-          .select('subscription_tier, subscription_status')
+          .select('subscription_tier, subscription_status, is_pro')
           .eq('id', session.user.id)
           .single();
 
-        if (profile && profile.subscription_status === 'active') {
-          // Corelație exactă cu matricea de privilegii din backend
-          setUserTier(profile.subscription_tier);
+        if (profile) {
+          // Detectăm dacă are Founder, Pro, sau e free.
+          setUserTier(profile.subscription_tier || (profile.is_pro ? 'pro' : 'free'));
         }
 
         const { data: purchases } = await supabase
@@ -128,13 +128,18 @@ export default function ModeleContracte() {
 
   const areAccesLaSablon = (sablon) => {
     if (!sablon.premium) return true;
-    // Corelație exactă: verificăm ambele tipuri de cont deblocate (Pro și Lifetime/Founder)
-    if (userTier === 'founder' || userTier === 'pro' || userTier === 'premium') return true;
+    if (userTier === 'founder' || userTier === 'pro') return true;
     if (achizitiiIndividuale.includes(sablon.id)) return true;
     return false;
   };
 
   const handleDescarcaSauCumpara = async (sablon) => {
+    // 1. Verificăm mai întâi dacă utilizatorul este logat (inclusiv pentru cel Gratuit)
+    if (!user) {
+      alert('Trebuie să fii autentificat pentru a descărca șabloane de contracte. Te rugăm să te întorci pe pagina principală și să creezi un cont gratuit.');
+      return;
+    }
+
     if (areAccesLaSablon(sablon)) {
       setLoadingTemplate(sablon.id);
       try {
@@ -166,13 +171,7 @@ export default function ModeleContracte() {
       return;
     }
 
-    // AICI INTERVINE LOGICA DE CHECKOUT SECURIZATĂ (FĂRĂ FALLBACK ANONIM)
-    if (!user) {
-      alert('Pentru a achiziționa și debloca acest șablon, te rugăm să te autentifici din pagina principală.');
-      window.location.href = '/';
-      return;
-    }
-
+    // AICI INTERVINE LOGICA DE CHECKOUT SECURIZATĂ PENTRU PREMIUM
     setLoadingTemplate(sablon.id);
     try {
       const res = await fetch('/api/checkout', {
@@ -209,7 +208,7 @@ export default function ModeleContracte() {
             className="inline-flex items-center gap-2 text-xs font-medium text-slate-500 hover:text-slate-300 transition-colors group"
           >
             <span className="transform group-hover:-translate-x-0.5 transition-transform">←</span> 
-            Înapoia la panou
+            Înapoi la panou
           </Link>
         </div>
         
@@ -231,7 +230,7 @@ export default function ModeleContracte() {
           {sabloane.map((sablon) => {
             const deblocat = areAccesLaSablon(sablon);
             return (
-              <div key={sablon.id} className="bg-[#12181D] border border-slate-800 rounded-2xl p-6 flex flex-col justify-between hover:border-slate-700 transition shadow-xl">
+              <div key={sablon.id} className="bg-[#12181D] border border-slate-800 rounded-lg p-6 flex flex-col justify-between hover:border-slate-700 transition shadow-lg">
                 <div>
                   <div className="flex justify-between items-center mb-3">
                     <span className={`text-[10px] font-bold uppercase px-2.5 py-0.5 rounded border ${
@@ -254,15 +253,15 @@ export default function ModeleContracte() {
                     type="button"
                     onClick={() => handleDescarcaSauCumpara(sablon)}
                     disabled={loadingTemplate !== null}
-                    className={`w-full font-bold text-xs py-3 rounded-xl transition flex items-center justify-center gap-2 ${
+                    className={`w-full font-bold text-xs py-3 rounded transition flex items-center justify-center gap-2 ${
                       deblocat
-                        ? 'bg-[#8ba888] text-[#0B0F12] font-black hover:opacity-90 shadow-lg'
+                        ? 'bg-[#8ba888] text-[#0B0F12] font-black hover:opacity-90 shadow-md'
                         : 'bg-gradient-to-r from-amber-500/20 to-amber-600/20 border border-amber-500/30 text-amber-300 hover:from-amber-500/30'
                     }`}
                   >
                     {loadingTemplate === sablon.id 
                       ? 'Se randează PDF...' 
-                      : deblocat ? '📥 Descarcă Model Tipizat (.PDF)' : '🔓 Deblochează Acces Șablon Legal'}
+                      : deblocat ? '📥 Descarcă Model Tipizat (.PDF)' : '🔓 Cumpără Șablon Legal'}
                   </button>
                 </div>
               </div>

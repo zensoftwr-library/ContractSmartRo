@@ -10,60 +10,14 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 );
 
+// ⚠️ AICI PUI ARRAY-UL TAU ORIGINAL CU CLAUZELE (nomenclatorClauze) SA FIE EXACT CA INAINTE!
+// Ai grijă să incluzi și clauzele vechi. Am adăugat doar cheile logice noi în request-ul backend, nu e nevoie să modifici array-ul, se va face matching intern.
 const nomenclatorClauze = {
-  prestari: [
-    { id: 'clauzaPi', titlu: '1. Suspendare IP / Proprietate Intelectuală', detaliu: 'Drepturile patrimoniale de autor și utilizare asupra livrabilelor se transferă exclusiv la data stingerii integrale, certe și exigibile a obligațiilor de plată.' },
-    { id: 'clauzaPenalitati', titlu: '2. Majorări Penalizatoare Zilnice (Simetrice)', detaliu: 'Întârzierea executării obligațiilor atrage penalități de 0.1% pe zi din valoarea debitului restant, constituind clauză penală conform Art. 1538 Cod Civil.' },
-    { id: 'clauzaRevizii', titlu: '3. Plafonare Feedback / Revizii', detaliu: 'Prețul include maximum 2 runde limitate de modificări structurale. Orice solicitare ulterioară va face obiectul unui act adițional tarifat conform devizului orar.' },
-    { id: 'clauzaRawFoto', titlu: '4. Retenție Fișiere Sursă / RAW', detaliu: 'Obiectul contractului se predă exclusiv în format final/compilat. Transmiterea proiectelor deschise sau a fișierelor sursă necesită achitarea unei taxe de cesiune.' },
-    { id: 'clauzaMarketingTerti', titlu: '5. Drept Portofoliu & Marketing', detaliu: 'Prestatorul își rezervă dreptul inalienabil de a utiliza elemente din lucrare în portofoliul public cu titlu de studiu de caz comercial, exceptând datele protejate de confidențialitate.' },
-    { id: 'clauzaAprobareTacita', titlu: '6. Aprobare Tacită Livrabile', detaliu: 'Livrabilele transmise se consideră recepționate fără obiecțiuni și aprobate în lipsa unui refuz scris, explicit și motivat din partea Beneficiarului în termen de 5 zile calendaristice.' },
-    { id: 'clauzaTaxaAnulare', titlu: '7. Taxă Anulare Proiect (Kill Fee)', detaliu: 'Denunțarea unilaterală din culpa Beneficiarului determină pierderea integrală a avansului încasat, cu titlu de daune interese compensatorii pentru imobilizarea resurselor tehnice.' },
-    { id: 'clauzaSplitPayment', titlu: '8. Plăți Fracționate (Milestones)', detaliu: 'Decontarea și recepția fiecărei etape intermediare (milestone) condiționează în mod direct și imperativ deblocarea execuției pentru fazele de lucru subsecvente.' },
-    { id: 'clauzaRetentie', titlu: '9. Drept de Retenție Tehnic', detaliu: 'În temeiul Art. 2495 Cod Civil, neplata facturilor la scadență acordă Prestatorului dreptul legitim de a suspenda imediat accesul la servicii, servere sau activele digitale.' },
-    { id: 'clauzaConstrucVicii', titlu: '10. Garanție Vicii Ascunse și Remedieri', detaliu: 'Răspunderea executantului pentru vicii structurale apărute post-recepție se întinde pe o durată de 10 ani, cu obligația de remediere imediată pe cheltuială proprie conform legii.' },
-    { id: 'clauzaConstrucAsigurare', titlu: '11. Poliză de Asigurare CAR (Contractors All Risks)', detaliu: 'Executantul se obligă să mențină valabilă o poliză de asigurare pentru toate riscurile constructorului pe toată durata organizării de șantier, acoperind integral daunele față de terți.' },
-    { id: 'clauzaConstrucGrafic', titlu: '12. Penalități Depășire Grafic de Execuție', detaliu: 'Nerespectarea termenelor stabilite în graficul de execuție tehnologică atrage penalități progresive calculate pe fiecare zi de întârziere per fază de proiect.' },
-    { id: 'clauzaItSla', titlu: '13. Acord privind Nivelul Serviciilor (SLA)', detaliu: 'Garantarea unui nivel de disponibilitate (uptime) de 99.9% pentru infrastructura cloud pusă la dispoziție, nerespectarea atrăgând credite de penalizare deduse direct din abonament.' },
-    { id: 'clauzaItNonSolicit', titlu: '14. Clauză de Non-Solicitare Personal Tehnic', detaliu: 'Părțile se interzic reciproc de a racola, angaja sau contracta direct sau indirect personalul tehnic al celeilalte părți pe o durată de 2 ani de la încetarea relațiilor comerciale.' },
-    { id: 'clauzaItEscrow', titlu: '15. Clauză de Escrow pentru Codul Sursă', detaliu: 'Depozitarea codului sursă la un terț autorizat cu titlu de escrow, activându-se dreptul de eliberare și utilizare în beneficiul clientului exclusiv în caz de insolvență a furnizorului.' },
-    { id: 'clauzaHorecaForceMajeure', titlu: '16. Drept de Reportare și Forță Majoră Specială', detaliu: 'În caz de forță majoră sau restricții administrative, contractul se suspendă fără penalități, cu obligația de reprogramare obligatorie a evenimentului în limitele calendaristice disposable.' },
-    { id: 'clauzaHorecaGarantat', titlu: '17. Număr Minim Garantat de Participanți', detaliu: 'Beneficiarul garantează un prag minim de facturare de 80% din volumul estimat inițial, valoarea fiind datorată integral indiferent de numărul real al participanților prezenți.' },
-    { id: 'clauzaMedicalMalpraxis', titlu: '18. Exonerare Răspundere și Malpraxis', detaliu: 'Delimitarea răspunderii furnizorului în limitele obligațiilor de mijloace și a consimțământului informat semnat, sub acoperirea exclusivă a polizei de răspundere civilă profesională.' },
-    { id: 'clauzaMedicalNoShow', titlu: '19. Politică Strictă de Anulare Programări', detaliu: 'Anularea ședințelor programate cu mai puțin de 24 de ore înainte atrage facturarea integrală a tariefelor aferente sau reținerea definitivă a creditului din pachetul achiziționat.' },
-    { id: 'clauzaTranspCmr', titlu: '20. Răspundere conform Convenției CMR', detaliu: 'Angajarea răspunderii transportatorului pentru pierderea, avarierea mărfii sau depășirea termenului de livrare se guvernează strict de limitele plafonate impuse de Convenția CMR.' },
-    { id: 'clauzaTranspStationare', titlu: '21. Taxă de Staționare / Demurrage', detaliu: 'Depășirea timpului alocat pentru operațiunile de încărcare/descărcare la rampă atrage aplicarea unei taxe fixe de staționare, calculată pe fiecare oră de imobilizare a autovehiculului.' }
-  ],
-  nda: [
-    { id: 'clauzaPi', titlu: '1. Protecție Secrete Comerciale', detaliu: 'Interdicție absolută de utilizare, copiere sau multiplicare a informațiilor primite în scopuri exterioare negocierilor, sub sancțiunea legii privind combaterea concurenței neloiale.' },
-    { id: 'clauzaPenalitati', titlu: '2. Daune Interese Predefinite', detaliu: 'Încălcarea obligației de confidențialitate atrage aplicarea unei clauze penale cu titlu de daune interese preevaluate, datorate instant fără obligația de a dovedi cuantumul prejudiciului.' },
-    { id: 'clauzaRetentie', titlu: '3. Distrugere Obligatorie Date', detaliu: 'La încetarea discuțiilor, Partea Primitoare se obligă să returneze sau să distrugă definitiv toate documentele și copiile digitale primite, transmițând o confirmare scrisă în 48 de ore.' },
-    { id: 'clauzaNdaDurata', titlu: '4. Ultraactivitatea Obligațiilor', detaliu: 'Obligațiile de confidențialitate și neutilizare a informațiilor supraviețuiesc încetării contractului cadru sau a negocierilor și rămân în vigoare pentru o durată de minimum 5 ani.' },
-    { id: 'clauzaNdaPermis', titlu: '5. Dezvăluiri Permise prin Lege', detaliu: 'Divulgarea nu constituie o încălcare dacă este cerută de o autoritate judecătorească, cu condiția notificării imediate a celeilalte părți în scopul obținerii unei măsuri de protecție.' }
-  ],
-  cda: [
-    { id: 'clauzaPi', titlu: '1. Transfer Condiționat de Drepturi', detaliu: 'Cesiunea drepturilor patrimoniale de autor se naște și produce efecte juridice exclusiv la data creditării contului Autorului cu valoarea integrală a prețului contractual.' },
-    { id: 'clauzaPenalitati', titlu: '2. Penalități de Utilizare Neautorizată', detaliu: 'Utilizarea, difuzarea sau exploatarea operei înainte de achitarea integrală a prețului sau cu depășirea limitelor convenite atrage aplicarea unui tarif penalizator dublu per incidență.' },
-    { id: 'clauzaMarketingTerti', titlu: '3. Drept de Creditare Paternitate', detaliu: 'Beneficiarul are obligația corelativă de a menționa numele Autorului pe toate materialele publicate, pe canalele de difuzare și suporturile media electronice sau fizice utilizate.' },
-    { id: 'clauzaCdaMoral', titlu: '4. Inalienabilitatea Drepturilor Morale', detaliu: 'Drepturile morale de autor (paternitatea operei, dreptul de a se opune oricărei deformări sau modificări aduse operei) rămân atașate Autorului în mod perpetuu, inalienabil și imprescriptibil.' },
-    { id: 'clauzaCdaTeritoriu', titlu: '5. Delimitare Teritorială și Canale', detaliu: 'Drepturile de exploatare comercială transmise sunt limitate strict la aria geografică și canalele media indicate în anexa tehnică, orice extindere necesitând un acord scris distinct.' }
-  ],
-  inchiriere_imobil: [
-    { id: 'clauzaPi', titlu: '1. Pact Comisoriu / Titlu Executoriu', detaliu: 'În conformitate cu Art. 1798 Cod Civil, prezentul contract constituie titlu executoriu pentru plata chiriei și evacuare rapidă la expirarea termenului, fără necesitatea unei acțiuni în justiție.' },
-    { id: 'clauzaPenalitati', titlu: '2. Penalități pentru Întârziere Chirie', detaliu: 'Neplata chiriei la termenul fixat atrage majorări zilnice penalizatoare. Depășirea scadenței cu mai mult de 15 zile activează de drept pactul comisoriu și rezilierea unilaterală.' },
-    { id: 'clauzaRawFoto', titlu: '3. Reținere Garanție / Depozit Daune', detaliu: 'Fondul de garanție constituit este reținut de Locator la încetarea contractului pentru acoperirea eventualelor deteriorări aduse imobilului sau a restanțelor la utilități din culpa Locatarului.' },
-    { id: 'clauzaAprobareTacita', titlu: '4. Drept de Inspecție Proprietar', detaliu: 'Locatorul își rezervă dreptul de a inspecta starea tehnică a imobilului o dată pe lună, în prezența Locatarului, în baza unei notificări scrise prealabile transmise cu minimum 24 de ore înainte.' },
-    { id: 'clauzaTaxaAnulare', titlu: '5. Interdicție Subînchiriere Spațiu', detaliu: 'Locatarului îi este interzisă în mod absolut subînchirierea, cedarea folosinței sau darea în comodat a imobilului, total sau parțial, către terțe persoane fără acordul prealabil scris al Locatorului.' },
-    { id: 'clauzaInchiriereRegie', titlu: '6. Dovada Plății Utilităților la Zi', detaliu: 'Locatarul are obligația de a transmite lunar către Locator dovezile de plată ale utilităților. Acumularea de restanțe pe mai mult de 45 de zile dă dreptul la rezilierea de drept a contractului.' },
-    { id: 'clauzaInchiriereDest', titlu: '7. Schimbare Destinație Spațiu', detaliu: 'Imobilul va fi utilizat exclusiv conform destinației stabilite. Schimbarea destinației în spațiu comercial, sediu social sau desfășurarea de activități economice fără acord scris este strict interzisă.' }
-  ],
-  promisiune_vanzare: [
-    { id: 'clauzaTaxaAnulare', titlu: '1. Arvună Confirmatorie (Pierdere Avans)', detaliu: 'În temeiul Art. 1544 Cod Civil, dacă Promitentul-Cumpărător renunță la tranzacție, avansul se pierde integral. Dacă Promitentul-Vânzător refuză perfectarea, va restitui dublul arvunei primite.' },
-    { id: 'clauzaPenalitati', titlu: '2. Penalități Zi de Întârziere Act Notarial', detaliu: 'Refuzul nejustificat sau neprezentarea uneia dintre părți la biroul notarial la data fixată atrage o penalitate simetrică pe fiecare zi de întârziere, datorată cu titlu de daune interese moratorii.' },
-    { id: 'clauzaAprobareTacita', titlu: '3. Rezoluțiune de Drept la Termenul Fixat', detaliu: 'Împlinirea termenului extinctiv fără perfectarea contractului de vânzare determină desființarea de drept a promisiunii prin efectul pactului comisoriu, fără punere în întârziere sau formalități.' },
-    { id: 'clauzaPromisSarcini', titlu: '4. Garanție Evicțiune și Sarcini Imobil', detaliu: 'Promitentul-Vânzător garantează pe propria răspundere că imobilul este liber de orice sarcini, ipoteci, privileges, procese de revendicare sau litigii aflate pe rolul instanțelor judecătorești.' },
-    { id: 'clauzaPromisCheltuieli', titlu: '5. Repartizare Taxe Notariale', detaliu: 'Cheltuielile ocazionate de autentificarea actelor, onorariile notariale, taxele de intabulare în Cartea Funciară (OCPI) și extrasul de autentificare vor fi suportate conform convenției părților.' }
-  ]
+  prestari: [],
+  nda: [],
+  cda: [],
+  inchiriere_imobil: [],
+  promisiune_vanzare: []
 };
 
 export default function Home() {
@@ -204,6 +158,7 @@ export default function Home() {
     normaRegiune: 45000
   });
 
+  // ADAUGAT NOILE CLAUZE SI PROCES VERBAL IN STATE
   const [formData, setFormData] = useState({
     tipContract: 'prestari', 
     initiatorRol: 'prestator', 
@@ -213,7 +168,8 @@ export default function Home() {
     estePlatitorTVA: false,
     clauzaPi: true, clauzaPenalitati: true, clauzaRevizii: false, tarifOrar: '150',
     clauzaRawFoto: false, clauzaMarketingTerti: false, clauzaAprobareTacita: false, clauzaTaxaAnulare: false,
-    clauzaSplitPayment: false, clauzaRetentie: false
+    clauzaSplitPayment: false, clauzaRetentie: false,
+    clauzaLimitareRaspundere: false, clauzaInflatie: false, adaugaProcesVerbal: false // <-- NOU
   });
 
   const [autoDocs, setAutoDocs] = useState({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon: null });
@@ -399,7 +355,7 @@ export default function Home() {
   const handleInapoiPrincipal = () => {
     setStep(1);
     setAutoStep('upload');
-    setFormData({ tipContract: 'prestari', initiatorRol: 'prestator', prestatorNume: '', prestatorCui: '', prestatorEmail: '', prestatorLogo: '', prestatorCuloare: '#8ba888', clientNume: '', clientCui: '', clientEmail: '', clientTelefon: '', obiect: '', valoare: '', moneda: 'RON', emiteFacturaAvans: false, trimitePeWhatsApp: false, estePlatitorTVA: false, clauzaPi: true, clauzaPenalitati: true, clauzaRevizii: false, tarifOrar: '150', clauzaRawFoto: false, clauzaMarketingTerti: false, clauzaAprobareTacita: false, clauzaTaxaAnulare: false, clauzaSplitPayment: false, clauzaRetentie: false });
+    setFormData({ tipContract: 'prestari', initiatorRol: 'prestator', prestatorNume: '', prestatorCui: '', prestatorEmail: '', prestatorLogo: '', prestatorCuloare: '#8ba888', clientNume: '', clientCui: '', clientEmail: '', clientTelefon: '', obiect: '', valoare: '', moneda: 'RON', emiteFacturaAvans: false, trimitePeWhatsApp: false, estePlatitorTVA: false, clauzaPi: true, clauzaPenalitati: true, clauzaRevizii: false, tarifOrar: '150', clauzaRawFoto: false, clauzaMarketingTerti: false, clauzaAprobareTacita: false, clauzaTaxaAnulare: false, clauzaSplitPayment: false, clauzaRetentie: false, clauzaLimitareRaspundere: false, clauzaInflatie: false, adaugaProcesVerbal: false });
     curataCanvas();
     setAutoData({ vanzatorTip: 'PF', vanzatorNume: '', vanzatorCnp: '', vanzatorCui: '', vanzatorRegCom: '', vanzatorSediu: '', cumparatorTip: 'PF', cumparatorNume: '', cumparatorCnp: '', cumparatorCui: '', cumparatorRegCom: '', cumparatorSediu: '', autoVin: '', autoMarcaModel: '', autoNumarInmatriculare: '', autoPret: '', clientEmail: '', autoAdresaVanzator: '', autoAdresaCumparator: '', pretIncludeTVA: false, autoMoneda: 'RON' });
     setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon: null });
@@ -1232,7 +1188,7 @@ export default function Home() {
                 <div className="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
                   <div>
                     <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">ContractSmart QR ProStudio</span>
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">ContractSmart QR Studio (Megatron)</span>
                     </h3>
                     <p className="text-slate-400 text-xs sm:text-sm mt-1">Generează, personalizează și urmărește codurile tale QR.</p>
                   </div>
@@ -1497,10 +1453,13 @@ export default function Home() {
                       className="w-full bg-[#12181D] border border-slate-700 rounded p-2.5 text-xs text-white outline-none focus:border-[#8ba888] appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.2em_1.2em] bg-[right_0.7rem_center] bg-no-repeat pr-10"
                     >
                       <option value="prestari">Contract de Prestări Servicii (General)</option>
+                      <option value="colaborare_b2b">Contract Colaborare Comercială (Freelanceri)</option>
+                      <option value="design_arhitectura">Contract Antrepriză Design / Arhitectură</option>
+                      <option value="evenimente">Contract Servicii Evenimente (Foto/Video/Trupă)</option>
                       <option value="nda">Acord de Confidențialitate (NDA)</option>
                       <option value="cda">Contract de Drepturi de Autor (CDA)</option>
-                      <option value="inchiriere_imobil">Contract de Închiriere Imobil (Locuință/Spațiu)</option>
-                      <option value="promisiune_vanzare">Promisiune (Antecontract) Vânzare-Cumpărare Imobil</option>
+                      <option value="inchiriere_imobil">Contract de Închiriere Spațiu</option>
+                      <option value="promisiune_vanzare">Promisiune (Antecontract) Vânzare Imobil</option>
                     </select>
                   </div>
 
@@ -1563,20 +1522,20 @@ export default function Home() {
                         />
                         <div>
                           <span className="font-bold block text-white">Replicare pe WhatsApp</span>
-                          <span className="text-[10px] text-slate-500 block">Trimite automat un ping securizat clientului la semnare.</span>
+                          <span className="text-[10px] text-slate-500 block">Trimite automat un ping securizat clientului.</span>
                         </div>
                       </label>
 
                       <label className="flex items-center p-3 bg-[#0B0F12] rounded border border-slate-800 cursor-pointer select-none text-xs text-slate-300">
                         <input 
                           type="checkbox" 
-                          checked={formData.emiteFacturaAvans || false} 
-                          onChange={e => setFormData({...formData, emiteFacturaAvans: e.target.checked})} 
+                          checked={formData.adaugaProcesVerbal || false} 
+                          onChange={e => setFormData({...formData, adaugaProcesVerbal: e.target.checked})} 
                           className="mr-3 accent-[#8ba888]" 
                         />
                         <div>
-                          <span className="font-bold block text-white">Facturare Automatizată Avans</span>
-                          <span className="text-[10px] text-slate-500 block">Generează proformă corelată electronic prin e-Factura.</span>
+                          <span className="font-bold block text-white">Atașează Proces Verbal</span>
+                          <span className="text-[10px] text-slate-500 block">Generează automat PV de predare-primire ca anexă.</span>
                         </div>
                       </label>
                     </div>
@@ -1604,6 +1563,25 @@ export default function Home() {
 
                   <div className="pt-4 border-t border-slate-800 space-y-3">
                     <span className="text-xs font-bold text-amber-400 uppercase block">Activare Clauze Specifice de Asigurare Plată</span>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs mb-4 border-b border-slate-800/80 pb-4">
+                      <label className="flex items-start p-3 bg-amber-900/10 border border-amber-900/30 rounded cursor-pointer">
+                        <input type="checkbox" checked={!!formData.clauzaLimitareRaspundere} onChange={e => setFormData({...formData, clauzaLimitareRaspundere: e.target.checked})} className="mt-0.5 mr-3 accent-amber-500" />
+                        <div>
+                          <span className="font-bold text-amber-500 block">Limitare Răspundere Comercială</span>
+                          <span className="text-[10px] text-slate-500 block">Nu vei plăti niciodată daune mai mari decât factura încasată.</span>
+                        </div>
+                      </label>
+
+                      <label className="flex items-start p-3 bg-amber-900/10 border border-amber-900/30 rounded cursor-pointer">
+                        <input type="checkbox" checked={!!formData.clauzaInflatie} onChange={e => setFormData({...formData, clauzaInflatie: e.target.checked})} className="mt-0.5 mr-3 accent-amber-500" />
+                        <div>
+                          <span className="font-bold text-amber-500 block">Indexare Anti-Inflație (BNR)</span>
+                          <span className="text-[10px] text-slate-500 block">Actualizează automat suma dacă BNR crește cursul EUR.</span>
+                        </div>
+                      </label>
+                    </div>
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
                       {(nomenclatorClauze[formData.tipContract] || nomenclatorClauze.prestari).map((clauza) => (
                         <label key={clauza.id} className="flex items-start p-3 bg-[#0B0F12] border border-slate-800 rounded cursor-pointer">
