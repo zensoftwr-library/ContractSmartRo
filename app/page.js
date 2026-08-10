@@ -10,7 +10,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 );
 
-// NOMENCLATOR COMPLET CU TOATE CLAUZELE (VECHI + CELE NOI ADAUGATE)
+// NOMENCLATOR COMPLET CU TOATE CLAUZELE (VECHI INTEGRALE + NOI)
 const nomenclatorClauze = {
   prestari: [
     { id: 'clauzaPi', titlu: '1. Suspendare IP / Proprietate Intelectuală', detaliu: 'Drepturile patrimoniale de autor și utilizare asupra livrabilelor se transferă exclusiv la data stingerii integrale, certe și exigibile a obligațiilor de plată.' },
@@ -37,22 +37,23 @@ const nomenclatorClauze = {
   ],
   colaborare_b2b: [
     { id: 'clauzaPi', titlu: '1. Suspendare IP / Proprietate Intelectuală', detaliu: 'Drepturile patrimoniale de autor se transferă exclusiv la data stingerii integrale a obligațiilor de plată.' },
-    { id: 'clauzaPenalitati', titlu: '2. Majorări Penalizatoare Zilnice', detaliu: 'Întârzierea executării obligațiilor atrage penalități de 0.5% pe zi din valoarea debitului restant.' },
-    { id: 'clauzaItNonSolicit', titlu: '3. Clauză de Non-Solicitare Personal', detaliu: 'Părțile se interzic reciproc de a racola personalul sau clienții celeilalte părți pe o durată de 2 ani.' },
-    { id: 'clauzaTaxaAnulare', titlu: '4. Taxă Anulare Proiect (Kill Fee)', detaliu: 'Denunțarea unilaterală din culpa Beneficiarului determină pierderea integrală a avansului încasat.' }
+    { id: 'clauzaAntiRecalificare', titlu: '2. Anti-Recalificare Fiscală (ANAF)', detaliu: 'Contractul elimină total subordonarea (Art. 7 Cod Fiscal), Prestatorul lucrând independent, cu program și mijloace proprii.' },
+    { id: 'clauzaPenalitati', titlu: '3. Majorări Penalizatoare Zilnice', detaliu: 'Întârzierea executării obligațiilor atrage penalități zilnice din valoarea debitului restant.' },
+    { id: 'clauzaItNonSolicit', titlu: '4. Clauză de Non-Solicitare Personal', detaliu: 'Părțile se interzic reciproc de a racola personalul sau clienții celeilalte părți pe o durată de 2 ani.' },
+    { id: 'clauzaTaxaAnulare', titlu: '5. Taxă Anulare Proiect (Kill Fee)', detaliu: 'Denunțarea unilaterală din culpa Beneficiarului determină pierderea integrală a avansului încasat.' }
   ],
   design_arhitectura: [
-    { id: 'clauzaPi', titlu: '1. Suspendare IP / Proprietate Intelectuală', detaliu: 'Drepturile patrimoniale de autor și utilizare asupra livrabilelor se transferă exclusiv la data stingerii integrale.' },
-    { id: 'clauzaRevizii', titlu: '2. Plafonare Feedback / Revizii', detaliu: 'Prețul include maximum 2 runde limitate de modificări structurale.' },
-    { id: 'clauzaRawFoto', titlu: '3. Retenție Fișiere Sursă', detaliu: 'Obiectul contractului se predă exclusiv în format final/compilat (fără fișierele sursă deschise CAD/3D).' },
+    { id: 'clauzaPi', titlu: '1. Suspendare IP / Proprietate Intelectuală', detaliu: 'Drepturile de utilizare asupra livrabilelor arhitecturale se transferă la data plății integrale.' },
+    { id: 'clauzaSuspendareFeedback', titlu: '2. Suspendare pentru Lipsă Feedback', detaliu: 'Întârzierea aprobărilor de către client decalează automat predarea și permite facturarea muncii la stadiul curent.' },
+    { id: 'clauzaRevizii', titlu: '3. Plafonare Feedback / Revizii', detaliu: 'Prețul include maximum 2 runde limitate de modificări structurale.' },
     { id: 'clauzaSplitPayment', titlu: '4. Plăți Fracționate (Milestones)', detaliu: 'Decontarea și recepția fiecărei etape intermediare condiționează deblocarea execuției pentru fazele subsecvente.' },
     { id: 'clauzaMarketingTerti', titlu: '5. Drept Portofoliu & Marketing', detaliu: 'Prestatorul își rezervă dreptul de a utiliza elemente din lucrare în portofoliul public.' }
   ],
   evenimente: [
-    { id: 'clauzaTaxaAnulare', titlu: '1. Reținere Avans (Non-Refundable Retainer)', detaliu: 'Sumele achitate cu titlu de avans rămân integral în posesia Prestatorului pentru blocarea calendarului.' },
-    { id: 'clauzaHorecaForceMajeure', titlu: '2. Forță Majoră Specială (Reprogramare)', detaliu: 'Contractul se suspendă fără penalități, cu obligația de reprogramare obligatorie a evenimentului.' },
-    { id: 'clauzaMarketingTerti', titlu: '3. Drept Portofoliu & Marketing', detaliu: 'Prestatorul își rezervă dreptul inalienabil de a utiliza materiale foto/video în portofoliul de clienți.' },
-    { id: 'clauzaMedicalNoShow', titlu: '4. Politică Strictă de Anulare', detaliu: 'Anularea evenimentului cu mai puțin de 90 de zile înainte atrage facturarea integrală a tarifului.' }
+    { id: 'clauzaTaxaAnulare', titlu: '1. Reținere Avans (Non-Refundable Retainer)', detaliu: 'Sumele achitate cu titlu de avans rămân integral la Prestator dacă evenimentul este anulat.' },
+    { id: 'clauzaLogisticaHoreca', titlu: '2. Asigurare Logistică (Masă & Curent)', detaliu: 'Beneficiarul e obligat să asigure curent stabil, masă caldă pentru echipa tehnică și parcare.' },
+    { id: 'clauzaHorecaForceMajeure', titlu: '3. Forță Majoră Specială (Reprogramare)', detaliu: 'Contractul se suspendă fără penalități în caz de stare de urgență/restricții, obligând la reprogramare.' },
+    { id: 'clauzaMarketingTerti', titlu: '4. Drept Portofoliu & Marketing', detaliu: 'Prestatorul își rezervă dreptul inalienabil de a utiliza materiale foto/video în portofoliul de clienți.' }
   ],
   nda: [
     { id: 'clauzaPi', titlu: '1. Protecție Secrete Comerciale', detaliu: 'Interdicție absolută de utilizare, copiere sau multiplicare a informațiilor primite în scopuri exterioare negocierilor, sub sancțiunea legii privind combaterea concurenței neloiale.' },
@@ -63,26 +64,29 @@ const nomenclatorClauze = {
   ],
   cda: [
     { id: 'clauzaPi', titlu: '1. Transfer Condiționat de Drepturi', detaliu: 'Cesiunea drepturilor patrimoniale de autor se naște și produce efecte juridice exclusiv la data creditării contului Autorului cu valoarea integrală a prețului contractual.' },
-    { id: 'clauzaPenalitati', titlu: '2. Penalități de Utilizare Neautorizată', detaliu: 'Utilizarea, difuzarea sau exploatarea operei înainte de achitarea integrală a prețului sau cu depășirea limitelor convenite atrage aplicarea unui tarif penalizator dublu per incidență.' },
-    { id: 'clauzaMarketingTerti', titlu: '3. Drept de Creditare Paternitate', detaliu: 'Beneficiarul are obligația corelativă de a menționa numele Autorului pe toate materialele publicate, pe canalele de difuzare și suporturile media electronice sau fizice utilizate.' },
-    { id: 'clauzaCdaMoral', titlu: '4. Inalienabilitatea Drepturilor Morale', detaliu: 'Drepturile morale de autor (paternitatea operei, dreptul de a se opune oricărei deformări sau modificări aduse operei) rămân atașate Autorului în mod perpetuu, inalienabil și imprescriptibil.' },
-    { id: 'clauzaCdaTeritoriu', titlu: '5. Delimitare Teritorială și Canale', detaliu: 'Drepturile de exploatare comercială transmise sunt limitate strict la aria geografică și canalele media indicate în anexa tehnică, orice extindere necesitând un acord scris distinct.' }
+    { id: 'clauzaOriginalitate', titlu: '2. Garanția Originalității (Anti-Plagiat)', detaliu: 'Autorul garantează absolut că opera este 100% creație proprie și nu încalcă drepturile altor autori.' },
+    { id: 'clauzaPenalitati', titlu: '3. Penalități de Utilizare Neautorizată', detaliu: 'Utilizarea, difuzarea sau exploatarea operei înainte de achitarea integrală a prețului sau cu depășirea limitelor convenite atrage aplicarea unui tarif penalizator dublu per incidență.' },
+    { id: 'clauzaMarketingTerti', titlu: '4. Drept de Creditare Paternitate', detaliu: 'Beneficiarul are obligația corelativă de a menționa numele Autorului pe toate materialele publicate, pe canalele de difuzare și suporturile media electronice sau fizice utilizate.' },
+    { id: 'clauzaCdaMoral', titlu: '5. Inalienabilitatea Drepturilor Morale', detaliu: 'Drepturile morale de autor (paternitatea operei, dreptul de a se opune oricărei deformări sau modificări aduse operei) rămân atașate Autorului în mod perpetuu, inalienabil și imprescriptibil.' },
+    { id: 'clauzaCdaTeritoriu', titlu: '6. Delimitare Teritorială și Canale', detaliu: 'Drepturile de exploatare comercială transmise sunt limitate strict la aria geografică și canalele media indicate în anexa tehnică, orice extindere necesitând un acord scris distinct.' }
   ],
   inchiriere_imobil: [
     { id: 'clauzaPi', titlu: '1. Pact Comisoriu / Titlu Executoriu', detaliu: 'În conformitate cu Art. 1798 Cod Civil, prezentul contract constituie titlu executoriu pentru plata chiriei și evacuare rapidă la expirarea termenului, fără necesitatea unei acțiuni în justiție.' },
-    { id: 'clauzaPenalitati', titlu: '2. Penalități pentru Întârziere Chirie', detaliu: 'Neplata chiriei la termenul fixat atrage majorări zilnice penalizatoare. Depășirea scadenței cu mai mult de 15 zile activează de drept pactul comisoriu și rezilierea unilaterală.' },
-    { id: 'clauzaRawFoto', titlu: '3. Reținere Garanție / Depozit Daune', detaliu: 'Fondul de garanție constituit este reținut de Locator la încetarea contractului pentru acoperirea eventualelor deteriorări aduse imobilului sau a restanțelor la utilități din culpa Locatarului.' },
-    { id: 'clauzaAprobareTacita', titlu: '4. Drept de Inspecție Proprietar', detaliu: 'Locatorul își rezervă dreptul de a inspecta starea tehnică a imobilului o dată pe lună, în prezența Locatarului, în baza unei notificări scrise prealabile transmise cu minimum 24 de ore înainte.' },
-    { id: 'clauzaTaxaAnulare', titlu: '5. Interdicție Subînchiriere Spațiu', detaliu: 'Locatarului îi este interzisă în mod absolut subînchirierea, cedarea folosinței sau darea în comodat a imobilului, total sau parțial, către terțe persoane fără acordul prealabil scris al Locatorului.' },
-    { id: 'clauzaInchiriereRegie', titlu: '6. Dovada Plății Utilităților la Zi', detaliu: 'Locatarul are obligația de a transmite lunar către Locator dovezile de plată ale utilităților. Acumularea de restanțe pe mai mult de 45 de zile dă dreptul la rezilierea de drept a contractului.' },
-    { id: 'clauzaInchiriereDest', titlu: '7. Schimbare Destinație Spațiu', detaliu: 'Imobilul va fi utilizat exclusiv conform destinației stabilite. Schimbarea destinației în spațiu comercial, sediu social sau desfășurarea de activități economice fără acord scris este strict interzisă.' }
+    { id: 'clauzaDauneTerti', titlu: '2. Răspundere Daune Terți', detaliu: 'Locatarul răspunde 100% pentru distrugerile (inundații/incendii) provocate vecinilor din culpa sa.' },
+    { id: 'clauzaPenalitati', titlu: '3. Penalități pentru Întârziere Chirie', detaliu: 'Neplata chiriei la termenul fixat atrage majorări zilnice penalizatoare. Depășirea scadenței cu mai mult de 15 zile activează de drept pactul comisoriu și rezilierea unilaterală.' },
+    { id: 'clauzaRawFoto', titlu: '4. Reținere Garanție / Depozit Daune', detaliu: 'Fondul de garanție constituit este reținut de Locator la încetarea contractului pentru acoperirea eventualelor deteriorări aduse imobilului sau a restanțelor la utilități din culpa Locatarului.' },
+    { id: 'clauzaAprobareTacita', titlu: '5. Drept de Inspecție Proprietar', detaliu: 'Locatorul își rezervă dreptul de a inspecta starea tehnică a imobilului o dată pe lună, în prezența Locatarului, în baza unei notificări scrise prealabile transmise cu minimum 24 de ore înainte.' },
+    { id: 'clauzaTaxaAnulare', titlu: '6. Interdicție Subînchiriere Spațiu', detaliu: 'Locatarului îi este interzisă în mod absolut subînchirierea, cedarea folosinței sau darea în comodat a imobilului, total sau parțial, către terțe persoane fără acordul prealabil scris al Locatorului.' },
+    { id: 'clauzaInchiriereRegie', titlu: '7. Dovada Plății Utilităților la Zi', detaliu: 'Locatarul are obligația de a transmite lunar către Locator dovezile de plată ale utilităților. Acumularea de restanțe pe mai mult de 45 de zile dă dreptul la rezilierea de drept a contractului.' },
+    { id: 'clauzaInchiriereDest', titlu: '8. Schimbare Destinație Spațiu', detaliu: 'Imobilul va fi utilizat exclusiv conform destinației stabilite. Schimbarea destinației în spațiu comercial, sediu social sau desfășurarea de activități economice fără acord scris este strict interzisă.' }
   ],
   promisiune_vanzare: [
     { id: 'clauzaTaxaAnulare', titlu: '1. Arvună Confirmatorie (Pierdere Avans)', detaliu: 'În temeiul Art. 1544 Cod Civil, dacă Promitentul-Cumpărător renunță la tranzacție, avansul se pierde integral. Dacă Promitentul-Vânzător refuză perfectarea, va restitui dublul arvunei primite.' },
-    { id: 'clauzaPenalitati', titlu: '2. Penalități Zi de Întârziere Act Notarial', detaliu: 'Refuzul nejustificat sau neprezentarea uneia dintre părți la biroul notarial la data fixată atrage o penalitate simetrică pe fiecare zi de întârziere, datorată cu titlu de daune interese moratorii.' },
-    { id: 'clauzaAprobareTacita', titlu: '3. Rezoluțiune de Drept la Termenul Fixat', detaliu: 'Împlinirea termenului extinctiv fără perfectarea contractului de vânzare determină desființarea de drept a promisiunii prin efectul pactului comisoriu, fără punere în întârziere sau formalități.' },
-    { id: 'clauzaPromisSarcini', titlu: '4. Garanție Evicțiune și Sarcini Imobil', detaliu: 'Promitentul-Vânzător garantează pe propria răspundere că imobilul este liber de orice sarcini, ipoteci, privileges, procese de revendicare sau litigii aflate pe rolul instanțelor judecătorești.' },
-    { id: 'clauzaPromisCheltuieli', titlu: '5. Repartizare Taxe Notariale', detaliu: 'Cheltuielile ocazionate de autentificarea actelor, onorariile notariale, taxele de intabulare în Cartea Funciară (OCPI) și extrasul de autentificare vor fi suportate conform convenției părților.' }
+    { id: 'clauzaRiscPieire', titlu: '2. Riscul Pieirii Bunului', detaliu: 'Până la semnarea la notar, riscul degradării bunului e la Vânzător, generând scăderea prețului.' },
+    { id: 'clauzaPenalitati', titlu: '3. Penalități Zi de Întârziere Act Notarial', detaliu: 'Refuzul nejustificat sau neprezentarea uneia dintre părți la biroul notarial la data fixată atrage o penalitate simetrică pe fiecare zi de întârziere, datorată cu titlu de daune interese moratorii.' },
+    { id: 'clauzaAprobareTacita', titlu: '4. Rezoluțiune de Drept la Termenul Fixat', detaliu: 'Împlinirea termenului extinctiv fără perfectarea contractului de vânzare determină desființarea de drept a promisiunii prin efectul pactului comisoriu, fără punere în întârziere sau formalități.' },
+    { id: 'clauzaPromisSarcini', titlu: '5. Garanție Evicțiune și Sarcini Imobil', detaliu: 'Promitentul-Vânzător garantează pe propria răspundere că imobilul este liber de orice sarcini, ipoteci, privileges, procese de revendicare sau litigii aflate pe rolul instanțelor judecătorești.' },
+    { id: 'clauzaPromisCheltuieli', titlu: '6. Repartizare Taxe Notariale', detaliu: 'Cheltuielile ocazionate de autentificarea actelor, onorariile notariale, taxele de intabulare în Cartea Funciară (OCPI) și extrasul de autentificare vor fi suportate conform convenției părților.' }
   ]
 };
 
@@ -224,6 +228,7 @@ export default function Home() {
     normaRegiune: 45000
   });
 
+  // STATE CONTRACT
   const [formData, setFormData] = useState({
     tipContract: 'prestari', 
     initiatorRol: 'prestator', 
@@ -234,7 +239,7 @@ export default function Home() {
     clauzaPi: true, clauzaPenalitati: true, clauzaRevizii: false, tarifOrar: '150',
     clauzaRawFoto: false, clauzaMarketingTerti: false, clauzaAprobareTacita: false, clauzaTaxaAnulare: false,
     clauzaSplitPayment: false, clauzaRetentie: false,
-    clauzaLimitareRaspundere: false, clauzaInflatie: false, adaugaProcesVerbal: false // <-- NOU
+    clauzaLimitareRaspundere: false, clauzaInflatie: false, adaugaProcesVerbal: false
   });
 
   const [autoDocs, setAutoDocs] = useState({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon: null });
@@ -1147,8 +1152,8 @@ export default function Home() {
               <h1 className="text-5xl md:text-6xl font-black text-white mt-6 leading-tight tracking-tighter">Asigurarea Încasărilor <br/><span className="text-[#8ba888]">Privitor La Management de Clauze</span></h1>
               
               <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto px-4">
-                <button type="button" onClick={() => { setFormData(prev => ({ ...prev, tipContract: 'prestari' })); setStep(2); }} className="bg-[#8ba888] text-[#0B0F12] font-black px-4 py-4 rounded-md shadow-md shadow-[#8ba888]/5 transition text-xs tracking-tight flex items-center justify-center gap-2">
-                    Generator Contracte Servicii & B2B
+                <button type="button" onClick={() => { setFormData(prev => ({ ...prev, tipContract: 'prestari' })); setStep(2); }} className="bg-[#8ba888] hover:opacity-90 text-[#0B0F12] font-black px-4 py-4 rounded-md shadow-md shadow-[#8ba888]/5 transition text-xs tracking-tight flex items-center justify-center gap-2">
+                    Generator Contracte B2B / Servicii
                 </button>
                 <button type="button" onClick={() => { setFormData(prev => ({ ...prev, tipContract: 'auto' })); setStep(2); }} className="bg-[#12181D] border border-slate-700 text-white font-bold px-4 py-4 rounded-md hover:border-[#8ba888]/50 transition text-xs tracking-tight flex items-center justify-center gap-2">
                     Generator Pachet Acte Tranzacții Auto

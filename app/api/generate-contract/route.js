@@ -51,39 +51,38 @@ export async function POST(request) {
     let temeiJuridicHtml = '';
     let titluContractOficial = '';
 
-    // NOILE TEMEIURI JURIDICE "BLINDATE"
     switch(tipContract) {
       case 'prestari':
         titluContractOficial = "CONTRACT-CADRU DE PRESTĂRI SERVICII COMERCIALE B2B";
-        temeiJuridicHtml = `Prezentul acord este guvernat de prevederile <strong>Art. 1851 - Art. 1880 din Codul Civil român</strong> (Contractul de Antrepriză și Prestări Servicii). Părțile declară expres că prezentul raport nu este unul de subordonare, excluzând orice recalificare fiscală de tip contract de muncă (Art. 7 Cod Fiscal).`;
+        temeiJuridicHtml = `Prezentul acord este guvernat de prevederile <strong>Art. 1851 - Art. 1880 din Codul Civil român</strong> (Contractul de Antrepriză și Prestări Servicii). Părțile declară expres că prezentul raport nu este unul de subordonare, excluzând orice recalificare fiscală.`;
         break;
       case 'nda':
         titluContractOficial = "ACORD PRIVIND NEPROMOVAREA ȘI PROTECȚIA SECRETELOR COMERCIALE (NDA)";
-        temeiJuridicHtml = `Prezentul înscris se fundamentează pe dispozițiile <strong>Art. 1184 și Art. 1200 din Codul Civil român</strong> referitoare la obligația de confidențialitate în cadrul negocierilor precontractuale, coroborat cu reglementările stricte privind protecția secretelor de afaceri.`;
+        temeiJuridicHtml = `Prezentul înscris se fundamentează pe dispozițiile <strong>Art. 1184 și Art. 1200 din Codul Civil român</strong> referitoare la obligația de confidențialitate în cadrul negocierilor precontractuale.`;
         break;
       case 'cda':
         titluContractOficial = "CONTRACT DE CESIUNE EXCLUSIVĂ A DREPTURILOR PATRIMONIALE DE AUTOR";
-        temeiJuridicHtml = `Raportul juridic este reglementat de normele imperative ale <strong>Legii nr. 8/1996 privind dreptul de autor și drepturile conexe</strong>, republicată și actualizată, operând o distincție absolută între drepturile nepatrimoniale (morale) și exploatarea patrimonială a operei.`;
+        temeiJuridicHtml = `Raportul juridic este reglementat de normele imperative ale <strong>Legii nr. 8/1996 privind dreptul de autor și drepturile conexe</strong>, republicată și actualizată.`;
         break;
       case 'inchiriere_imobil':
         titluContractOficial = "CONTRACT DE LOCAȚIUNE ȘI EXPLOATARE SPAȚIU IMOBILIAR";
-        temeiJuridicHtml = `Încheiat conform <strong>Art. 1777 - Art. 1835 din Codul Civil român</strong>. Raportul este supus dispozițiilor <strong>Art. 1798 din Codul Civil</strong>, constituind un instrument cu valoare de <strong>TITLU EXECUTORIU</strong> pentru evacuare la termen și debite restante.`;
+        temeiJuridicHtml = `Încheiat conform <strong>Art. 1777 - Art. 1835 din Codul Civil român</strong>. Raportul este supus dispozițiilor <strong>Art. 1798 din Codul Civil</strong>, constituind un instrument cu valoare de <strong>TITLU EXECUTORIU</strong>.`;
         break;
       case 'promisiune_vanzare':
         titluContractOficial = "ANTECONTRACT / PROMISIUNE BILATERALĂ DE VÂNZARE-CUMPĂRARE IMOBIL";
-        temeiJuridicHtml = `Guvernat de normele cuprinse în <strong>Art. 1669 și Art. 1279 din Codul Civil român</strong> (promisiunea de a contracta și executarea silită a obligațiilor corelative), cu aplicarea strictă a regimului juridic penalizator al arvunei confirmatorii.`;
+        temeiJuridicHtml = `Guvernat de normele cuprinse în <strong>Art. 1669 și Art. 1279 din Codul Civil român</strong> referitoare la promisiunea de a contracta și executarea silită a obligațiilor corelative.`;
         break;
       case 'colaborare_b2b':
         titluContractOficial = "CONTRACT DE COLABORARE COMERCIALĂ INDEPENDENTĂ";
-        temeiJuridicHtml = `Guvernat de prevederile generale ale Codului Civil privind obligațiile. Prestatorul acționează pe riscul și cu mijloacele sale proprii, nefiind integrat în organigrama Beneficiarului, preîntâmpinând astfel recalificarea fiscală.`;
+        temeiJuridicHtml = `Guvernat de prevederile generale ale Codului Civil privind obligațiile. Prestatorul acționează pe riscul și cu mijloacele sale proprii, nefiind integrat în organigrama Beneficiarului.`;
         break;
       case 'design_arhitectura':
         titluContractOficial = "CONTRACT DE ANTREPRIZĂ PENTRU DESIGN ȘI ARHITECTURĂ";
-        temeiJuridicHtml = `Supus normelor speciale de antrepriză (Art. 1851 Cod Civil) și Legii nr. 8/1996. Proiectul arhitectural reprezintă operă de creație intelectuală, a cărei implementare faptică este condiționată de recepția finală.`;
+        temeiJuridicHtml = `Supus normelor speciale de antrepriză (Art. 1851 Cod Civil) și Legii nr. 8/1996. Proiectul arhitectural reprezintă operă de creație intelectuală.`;
         break;
       case 'evenimente':
         titluContractOficial = "CONTRACT PRESTĂRI SERVICII EVENIMENTE (ENTERTAINMENT)";
-        temeiJuridicHtml = `Încheiat în baza principiului libertății contractuale. Obligația asumată este una de mijloace, nu de rezultat. Suma achitată cu titlu de avans poartă regim de "Non-Refundable Retainer" pentru blocarea calendarului.`;
+        temeiJuridicHtml = `Încheiat în baza principiului libertății contractuale. Obligația asumată este una de mijloace, nu de rezultat. Suma achitată poartă regim de "Non-Refundable Retainer".`;
         break;
       default:
         titluContractOficial = "CONTRACT COMERCIAL GENERAL";
@@ -92,42 +91,65 @@ export async function POST(request) {
 
     let clauzeInjectateHtml = '';
     
-    // DINAMICIZARE CLAUZE AVOCĂȚEȘTI (Noile verificări din payload)
+    // CLAUZE GENERICE/GLOBAL (PI, Penalități, etc.)
     if (body.clauzaPi) {
       if (tipContract === 'inchiriere_imobil') {
-        clauzeInjectateHtml += `<li><strong>ART. 4.1. CLAUZĂ DE INVESTIRE CU TITLU EXECUTORIU:</strong> În conformitate cu art. 1798 Cod Civil, prezentul contract constituie titlu executoriu de drept pentru recuperarea chiriilor restante și pentru evacuarea rapidă a Locatarului la expirarea termenului sau în caz de neplată, fără somație și fără procedură judecătorească prealabilă.</li>`;
+        clauzeInjectateHtml += `<li><strong>ART. X. CLAUZĂ DE INVESTIRE CU TITLU EXECUTORIU:</strong> În conformitate cu art. 1798 Cod Civil, prezentul contract constituie titlu executoriu de drept pentru recuperarea chiriilor restante și pentru evacuarea rapidă a Locatarului, fără somație.</li>`;
       } else if (tipContract === 'cda') {
-        clauzeInjectateHtml += `<li><strong>ART. 4.1. TRANSFER CONDIȚIONAT DE REMUNERAȚIE:</strong> Drepturile patrimoniale de exploatare a operei se transferă exclusiv condiționat de decontarea integrală, efectivă și confirmată bancar a prețului. Orice utilizare anterioară constituie delict civil și încălcare a drepturilor de autor.</li>`;
+        clauzeInjectateHtml += `<li><strong>ART. X. TRANSFER CONDIȚIONAT DE REMUNERAȚIE:</strong> Drepturile patrimoniale se transferă exclusiv condiționat de decontarea integrală a prețului. Orice utilizare anterioară constituie delict civil.</li>`;
       } else {
-        clauzeInjectateHtml += `<li><strong>ART. 4.1. REȚINERE DE PROPRIETATE INTELECTUALĂ:</strong> Toate livrabilele, planurile, codul sursă și materialele de proiect rămân în proprietatea exclusivă a Prestatorului până la momentul stingerii integrale a tuturor obligațiilor de plată.</li>`;
+        clauzeInjectateHtml += `<li><strong>ART. X. REȚINERE DE PROPRIETATE INTELECTUALĂ:</strong> Toate livrabilele și materialele de proiect rămân în proprietatea exclusivă a Prestatorului până la momentul stingerii integrale a tuturor obligațiilor de plată.</li>`;
       }
     }
     if (body.clauzaPenalitati) {
-      clauzeInjectateHtml += `<li><strong>ART. 4.2. REGIM PENALIZATOR ȘI DAUNE INTERESE:</strong> Depășirea scadenței facturilor atrage penalități de întârziere în cuantum de 0.5% pe zi calendaristică, calculate din suma restantă, cuantumul penalităților putând depăși suma debitului principal. Pentru contractele NDA/CDA, încălcarea confidențialității atrage daune-interese preevaluate la suma de 50.000 EUR, exigibile imediat.</li>`;
+      clauzeInjectateHtml += `<li><strong>ART. X. REGIM PENALIZATOR ȘI DAUNE INTERESE:</strong> Depășirea scadenței atrage penalități de 0.5% pe zi calendaristică. Pentru contractele confidențiale, încălcarea atrage daune-interese preevaluate la suma de 50.000 EUR, exigibile imediat.</li>`;
     }
-    if (body.clauzaLimitareRaspundere) { // Clauză nouă adăugată pentru B2B
-      clauzeInjectateHtml += `<li><strong>ART. 4.X. LIMITAREA RĂSPUNDERII COMERCIALE:</strong> Sub nicio formă și indiferent de natura litigiului, răspunderea financiară totală a Prestatorului pentru orice daune dovedite nu va depăși valoarea netă încasată efectiv pentru serviciile prestate în cadrul acestui contract. Prestatorul nu răspunde pentru pierderi de profit, de date sau oportunități comerciale ratate de Beneficiar.</li>`;
+    if (body.clauzaLimitareRaspundere) {
+      clauzeInjectateHtml += `<li><strong>ART. X. LIMITAREA RĂSPUNDERII COMERCIALE:</strong> Sub nicio formă și indiferent de natura litigiului, răspunderea financiară totală a Prestatorului pentru orice daune dovedite nu va depăși valoarea netă încasată efectiv.</li>`;
     }
-    if (body.clauzaInflatie) { // Clauză nouă pentru abonamente/închirieri
-      clauzeInjectateHtml += `<li><strong>ART. 4.X. INDEXARE ANTI-INFLAȚIONISTĂ (EUR/BNR):</strong> Pentru a menține echilibrul prestațiilor, prețul contractului va fi actualizat/indexat automat anual (sau la emiterea facturii) raportat la evoluția cursului EUR/RON comunicat de BNR sau la indicele inflației comunicat de INS, aplicându-se valoarea cea mai favorabilă Prestatorului/Locatorului.</li>`;
+    if (body.clauzaInflatie) {
+      clauzeInjectateHtml += `<li><strong>ART. X. INDEXARE ANTI-INFLAȚIONISTĂ (EUR/BNR):</strong> Pentru a menține echilibrul prestațiilor, prețul va fi actualizat/indexat automat raportat la evoluția cursului EUR/RON comunicat de BNR la data emiterii facturii.</li>`;
     }
     if (body.clauzaRevizii) {
-      clauzeInjectateHtml += `<li><strong>ART. 4.3. PLAFONARE STRUCTURALĂ FEEDBACK:</strong> Modificările sau revizile sunt limitate la maximum 2 runde incluse în buget. Orice solicitare ulterioară va fi tarifată suplimentar prin act adițional.</li>`;
+      clauzeInjectateHtml += `<li><strong>ART. X. PLAFONARE STRUCTURALĂ FEEDBACK:</strong> Modificările sau revizile sunt limitate la maximum 2 runde incluse în buget. Orice solicitare ulterioară va fi tarifată suplimentar prin act adițional.</li>`;
     }
     if (body.clauzaTaxaAnulare) {
       if (tipContract === 'promisiune_vanzare') {
-        clauzeInjectateHtml += `<li><strong>ART. 4.7. EXECUTARE ARVUNĂ CONFIRMATORIE:</strong> În caz de reziliere din culpa Promitentului Cumpărător, sumele predate cu titlu de avans vor fi reținute integral. În caz de renunțare a Promitentului Vânzător, acesta este obligat de drept la restituirea dublului sumei încasate.</li>`;
+        clauzeInjectateHtml += `<li><strong>ART. X. EXECUTARE ARVUNĂ CONFIRMATORIE:</strong> În caz de reziliere din culpa Promitentului Cumpărător, sumele predate se rețin integral. În caz de renunțare a Vânzătorului, se restituie dublul sumei.</li>`;
       } else if (tipContract === 'evenimente') {
-        clauzeInjectateHtml += `<li><strong>ART. 4.7. REȚINERE AVANS (NON-REFUNDABLE RETAINER):</strong> Avansul încasat reprezintă rezervarea fermă a datei și a resurselor. În cazul în care Beneficiarul anulează evenimentul cu mai puțin de 90 de zile înainte, avansul este considerat daune-interese compensatorii nereturnabile și va fi reținut în proporție de 100%.</li>`;
+        clauzeInjectateHtml += `<li><strong>ART. X. REȚINERE AVANS (NON-REFUNDABLE RETAINER):</strong> Avansul încasat reprezintă rezervarea fermă a datei. Anularea evenimentului cu mai puțin de 90 de zile înainte transformă avansul în daune-interese nereturnabile.</li>`;
       } else {
-        clauzeInjectateHtml += `<li><strong>ART. 4.7. PENALITATE DE ANULARE (KILL FEE):</strong> În cazul denunțării unilaterale a contractului din culpa exclusivă a Beneficiarului, sumele achitate cu titlu de avans rămân integral în posesia Prestatorului pentru blocarea resurselor operaționale.</li>`;
+        clauzeInjectateHtml += `<li><strong>ART. X. PENALITATE DE ANULARE (KILL FEE):</strong> În cazul denunțării din culpa exclusivă a Beneficiarului, avansul rămâne în posesia Prestatorului pentru blocarea resurselor operaționale.</li>`;
       }
     }
+    if (body.clauzaSplitPayment) {
+      clauzeInjectateHtml += `<li><strong>ART. X. PLĂȚI FRACȚIONATE (MILESTONES):</strong> Decontarea și recepția fiecărei etape intermediare condiționează imperativ deblocarea execuției pentru fazele de lucru subsecvente.</li>`;
+    }
     if (body.clauzaRetentie) {
-      clauzeInjectateHtml += `<li><strong>ART. 4.9. DREPT DE RETENȚIE TEHNICĂ:</strong> În caz de neplată a oricărei facturi scadente în termen de 15 zile, Prestatorul are facultatea legală de a sista serviciile, de a revoca permisiunile de acces sau de a suspenda instanțele de server.</li>`;
+      clauzeInjectateHtml += `<li><strong>ART. X. DREPT DE RETENȚIE TEHNICĂ:</strong> În caz de neplată în termen de 15 zile, Prestatorul are facultatea legală de a sista serviciile, revoca accesul sau de a suspenda instanțele de server și activele digitale.</li>`;
     }
     if (body.clauzaItNonSolicit) {
-      clauzeInjectateHtml += `<li><strong>ART. 4.14. CLAUZĂ DE NON-SOLICITARE PERSONAL:</strong> Beneficiarul se obligă ferm să nu recruteze, direct sau prin interpuși, angajații sau subcontractorii Prestatorului pe o perioadă de 24 de luni de la încetarea contractului.</li>`;
+      clauzeInjectateHtml += `<li><strong>ART. X. NON-SOLICITARE PERSONAL:</strong> Părțile se obligă să nu recruteze angajații celeilalte părți pe o perioadă de 24 de luni de la încetarea contractului.</li>`;
+    }
+
+    // CLAUZE NOI AVOCĂȚEȘTI (SPECIFICE NIȘELOR)
+    if (body.clauzaAntiRecalificare) {
+      clauzeInjectateHtml += `<li><strong>ART. X. INDEPENDEȚĂ OPERAȚIONALĂ ȘI FISCALĂ:</strong> Relația este strict comercială (B2B). Prestatorul dispune de libertate absolută în organizare, utilizarea echipamentelor proprii și stabilirea programului, fiind eliminat orice element de subordonare (Art. 7 Cod Fiscal).</li>`;
+    }
+    if (body.clauzaSuspendareFeedback) {
+      clauzeInjectateHtml += `<li><strong>ART. X. SUSPENDARE PENTRU LIPSĂ FEEDBACK:</strong> Orice întârziere a Beneficiarului în furnizarea materialelor ce depășește 5 zile lucrătoare atrage decalarea automată a predării. Depășirea a 15 zile dă dreptul facturării integrale a stadiului curent.</li>`;
+    }
+    if (body.clauzaLogisticaHoreca) {
+      clauzeInjectateHtml += `<li><strong>ART. X. ASIGURARE LOGISTICĂ EVENIMENT:</strong> Beneficiarul se obligă să asigure Prestatorului acces la curent electric stabil (220V), mese calde pe durata evenimentelor ce depășesc 4 ore, și loc de parcare garantat pentru echipamente.</li>`;
+    }
+    if (body.clauzaOriginalitate) {
+      clauzeInjectateHtml += `<li><strong>ART. X. GARANȚIA ORIGINALITĂȚII:</strong> Autorul garantează absolut și sub sancțiunea legii penale că opera este 100% creație originală, nu încalcă drepturile terților (fără plagiat) și nu a mai fost cedată anterior.</li>`;
+    }
+    if (body.clauzaDauneTerti) {
+      clauzeInjectateHtml += `<li><strong>ART. X. RĂSPUNDEREA PENTRU DAUNE PROVOCATE TERȚILOR:</strong> Locatarul este 100% solidar responsabil pentru orice distrugeri (inundații, incendii din culpă, vandalism) provocate vecinilor sau spațiilor comune, degrevând total Locatorul de orice acțiune în regres.</li>`;
+    }
+    if (body.clauzaRiscPieire) {
+      clauzeInjectateHtml += `<li><strong>ART. X. RISCUL PIEIRII BUNULUI:</strong> Până la semnarea formei autentice, riscul pieirii fortuite a imobilului rămâne în sarcina Promitentului-Vânzător. Orice degradare a stării fizice dă dreptul Cumpărătorului să ceară reducerea prețului.</li>`;
     }
 
     const field = (valoare, minWidth = "120px") => {
@@ -232,7 +254,6 @@ export async function POST(request) {
         </div>
     `;
 
-    // ADAUGĂ PROCES VERBAL DACĂ E BIFAT
     if (adaugaProcesVerbal) {
       htmlContract += `
         <div class="page-break"></div>
@@ -279,7 +300,6 @@ export async function POST(request) {
     const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true, margin: { top: '40px', bottom: '40px', left: '40px', right: '40px' } });
     await browser.close();
 
-    // EMAIL RESEND
     if (process.env.RESEND_API_KEY && clientEmail) {
       try {
         const { Resend } = await import('resend');
@@ -294,7 +314,6 @@ export async function POST(request) {
       } catch (emailErr) {}
     }
 
-    // TWILIO
     if (trimitePeWhatsApp && clientTelefon && process.env.TWILIO_WHATSAPP_FROM) {
       try {
         const formatE164 = clientTelefon.trim().startsWith('+') ? clientTelefon.trim() : `+4${clientTelefon.trim()}`;
@@ -306,7 +325,6 @@ export async function POST(request) {
       } catch (twilioError) {}
     }
 
-    // SCĂDERE CREDITE DOAR DACA E FREE
     if (!isPremium && availableCredits > 0) {
       await supabase.from('profiles').update({ credits_remaining: availableCredits - 1 }).eq('id', userId);
     }
