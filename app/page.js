@@ -207,7 +207,6 @@ export default function Home() {
   const [profil, setProfil] = useState(null);
   const [userTier, setUserTier] = useState('free');
   
-  // LOGICĂ CORECTATĂ PREMIUM
   const isPremium = ['founder', 'pro'].includes(profil?.subscription_tier) || profil?.is_pro;
 
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -232,7 +231,6 @@ export default function Home() {
     normaRegiune: 45000
   });
 
-  // FĂRĂ CÂMPURI DE WHATSAPP PENTRU CONTRACT
   const [formData, setFormData] = useState({
     tipContract: 'prestari', 
     initiatorRol: 'prestator', 
@@ -1645,12 +1643,12 @@ export default function Home() {
                       <input type="text" placeholder="CUI / CNP Client" autoComplete="new-password" value={formData.clientCui} onChange={e => setFormData({...formData, clientCui: e.target.value})} className="w-full p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white outline-none focus:border-[#8ba888]" />
                       <input type="text" placeholder="Companie Client / Nume" autoComplete="new-password" value={formData.clientNume} onChange={e => setFormData({...formData, clientNume: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white" />
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <input type="email" placeholder="Email Client" autoComplete="new-password" value={formData.clientEmail} onChange={e => setFormData({...formData, clientEmail: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white focus:border-[#8ba888]" required />
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                      <label className="flex items-center p-3 bg-[#0B0F12] rounded border border-slate-800 cursor-pointer select-none text-xs text-slate-300">
+                    
+                    {/* UI REZOLVAT (Aliniere perfectă Email + Proces Verbal pe același rând) */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                      <input type="email" placeholder="Email Client" autoComplete="new-password" value={formData.clientEmail} onChange={e => setFormData({...formData, clientEmail: e.target.value})} className="w-full p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white focus:border-[#8ba888] outline-none" required />
+                      
+                      <label className="flex items-center p-2.5 bg-[#0B0F12] rounded border border-slate-800/60 cursor-pointer select-none text-xs text-slate-300 h-full">
                         <input 
                           type="checkbox" 
                           checked={formData.adaugaProcesVerbal || false} 
@@ -1659,7 +1657,7 @@ export default function Home() {
                         />
                         <div>
                           <span className="font-bold block text-white">Atașează Proces Verbal</span>
-                          <span className="text-[10px] text-slate-500 block">Generează automat PV de predare-primire ca anexă.</span>
+                          <span className="text-[10px] text-slate-500 block">Generează automat PV anexă.</span>
                         </div>
                       </label>
                     </div>
