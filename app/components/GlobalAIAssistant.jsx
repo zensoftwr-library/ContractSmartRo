@@ -7,6 +7,22 @@ export default function GlobalAIAssistant({ user }) {
   const [aiInputMessage, setAiInputMessage] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
 
+  // Funcție care transformă URL-urile text în link-uri click-uibile
+  const renderTextWithLinks = (text) => {
+    if (!text) return '';
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlRegex);
+    return parts.map((part, i) => 
+      urlRegex.test(part) ? (
+        <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-blue-900 font-bold hover:underline break-all">
+          {part}
+        </a>
+      ) : (
+        <span key={i} className="whitespace-pre-wrap">{part}</span>
+      )
+    );
+  };
+
   const handleSendAiMessage = async (e) => {
     e.preventDefault();
     if (!aiInputMessage.trim()) return;
@@ -59,7 +75,7 @@ export default function GlobalAIAssistant({ user }) {
                       ? 'bg-[#8ba888] text-[#0B0F12] rounded-lg rounded-tr-sm' 
                       : 'bg-[#12181D] border border-slate-800 text-slate-300 rounded-lg rounded-tl-sm'
                   }`}>
-                    {msg.content}
+                    {msg.role === 'user' ? msg.content : renderTextWithLinks(msg.content)}
                   </div>
                 </div>
               ))
