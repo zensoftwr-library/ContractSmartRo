@@ -382,8 +382,22 @@ export default function Home() {
         setAutoStep('upload');
       }
     };
+    
+    // Curăță ecranul de loading dacă utilizatorul dă "Back" din browser (BFCache)
+    const handlePageShow = (e) => {
+      if (e.persisted) {
+        setLoadingText(null);
+        isProcessingForm.current = false;
+      }
+    };
+
     window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+    window.addEventListener('pageshow', handlePageShow);
+    
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('pageshow', handlePageShow);
+    };
   }, [step]);
 
   useEffect(() => {
