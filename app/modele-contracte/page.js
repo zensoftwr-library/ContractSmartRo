@@ -8,6 +8,9 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 );
 
+// LINK GUMROAD PENTRU ȘABLOANE LEGALE
+const GUMROAD_SABLON_LINK = 'https://zensoftware.gumroad.com/l/sablon-tipizat-legal';
+
 export default function ModeleContracte() {
   const [loadingTemplate, setLoadingTemplate] = useState(null);
   const [user, setUser] = useState(null);
@@ -27,7 +30,6 @@ export default function ModeleContracte() {
           .single();
 
         if (profile) {
-          // Detectăm dacă are Founder, Pro, sau e free.
           setUserTier(profile.subscription_tier || (profile.is_pro ? 'pro' : 'free'));
         }
 
@@ -134,7 +136,6 @@ export default function ModeleContracte() {
   };
 
   const handleDescarcaSauCumpara = async (sablon) => {
-    // 1. Verificăm mai întâi dacă utilizatorul este logat (inclusiv pentru cel Gratuit)
     if (!user) {
       alert('Trebuie să fii autentificat pentru a descărca șabloane de contracte. Te rugăm să te întorci pe pagina principală și să creezi un cont gratuit.');
       return;
@@ -171,28 +172,15 @@ export default function ModeleContracte() {
       return;
     }
 
-    // AICI INTERVINE LOGICA DE CHECKOUT SECURIZATĂ PENTRU PREMIUM
+    // REDIRECȚIONARE GUMROAD CU PRE-FILL USER ID
     setLoadingTemplate(sablon.id);
     try {
-      const res = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userEmail: user.email,
-          userId: user.id, 
-          tipProdus: sablon.variantType,
-          template_id: sablon.id 
-        })
-      });
-      const data = await res.json();
-      if (data.success && data.redirectUrl) {
-        window.location.href = data.redirectUrl;
-      } else {
-        alert(data.message || 'Eroare la inițierea securizată a plății.');
-      }
+      const urlObj = new URL(GUMROAD_SABLON_LINK);
+      urlObj.searchParams.set('user_id', user.id);
+      urlObj.searchParams.set('email', user.email);
+      window.location.href = urlObj.toString();
     } catch {
-      alert('Eroare critică de rețea. Nu am putut contacta procesatorul de plăți.');
-    } finally {
+      alert('Eroare la redirecționarea către Gumroad.');
       setLoadingTemplate(null);
     }
   };
