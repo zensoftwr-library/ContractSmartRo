@@ -46,6 +46,17 @@ export default function ModeleContracte() {
     getSesiuneSiProfil();
   }, []);
 
+  // Resetare stare loading la întoarcerea în pagină (Back)
+  useEffect(() => {
+    const handlePageShow = (e) => {
+      if (e.persisted) {
+        setLoadingTemplate(null);
+      }
+    };
+    window.addEventListener('pageshow', handlePageShow);
+    return () => window.removeEventListener('pageshow', handlePageShow);
+  }, []);
+  
   const sabloane = [
     { 
       id: 'prestari_gratuit', 
