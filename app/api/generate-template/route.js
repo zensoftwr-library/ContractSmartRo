@@ -53,10 +53,11 @@ export async function POST(request) {
         titluOficial = "CONTRACT-CADRU DE PRESTĂRI SERVICII COMERCIALE";
         temeiLegal = "Prezentul contract este încheiat în temeiul Art. 1851 - Art. 1880 din Codul Civil român privitor la contractul de antrepriză și prestări servicii.";
         articoleSpecificeHtml = `
-          <div class="art-title">ARTICOLUL 3. OBLIGAȚIILE PRESTATORULUI</div>
-          <div class="paragraph">3.1. Prestatorul se obligă să execute serviciile menționate cu diligență profesională maximă, respectând termenele stabilite de comun acord cu Beneficiarul.</div>
-          <div class="art-title">ARTICOLUL 4. PLAFONARE REVIZII ȘI FEEDBACK COMERCIAL</div>
-          <div class="paragraph">4.1. Modificările solicitate de Beneficiar sunt limitate la maximum 2 runde incluse în bugetul inițial. Orice revizie suplimentară se va tarifa separat conform tarifelor de listă standard ale Prestatorului.</div>
+          <div class="art-title">ARTICOLUL 3. OBLIGAȚIILE PRESTATORULUI ȘI REȚINERE IP</div>
+          <div class="paragraph">3.1. Prestatorul se obligă să execute serviciile menționate cu diligență profesională maximă. Toate livrabilele, planurile și materialele de proiect rămân în proprietatea exclusivă a Prestatorului până la momentul stingerii integrale a tuturor obligațiilor de plată.</div>
+          <div class="art-title">ARTICOLUL 4. PLAFONARE REVIZII ȘI PENALITĂȚI DE ÎNTÂRZIERE</div>
+          <div class="paragraph">4.1. Modificările solicitate de Beneficiar sunt limitate la maximum 2 runde incluse în bugetul inițial. Orice revizie suplimentară se va tarifa separat.</div>
+          <div class="paragraph">4.2. Depășirea scadenței facturilor atrage penalități de întârziere în cuantum de 0.5% pe zi calendaristică, calculate din suma restantă, constituind clauză penală conform Art. 1538 Cod Civil.</div>
         `;
         break;
 
@@ -66,8 +67,9 @@ export async function POST(request) {
         articoleSpecificeHtml = `
           <div class="art-title">ARTICOLUL 3. DEFINIREA INFORMAȚIILOR CONFIDENȚIALE</div>
           <div class="paragraph">3.1. Sunt considerate informații confidențiale toate datele tehnice, financiare, secretele de producție, bazele de date de clienți sau planurile de business transmise pe parcursul negocierilor.</div>
-          <div class="art-title">ARTICOLUL 4. DAUNE-INTERESE FIXE ȘI PENALIZĂRI</div>
+          <div class="art-title">ARTICOLUL 4. DAUNE-INTERESE FIXE ȘI DISTRUGERE DATE</div>
           <div class="paragraph">4.1. Încălcarea prezentului acord atrage răspunderea patrimonială directă a părții în culpă, care se obligă la plata unor daune interese predefinite în cuantum fix stabilit prin acord bilateral.</div>
+          <div class="paragraph">4.2. La încetarea discuțiilor, Partea Primitoare se obligă să distrugă definitiv toate documentele și copiile digitale primite, transmițând o confirmare scrisă în 48 de ore.</div>
         `;
         break;
 
@@ -75,28 +77,33 @@ export async function POST(request) {
         titluOficial = "CONTRACT DE CESIUNE EXCLUSIVĂ A DREPTURILOR PATRIMONIALE DE AUTOR";
         temeiLegal = "Guvernat în mod imperativ de dispozițiile imperative ale Legii nr. 8/1996 privind dreptul de autor și drepturile conexe, cu modificările ulterioare.";
         articoleSpecificeHtml = `
-          <div class="art-title">ARTICOLUL 3. SFERA DE EXPLOATARE PATRIMONIALĂ</div>
-          <div class="paragraph">3.1. Autorul cedează în mod exclusiv drepturile de reproducere, distribuire, radiodifuzare și import al operei create, pe o durată determinată de ani specificată în anexă.</div>
-          <div class="art-title">ARTICOLUL 4. TRANSFER CONDIȚIONAT DE PLATĂ INTEGRALĂ</div>
-          <div class="paragraph">4.1. Drepturile patrimoniale de exploatare se transferă către Cesionar exclusiv în momentul decontării bancare integrale și efective a remunerației stabilite în prezentul înscris.</div>
+          <div class="art-title">ARTICOLUL 3. TRANSFER CONDIȚIONAT ȘI GARANȚIA ORIGINALITĂȚII</div>
+          <div class="paragraph">3.1. Autorul garantează absolut și sub sancțiunea legii penale că opera este 100% creație originală, nu încalcă drepturile terților (fără plagiat) și nu a mai fost cedată anterior.</div>
+          <div class="paragraph">3.2. Drepturile patrimoniale de exploatare se transferă către Cesionar exclusiv în momentul decontării bancare integrale și efective a remunerației stabilite. Orice utilizare, difuzare sau exploatare a operei înainte de achitarea integrală atrage aplicarea unui tarif penalizator dublu per incidență.</div>
+          <div class="art-title">ARTICOLUL 4. DREPT DE CREDITARE ȘI INALIENABILITATEA DREPTURILOR MORALE</div>
+          <div class="paragraph">4.1. Drepturile morale de autor rămân atașate Autorului în mod perpetuu și inalienabil. Beneficiarul are obligația corelativă de a menționa numele Autorului pe materialele publicate.</div>
         `;
         break;
 
       case 'inchiriere_imobil_premium':
         titluOficial = "CONTRACT DE LOCAȚIUNE ȘI EXPLOATARE SPAȚIU IMOBILIAR (LOCUINȚĂ)";
-        temeiLegal = "În conformitate cu Art. 1777 - Art. 1835 din Codul Civil român privitoare la locațiunea imobilelor rezidențiale.";
+        temeiLegal = "În conformitate cu Art. 1777 - Art. 1835 din Codul Civil român privitoare la locațiunea imobilelor rezidențiale. Raportul este supus dispozițiilor Art. 1798 din Codul Civil, constituind TITLU EXECUTORIU.";
         articoleSpecificeHtml = `
-          <div class="art-title">ARTICOLUL 3. DEPOZIT DE GARANȚIE ȘI RESTITUIRE</div>
-          <div class="paragraph">3.1. Locatarul va pune la dispoziția Locatorului o garanție valorică echivalentă cu o chirie lunară, destinată acoperirii daunelor sau a debitelor acumulate la regie sau utilități publice.</div>
+          <div class="art-title">ARTICOLUL 3. DEPOZIT DE GARANȚIE ȘI CLAUZĂ DE EVACUARE</div>
+          <div class="paragraph">3.1. Locatarul va pune la dispoziția Locatorului o garanție valorică echivalentă cu o chirie lunară. În conformitate cu art. 1798 Cod Civil, prezentul contract constituie titlu executoriu de drept pentru recuperarea chiriilor restante și pentru evacuarea rapidă a Locatarului la expirarea termenului sau în caz de neplată, fără somație prealabilă.</div>
+          <div class="art-title">ARTICOLUL 4. RĂSPUNDEREA PENTRU DAUNE PROVOCATE TERȚILOR</div>
+          <div class="paragraph">4.1. Locatarul este 100% solidar responsabil pentru orice distrugeri (inundații, incendii din culpă, vandalism) provocate vecinilor sau spațiilor comune, degrevând total Locatorul de orice acțiune în regres. Subînchirierea spațiului este strict interzisă fără acord scris.</div>
         `;
         break;
 
       case 'promisiune_vanzare_premium':
         titluOficial = "ANTECONTRACT / PROMISIUNE BILATERALĂ DE VÂNZARE-CUMPĂRARE IMOBIL";
-        temeiLegal = "Guvernat de Art. 1279 și Art. 1669 din Codul Civil român referitoare la promisiunea de a contracta și executarea silită a obligațiilor corelative.";
+        temeiLegal = "Guvernat de normele cuprinse în Art. 1669 și Art. 1279 din Codul Civil român (promisiunea de a contracta și executarea silită a obligațiilor corelative), cu aplicarea strictă a regimului juridic penalizator al arvunei confirmatorii.";
         articoleSpecificeHtml = `
-          <div class="art-title">ARTICOLUL 3. ARVUNĂ CONFIRMATORIE</div>
-          <div class="paragraph">3.1. În caz de reziliere din culpa sau răzgândirea Promitentului Cumpărător, sumele predate cu titlu de avans vor fi reținute integral de către Vânzător. În caz de renunțare din partea Promitentului Vânzător, acesta este obligat de drept la restituirea dublului sumei încasate.</div>
+          <div class="art-title">ARTICOLUL 3. EXECUTARE ARVUNĂ CONFIRMATORIE</div>
+          <div class="paragraph">3.1. În temeiul Art. 1544 Cod Civil, în caz de reziliere din culpa sau răzgândirea Promitentului Cumpărător, sumele predate cu titlu de avans vor fi reținute integral de către Vânzător. În caz de renunțare din culpa Promitentului Vânzător, acesta este obligat de drept la restituirea dublului sumei încasate.</div>
+          <div class="art-title">ARTICOLUL 4. RISCUL PIEIRII BUNULUI ȘI REZOLUȚIUNEA DE DREPT</div>
+          <div class="paragraph">4.1. Până la semnarea formei autentice notariale, riscul pieirii fortuite a imobilului rămâne în sarcina Promitentului-Vânzător. Împlinirea termenului extinctiv fără perfectarea contractului de vânzare determină desființarea de drept a promisiunii prin efectul pactului comisoriu.</div>
         `;
         break;
 
@@ -113,8 +120,8 @@ export async function POST(request) {
         titluOficial = "CONTRACT COMERCIAL DE MANAGEMENT ȘI CONSULTANȚĂ B2B";
         temeiLegal = "Încheiat în baza dispozițiilor Codului Civil român și a Legii 31/1990 privind libertatea contractuală și contractele de prestări servicii executive.";
         articoleSpecificeHtml = `
-          <div class="art-title">ARTICOLUL 3. INDICATORI KEY DE PERFORMANȚĂ (KPI)</div>
-          <div class="paragraph">3.1. Managerul se obligă la monitorizarea activității operaționale și atingerea obiectivelor specifice de profitabilitate industrială, orice bonusare fiind condiționată de acești indicatori.</div>
+          <div class="art-title">ARTICOLUL 3. INDICATORI KEY DE PERFORMANȚĂ (KPI) ȘI NON-SOLICITARE</div>
+          <div class="paragraph">3.1. Managerul se obligă la monitorizarea activității operaționale și atingerea obiectivelor specifice de profitabilitate industrială. Beneficiarul se obligă ferm să nu recruteze personalul Consultantului pe o perioadă de 24 de luni.</div>
         `;
         break;
 
@@ -260,8 +267,8 @@ export async function POST(request) {
         ${articoleSpecificeHtml}
 
         <div class="capitol-title">CAPITOLUL IV. FORȚĂ MAJORĂ ȘI LITIGII COMERCIALE</div>
-        <div class="paragraph"><strong>ARTICOLUL X:</strong> Forța majoră exonerează de răspundere partea care o invocă conform legislației române, cu obligația transmiterii unei notificări scrise în termen de maximum 5 zile de la apariția evenimentului fortuit.</div>
-        <div class="paragraph"><strong>ARTICOLUL Y:</strong> Orice diferend comercial decurgând din interpretarea prezentului contract se va soluționa pe cale amiabilă. În caz contrar, competența teritorială de judecată revine instanțelor de drept comun competente.</div>
+        <div class="paragraph"><strong>ARTICOLUL X:</strong> Forța majoră exonerează de răspundere partea care o invocă conform legislației române, cu obligația transmiterii unei notificări scrise în termen de maximum 5 zile de la apariția evenimentului fortuit. Restricțiile administrative (ANAF/ONRC) se asimilează forței majore.</div>
+        <div class="paragraph"><strong>ARTICOLUL Y:</strong> Orice diferend comercial decurgând din interpretarea prezentului contract se va soluționa pe cale amiabilă. În caz contrar, competența teritorială de judecată revine exclusiv instanțelor de drept comun de la sediul Prestatorului.</div>
 
         <div class="signature-layout">
           <div class="signature-column">SEMNĂTURĂ PRIMA PARTE<br><br><br><span style="font-size:10px; font-weight:normal; color:#94a3b8;">[L.S. / Ștampilă Manuală / Olograf]</span></div>

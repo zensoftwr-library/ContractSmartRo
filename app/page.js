@@ -91,8 +91,20 @@ const nomenclatorClauze = {
   ]
 };
 
+// LINK-URI GUMROAD DINAMICE
+const gumroadLinks = {
+  founder: 'https://zensoftware.gumroad.com/l/founder-lifetime',
+  pro: 'https://zensoftware.gumroad.com/l/abonament-pro',
+  contract_auto: 'https://zensoftware.gumroad.com/l/pachet-acte-auto',
+  qr_vcard: 'https://zensoftware.gumroad.com/l/qr-vcard-pro',
+  qr_branding: 'https://zensoftware.gumroad.com/l/qr-branding',
+  qr_dynamic: 'https://zensoftware.gumroad.com/l/qr-dinamic',
+  sablon_tipizat: 'https://zensoftware.gumroad.com/l/sablon-tipizat-legal',
+  one_time_contract: 'https://zensoftware.gumroad.com/l/contract-b2b'
+};
+
 export default function Home() {
-  const [loading, setLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState(null);
   const [step, setStep] = useState(1);
   const [autoStep, setAutoStep] = useState('upload');
   const [hydrated, setHydrated] = useState(false);
@@ -221,7 +233,6 @@ export default function Home() {
   const [widgetLoading, setWidgetLoading] = useState(false);
 
   const [anafCui, setAnafCui] = useState('');
-  const [isAiOpen, setIsAiOpen] = useState(false);
 
   const [fiscal, setFiscal] = useState({
     venitLunar: 45000,
@@ -248,13 +259,12 @@ export default function Home() {
   const [isUploading, setIsUploading] = useState(false);
 
   const [scrollPercent, setScrollPercent] = useState(0);
+
+  // Semnătura Upgrade
+  const [signatureTab, setSignatureTab] = useState('draw'); // 'draw' | 'upload'
   const [isDrawing, setIsDrawing] = useState(false);
-
-  const [aiChatMessages, setAiChatMessages] = useState([]);
-  const [aiInputMessage, setAiInputMessage] = useState('');
-  const [aiLoading, setAiLoading] = useState(false);
-
   const canvasRef = useRef(null);
+  const [uploadedSignature, setUploadedSignature] = useState(null);
 
   const [autoData, setAutoData] = useState({
     vanzatorTip: 'PF', 
@@ -388,6 +398,7 @@ export default function Home() {
   }, []);
 
   const pornesteDesenul = (e) => {
+    if (signatureTab !== 'draw') return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -402,7 +413,7 @@ export default function Home() {
   };
 
   const deseneaza = (e) => {
-    if (!isDrawing) return;
+    if (!isDrawing || signatureTab !== 'draw') return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     const rect = canvas.getBoundingClientRect();
@@ -412,16 +423,34 @@ export default function Home() {
 
     ctx.lineTo(clientX - rect.left, clientY - rect.top);
     ctx.strokeStyle = '#000000';
-    ctx.lineWidth = 2.5;
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
     ctx.stroke();
   };
 
   const opresteDesenul = () => setIsDrawing(false);
+  
   const curataCanvas = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (signatureTab === 'draw') {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    } else {
+      setUploadedSignature(null);
+    }
+  };
+
+  const handleIncarcareSemnatura = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setUploadedSignature(event.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleInapoiPrincipal = () => {
@@ -537,58 +566,34 @@ export default function Home() {
     incarcaStiriSecurizat();
   }, []);
 
-  const handleQuickAnafFormSubmit = async (e) => {
-    e.preventDefault();
-    const cuiCurat = anafCui.replace(/[^0-9]/g, '');
-    if (!cuiCurat) return alert('Introdu un CUI valid format doar din cifre.');
-    
-    setWidgetLoading(true);
-    try {
-      const res = await fetch('/api/company-info', { 
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cui: cuiCurat, userId: user?.id }) 
-      });
-      const data = await res.json();
-      if (data.success) {
-        setWidgetCompany({
-          ...data,
-          necesita_plata: !data.detalii_premium
-        });
-      } else {
-        alert(data.message || "CUI invalid sau inexistent.");
-        setWidgetCompany(null);
-      }
-    } catch {
-      alert('Eroare la procesarea interogării.');
-    } finally {
-      setWidgetLoading(false);
-    }
-  };
-
   const handleCumparaPremium = async (tipProdus = 'founder') => {
     if (isProcessingForm.current) return;
-    isProcessingForm.current = true;
-    setLoading(true);
-    try {
-      const res = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userEmail: user?.email || 'client@contractsmart.ro', tipProdus, userId: user?.id || null })
-      });
-      const data = await res.json();
-      
-      if (data.success && data.redirectUrl) {
-        window.location.href = data.redirectUrl;
-      } else {
-        alert(data.message || 'Eroare la inițierea plății LemonSqueezy. Asigură-te că ai setat cheile API în backend.');
-      }
-    } catch (e) {
-      alert('A apărut o problemă de conexiune cu procesatorul de plăți.');
-    } finally {
-      isProcessingForm.current = false;
-      setLoading(false);
+    
+    if (!user) {
+      alert('Trebuie să fii autentificat pentru a putea plasa comenzi și a atașa produsele contului tău.');
+      setIsSignUp(false);
+      setAuthEmail('');
+      setAuthPassword('');
+      setAuthConfirmPassword('');
+      setShowAuthModal(true);
+      return;
     }
+
+    isProcessingForm.current = true;
+    setLoadingText({ title: "SE INIȚIAZĂ PLATA...", desc: "Redirecționare către procesatorul securizat Gumroad." });
+    
+    setTimeout(() => {
+      const destinatie = gumroadLinks[tipProdus];
+      if (destinatie) {
+        const urlObj = new URL(destinatie);
+        urlObj.searchParams.set('user_id', user.id); 
+        window.location.href = urlObj.toString();
+      } else {
+        alert("Eroare: Produsul nu a fost găsit în catalog.");
+        setLoadingText(null);
+      }
+      isProcessingForm.current = false;
+    }, 1200);
   };
 
   const handleCheckout = (tipProdus) => {
@@ -677,11 +682,13 @@ export default function Home() {
     }
 
     isProcessingForm.current = true;
-    setLoading(true);
+    setLoadingText({ title: "SECURIZARE CONTRACT...", desc: "Redactăm articolele din Codul Civil și pregătim PDF-ul." });
 
     let imagineSemnaturaText = '';
-    if (canvasRef.current) {
+    if (signatureTab === 'draw' && canvasRef.current) {
       imagineSemnaturaText = canvasRef.current.toDataURL('image/png');
+    } else if (signatureTab === 'upload' && uploadedSignature) {
+      imagineSemnaturaText = uploadedSignature;
     }
 
     try {
@@ -715,7 +722,7 @@ export default function Home() {
       alert('Eroare de comunicare rețea cu serverele de producție.');
     } finally {
       isProcessingForm.current = false;
-      setLoading(false);
+      setLoadingText(null);
     }
   };
 
@@ -809,7 +816,7 @@ export default function Home() {
     }
     
     isProcessingForm.current = true;
-    setLoading(true);
+    setLoadingText({ title: "COMPILARE DOSAR AUTO...", desc: "Generăm cele 5 exemplare DITL și fișa de înmatriculare." });
 
     try {
       const binarFormData = new FormData();
@@ -863,33 +870,7 @@ export default function Home() {
       alert('Eroare de rețea la descărcarea pachetului auto.');
     } finally {
       isProcessingForm.current = false;
-      setLoading(false);
-    }
-  };
-
-  const handleSendAiMessage = async (e) => {
-    e.preventDefault();
-    if (!aiInputMessage.trim()) return;
-    const userMsg = { role: 'user', content: aiInputMessage };
-    setAiChatMessages(prev => [...prev, userMsg]);
-    setAiInputMessage('');
-    setAiLoading(true);
-    try {
-      const res = await fetch('/api/consilier-ai', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMsg.content, history: aiChatMessages, userId: user?.id || null })
-      });
-      const data = await res.json();
-      if (data.success) {
-        setAiChatMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
-      } else {
-        alert(data.message || 'Eroare de la Asistentul AI.');
-      }
-    } catch {
-      alert('Eroare de conexiune cu Asistentul Virtual.');
-    } finally {
-      setAiLoading(false);
+      setLoadingText(null);
     }
   };
 
@@ -929,7 +910,7 @@ export default function Home() {
     }
 
     isProcessingForm.current = true;
-    setLoading(true); 
+    setLoadingText({ title: "AUTENTIFICARE", desc: "Se securizează token-urile de sesiune." }); 
     try {
       if (isSignUp) {
         const { data, error } = await supabase.auth.signUp({ email: authEmail, password: authPassword });
@@ -967,7 +948,7 @@ export default function Home() {
       alert(err.message || "Eroare la autentificare. Verificați datele introduse.");
     } finally {
       isProcessingForm.current = false;
-      setLoading(false);
+      setLoadingText(null);
     }
   };
 
@@ -1080,8 +1061,8 @@ export default function Home() {
 
       <div className="relative z-10">
         
-        {/* OVERLAY ELEGANT DE LOADING */}
-        {loading && (
+        {/* OVERLAY ELEGANT DE LOADING DINAMIC */}
+        {loadingText && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#0B0F12]/80 backdrop-blur-md animate-fadeIn">
             <div className="flex flex-col items-center bg-[#12181D] p-8 rounded-2xl border border-slate-800 shadow-2xl">
               <div className="relative w-16 h-16 mb-6 flex items-center justify-center">
@@ -1089,8 +1070,8 @@ export default function Home() {
                 <div className="absolute w-10 h-10 rounded-full border-4 border-l-[#8ba888]/80 border-r-[#8ba888]/20 border-t-transparent border-b-transparent animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.2s' }}></div>
                 <span className="text-xl">🔒</span>
               </div>
-              <h3 className="text-sm font-black text-white tracking-widest uppercase mb-2">Securizare în curs...</h3>
-              <p className="text-xs text-slate-400 text-center max-w-[250px]">Generăm documentul și aplicăm auditul criptografic. Te rugăm să aștepți.</p>
+              <h3 className="text-sm font-black text-white tracking-widest uppercase mb-2">{loadingText.title}</h3>
+              <p className="text-xs text-slate-400 text-center max-w-[250px]">{loadingText.desc}</p>
             </div>
           </div>
         )}
@@ -1118,8 +1099,8 @@ export default function Home() {
                     <input type="password" required placeholder="••••••••" value={authConfirmPassword} onChange={e => setAuthConfirmPassword(e.target.value)} className="w-full p-3 bg-[#0B0F12] border border-slate-700 rounded-md text-xs text-white outline-none focus:border-[#8ba888]" />
                   </div>
                 )}
-                <button type="submit" disabled={loading} className="w-full bg-[#8ba888] text-[#0B0F12] font-black py-3 rounded-md text-xs tracking-tight transition hover:opacity-90 mt-2">
-                  {loading ? 'Se procesează...' : isSignUp ? 'Confirmă Înregistrarea' : 'Conectare Securizată'}
+                <button type="submit" disabled={!!loadingText} className="w-full bg-[#8ba888] text-[#0B0F12] font-black py-3 rounded-md text-xs tracking-tight transition hover:opacity-90 mt-2">
+                  {loadingText ? 'Se procesează...' : isSignUp ? 'Confirmă Înregistrarea' : 'Conectare Securizată'}
                 </button>
               </form>
               <div className="text-center mt-5 pt-4 border-t border-slate-800/80">
@@ -1141,11 +1122,11 @@ export default function Home() {
               <div className="space-y-3">
                 <button onClick={() => { setShowPaymentModal(false); handleCumparaPremium('one_time_contract'); }} className="w-full bg-[#0B0F12] hover:bg-slate-900 border border-slate-700 text-white font-bold py-3 rounded-md text-sm transition flex justify-between items-center px-4">
                   <span>Cumpără 1 Contract Acum</span>
-                  <span className="text-[#8ba888]">19 RON</span>
+                  <span className="text-[#8ba888]">19 RON (~3.99 €)</span>
                 </button>
                 <button onClick={() => { setShowPaymentModal(false); handleCumparaPremium('pro'); }} className="w-full bg-[#8ba888] text-[#0B0F12] font-black py-3 rounded-md text-sm transition hover:opacity-90 flex justify-between items-center px-4 shadow-md shadow-[#8ba888]/10">
                   <span>Abonament Pro (Nelimitat)</span>
-                  <span>99 RON / lună</span>
+                  <span>99 RON (~19.99 €)</span>
                 </button>
               </div>
               <button onClick={() => { setShowPaymentModal(false); const el = document.getElementById('sectiune-preturi'); el?.scrollIntoView({ behavior: 'smooth' }); }} className="text-xs text-slate-500 hover:text-white mt-5 underline">Vezi toate beneficiile planurilor</button>
@@ -1660,7 +1641,6 @@ export default function Home() {
                       <input type="text" placeholder="Companie Client / Nume" autoComplete="new-password" value={formData.clientNume} onChange={e => setFormData({...formData, clientNume: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white" />
                     </div>
                     
-                    {/* UI REZOLVAT (Aliniere perfectă Email + Proces Verbal pe același rând) */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                       <input type="email" placeholder="Email Client" autoComplete="new-password" value={formData.clientEmail} onChange={e => setFormData({...formData, clientEmail: e.target.value})} className="w-full p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white focus:border-[#8ba888] outline-none" required />
                       
@@ -1733,9 +1713,71 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="bg-[#0B0F12] p-4 rounded border border-slate-800 space-y-2">
-                    <canvas ref={canvasRef} width={600} height={150} onTouchStart={pornesteDesenul} onTouchMove={deseneaza} onTouchEnd={opresteDesenul} onMouseDown={pornesteDesenul} onMouseMove={deseneaza} onMouseUp={opresteDesenul} onMouseLeave={opresteDesenul} className="w-full h-32 bg-white rounded border border-slate-700 cursor-crosshair block touch-none" />
-                    <button type="button" onClick={curataCanvas} className="text-[10px] text-red-400 hover:underline block text-right w-full">Șterge / Resemnează</button>
+                  {/* SISTEM AVANSAT DE SEMNĂTURI */}
+                  <div className="bg-[#0B0F12] p-5 rounded-lg border border-slate-800 space-y-4">
+                    <div className="flex justify-between items-center border-b border-slate-800 pb-2">
+                      <span className="text-xs font-bold text-slate-400 uppercase block tracking-wider">Aprobare și Semnare Document</span>
+                      <div className="flex gap-2 bg-[#12181D] p-1 rounded border border-slate-700">
+                        <button type="button" onClick={() => { setSignatureTab('draw'); curataCanvas(); }} className={`px-3 py-1 rounded text-[10px] font-bold transition-colors ${signatureTab === 'draw' ? 'bg-[#8ba888] text-black' : 'text-slate-400 hover:text-white'}`}>Desenează</button>
+                        <button type="button" onClick={() => { setSignatureTab('upload'); curataCanvas(); }} className={`px-3 py-1 rounded text-[10px] font-bold transition-colors ${signatureTab === 'upload' ? 'bg-[#8ba888] text-black' : 'text-slate-400 hover:text-white'}`}>Încarcă (PNG/JPG)</button>
+                      </div>
+                    </div>
+
+                    {signatureTab === 'draw' && (
+                      <div className="space-y-3 relative">
+                        <div className="relative border-2 border-dashed border-slate-700 rounded-lg bg-white overflow-hidden">
+                          {!isDrawing && !canvasRef.current?.toDataURL().length > 100 && (
+                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+                              <span className="text-black text-2xl font-black italic">Semnează aici</span>
+                            </div>
+                          )}
+                          <canvas 
+                            ref={canvasRef} 
+                            width={600} 
+                            height={160} 
+                            onTouchStart={pornesteDesenul} 
+                            onTouchMove={deseneaza} 
+                            onTouchEnd={opresteDesenul} 
+                            onMouseDown={pornesteDesenul} 
+                            onMouseMove={deseneaza} 
+                            onMouseUp={opresteDesenul} 
+                            onMouseLeave={opresteDesenul} 
+                            className="w-full h-40 cursor-crosshair block touch-none relative z-10" 
+                          />
+                        </div>
+                        <div className="flex justify-end">
+                          <button type="button" onClick={curataCanvas} className="text-[10px] font-bold text-red-400 hover:text-red-300 transition-colors uppercase tracking-wider flex items-center gap-1">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            Curăță / Resemnează
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {signatureTab === 'upload' && (
+                      <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-slate-700 rounded-lg bg-[#12181D]">
+                        {!uploadedSignature ? (
+                          <>
+                            <svg className="w-8 h-8 text-slate-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                            <label className="cursor-pointer bg-[#8ba888] text-black px-4 py-2 rounded text-xs font-bold hover:opacity-90 transition-opacity">
+                              Alege Imaginea (Fără fundal ideal)
+                              <input type="file" accept="image/png, image/jpeg" onChange={handleIncarcareSemnatura} className="hidden" />
+                            </label>
+                            <span className="text-[10px] text-slate-500 mt-3">Sistemul o va decupa și o va aplica direct în contract.</span>
+                          </>
+                        ) : (
+                          <div className="flex flex-col items-center w-full">
+                            <div className="bg-white p-4 rounded mb-4 w-full flex justify-center border border-slate-700">
+                              <img src={uploadedSignature} alt="Semnatura Incarcata" className="max-h-24 object-contain" />
+                            </div>
+                            <button type="button" onClick={() => setUploadedSignature(null)} className="text-[10px] font-bold text-red-400 hover:text-red-300 transition-colors uppercase tracking-wider flex items-center gap-1">
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                              Elimină Imaginea
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
@@ -1744,8 +1786,8 @@ export default function Home() {
 
                   <div className="flex justify-between items-center pt-6 border-t border-slate-800">
                     <button type="button" onClick={handleInapoiPrincipal} className="text-xs text-slate-400 underline">Înapoi</button>
-                    <button type="submit" disabled={loading} className="bg-[#8ba888] text-[#0B0F12] font-black px-8 py-4 rounded text-sm transition hover:opacity-90">
-                      {loading ? 'Se înregistrează...' : 'Descărcare PDF directă'}
+                    <button type="submit" disabled={!!loadingText} className="bg-[#8ba888] text-[#0B0F12] font-black px-8 py-4 rounded text-sm transition hover:opacity-90">
+                      {loadingText ? 'Se înregistrează...' : 'Descărcare PDF directă'}
                     </button>
                   </div>
                 </form>
@@ -1885,8 +1927,8 @@ export default function Home() {
                         )}
                         <div className="flex justify-between items-center pt-2">
                           <button type="button" onClick={handleInapoiPrincipal} className="text-xs text-slate-400 underline">Înapoi la panou</button>
-                          <button type="submit" disabled={isUploading || loading} className="bg-[#8ba888] text-black font-black px-6 py-2.5 rounded text-xs tracking-tight transition hover:opacity-90">
-                            {loading ? 'Se procesează...' : `Generează Pachet Securizat Auto .ZIP (${autoData.autoMoneda === 'EUR' ? `${Math.round(99 / cursBnr.eur)} EUR` : '99 RON'})`}
+                          <button type="submit" disabled={isUploading || !!loadingText} className="bg-[#8ba888] text-black font-black px-6 py-2.5 rounded text-xs tracking-tight transition hover:opacity-90">
+                            {loadingText ? 'Se procesează...' : `Generează Pachet Securizat Auto .ZIP (${autoData.autoMoneda === 'EUR' ? `${Math.round(99 / cursBnr.eur)} EUR` : '19.99 €'})`}
                           </button>
                         </div>
                       </div>
@@ -1940,10 +1982,10 @@ export default function Home() {
               <div>
                 <span className="text-[10px] font-mono text-emerald-500 font-bold block uppercase">Plată Unică</span>
                 <h4 className="text-sm font-bold text-white mt-1">1x Contract B2B</h4>
-                <div className="text-lg font-black text-[#8ba888] mt-2 mb-1">19 RON</div>
+                <div className="text-lg font-black text-[#8ba888] mt-2 mb-1">19 RON <span className="text-[10px] text-slate-500 font-normal">(~3.99 €)</span></div>
                 <p className="text-[11px] text-slate-400 leading-relaxed mb-3">Plătești strict pe contractul de servicii descărcat.</p>
               </div>
-              <button type="button" onClick={() => handleCumparaPremium('one_time_contract')} className="w-full mt-4 bg-[#0B0F12] border border-slate-700 hover:bg-slate-900 text-white font-bold py-2 rounded text-xs transition">Cumpără 19 RON</button>
+              <button type="button" onClick={() => handleCumparaPremium('one_time_contract')} className="w-full mt-4 bg-[#0B0F12] border border-slate-700 hover:bg-slate-900 text-white font-bold py-2 rounded text-xs transition">Cumpără 3.99 €</button>
             </div>
 
             {/* Onetime Auto */}
@@ -1952,10 +1994,10 @@ export default function Home() {
               <div>
                 <span className="text-[10px] font-mono text-blue-400 font-bold block uppercase">Plată Unică</span>
                 <h4 className="text-sm font-bold text-white mt-1">Pachet Acte Auto</h4>
-                <div className="text-lg font-black text-white mt-2 mb-3">99 RON</div>
+                <div className="text-lg font-black text-white mt-2 mb-3">99 RON <span className="text-[10px] text-slate-500 font-normal">(~19.99 €)</span></div>
                 <p className="text-[11px] text-slate-300 leading-relaxed">Generare pachet complet vânzare auto (contracte, DITL, PV).</p>
               </div>
-              <button type="button" onClick={() => handleCumparaPremium('contract_auto')} className="w-full mt-4 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded text-xs transition">Cumpără 99 RON</button>
+              <button type="button" onClick={() => handleCumparaPremium('contract_auto')} className="w-full mt-4 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded text-xs transition">Cumpără 19.99 €</button>
             </div>
 
             {/* PRO */}
@@ -1964,7 +2006,7 @@ export default function Home() {
               <div>
                 <span className="text-[10px] font-mono text-[#8ba888] block uppercase">Abonament</span>
                 <h4 className="text-sm font-bold text-white mt-1">Abonament PRO</h4>
-                <div className="text-lg font-black text-white mt-2 mb-3">99 RON <span className="text-[10px] text-slate-500 font-normal">/ lună</span></div>
+                <div className="text-lg font-black text-white mt-2 mb-3">99 RON <span className="text-[10px] text-slate-500 font-normal">/ lună (~19.99 €)</span></div>
                 <p className="text-[11px] text-slate-300 leading-relaxed">Contracte B2B nelimitate + Mega-QR Studio (Smart, Geo, PDF, Landing).</p>
               </div>
               <button type="button" onClick={() => handleCumparaPremium('pro')} className="w-full mt-4 bg-[#8ba888] text-[#0B0F12] font-black py-2 rounded text-xs transition hover:opacity-90">Abonează-te</button>
@@ -1981,7 +2023,8 @@ export default function Home() {
                 <p className="text-xs text-slate-300 leading-relaxed mt-2 max-w-lg">Cumperi o singură dată și ai acces nelimitat pe viață la absolut toate funcțiile platformei curente și viitoare: contracte, pachet auto, module QR, hosting, totul.</p>
               </div>
               <div className="w-full sm:w-1/3 flex flex-col items-center sm:items-end mt-4 sm:mt-0">
-                <div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-500 mb-2">999 RON</div>
+                <div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-500 mb-1">999 RON</div>
+                <div className="text-xs text-slate-400 mb-3">(~199.99 €)</div>
                 <button type="button" onClick={() => handleCumparaPremium('founder')} className="bg-gradient-to-r from-amber-200 to-yellow-500 hover:opacity-90 text-black font-black py-3 px-8 rounded text-sm transition">Devino Fondator</button>
               </div>
             </div>
@@ -1997,124 +2040,66 @@ export default function Home() {
               <div>
                 <h4 className="text-sm font-bold text-white mt-1">Șablon Tipizat Legal</h4>
                 <p className="text-[10px] text-slate-400 mt-1">Contracte PDF gata redactate.</p>
-                <div className="text-lg font-black text-white mt-2 mb-3">49 RON</div>
+                <div className="text-lg font-black text-white mt-2 mb-3">49 RON <span className="text-[10px] text-slate-500 font-normal">(~9.99 €)</span></div>
               </div>
-              <Link href="/modele-contracte" className="w-full block text-center bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded text-xs hover:bg-slate-900">Vezi Șabloanele</Link>
+              <button onClick={() => handleCumparaPremium('sablon_tipizat')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded text-xs hover:bg-slate-900">Cumpără 9.99 €</button>
             </div>
 
             <div className="bg-[#12181D] border border-slate-800 rounded-lg p-4 flex flex-col justify-between">
               <div>
                 <h4 className="text-sm font-bold text-white mt-1">Pachet QR Branding</h4>
                 <p className="text-[10px] text-slate-400 mt-1">Adaugă logo-ul tău pe centru.</p>
-                <div className="text-lg font-black text-white mt-2 mb-3">49 RON</div>
+                <div className="text-lg font-black text-white mt-2 mb-3">49 RON <span className="text-[10px] text-slate-500 font-normal">(~9.99 €)</span></div>
               </div>
-              <button onClick={() => handleCumparaPremium('qr_branding')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded text-xs hover:bg-slate-900">Cumpără 49 RON</button>
+              <button onClick={() => handleCumparaPremium('qr_branding')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded text-xs hover:bg-slate-900">Cumpără 9.99 €</button>
             </div>
 
             <div className="bg-[#12181D] border border-slate-800 rounded-lg p-4 flex flex-col justify-between">
               <div>
                 <h4 className="text-sm font-bold text-white mt-1">Pachet QR Dynamic</h4>
                 <p className="text-[10px] text-slate-400 mt-1">Schimbă destinația + Găzduire PDF.</p>
-                <div className="text-lg font-black text-white mt-2 mb-3">39 RON</div>
+                <div className="text-lg font-black text-white mt-2 mb-3">39 RON <span className="text-[10px] text-slate-500 font-normal">(~7.99 €)</span></div>
               </div>
-              <button onClick={() => handleCumparaPremium('qr_dynamic')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded text-xs hover:bg-slate-900">Cumpără 39 RON</button>
+              <button onClick={() => handleCumparaPremium('qr_dynamic')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded text-xs hover:bg-slate-900">Cumpără 7.99 €</button>
             </div>
 
             <div className="bg-[#12181D] border border-slate-800 rounded-lg p-4 flex flex-col justify-between">
               <div>
                 <h4 className="text-sm font-bold text-white mt-1">Pachet QR vCard Pro</h4>
                 <p className="text-[10px] text-slate-400 mt-1">Carte de vizită cu salvare în agendă.</p>
-                <div className="text-lg font-black text-white mt-2 mb-3">69 RON</div>
+                <div className="text-lg font-black text-white mt-2 mb-3">69 RON <span className="text-[10px] text-slate-500 font-normal">(~13.99 €)</span></div>
               </div>
-              <button onClick={() => handleCumparaPremium('qr_vcard')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded text-xs hover:bg-slate-900">Cumpără 69 RON</button>
+              <button onClick={() => handleCumparaPremium('qr_vcard')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded text-xs hover:bg-slate-900">Cumpără 13.99 €</button>
             </div>
           </div>
         </div>
 
-        {/* ȘTIRI LIVE - GLOBALE */}
+        {/* ȘTIRI LIVE - GLOBALE CU THUMBNAILS UI/UX */}
         <div className="max-w-7xl mx-auto px-6 mt-12 mb-12">
           <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-4">Flux Monitorizare Mediativă Legală Real-Time</span>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {stiriLive.slice(0, 6).map((stire, i) => (
-              <div key={i} className="bg-[#12181D] border border-slate-800 rounded-lg p-5 flex flex-col justify-between hover:border-slate-700 transition">
-                <div>
-                  <span className="text-[10px] font-bold text-[#8ba888] bg-[#16221A] px-2 py-0.5 rounded border border-emerald-900/50 uppercase">{stire.sursa || "Presă Economică"}</span>
-                  <h3 className="text-sm font-bold text-white mt-3 leading-snug">{stire.titlu || stire.title}</h3>
-                </div>
-                <div className="mt-4 pt-3 border-t border-slate-800/60 flex justify-between items-center">
-                  <span className="text-[10px] text-slate-500">Actualizat Live</span>
-                  <a href={stire.link} target="_blank" rel="noreferrer" className="text-xs font-bold text-[#8ba888] hover:underline">Vezi mai mult</a>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* WIDGET CONSILIER AI */}
-        <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
-          {isAiOpen && (
-            <div className="bg-[#12181D] border border-slate-800 shadow-lg rounded-lg w-[320px] sm:w-[380px] h-[500px] mb-4 flex flex-col overflow-hidden animate-fadeIn">
-              <div className="bg-[#16221A] border-b border-[#8ba888]/20 p-4 flex justify-between items-center">
-                <div>
-                  <h3 className="text-white font-bold text-sm">Consilier Smart AI</h3>
-                  <span className="text-[10px] text-[#8ba888]">Asistent Juridic & Comercial</span>
-                </div>
-                <button onClick={() => setIsAiOpen(false)} className="text-slate-400 hover:text-white text-lg">✕</button>
-              </div>
-              
-              <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#0B0F12]">
-                {aiChatMessages.length === 0 ? (
-                  <div className="text-center text-slate-500 text-xs mt-10">
-                    <span className="text-3xl block mb-2">⚖️</span>
-                    Salut! Te pot ajuta cu redactarea clauzelor, explicații din Codul Civil sau proceduri auto. Cu ce începem?
+              <a href={stire.link} target="_blank" rel="noreferrer" key={i} className="group flex flex-col bg-[#12181D] border border-slate-800 rounded-lg overflow-hidden hover:border-[#8ba888]/50 hover:shadow-[0_0_15px_rgba(139,168,136,0.1)] transition-all h-full">
+                {stire.imagine ? (
+                  <div className="w-full h-32 overflow-hidden border-b border-slate-800">
+                    <img src={stire.imagine} alt="News thumbnail" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   </div>
                 ) : (
-                  aiChatMessages.map((msg, idx) => (
-                    <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-[85%] p-3 text-xs shadow-md ${
-                        msg.role === 'user' 
-                          ? 'bg-[#8ba888] text-[#0B0F12] rounded-lg rounded-tr-sm' 
-                          : 'bg-[#12181D] border border-slate-800 text-slate-300 rounded-lg rounded-tl-sm'
-                      }`}>
-                        {msg.content}
-                      </div>
-                    </div>
-                  ))
+                  <div className="w-full h-2 bg-[#16221A]"></div>
                 )}
-                {aiLoading && (
-                  <div className="flex justify-start">
-                    <div className="bg-[#12181D] border border-slate-800 text-slate-400 p-3 rounded text-xs flex gap-1 items-center">
-                      <div className="w-1.5 h-1.5 bg-slate-500 rounded-full animate-bounce"></div>
-                      <div className="w-1.5 h-1.5 bg-slate-500 rounded-full animate-bounce delay-75"></div>
-                      <div className="w-1.5 h-1.5 bg-slate-500 rounded-full animate-bounce delay-150"></div>
-                    </div>
+                <div className="p-5 flex flex-col justify-between flex-1">
+                  <div>
+                    <span className="text-[10px] font-bold text-[#8ba888] bg-[#16221A] px-2 py-0.5 rounded border border-emerald-900/50 uppercase inline-block mb-3">{stire.sursa || "Presă Economică"}</span>
+                    <h3 className="text-sm font-bold text-white leading-snug group-hover:text-[#8ba888] transition-colors">{stire.titlu || stire.title}</h3>
                   </div>
-                )}
-              </div>
-
-              <div className="p-3 bg-[#12181D] border-t border-slate-800">
-                <form onSubmit={handleSendAiMessage} className="flex gap-2">
-                  <input
-                    type="text"
-                    value={aiInputMessage}
-                    onChange={(e) => setAiInputMessage(e.target.value)}
-                    placeholder="Scrie o întrebare..."
-                    className="flex-1 bg-[#0B0F12] border border-slate-700 rounded px-3 py-2 text-xs text-white outline-none focus:border-[#8ba888]"
-                  />
-                  <button type="submit" disabled={aiLoading || !aiInputMessage.trim()} className="bg-[#8ba888] text-black px-3 py-2 rounded font-bold disabled:opacity-50 hover:opacity-90">
-                    ➤
-                  </button>
-                </form>
-              </div>
-            </div>
-          )}
-          
-          <button 
-            onClick={() => setIsAiOpen(!isAiOpen)} 
-            className="w-14 h-14 bg-[#8ba888] rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-transform border-4 border-[#0B0F12]"
-          >
-            <span className="text-2xl">{isAiOpen ? '✕' : '💬'}</span>
-          </button>
+                  <div className="mt-4 pt-3 border-t border-slate-800/60 flex justify-between items-center">
+                    <span className="text-[10px] text-slate-500">Actualizat Live</span>
+                    <span className="text-xs font-bold text-[#8ba888] group-hover:underline">Citește mai mult &rarr;</span>
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
         </div>
 
         {/* FOOTER GENERAL CENTRAT */}

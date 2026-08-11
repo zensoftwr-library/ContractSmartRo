@@ -1,5 +1,6 @@
 import './globals.css';
 import CookieConsent from './components/CookieConsent';
+import GlobalAIAssistant from './components/GlobalAIAssistant';
 
 export const metadata = {
   title: 'ContractSmart Premium - Contracte Digitale Securizate',
@@ -16,6 +17,7 @@ export default function RootLayout({ children }) {
         {children}
         
         <CookieConsent />
+        <GlobalAIAssistant />
       </body>
     </html>
   );

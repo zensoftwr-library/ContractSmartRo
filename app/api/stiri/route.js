@@ -5,7 +5,12 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const parser = new Parser();
+    // Adăugăm câmpuri extra (media:content, enclosure, content:encoded) pentru extragere poze
+    const parser = new Parser({
+      customFields: {
+        item: ['media:content', 'enclosure', 'content:encoded', 'description']
+      }
+    });
     
     // Definirea surselor multiple pe domenii diferite
     const fluxuri = [
@@ -21,11 +26,29 @@ export async function GET() {
         
         if (feed && feed.items) {
           // Luăm primele 2 știri din fiecare sursă
-          return feed.items.slice(0, 2).map(item => ({
-            sursa: f.sursa,
-            titlu: item.title,
-            link: item.link
-          }));
+          return feed.items.slice(0, 2).map(item => {
+            let imagineReala = null;
+
+            // 1. Verificare <enclosure>
+            if (item.enclosure && item.enclosure.url) {
+              imagineReala = item.enclosure.url;
+            } 
+            // 2. Extragere regex din content sau description (src="...")
+            else {
+              const htmlContent = item['content:encoded'] || item.content || item.description || '';
+              const imgMatch = htmlContent.match(/<img[^>]+src="([^">]+)"/i);
+              if (imgMatch && imgMatch[1]) {
+                imagineReala = imgMatch[1];
+              }
+            }
+
+            return {
+              sursa: f.sursa,
+              titlu: item.title,
+              link: item.link,
+              imagine: imagineReala
+            };
+          });
         }
         return [];
       } catch (err) {
