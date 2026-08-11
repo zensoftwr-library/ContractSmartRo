@@ -1021,9 +1021,11 @@ export default function Home() {
                   <span className="text-[10px] uppercase font-bold bg-[#16221A] text-[#8ba888] px-2 py-0.5 rounded border border-emerald-900/40">
                     {user.status}
                   </span>
-                  <span className="text-[10px] uppercase font-bold bg-amber-900/20 text-amber-500 px-2 py-0.5 rounded border border-amber-900/50">
-                    {user.credits} CREDITE
-                  </span>
+                  {!isPremium && (
+                    <span className="text-[10px] uppercase font-bold bg-amber-900/20 text-amber-500 px-2 py-0.5 rounded border border-amber-900/50">
+                      {user.credits} CREDITE
+                    </span>
+                  )}
                 </span>
                 <button type="button" onClick={handleLogout} className="text-slate-300 hover:text-white font-bold hover:underline">Ieșire</button>
                 <span className="text-slate-800">|</span>
