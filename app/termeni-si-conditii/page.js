@@ -59,7 +59,7 @@ export default function TermeniSiConditii() {
           <section>
             <h2 className="text-xl font-bold text-white mb-3">3. Plăți, Abonamente și Facturare</h2>
             <p>
-              Plățile sunt procesate în siguranță prin intermediul partenerului nostru autorizat, <strong>LemonSqueezy</strong>. Oferim produse cu plată unică (Micro-tranzacții) și abonamente recurente (PRO, Enterprise). Abonamentele se reînnoiesc automat până la anularea explicită din contul utilizatorului. Licența "Membru Fondator" oferă acces pe durata de viață a platformei.
+              Plățile sunt procesate exclusiv prin <strong>Gumroad</strong> (Merchant of Record), care gestionează facturarea și TVA-ul. Oferim produse cu plată unică (Micro-tranzacții) și abonamente recurente (PRO, Enterprise). Abonamentele se reînnoiesc automat până la anularea explicită din contul utilizatorului. Licența "Membru Fondator" oferă acces pe durata de viață a platformei.
             </p>
           </section>
 
