@@ -5,10 +5,10 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    // Adăugăm câmpuri extra (media:content, enclosure, content:encoded) pentru extragere poze
+    // Adăugăm TOATE posibilitățile de câmpuri media pentru extragere poze
     const parser = new Parser({
       customFields: {
-        item: ['media:content', 'enclosure', 'content:encoded', 'description']
+        item: ['media:content', 'media:thumbnail', 'enclosure', 'content:encoded', 'description']
       }
     });
     
@@ -29,17 +29,28 @@ export async function GET() {
           return feed.items.slice(0, 2).map(item => {
             let imagineReala = null;
 
-            // 1. Verificare <enclosure>
-            if (item.enclosure && item.enclosure.url) {
+            // 1. Verificare <media:thumbnail> sau <media:content>
+            if (item['media:thumbnail'] && item['media:thumbnail'].$) {
+              imagineReala = item['media:thumbnail'].$.url;
+            } else if (item['media:content'] && item['media:content'].$) {
+              imagineReala = item['media:content'].$.url;
+            }
+            // 2. Verificare <enclosure>
+            else if (item.enclosure && item.enclosure.url) {
               imagineReala = item.enclosure.url;
             } 
-            // 2. Extragere regex din content sau description (src="...")
+            // 3. Extragere regex din content sau description (src="...")
             else {
               const htmlContent = item['content:encoded'] || item.content || item.description || '';
               const imgMatch = htmlContent.match(/<img[^>]+src="([^">]+)"/i);
               if (imgMatch && imgMatch[1]) {
                 imagineReala = imgMatch[1];
               }
+            }
+
+            // 4. FALLBACK VIZUAL ELEGANT: Dacă știrea chiar nu are poză, punem una profi de business/legal
+            if (!imagineReala) {
+              imagineReala = 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80&w=600';
             }
 
             return {
