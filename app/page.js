@@ -1016,9 +1016,13 @@ export default function Home() {
               <button type="button" onClick={() => { setIsSignUp(false); setShowAuthModal(true); }} className="text-xs font-bold text-slate-300 hover:text-[#8ba888] transition">Autentificare / Cont Nou</button>
             ) : (
               <div className="flex items-center space-x-3 text-xs">
-                <span className="text-slate-400">Cont: <strong className="text-white font-mono font-normal">{user.email}</strong> 
-                  <span className="ml-1.5 text-[10px] uppercase font-bold bg-[#16221A] text-[#8ba888] px-2 py-0.5 rounded border border-emerald-900/40">
+                <span className="text-slate-400 flex items-center gap-2">
+                  <span>Cont: <strong className="text-white font-mono font-normal">{user.email}</strong></span>
+                  <span className="text-[10px] uppercase font-bold bg-[#16221A] text-[#8ba888] px-2 py-0.5 rounded border border-emerald-900/40">
                     {user.status}
+                  </span>
+                  <span className="text-[10px] uppercase font-bold bg-amber-900/20 text-amber-500 px-2 py-0.5 rounded border border-amber-900/50">
+                    {user.credits} CREDITE
                   </span>
                 </span>
                 <button type="button" onClick={handleLogout} className="text-slate-300 hover:text-white font-bold hover:underline">Ieșire</button>
