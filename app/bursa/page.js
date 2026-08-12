@@ -11,7 +11,6 @@ export default function BursaPage() {
     { name: 'MultiversX', symbol: 'EGLD', price: '$42.10', change: '+5.2%', up: true },
   ]);
 
-  // Transformare corectă în Array pentru a evita eroarea fatală .map() -> 502
   const [indiciBursa, setIndiciBursa] = useState([
     { name: 'BET (România)', symbol: '^BET', points: '17,420.50', change: '+1.24%', up: true },
     { name: 'S&P 500 (US)', symbol: '^GSPC', points: '5,310.12', change: '+0.68%', up: true },
@@ -40,13 +39,13 @@ export default function BursaPage() {
           });
         }
       }).catch(() => {});
-
-    // În producție aici poți chema /api/bursa pentru restul datelor
   }, []);
 
-  // Helper-funcții sigure pentru a trage datele în Ticker fără erori
-  const getIndexPoint = (sym) => indiciBursa.find(i => i.symbol === sym)?.points || '0.00';
-  const getIndexChange = (sym) => indiciBursa.find(i => i.symbol === sym)?.change || '0.00%';
+  // Helper pentru a extrage dinamic datele corecte pentru Ticker-ul de sus
+  const getIndexData = (sym) => indiciBursa.find(i => i.symbol === sym) || { points: '0', change: '0%' };
+  const betInfo = getIndexData('^BET');
+  const sp500Info = getIndexData('^GSPC');
+  const nasdaqInfo = getIndexData('^IXIC');
 
   return (
     <div className="min-h-screen bg-[#0B0F12] text-slate-200 font-sans pb-16 relative">
@@ -56,16 +55,16 @@ export default function BursaPage() {
         <div className="animate-marquee font-mono flex gap-12 items-center shrink-0 min-w-full justify-around pr-6">
           <span>📈 <strong>EUR/RON:</strong> {cursBnr.eur} lei</span>
           <span>🇺🇸 <strong>USD/RON:</strong> {cursBnr.usd} lei</span>
-          <span>📊 <strong>BET Index (BVB):</strong> {getIndexPoint('^BET')} ({getIndexChange('^BET')})</span>
-          <span>📊 <strong>S&P 500 (US):</strong> {getIndexPoint('^GSPC')} ({getIndexChange('^GSPC')})</span>
-          <span>📊 <strong>NASDAQ (US):</strong> {getIndexPoint('^IXIC')} ({getIndexChange('^IXIC')})</span>
+          <span>📊 <strong>BET Index (BVB):</strong> {betInfo.points} ({betInfo.change})</span>
+          <span>📊 <strong>S&P 500 (US):</strong> {sp500Info.points} ({sp500Info.change})</span>
+          <span>📊 <strong>NASDAQ (US):</strong> {nasdaqInfo.points} ({nasdaqInfo.change})</span>
         </div>
         <div className="animate-marquee font-mono flex gap-12 items-center shrink-0 min-w-full justify-around pr-6 select-none" aria-hidden="true">
           <span>📈 <strong>EUR/RON:</strong> {cursBnr.eur} lei</span>
           <span>🇺🇸 <strong>USD/RON:</strong> {cursBnr.usd} lei</span>
-          <span>📊 <strong>BET Index (BVB):</strong> {getIndexPoint('^BET')} ({getIndexChange('^BET')})</span>
-          <span>📊 <strong>S&P 500 (US):</strong> {getIndexPoint('^GSPC')} ({getIndexChange('^GSPC')})</span>
-          <span>📊 <strong>NASDAQ (US):</strong> {getIndexPoint('^IXIC')} ({getIndexChange('^IXIC')})</span>
+          <span>📊 <strong>BET Index (BVB):</strong> {betInfo.points} ({betInfo.change})</span>
+          <span>📊 <strong>S&P 500 (US):</strong> {sp500Info.points} ({sp500Info.change})</span>
+          <span>📊 <strong>NASDAQ (US):</strong> {nasdaqInfo.points} ({nasdaqInfo.change})</span>
         </div>
       </div>
 
