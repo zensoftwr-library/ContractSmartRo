@@ -1361,57 +1361,84 @@ export default function Home() {
             {/* BAND LAYOUT: CALCULATOR FISCAL + QR CODE STUDIO SLIM FULL-WIDTH */}
             <div className="max-w-7xl mx-auto px-6 mt-6 flex flex-col gap-6">
               
-              {/* BAND 1: CALCULATOR FISCAL */}
-              <div className="bg-[#12181D] p-5 rounded-xl border border-slate-800 shadow-lg flex flex-col xl:flex-row justify-between items-center gap-6">
-                <div className="flex items-center gap-3 shrink-0 self-start xl:self-center">
-                  <span className="text-3xl">🧮</span>
-                  <div>
-                    <h4 className="text-white font-bold text-sm">Calculator Fiscal 2026</h4>
-                    <p className="text-[11px] text-slate-400">Plafoane CASS & Impozit</p>
-                  </div>
-                </div>
-                
-                <div className="flex-1 flex flex-col md:flex-row gap-4 w-full">
-                  <div className="flex-1 flex flex-col justify-center">
-                    <div className="flex justify-between items-center mb-1">
-                      <label className="text-slate-400 text-[10px] font-bold uppercase">Valoare Factură / Venit</label>
-                      <span className="text-[#8ba888] font-mono text-[11px]">{fiscal.venitLunar} RON</span>
+              {/* BAND 1: CALCULATOR FISCAL COMPLET RESTAURAT (FULL WIDTH) */}
+              <div className="bg-[#12181D] p-5 rounded-xl border border-slate-800 shadow-lg flex flex-col gap-4">
+                {/* Controale */}
+                <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6 border-b border-slate-800/80 pb-4">
+                  <div className="flex items-center gap-3 shrink-0">
+                    <span className="text-3xl"></span>
+                    <div>
+                      <h4 className="text-white font-bold text-sm">Calculator Fiscal 2026</h4>
+                      <p className="text-[11px] text-slate-400">Plafoane CASS & Impozit</p>
                     </div>
-                    <input 
-                      type="range" 
-                      min="0" 
-                      max="50000" 
-                      step="1" 
-                      value={fiscal.venitLunar} 
-                      onChange={e => setFiscal({...fiscal, venitLunar: Number(e.target.value)})} 
-                      className="w-full h-1.5 bg-slate-800 rounded appearance-none cursor-pointer accent-[#8ba888]" 
-                    />
                   </div>
                   
-                  <div className="flex-1">
-                    <label className="text-slate-400 text-[10px] font-bold uppercase mb-1 block">Formă Juridică</label>
-                    <select value={fiscal.formaJuridica} onChange={e => setFiscal({...fiscal, formaJuridica: e.target.value})} className="w-full bg-[#0B0F12] border border-slate-700 rounded py-1.5 px-2 text-white outline-none text-xs appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1em_1em] bg-[right_0.5rem_center] bg-no-repeat pr-8">
-                      <option value="SRL">SRL (Microîntreprindere)</option>
-                      <option value="PFA_SISTEM_REAL">PFA (Sistem Real)</option>
-                    </select>
-                  </div>
-                  
-                  {fiscal.formaJuridica !== 'PFA_SISTEM_REAL' && (
-                    <div className="flex-1 flex gap-2">
-                      <label className="flex-1 flex items-center justify-center bg-[#0B0F12] rounded border border-slate-800 cursor-pointer text-[10px] text-white">
-                        <input type="checkbox" checked={fiscal.areAngajati} onChange={e => setFiscal({...fiscal, areAngajati: e.target.checked})} className="mr-1.5 accent-[#8ba888]" /> Angajați
-                      </label>
-                      <label className="flex-1 flex items-center justify-center bg-[#0B0F12] rounded border border-slate-800/60 cursor-pointer text-[10px] text-white">
-                        <input type="checkbox" checked={fiscal.platitorTva} onChange={e => setFiscal({...fiscal, platitorTva: e.target.checked})} className="mr-1.5 accent-[#8ba888]" /> TVA
-                      </label>
+                  <div className="flex-1 flex flex-col md:flex-row gap-4 w-full">
+                    <div className="flex-1 flex flex-col justify-center">
+                      <div className="flex justify-between items-center mb-1">
+                        <label className="text-slate-400 text-[10px] font-bold uppercase">Valoare Factură / Venit</label>
+                        <span className="text-[#8ba888] font-mono text-[11px]">{fiscal.venitLunar} RON</span>
+                      </div>
+                      <input 
+                        type="range" 
+                        min="0" 
+                        max="50000" 
+                        step="1" 
+                        value={fiscal.venitLunar} 
+                        onChange={e => setFiscal({...fiscal, venitLunar: Number(e.target.value)})} 
+                        className="w-full h-1.5 bg-slate-800 rounded appearance-none cursor-pointer accent-[#8ba888]" 
+                      />
                     </div>
-                  )}
+                    
+                    <div className="flex-1">
+                      <label className="text-slate-400 text-[10px] font-bold uppercase mb-1 block">Formă Juridică</label>
+                      <select value={fiscal.formaJuridica} onChange={e => setFiscal({...fiscal, formaJuridica: e.target.value})} className="w-full bg-[#0B0F12] border border-slate-700 rounded py-1.5 px-2 text-white outline-none text-xs appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1em_1em] bg-[right_0.5rem_center] bg-no-repeat pr-8">
+                        <option value="SRL">SRL (Microîntreprindere)</option>
+                        <option value="PFA_SISTEM_REAL">PFA (Sistem Real)</option>
+                      </select>
+                    </div>
+                    
+                    {fiscal.formaJuridica !== 'PFA_SISTEM_REAL' && (
+                      <div className="flex-1 flex gap-2">
+                        <label className="flex-1 flex items-center justify-center bg-[#0B0F12] rounded border border-slate-800 cursor-pointer text-[10px] text-white">
+                          <input type="checkbox" checked={fiscal.areAngajati} onChange={e => setFiscal({...fiscal, areAngajati: e.target.checked})} className="mr-1.5 accent-[#8ba888]" /> Angajați
+                        </label>
+                        <label className="flex-1 flex items-center justify-center bg-[#0B0F12] rounded border border-slate-800/60 cursor-pointer text-[10px] text-white">
+                          <input type="checkbox" checked={fiscal.platitorTva} onChange={e => setFiscal({...fiscal, platitorTva: e.target.checked})} className="mr-1.5 accent-[#8ba888]" /> TVA
+                        </label>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="shrink-0 flex gap-4 w-full xl:w-auto">
-                  <div className="bg-[#0B0F12] border border-slate-800 rounded p-2.5 px-4 w-full flex xl:flex-col justify-between xl:justify-center items-center xl:items-end min-w-[180px]">
-                    <span className="text-[10px] text-slate-400 block mb-0.5">Dări Stat: <strong className="text-red-400 font-mono">{rezultateFiscale.taxeLunare} RON</strong></span>
-                    <span className="text-[11px] text-slate-300 block">Net / Lună: <strong className="text-[#8ba888] font-mono text-sm">{rezultateFiscale.netLunar} RON</strong></span>
+                {/* Rezultate Detaliate (Defalcare matematică) */}
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 font-mono text-[11px]">
+                  <div className="bg-[#0B0F12] p-2 rounded-md border border-slate-800/40 flex flex-col justify-center">
+                    <span className="text-slate-500 block">Impozit micro/venit:</span>
+                    <span className="text-slate-300 font-bold">{rezultateFiscale.defalcare.impozit} RON</span>
+                  </div>
+                  <div className="bg-[#0B0F12] p-2 rounded-md border border-slate-800/40 flex flex-col justify-center">
+                    <span className="text-slate-500 block">Contribuții (CAS/CASS):</span>
+                    <span className="text-slate-300 font-bold">{rezultateFiscale.defalcare.sociale} RON</span>
+                  </div>
+                  
+                  {fiscal.formaJuridica === 'SRL' ? (
+                    <div className="bg-[#0B0F12] p-2 rounded-md border border-slate-800/40 flex flex-col justify-center">
+                      <span className="text-slate-500 block">Impozit Dividende (10%):</span>
+                      <span className="text-slate-300 font-bold">{rezultateFiscale.defalcare.dividende} RON</span>
+                    </div>
+                  ) : <div className="hidden lg:block"></div>}
+                  
+                  {fiscal.platitorTva ? (
+                    <div className="bg-[#0B0F12] p-2 rounded-md border border-slate-800/40 flex flex-col justify-center">
+                      <span className="text-slate-500 block">TVA Colectat (21%):</span>
+                      <span className="text-slate-300 font-bold">{rezultateFiscale.tvaLunar} RON</span>
+                    </div>
+                  ) : <div className="hidden lg:block"></div>}
+
+                  <div className="bg-[#0B0F12] border border-[#8ba888]/30 p-2 rounded-md flex flex-col justify-center items-end text-right md:col-span-2 lg:col-span-1">
+                    <span className="text-slate-400 block">Dări Stat: <strong className="text-red-400">{rezultateFiscale.taxeLunare} RON</strong></span>
+                    <span className="text-slate-400 block">Net / Lună: <strong className="text-[#8ba888] text-sm">{rezultateFiscale.netLunar} RON</strong></span>
                   </div>
                 </div>
               </div>
@@ -1420,7 +1447,7 @@ export default function Home() {
               <div className="bg-[#0B0F12] border border-slate-800 rounded-xl p-5 sm:p-6 shadow-lg flex flex-col">
                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4 pb-4 border-b border-slate-800 gap-4">
                   <div className="flex items-center gap-3 shrink-0">
-                    <span className="text-3xl">⚡</span>
+                    <span className="text-3xl"></span>
                     <div>
                       <h3 className="text-sm font-bold text-white uppercase tracking-wider block">ContractSmart QR ProStudio</h3>
                       <p className="text-slate-400 text-[11px] mt-0.5">Generează URL, Crypto, Smart OS sau Landing QR.</p>
