@@ -1203,15 +1203,15 @@ export default function Home() {
         )}
       </nav>
 
-      {/* AMBIENT BLOBS */}
-      <div className="absolute inset-0 pointer-events-none z-0 overflow-clip">
+      {/* PREMIUM CINEMATIC LIGHT LEAKS (FROSTED AURORA) */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        {/* Emerald Glow - Sursă de lumină colț stânga-sus */}
         <div 
-          className="absolute w-[500px] h-[500px] rounded-full bg-[#8ba888]/10 blur-[120px] animate-blob-1" 
-          style={{ top: 'calc(10% + (var(--scroll-y) * 0.3))', left: '15%' }} 
+          className="absolute -top-[20%] -left-[10%] w-[70vw] h-[70vh] rounded-[100%] bg-[#8ba888] blur-[160px] animate-glow-1 mix-blend-screen" 
         />
+        {/* Slate Glow - Sursă de lumină colț dreapta-jos */}
         <div 
-          className="absolute w-[600px] h-[600px] rounded-full bg-slate-600/10 blur-[130px] animate-blob-2 mix-blend-screen" 
-          style={{ top: 'calc(50% - (var(--scroll-y) * 0.2))', right: '10%' }} 
+          className="absolute -bottom-[20%] -right-[10%] w-[70vw] h-[70vh] rounded-[100%] bg-slate-500 blur-[180px] animate-glow-2 mix-blend-screen" 
         />
       </div>
 
