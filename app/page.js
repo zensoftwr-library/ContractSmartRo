@@ -1126,7 +1126,7 @@ export default function Home() {
 
       {/* NAVBAR */}
       <nav className="sticky top-0 z-40 backdrop-blur-md bg-[#0B0F12]/90 border-b border-slate-800 py-4 px-6 shadow-md transition-all">
-        <div className="flex justify-between items-center max-w-7xl mx-auto">
+        <div className="flex justify-between items-center w-full">
           <div className="w-[180px] h-[30px] flex items-center cursor-pointer" onClick={handleInapoiPrincipal}>
             <svg viewBox="0 0 240 40" className="w-full h-full">
               <g transform="translate(0, 2)">
