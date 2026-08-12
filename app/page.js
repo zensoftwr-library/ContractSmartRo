@@ -227,6 +227,11 @@ export default function Home() {
     }
   };
 
+  const [indiciBursa, setIndiciBursa] = useState({
+    bet: { puncte: '17,420.50', procent: '+1.24%', vol: '45.2M', high: '17,450.00', low: '17,210.20', trend: [] },
+    sp500: { puncte: '5,310.12', procent: '+0.68%', vol: '2.1B', high: '5,325.50', low: '5,280.10', trend: [] },
+    nasdaq: { puncte: '18,650.45', procent: '-0.12%', vol: '1.8B', high: '18,720.00', low: '18,590.30', trend: [] }
+  });
   const [stiriLive, setStiriLive] = useState([]);
 
   const [user, setUser] = useState(null); 
@@ -242,6 +247,11 @@ export default function Home() {
   const [authPassword, setAuthPassword] = useState('');
   const [authConfirmPassword, setAuthConfirmPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
+
+  const [widgetCompany, setWidgetCompany] = useState(null);
+  const [widgetLoading, setWidgetLoading] = useState(false);
+
+  const [anafCui, setAnafCui] = useState('');
 
   const [fiscal, setFiscal] = useState({
     venitLunar: 45000,
@@ -630,6 +640,64 @@ export default function Home() {
     });
 
     return () => subscription?.unsubscribe?.();
+  }, []);
+
+  useEffect(() => {
+    const actualizeazaIndiciLive = async () => {
+      try {
+        const res = await fetch('/api/bursa');
+        if (!res.ok) return;
+        const data = await res.json();
+        const quotes = data?.quotes;
+
+        if (quotes && quotes.length > 0) {
+          const betQuote = quotes.find(q => q.symbol === '^BET') || quotes[0];
+          const sp500Quote = quotes.find(q => q.symbol === '^GSPC') || quotes[1];
+          const nasdaqQuote = quotes.find(q => q.symbol === '^IXIC') || quotes[2];
+
+          setIndiciBursa({
+            bet: {
+              puncte: betQuote?.regularMarketPrice?.toLocaleString('ro-RO') || '17,420.50',
+              procent: (betQuote?.regularMarketChangePercent >= 0 ? '+' : '') + (betQuote?.regularMarketChangePercent?.toFixed(2) || '0.00') + '%'
+            },
+            sp500: {
+              puncte: sp500Quote?.regularMarketPrice?.toLocaleString('ro-RO') || '5,310.12',
+              procent: (sp500Quote?.regularMarketChangePercent >= 0 ? '+' : '') + (sp500Quote?.regularMarketChangePercent?.toFixed(2) || '0.00') + '%'
+            },
+            nasdaq: {
+              puncte: nasdaqQuote?.regularMarketPrice?.toLocaleString('ro-RO') || '18,650.45',
+              procent: (nasdaqQuote?.regularMarketChangePercent >= 0 ? '+' : '') + (nasdaqQuote?.regularMarketChangePercent?.toFixed(2) || '0.00') + '%'
+            }
+          });
+        }
+      } catch (err) {}
+    };
+
+    actualizeazaIndiciLive();
+    const interval = setInterval(actualizeazaIndiciLive, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    fetch('https://open.er-api.com/v6/latest/EUR')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.rates) {
+          setCursBnr({
+            eur: data.rates.RON ? data.rates.RON.toFixed(4) : '4.9752',
+            usd: (data.rates.RON / data.rates.USD) ? (data.rates.RON / data.rates.USD).toFixed(4) : '4.5820'
+          });
+        }
+      }).catch(() => {});
+
+    const incarcaStiriSecurizat = async () => {
+      try {
+        const res = await fetch('/api/stiri');
+        const data = await res.json();
+        if (data?.success) setStiriLive(data.stiri);
+      } catch (e) {}
+    };
+    incarcaStiriSecurizat();
   }, []);
 
   const handleCumparaPremium = async (tipProdus = 'founder') => {
@@ -1039,6 +1107,7 @@ export default function Home() {
         '--scroll-y-reverse': `${(1 - scrollPercent) * 100}%`
       }}
     >
+      
       {/* NAVBAR */}
       <nav className="sticky top-0 z-40 backdrop-blur-md bg-[#0B0F12]/90 border-b border-slate-800 py-4 px-6 shadow-md transition-all">
         <div className="flex justify-between items-center w-full">
@@ -1065,6 +1134,8 @@ export default function Home() {
             <Link href="/modele-contracte" className="text-xs text-slate-400 hover:text-white transition">Modele Contracte Standard</Link>
             <span className="text-slate-800">|</span>
             <Link href="/baza-legala" className="text-xs text-slate-400 hover:text-white transition">Articole Validitate Juridică</Link>
+            <span className="text-slate-800">|</span>
+            <Link href="/termeni-si-conditii" className="text-xs text-slate-400 hover:text-white transition">Termeni și Condiții</Link>
             <span className="text-slate-800">|</span>
             <Link href="/contact" className="text-xs text-slate-400 hover:text-white transition">Contact</Link>
             <span className="text-slate-800">|</span>
@@ -1288,7 +1359,7 @@ export default function Home() {
               <div className="bg-[#12181D] rounded-2xl border border-slate-800/80 shadow-xl p-6 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center gap-3 mb-6 border-b border-slate-800/80 pb-4">
-                    <span className="text-3xl">🧮</span>
+                    <span className="text-3xl"></span>
                     <div>
                       <h4 className="text-[#8ba888] font-bold text-sm">CALCULATOR FISCAL 2026</h4>
                       <p className="text-[11px] text-slate-400">Plafoane CASS & Impozit</p>
@@ -1371,7 +1442,6 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* CARD 2: MEGA-QR CODE STUDIO */}
               <div className="bg-[#12181D] rounded-2xl border border-slate-800/80 shadow-xl flex flex-col">
                 {/* Header & Tabs */}
                 <div className="p-6 border-b border-slate-800/80 bg-[#0B0F12]/30 rounded-t-2xl">
@@ -1405,7 +1475,7 @@ export default function Home() {
                 </div>
 
                 {/* Main Content Area */}
-                <div className="p-6 flex flex-col lg:flex-row gap-6 h-auto lg:h-full">
+                <div className="p-6 flex flex-col sm:flex-row gap-6 h-auto lg:h-full">
                   {/* Left Form */}
                   <div className="flex-1 flex flex-col justify-between space-y-4 h-auto lg:h-full">
                     <div>
@@ -1480,11 +1550,11 @@ export default function Home() {
                           <div className="flex flex-col md:flex-row gap-4 items-center border-t border-purple-500/20 pt-4">
                             <div className="w-full md:w-1/2">
                               <label className="text-[10px] text-purple-400 uppercase font-bold block mb-1">A. Link URL Simplu</label>
-                              <input type="text" placeholder="https://site-ul-tau.ro/oferta" value={dynamicDestUrl} onChange={e => setDynamicDestUrl(e.target.value)} className="w-full bg-[#0B0F12] border border-purple-500/50 rounded-lg p-2 text-white text-xs outline-none" />
+                              <input type="text" placeholder="https://site-ul-tau.ro/oferta" value={dynamicDestUrl} onChange={e => setDynamicDestUrl(e.target.value)} className="w-full bg-[#0B0F12] border border-purple-500/50 rounded-lg p-2.5 text-white text-xs outline-none" />
                             </div>
                             <div className="w-full md:w-1/2">
                               <label className="text-[10px] text-purple-400 uppercase font-bold block mb-1">B. Sau Încărcare Meniu/PDF</label>
-                              <input type="file" accept="application/pdf" onChange={(e) => handleUploadGeneric(e, setUploadedPdfUrl, 'qr_pdfs', setIsUploadingPdf)} className="block w-full text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:bg-purple-600 file:text-white cursor-pointer" />
+                              <input type="file" accept="application/pdf" onChange={(e) => handleUploadGeneric(e, setUploadedPdfUrl, 'qr_pdfs', setIsUploadingPdf)} className="block w-full text-xs text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-purple-600 file:text-white cursor-pointer" />
                               {isUploadingPdf && <span className="text-[10px] text-purple-400 mt-1 block animate-pulse">Se încarcă PDF...</span>}
                               {uploadedPdfUrl && <span className="text-[10px] text-emerald-400 mt-1 block">✅ PDF Găzduit Securizat</span>}
                             </div>
@@ -1544,7 +1614,7 @@ export default function Home() {
                       )}
 
                       {qrType === 'landing' && (
-                        <div className="p-4 bg-blue-900/10 border border-blue-500/30 rounded-xl space-y-4 max-h-64 overflow-y-auto custom-scrollbar">
+                        <div className="p-4 bg-blue-900/10 border border-blue-500/30 rounded-xl space-y-4 max-h-56 overflow-y-auto custom-scrollbar">
                           <div>
                             <label className="text-[10px] text-blue-400 uppercase font-bold block mb-1">Mini Landing-Page Generator (Link-in-Bio)</label>
                             <p className="text-[10px] text-slate-400 leading-tight">Nu ai site web? Generăm noi o mini-pagină elegantă de prezentare unde poți pune multiple butoane pe care clienții o vor accesa la scanare.</p>
@@ -1560,7 +1630,7 @@ export default function Home() {
                                 <input type="url" placeholder="https://..." value={link.url} onChange={(e) => { const newLinks = [...landingData.links]; newLinks[idx].url = e.target.value; setLandingData({...landingData, links: newLinks}); }} className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-white text-[11px] outline-none" />
                               </div>
                             ))}
-                            <div className="flex justify-between items-center pt-2">
+                            <div className="flex justify-between items-center">
                               <button type="button" onClick={() => setLandingData({...landingData, links: [...landingData.links, { label: '', url: '' }]})} className="text-[10px] text-blue-400 font-bold underline block">+ Adaugă Link Extra</button>
                               {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
                                 <div className="hidden"><Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} /></div>
@@ -1578,7 +1648,7 @@ export default function Home() {
                         <label className="text-[10px] text-slate-400 font-bold uppercase shrink-0">Culoare</label>
                         <input type="color" value={qrColor} onChange={(e) => setQrColor(e.target.value)} className="w-7 h-7 rounded cursor-pointer shrink-0 bg-transparent border-0 p-0" />
                         <label className="text-[10px] text-slate-400 font-bold uppercase ml-2 shrink-0 border border-slate-700 p-2 rounded-lg bg-[#0B0F12] cursor-pointer hover:bg-slate-800 transition">
-                          <span className="flex items-center gap-1">🖼️ Încarcă Logo Centru</span>
+                          <span className="flex items-center gap-1">Incarca Logo Central</span>
                           <input type="file" accept="image/png, image/jpeg, image/svg+xml" onChange={handleQrLogoUpload} className="hidden" />
                         </label>
                         {qrLogo && <button type="button" onClick={() => { setQrLogo(null); setQrLogoRatio(1); }} className="text-[10px] text-red-400 font-bold hover:underline">Elimină ❌</button>}
@@ -1590,13 +1660,13 @@ export default function Home() {
                   </div>
 
                   {/* Right: QR Preview Area */}
-                  <div className="w-full lg:w-[240px] shrink-0 border border-slate-800 rounded-xl bg-[#0B0F12]/50 p-5 flex flex-col justify-center items-center h-auto">
+                  <div className="w-full sm:w-[220px] shrink-0 border border-slate-800 rounded-xl bg-[#0B0F12]/50 p-5 flex flex-col justify-center items-center h-auto">
                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-4 block">Live Preview</span>
-                    <div className="bg-white p-3 rounded-xl shadow-md relative flex justify-center items-center overflow-hidden mb-6">
+                    <div className="bg-white p-3 rounded-xl shadow-md relative flex justify-center items-center overflow-hidden mb-5">
                       <QRCodeCanvas 
                         id="contract-qr"
                         value={getQrValue()} 
-                        size={150} 
+                        size={140} 
                         level={"H"}
                         fgColor={qrColor}
                         bgColor="#FFFFFF"
@@ -1636,7 +1706,7 @@ export default function Home() {
                         Descarcă QR
                       </button>
                       {(['dynamic', 'smart', 'geo', 'landing'].includes(qrType) && (isPremium || profil?.has_qr_dynamic)) && (
-                        <button onClick={fetchStats} className="w-full py-2 border border-purple-500/50 text-purple-400 hover:bg-purple-500/10 font-bold rounded-lg transition-colors uppercase tracking-wide text-[10px]">
+                        <button onClick={fetchStats} className="w-full py-1.5 border border-purple-500/50 text-purple-400 hover:bg-purple-500/10 font-bold rounded-lg transition-colors uppercase tracking-wide text-[10px]">
                           📊 Statistici Scanări
                         </button>
                       )}
@@ -1792,8 +1862,8 @@ export default function Home() {
 
                     {/* QR PAY OPTION - NOU */}
                     <div className="pt-4 border-t border-slate-800 space-y-3">
-                      <span className="text-[10px] font-bold text-[#8ba888] uppercase block">Opțiuni Încasare & QR Pay</span>
-                      <label className="flex items-center p-3 bg-[#0B0F12] border border-slate-800 rounded-lg cursor-pointer transition hover:border-slate-700">
+                      <span className="text-xs font-bold text-[#8ba888] uppercase block">Opțiuni Încasare & QR Pay</span>
+                      <label className="flex items-center p-3 bg-[#0B0F12] border border-slate-800 rounded cursor-pointer transition hover:border-slate-700">
                         <input type="checkbox" checked={formData.adaugaQrPlata} onChange={e => setFormData({...formData, adaugaQrPlata: e.target.checked})} className="mr-3 accent-[#8ba888]" />
                         <span className="text-xs text-white font-bold">Atașează Cod QR de Plată pe Contract</span>
                       </label>
@@ -1803,7 +1873,7 @@ export default function Home() {
                           placeholder="Introdu Contul IBAN sau Link de Plată (Stripe/Revolut)" 
                           value={formData.ibanPlata} 
                           onChange={e => setFormData({...formData, ibanPlata: e.target.value})} 
-                          className="w-full p-2.5 bg-[#12181D] border border-[#8ba888]/50 rounded-lg text-xs text-white focus:border-[#8ba888] outline-none font-mono transition" 
+                          className="w-full p-2.5 bg-[#12181D] border border-[#8ba888]/50 rounded text-xs text-white focus:border-[#8ba888] outline-none font-mono transition" 
                         />
                       )}
                     </div>
@@ -1918,7 +1988,7 @@ export default function Home() {
                   <div className="flex justify-between items-center pt-6 border-t border-slate-800">
                     <button type="button" onClick={handleInapoiPrincipal} className="text-xs text-slate-400 underline">Înapoi</button>
                     <button type="submit" disabled={!!loadingText} className="bg-[#8ba888] text-[#0B0F12] font-black px-8 py-4 rounded text-sm transition hover:opacity-90">
-                      {loadingText ? 'Se înregistrează...' : 'Descărcare PDF directă'}
+                      {loadingText ? 'Se înregistrează...' : 'Descărcare PDF'}
                     </button>
                   </div>
                 </form>
