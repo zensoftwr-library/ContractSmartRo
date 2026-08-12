@@ -1362,7 +1362,7 @@ export default function Home() {
             <div className="max-w-7xl mx-auto px-6 mt-6 flex flex-col gap-6">
               
               {/* BAND 1: CALCULATOR FISCAL COMPLET RESTAURAT (FULL WIDTH) */}
-              <div className="bg-[#8ba888] p-5 rounded-xl border border-slate-800 shadow-lg flex flex-col gap-4">
+              <div className="bg-[#12181D] p-5 rounded-xl border border-slate-800 shadow-lg flex flex-col gap-4">
                 {/* Controale */}
                 <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6 border-b border-slate-800/80 pb-4">
                   <div className="flex items-center gap-3 shrink-0">
@@ -1444,7 +1444,7 @@ export default function Home() {
               </div>
 
               {/* BAND 2: MEGA-QR CODE GENERATOR PRO */}
-              <div className="bg-[#8ba888] border border-slate-800 rounded-xl p-5 sm:p-6 shadow-lg flex flex-col">
+              <div className="bg-[#0B0F12] border border-slate-800 rounded-xl p-5 sm:p-6 shadow-lg flex flex-col">
                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4 pb-4 border-b border-slate-800 gap-4">
                   <div className="flex items-center gap-3 shrink-0">
                     <span className="text-3xl"></span>
