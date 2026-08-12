@@ -648,42 +648,6 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const actualizeazaIndiciLive = async () => {
-      try {
-        const res = await fetch('/api/bursa');
-        if (!res.ok) return;
-        const data = await res.json();
-        const quotes = data?.quotes || [];
-
-        if (quotes.length > 0) {
-          const betQuote = quotes.find(q => q.symbol === '^BET') || quotes[0];
-          const sp500Quote = quotes.find(q => q.symbol === '^GSPC') || quotes[1];
-          const nasdaqQuote = quotes.find(q => q.symbol === '^IXIC') || quotes[2];
-
-          setIndiciBursa({
-            bet: {
-              puncte: betQuote?.regularMarketPrice?.toLocaleString('ro-RO') || '17,420.50',
-              procent: (betQuote?.regularMarketChangePercent >= 0 ? '+' : '') + (betQuote?.regularMarketChangePercent?.toFixed(2) || '0.00') + '%'
-            },
-            sp500: {
-              puncte: sp500Quote?.regularMarketPrice?.toLocaleString('ro-RO') || '5,310.12',
-              procent: (sp500Quote?.regularMarketChangePercent >= 0 ? '+' : '') + (sp500Quote?.regularMarketChangePercent?.toFixed(2) || '0.00') + '%'
-            },
-            nasdaq: {
-              puncte: nasdaqQuote?.regularMarketPrice?.toLocaleString('ro-RO') || '18,650.45',
-              procent: (nasdaqQuote?.regularMarketChangePercent >= 0 ? '+' : '') + (nasdaqQuote?.regularMarketChangePercent?.toFixed(2) || '0.00') + '%'
-            }
-          });
-        }
-      } catch (err) {}
-    };
-
-    actualizeazaIndiciLive();
-    const interval = setInterval(actualizeazaIndiciLive, 30000);
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
     fetch('https://open.er-api.com/v6/latest/EUR')
       .then(res => res.json())
       .then(data => {
@@ -1255,17 +1219,17 @@ export default function Home() {
               
               <form onSubmit={handleAuthSubmit} className="space-y-4">
                 <div>
-                  <label className="text-[10px] text-slate-400 uppercase font-bold block mb-1">Adresă de Email</label>
-                  <input type="email" required placeholder="nume@companie.ro" value={authEmail} onChange={e => setAuthEmail(e.target.value)} className="w-full p-3 bg-[#0B0F12] border border-slate-700 rounded-md text-xs text-white outline-none focus:border-[#8ba888]" />
+                  <label htmlFor="authEmail" className="text-[10px] text-slate-400 uppercase font-bold block mb-1">Adresă de Email</label>
+                  <input id="authEmail" name="email" type="email" required placeholder="nume@companie.ro" value={authEmail} onChange={e => setAuthEmail(e.target.value)} className="w-full p-3 bg-[#0B0F12] border border-slate-700 rounded-md text-xs text-white outline-none focus:border-[#8ba888]" />
                 </div>
                 <div>
-                  <label className="text-[10px] text-slate-400 uppercase font-bold block mb-1">Parolă Validă</label>
-                  <input type="password" required placeholder="••••••••" value={authPassword} onChange={e => setAuthPassword(e.target.value)} className="w-full p-3 bg-[#0B0F12] border border-slate-700 rounded-md text-xs text-white outline-none focus:border-[#8ba888]" />
+                  <label htmlFor="authPassword" className="text-[10px] text-slate-400 uppercase font-bold block mb-1">Parolă Validă</label>
+                  <input id="authPassword" name="password" type="password" required placeholder="••••••••" value={authPassword} onChange={e => setAuthPassword(e.target.value)} className="w-full p-3 bg-[#0B0F12] border border-slate-700 rounded-md text-xs text-white outline-none focus:border-[#8ba888]" />
                 </div>
                 {isSignUp && (
                   <div>
-                    <label className="text-[10px] text-slate-400 uppercase font-bold block mb-1">Confirmă Parola</label>
-                    <input type="password" required placeholder="••••••••" value={authConfirmPassword} onChange={e => setAuthConfirmPassword(e.target.value)} className="w-full p-3 bg-[#0B0F12] border border-slate-700 rounded-md text-xs text-white outline-none focus:border-[#8ba888]" />
+                    <label htmlFor="authConfirmPassword" className="text-[10px] text-slate-400 uppercase font-bold block mb-1">Confirmă Parola</label>
+                    <input id="authConfirmPassword" name="confirmPassword" type="password" required placeholder="••••••••" value={authConfirmPassword} onChange={e => setAuthConfirmPassword(e.target.value)} className="w-full p-3 bg-[#0B0F12] border border-slate-700 rounded-md text-xs text-white outline-none focus:border-[#8ba888]" />
                   </div>
                 )}
                 <button type="submit" disabled={!!loadingText} className="w-full bg-[#8ba888] text-[#0B0F12] font-black py-3 rounded-md text-xs tracking-tight transition hover:opacity-90 mt-2">
@@ -1394,10 +1358,12 @@ export default function Home() {
                   <div className="space-y-6">
                     <div>
                       <div className="flex justify-between items-center mb-1">
-                        <label className="text-slate-400 text-[10px] font-bold uppercase">Valoare Factură / Venit</label>
+                        <label htmlFor="venitLunar" className="text-slate-400 text-[10px] font-bold uppercase">Valoare Factură / Venit</label>
                         <span className="text-[#8ba888] font-mono text-[11px] font-bold">{fiscal.venitLunar} RON</span>
                       </div>
                       <input 
+                        id="venitLunar"
+                        name="venitLunar"
                         type="range" 
                         min="0" 
                         max="50000" 
@@ -1410,8 +1376,8 @@ export default function Home() {
                     
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="text-slate-400 text-[10px] font-bold uppercase mb-1 block">Formă Juridică</label>
-                        <select value={fiscal.formaJuridica} onChange={e => setFiscal({...fiscal, formaJuridica: e.target.value})} className="w-full bg-[#0B0F12] border border-slate-700 rounded-lg py-2.5 px-3 text-white outline-none text-xs appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.2em_1.2em] bg-[right_0.6rem_center] bg-no-repeat pr-8">
+                        <label htmlFor="formaJuridica" className="text-slate-400 text-[10px] font-bold uppercase mb-1 block">Formă Juridică</label>
+                        <select id="formaJuridica" name="formaJuridica" value={fiscal.formaJuridica} onChange={e => setFiscal({...fiscal, formaJuridica: e.target.value})} className="w-full bg-[#0B0F12] border border-slate-700 rounded-lg py-2.5 px-3 text-white outline-none text-xs appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.2em_1.2em] bg-[right_0.6rem_center] bg-no-repeat pr-8">
                           <option value="SRL">SRL (Microîntreprindere)</option>
                           <option value="PFA_SISTEM_REAL">PFA (Sistem Real)</option>
                         </select>
@@ -1781,7 +1747,7 @@ export default function Home() {
                   </div>
 
                   <div className="bg-[#0B0F12] p-4 rounded border border-slate-800 space-y-2">
-                    <label className="text-xs font-bold text-slate-400 uppercase block">Calitatea ta în acest Contract (Rol Semnatar)</label>
+                    <span className="text-xs font-bold text-slate-400 uppercase block mb-2">Calitatea ta în acest Contract (Rol Semnatar)</span>
                     <div className="flex gap-4 text-xs">
                       <label className="flex items-center text-white cursor-pointer select-none">
                         <input type="radio" name="initiatorRol" value="prestator" checked={formData.initiatorRol === 'prestator'} onChange={e => setFormData({...formData, initiatorRol: e.target.value})} className="mr-2 accent-[#8ba888]" />
