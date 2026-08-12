@@ -1153,8 +1153,6 @@ export default function Home() {
             <span className="text-slate-800">|</span>
             <Link href="/baza-legala" className="text-xs text-slate-400 hover:text-white transition">Articole Validitate Juridică</Link>
             <span className="text-slate-800">|</span>
-            <Link href="/bursa" className="text-xs text-[#8ba888] font-bold hover:text-white transition">Terminal Bursa</Link>
-            <span className="text-slate-800">|</span>
             <Link href="/termeni-si-conditii" className="text-xs text-slate-400 hover:text-white transition">Termeni și Condiții</Link>
             <span className="text-slate-800">|</span>
             <Link href="/contact" className="text-xs text-slate-400 hover:text-white transition">Contact</Link>
