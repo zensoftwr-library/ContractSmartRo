@@ -1378,7 +1378,7 @@ export default function Home() {
                   <div className="flex items-center gap-3 mb-6 border-b border-slate-800/80 pb-4">
                     <span className="text-3xl"></span>
                     <div>
-                      <h4 className="text-[#8ba888] font-bold text-sm">Calculator Fiscal 2026</h4>
+                      <h4 className="text-[#8ba888] font-bold text-sm">CALCULATOR FISCAL 2026</h4>
                       <p className="text-[11px] text-slate-400">Plafoane CASS & Impozit</p>
                     </div>
                   </div>
