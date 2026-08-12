@@ -48,7 +48,7 @@ const nomenclatorClauze = {
     { id: 'clauzaSuspendareFeedback', titlu: '2. Suspendare pentru Lipsă Feedback', detaliu: 'Întârzierea aprobărilor de către client decalează automat predarea și permite facturarea muncii la stadiul curent.' },
     { id: 'clauzaRevizii', titlu: '3. Plafonare Feedback / Revizii', detaliu: 'Prețul include maximum 2 runde limitate de modificări structurale.' },
     { id: 'clauzaSplitPayment', titlu: '4. Plăți Fracționate (Milestones)', detaliu: 'Decontarea și recepția fiecărei etape intermediare condiționează deblocarea execuției pentru fazele subsecvente.' },
-    { id: 'clauzaMarketingTerti', titlu: '5. Drept Portofoliu & Marketing', detaliu: 'Prestatorul își rezervă dreptul de a utiliza elemente din lucrare în portofoliul public.' }
+    { id: 'clauzaMarketingTerti', titlu: '5. Drept Portofoliu & Marketing', detaliu: 'Prestatorul își rezervă dreptul de a utilize elemente din lucrare în portofoliul public.' }
   ],
   evenimente: [
     { id: 'clauzaTaxaAnulare', titlu: '1. Reținere Avans (Non-Refundable Retainer)', detaliu: 'Sumele achitate cu titlu de avans rămân integral la Prestator dacă evenimentul este anulat.' },
@@ -1362,267 +1362,279 @@ export default function Home() {
             <div className="max-w-7xl mx-auto px-6 mt-6 flex flex-col gap-6">
               
               {/* BAND 1: CALCULATOR FISCAL COMPLET RESTAURAT (FULL WIDTH) */}
-              <div className="bg-[#12181D] p-5 rounded-xl border border-slate-800 shadow-lg flex flex-col gap-4">
-                {/* Controale */}
-                <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6 border-b border-slate-800/80 pb-4">
-                  <div className="flex items-center gap-3 shrink-0">
-                    <span className="text-3xl"></span>
-                    <div>
-                      <h4 className="text-white font-bold text-sm">Calculator Fiscal 2026</h4>
-                      <p className="text-[11px] text-slate-400">Plafoane CASS & Impozit</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex-1 flex flex-col md:flex-row gap-4 w-full">
-                    <div className="flex-1 flex flex-col justify-center">
-                      <div className="flex justify-between items-center mb-1">
-                        <label className="text-slate-400 text-[10px] font-bold uppercase">Valoare Factură / Venit</label>
-                        <span className="text-[#8ba888] font-mono text-[11px]">{fiscal.venitLunar} RON</span>
+              <div className="bg-[#12181D] rounded-2xl border border-slate-800/80 shadow-xl overflow-hidden">
+                <div className="flex flex-col lg:flex-row">
+                  {/* Partea stanga: Controale */}
+                  <div className="flex-1 p-6 lg:border-r border-slate-800/80">
+                    <div className="flex items-center gap-3 mb-6">
+                      <span className="text-2xl">🧮</span>
+                      <div>
+                        <h4 className="text-white font-bold text-sm">Calculator Fiscal 2026</h4>
+                        <p className="text-[11px] text-slate-400">Plafoane CASS & Impozit</p>
                       </div>
-                      <input 
-                        type="range" 
-                        min="0" 
-                        max="50000" 
-                        step="1" 
-                        value={fiscal.venitLunar} 
-                        onChange={e => setFiscal({...fiscal, venitLunar: Number(e.target.value)})} 
-                        className="w-full h-1.5 bg-slate-800 rounded appearance-none cursor-pointer accent-[#8ba888]" 
-                      />
                     </div>
                     
-                    <div className="flex-1">
-                      <label className="text-slate-400 text-[10px] font-bold uppercase mb-1 block">Formă Juridică</label>
-                      <select value={fiscal.formaJuridica} onChange={e => setFiscal({...fiscal, formaJuridica: e.target.value})} className="w-full bg-[#0B0F12] border border-slate-700 rounded py-1.5 px-2 text-white outline-none text-xs appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1em_1em] bg-[right_0.5rem_center] bg-no-repeat pr-8">
-                        <option value="SRL">SRL (Microîntreprindere)</option>
-                        <option value="PFA_SISTEM_REAL">PFA (Sistem Real)</option>
-                      </select>
-                    </div>
-                    
-                    {fiscal.formaJuridica !== 'PFA_SISTEM_REAL' && (
-                      <div className="flex-1 flex gap-2">
-                        <label className="flex-1 flex items-center justify-center bg-[#0B0F12] rounded border border-slate-800 cursor-pointer text-[10px] text-white">
-                          <input type="checkbox" checked={fiscal.areAngajati} onChange={e => setFiscal({...fiscal, areAngajati: e.target.checked})} className="mr-1.5 accent-[#8ba888]" /> Angajați
-                        </label>
-                        <label className="flex-1 flex items-center justify-center bg-[#0B0F12] rounded border border-slate-800/60 cursor-pointer text-[10px] text-white">
-                          <input type="checkbox" checked={fiscal.platitorTva} onChange={e => setFiscal({...fiscal, platitorTva: e.target.checked})} className="mr-1.5 accent-[#8ba888]" /> TVA
-                        </label>
+                    <div className="flex flex-col md:flex-row gap-6">
+                      <div className="flex-1 flex flex-col justify-center">
+                        <div className="flex justify-between items-center mb-1">
+                          <label className="text-slate-400 text-[10px] font-bold uppercase">Valoare Factură / Venit</label>
+                          <span className="text-[#8ba888] font-mono text-[11px]">{fiscal.venitLunar} RON</span>
+                        </div>
+                        <input 
+                          type="range" 
+                          min="0" 
+                          max="50000" 
+                          step="1" 
+                          value={fiscal.venitLunar} 
+                          onChange={e => setFiscal({...fiscal, venitLunar: Number(e.target.value)})} 
+                          className="w-full h-1.5 bg-slate-800 rounded appearance-none cursor-pointer accent-[#8ba888]" 
+                        />
                       </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Rezultate Detaliate (Defalcare matematică) */}
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 font-mono text-[11px]">
-                  <div className="bg-[#0B0F12] p-2 rounded-md border border-slate-800/40 flex flex-col justify-center">
-                    <span className="text-slate-500 block">Impozit micro/venit:</span>
-                    <span className="text-slate-300 font-bold">{rezultateFiscale.defalcare.impozit} RON</span>
-                  </div>
-                  <div className="bg-[#0B0F12] p-2 rounded-md border border-slate-800/40 flex flex-col justify-center">
-                    <span className="text-slate-500 block">Contribuții (CAS/CASS):</span>
-                    <span className="text-slate-300 font-bold">{rezultateFiscale.defalcare.sociale} RON</span>
-                  </div>
-                  
-                  {fiscal.formaJuridica === 'SRL' ? (
-                    <div className="bg-[#0B0F12] p-2 rounded-md border border-slate-800/40 flex flex-col justify-center">
-                      <span className="text-slate-500 block">Impozit Dividende (10%):</span>
-                      <span className="text-slate-300 font-bold">{rezultateFiscale.defalcare.dividende} RON</span>
+                      
+                      <div className="flex-1">
+                        <label className="text-slate-400 text-[10px] font-bold uppercase mb-1 block">Formă Juridică</label>
+                        <select value={fiscal.formaJuridica} onChange={e => setFiscal({...fiscal, formaJuridica: e.target.value})} className="w-full bg-[#0B0F12] border border-slate-700 rounded py-1.5 px-2 text-white outline-none text-xs appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1em_1em] bg-[right_0.5rem_center] bg-no-repeat pr-8">
+                          <option value="SRL">SRL (Microîntreprindere)</option>
+                          <option value="PFA_SISTEM_REAL">PFA (Sistem Real)</option>
+                        </select>
+                      </div>
+                      
+                      {fiscal.formaJuridica !== 'PFA_SISTEM_REAL' && (
+                        <div className="flex-1 flex gap-2">
+                          <label className="flex-1 flex items-center justify-center bg-[#0B0F12] rounded border border-slate-800 cursor-pointer text-[10px] text-white">
+                            <input type="checkbox" checked={fiscal.areAngajati} onChange={e => setFiscal({...fiscal, areAngajati: e.target.checked})} className="mr-1.5 accent-[#8ba888]" /> Angajați
+                          </label>
+                          <label className="flex-1 flex items-center justify-center bg-[#0B0F12] rounded border border-slate-800/60 cursor-pointer text-[10px] text-white">
+                            <input type="checkbox" checked={fiscal.platitorTva} onChange={e => setFiscal({...fiscal, platitorTva: e.target.checked})} className="mr-1.5 accent-[#8ba888]" /> TVA
+                          </label>
+                        </div>
+                      )}
                     </div>
-                  ) : <div className="hidden lg:block"></div>}
-                  
-                  {fiscal.platitorTva ? (
-                    <div className="bg-[#0B0F12] p-2 rounded-md border border-slate-800/40 flex flex-col justify-center">
-                      <span className="text-slate-500 block">TVA Colectat (21%):</span>
-                      <span className="text-slate-300 font-bold">{rezultateFiscale.tvaLunar} RON</span>
-                    </div>
-                  ) : <div className="hidden lg:block"></div>}
+                  </div>
 
-                  <div className="bg-[#0B0F12] border border-[#8ba888]/30 p-2 rounded-md flex flex-col justify-center items-end text-right md:col-span-2 lg:col-span-1">
-                    <span className="text-slate-400 block">Dări Stat: <strong className="text-red-400">{rezultateFiscale.taxeLunare} RON</strong></span>
-                    <span className="text-slate-400 block">Net / Lună: <strong className="text-[#8ba888] text-sm">{rezultateFiscale.netLunar} RON</strong></span>
+                  {/* Partea dreapta: Rezultate */}
+                  <div className="w-full lg:w-[380px] bg-[#0B0F12]/50 p-6 flex flex-col justify-center">
+                    <div className="grid grid-cols-2 gap-3 mb-4">
+                      <div className="bg-[#12181D] p-3 rounded-lg border border-slate-800/60">
+                        <span className="text-slate-500 text-[10px] uppercase font-bold block">Impozit micro/venit</span>
+                        <span className="text-slate-200 block text-sm font-mono mt-1">{rezultateFiscale.defalcare.impozit} RON</span>
+                      </div>
+                      <div className="bg-[#12181D] p-3 rounded-lg border border-slate-800/60">
+                        <span className="text-slate-500 text-[10px] uppercase font-bold block">CAS / CASS</span>
+                        <span className="text-slate-200 block text-sm font-mono mt-1">{rezultateFiscale.defalcare.sociale} RON</span>
+                      </div>
+                      {fiscal.formaJuridica === 'SRL' && (
+                        <div className="bg-[#12181D] p-3 rounded-lg border border-slate-800/60">
+                          <span className="text-slate-500 text-[10px] uppercase font-bold block">Dividende (10%)</span>
+                          <span className="text-slate-200 block text-sm font-mono mt-1">{rezultateFiscale.defalcare.dividende} RON</span>
+                        </div>
+                      )}
+                      {fiscal.platitorTva && (
+                        <div className="bg-[#12181D] p-3 rounded-lg border border-slate-800/60">
+                          <span className="text-slate-500 text-[10px] uppercase font-bold block">TVA (21%)</span>
+                          <span className="text-slate-200 block text-sm font-mono mt-1">{rezultateFiscale.tvaLunar} RON</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="bg-[#16221A] border border-[#8ba888]/30 p-3 rounded-lg flex justify-between items-center">
+                      <div>
+                        <span className="text-slate-400 block text-[10px] uppercase font-bold mb-0.5">Dări Stat</span>
+                        <strong className="text-red-400 font-mono text-sm">{rezultateFiscale.taxeLunare} RON</strong>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-slate-400 block text-[10px] uppercase font-bold mb-0.5">Net / Lună</span>
+                        <strong className="text-[#8ba888] text-lg font-mono">{rezultateFiscale.netLunar} RON</strong>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* BAND 2: MEGA-QR CODE GENERATOR PRO */}
-              <div className="bg-[#0B0F12] border border-slate-800 rounded-xl p-5 sm:p-6 shadow-lg flex flex-col">
-                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4 pb-4 border-b border-slate-800 gap-4">
+              <div className="bg-[#12181D] rounded-2xl border border-slate-800/80 shadow-xl flex flex-col">
+                {/* Header integrat cu Tabs */}
+                <div className="px-6 py-4 border-b border-slate-800/80 bg-[#0B0F12]/30 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                   <div className="flex items-center gap-3 shrink-0">
-                    <span className="text-3xl"></span>
+                    <span className="text-2xl">⚡</span>
                     <div>
                       <h3 className="text-sm font-bold text-white uppercase tracking-wider block">ContractSmart QR ProStudio</h3>
-                      <p className="text-slate-400 text-[11px] mt-0.5">Generează URL, Crypto, Smart OS sau Landing QR.</p>
                     </div>
                   </div>
                   
-                  <div className="w-full lg:w-auto flex flex-wrap gap-2 flex-1 lg:justify-end">
-                    <button onClick={() => setQrType('url')} className={`px-3 py-1.5 rounded border text-[10px] font-bold transition-all ${qrType === 'url' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>🌐 URL</button>
-                    <button onClick={() => setQrType('wifi')} className={`px-3 py-1.5 rounded border text-[10px] font-bold transition-all ${qrType === 'wifi' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>📶 Wi-Fi</button>
-                    <button onClick={() => setQrType('crypto')} className={`px-3 py-1.5 rounded border text-[10px] font-bold transition-all ${qrType === 'crypto' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>₿ Crypto</button>
-                    <button onClick={() => { if(!isPremium && !profil?.has_qr_vcard) handleCheckout('qr_vcard'); else setQrType('vcard'); }} className={`relative px-3 py-1.5 rounded border text-[10px] font-bold transition-all ${qrType === 'vcard' ? 'bg-[#8ba888]/10 border-[#8ba888] text-[#8ba888]' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
-                      📇 vCard {(!isPremium && !profil?.has_qr_vcard) && <span className="absolute -top-2 -right-2 text-[8px] bg-amber-500 text-black px-1.5 rounded-full shadow-md">69 RON</span>}
+                  <div className="flex flex-wrap gap-2 w-full lg:w-auto">
+                    <button onClick={() => setQrType('url')} className={`px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'url' ? 'bg-[#8ba888] text-[#0B0F12]' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>🌐 URL</button>
+                    <button onClick={() => setQrType('wifi')} className={`px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'wifi' ? 'bg-[#8ba888] text-[#0B0F12]' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>📶 Wi-Fi</button>
+                    <button onClick={() => setQrType('crypto')} className={`px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'crypto' ? 'bg-[#8ba888] text-[#0B0F12]' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>₿ Crypto</button>
+                    <button onClick={() => { if(!isPremium && !profil?.has_qr_vcard) handleCheckout('qr_vcard'); else setQrType('vcard'); }} className={`relative px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'vcard' ? 'bg-[#8ba888] text-[#0B0F12]' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>
+                      📇 vCard {(!isPremium && !profil?.has_qr_vcard) && <span className="absolute -top-1 -right-1 text-[8px] bg-amber-500 text-black px-1.5 rounded-full shadow-md">69 RON</span>}
                     </button>
-                    <button onClick={() => { if(!isPremium && !profil?.has_qr_pdf) handleCheckout('qr_dynamic'); else setQrType('dynamic'); }} className={`relative px-3 py-1.5 rounded border text-[10px] font-bold transition-all ${qrType === 'dynamic' ? 'bg-purple-900/30 border-purple-500 text-purple-400' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
-                      📄 Dinamic {(!isPremium && !profil?.has_qr_pdf) && <span className="absolute -top-2 -right-2 text-[8px] bg-purple-500 text-white px-1.5 rounded-full shadow-md">39 RON</span>}
+                    <button onClick={() => { if(!isPremium && !profil?.has_qr_pdf) handleCheckout('qr_dynamic'); else setQrType('dynamic'); }} className={`relative px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'dynamic' ? 'bg-purple-600 text-white' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>
+                      📄 Dinamic {(!isPremium && !profil?.has_qr_pdf) && <span className="absolute -top-1 -right-1 text-[8px] bg-purple-500 text-white px-1.5 rounded-full shadow-md">39 RON</span>}
                     </button>
-                    <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('smart'); }} className={`relative px-3 py-1.5 rounded border text-[10px] font-bold transition-all ${qrType === 'smart' ? 'bg-blue-900/30 border-blue-500 text-blue-400' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
-                      📱 Smart OS {(!isPremium) && <span className="absolute -top-2 -right-2 text-[8px] bg-blue-500 text-white px-1.5 rounded-full shadow-md">PRO</span>}
+                    <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('smart'); }} className={`relative px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'smart' ? 'bg-blue-600 text-white' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>
+                      📱 Smart OS {(!isPremium) && <span className="absolute -top-1 -right-1 text-[8px] bg-blue-500 text-white px-1.5 rounded-full shadow-md">PRO</span>}
                     </button>
-                    <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('geo'); }} className={`relative px-3 py-1.5 rounded border text-[10px] font-bold transition-all ${qrType === 'geo' ? 'bg-blue-900/30 border-blue-500 text-blue-400' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
-                      🌍 Geo-Target {(!isPremium) && <span className="absolute -top-2 -right-2 text-[8px] bg-blue-500 text-white px-1.5 rounded-full shadow-md">PRO</span>}
+                    <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('geo'); }} className={`relative px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'geo' ? 'bg-blue-600 text-white' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>
+                      🌍 Geo-Target {(!isPremium) && <span className="absolute -top-1 -right-1 text-[8px] bg-blue-500 text-white px-1.5 rounded-full shadow-md">PRO</span>}
                     </button>
-                    <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('landing'); }} className={`relative px-3 py-1.5 rounded border text-[10px] font-bold transition-all ${qrType === 'landing' ? 'bg-blue-900/30 border-blue-500 text-blue-400' : 'bg-[#16221A]/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
-                      🔗 Landing {(!isPremium) && <span className="absolute -top-2 -right-2 text-[8px] bg-blue-500 text-white px-1.5 rounded-full shadow-md">PRO</span>}
+                    <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('landing'); }} className={`relative px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'landing' ? 'bg-blue-600 text-white' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>
+                      🔗 Landing {(!isPremium) && <span className="absolute -top-1 -right-1 text-[8px] bg-blue-500 text-white px-1.5 rounded-full shadow-md">PRO</span>}
                     </button>
                   </div>
                 </div>
 
-                <div className="flex flex-col lg:flex-row gap-6 items-start">
-                  {/* Left: Input Form */}
-                  <div className="flex-1 w-full space-y-4">
-                    {qrType === 'url' && (
-                      <input type="text" placeholder="https://site-ul-tau.ro" value={qrUrl} onChange={(e) => setQrUrl(e.target.value)} className="w-full bg-[#12181D] border border-slate-700 rounded p-2 text-white text-sm focus:border-[#8ba888] outline-none" />
-                    )}
+                {/* Main Area */}
+                <div className="p-6 flex flex-col lg:flex-row gap-8">
+                  {/* Left: Input Form & Branding */}
+                  <div className="flex-1 space-y-5 flex flex-col justify-between">
+                    <div>
+                      {qrType === 'url' && (
+                        <input type="text" placeholder="https://site-ul-tau.ro" value={qrUrl} onChange={(e) => setQrUrl(e.target.value)} className="w-full bg-[#0B0F12] border border-slate-700 rounded-lg p-3 text-white text-sm focus:border-[#8ba888] outline-none" />
+                      )}
 
-                    {qrType === 'crypto' && (
-                      <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-                        <select value={cryptoData.coin} onChange={e => setCryptoData({...cryptoData, coin: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded p-2 text-white text-xs outline-none">
-                          <option value="bitcoin">Bitcoin (BTC)</option>
-                          <option value="ethereum">Ethereum (ETH)</option>
-                          <option value="solana">Solana (SOL)</option>
-                          <option value="tether">USDT</option>
-                        </select>
-                        <input type="text" placeholder="Adresă Wallet Crypto" value={cryptoData.address} onChange={(e) => setCryptoData({...cryptoData, address: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded p-2 text-white text-xs focus:border-[#8ba888] outline-none sm:col-span-2 font-mono" />
-                        <input type="number" placeholder="Sumă (Opțional)" value={cryptoData.amount} onChange={(e) => setCryptoData({...cryptoData, amount: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded p-2 text-white text-xs focus:border-[#8ba888] outline-none" />
-                      </div>
-                    )}
-
-                    {qrType === 'wifi' && (
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <input type="text" placeholder="Nume Rețea (SSID)" value={wifiData.ssid} onChange={(e) => setWifiData({...wifiData, ssid: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded p-2 text-white text-xs focus:border-[#8ba888] outline-none" />
-                        <input type="text" placeholder="Parolă Rețea" value={wifiData.password} onChange={(e) => setWifiData({...wifiData, password: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded p-2 text-white text-xs focus:border-[#8ba888] outline-none" />
-                        <select value={wifiData.type} onChange={e => setWifiData({...wifiData, type: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded p-2 text-white text-xs outline-none">
-                          <option value="WPA">Securitate WPA/WPA2</option>
-                          <option value="WEP">Securitate WEP</option>
-                          <option value="nopass">Fără parolă (Liber)</option>
-                        </select>
-                      </div>
-                    )}
-
-                    {qrType === 'vcard' && (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <input type="text" placeholder="Nume Complet" value={qrData.nume} onChange={(e) => setQrData({...qrData, nume: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded p-2 text-white text-xs focus:border-[#8ba888] outline-none sm:col-span-2" />
-                        <input type="text" placeholder="Funcție / Titlu (ex: Manager)" value={qrData.functie} onChange={(e) => setQrData({...qrData, functie: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded p-2 text-white text-xs focus:border-[#8ba888] outline-none sm:col-span-2" />
-                        <input type="text" placeholder="Telefon" value={qrData.telefon} onChange={(e) => setQrData({...qrData, telefon: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded p-2 text-white text-xs focus:border-[#8ba888] outline-none" />
-                        <input type="email" placeholder="Email" value={qrData.email} onChange={(e) => setQrData({...qrData, email: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded p-2 text-white text-xs focus:border-[#8ba888] outline-none" />
-                      </div>
-                    )}
-
-                    {qrType === 'dynamic' && (
-                      <div className="p-3 bg-purple-900/20 border border-purple-500/30 rounded flex flex-col md:flex-row gap-4 items-center">
-                        <div className="w-full md:w-1/2">
-                          <label className="text-[10px] text-purple-300 uppercase font-bold block mb-1">A. Redirecționare Link Simplu</label>
-                          <input type="text" placeholder="https://site-ul-tau.ro/oferta" value={dynamicDestUrl} onChange={e => setDynamicDestUrl(e.target.value)} className="w-full bg-[#12181D] border border-purple-500/50 rounded p-2 text-white text-xs outline-none" />
+                      {qrType === 'crypto' && (
+                        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                          <select value={cryptoData.coin} onChange={e => setCryptoData({...cryptoData, coin: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-3 text-white text-xs outline-none">
+                            <option value="bitcoin">Bitcoin (BTC)</option>
+                            <option value="ethereum">Ethereum (ETH)</option>
+                            <option value="solana">Solana (SOL)</option>
+                            <option value="tether">USDT</option>
+                          </select>
+                          <input type="text" placeholder="Adresă Wallet Crypto" value={cryptoData.address} onChange={(e) => setCryptoData({...cryptoData, address: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-3 text-white text-xs focus:border-[#8ba888] outline-none sm:col-span-2 font-mono" />
+                          <input type="number" placeholder="Sumă (Opțional)" value={cryptoData.amount} onChange={(e) => setCryptoData({...cryptoData, amount: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-3 text-white text-xs focus:border-[#8ba888] outline-none" />
                         </div>
-                        <div className="w-full md:w-1/2">
-                          <label className="text-[10px] text-purple-300 uppercase font-bold block mb-1">B. Sau Încărcare Meniu/Catalog PDF</label>
-                          <input type="file" accept="application/pdf" onChange={(e) => handleUploadGeneric(e, setUploadedPdfUrl, 'qr_pdfs', setIsUploadingPdf)} className="block w-full text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-purple-600 file:text-white cursor-pointer" />
-                          {isUploadingPdf && <span className="text-[10px] text-purple-400 mt-1 block animate-pulse">Se încarcă PDF...</span>}
-                          {uploadedPdfUrl && <span className="text-[10px] text-emerald-400 mt-1 block">✅ PDF Găzduit</span>}
-                        </div>
-                        <div className="shrink-0 w-full md:w-auto mt-2 md:mt-0">
-                          {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
-                            <div className="hidden"><Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} /></div>
-                          )}
-                          <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="w-full bg-purple-600 text-white font-bold px-4 py-2 rounded text-[11px] hover:bg-purple-500 transition whitespace-nowrap">
-                            {isGeneratingShortlink ? 'Securizare...' : '🔗 Salvează Dinamic'}
-                          </button>
-                        </div>
-                      </div>
-                    )}
+                      )}
 
-                    {qrType === 'smart' && (
-                      <div className="p-3 bg-blue-900/20 border border-blue-500/30 rounded flex flex-col md:flex-row gap-3 items-center">
-                        <input type="url" placeholder="🍏 Link App Store (iOS)" value={iosUrl} onChange={(e) => setIosUrl(e.target.value)} className="w-full flex-1 bg-[#12181D] border border-slate-700 rounded p-2 text-white text-xs focus:border-blue-500 outline-none" />
-                        <input type="url" placeholder="🤖 Link Google Play (Android)" value={androidUrl} onChange={(e) => setAndroidUrl(e.target.value)} className="w-full flex-1 bg-[#12181D] border border-slate-700 rounded p-2 text-white text-xs focus:border-blue-500 outline-none" />
-                        <div className="shrink-0 w-full md:w-auto">
-                          {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
-                            <div className="hidden"><Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} /></div>
-                          )}
-                          <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="w-full bg-blue-600 text-white font-bold px-4 py-2 rounded text-[11px] hover:bg-blue-500 transition">Activează Routing</button>
+                      {qrType === 'wifi' && (
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          <input type="text" placeholder="Nume Rețea (SSID)" value={wifiData.ssid} onChange={(e) => setWifiData({...wifiData, ssid: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-3 text-white text-xs focus:border-[#8ba888] outline-none" />
+                          <input type="text" placeholder="Parolă Rețea" value={wifiData.password} onChange={(e) => setWifiData({...wifiData, password: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-3 text-white text-xs focus:border-[#8ba888] outline-none" />
+                          <select value={wifiData.type} onChange={e => setWifiData({...wifiData, type: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-3 text-white text-xs outline-none">
+                            <option value="WPA">Securitate WPA/WPA2</option>
+                            <option value="WEP">Securitate WEP</option>
+                            <option value="nopass">Fără parolă (Liber)</option>
+                          </select>
                         </div>
-                      </div>
-                    )}
+                      )}
 
-                    {qrType === 'geo' && (
-                      <div className="p-3 bg-blue-900/20 border border-blue-500/30 rounded flex flex-col gap-2">
-                        {geoRules.map((rule, idx) => (
-                          <div key={idx} className="flex gap-2">
-                            <input type="text" placeholder="Cod Țară (RO, DE)" value={rule.country} onChange={(e) => { const newRules = [...geoRules]; newRules[idx].country = e.target.value.toUpperCase(); setGeoRules(newRules); }} className="w-20 bg-[#12181D] border border-slate-700 rounded p-1.5 text-white text-xs text-center font-bold outline-none" disabled={rule.country === 'DEFAULT'} />
-                            <input type="url" placeholder="URL Destinație Specifică" value={rule.url} onChange={(e) => { const newRules = [...geoRules]; newRules[idx].url = e.target.value; setGeoRules(newRules); }} className="flex-1 bg-[#12181D] border border-slate-700 rounded p-1.5 text-white text-xs outline-none" />
+                      {qrType === 'vcard' && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <input type="text" placeholder="Nume Complet" value={qrData.nume} onChange={(e) => setQrData({...qrData, nume: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-3 text-white text-xs focus:border-[#8ba888] outline-none sm:col-span-2" />
+                          <input type="text" placeholder="Funcție / Titlu (ex: Manager)" value={qrData.functie} onChange={(e) => setQrData({...qrData, functie: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-3 text-white text-xs focus:border-[#8ba888] outline-none sm:col-span-2" />
+                          <input type="text" placeholder="Telefon" value={qrData.telefon} onChange={(e) => setQrData({...qrData, telefon: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-3 text-white text-xs focus:border-[#8ba888] outline-none" />
+                          <input type="email" placeholder="Email" value={qrData.email} onChange={(e) => setQrData({...qrData, email: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-3 text-white text-xs focus:border-[#8ba888] outline-none" />
+                        </div>
+                      )}
+
+                      {qrType === 'dynamic' && (
+                        <div className="p-4 bg-purple-900/10 border border-purple-500/20 rounded-xl flex flex-col md:flex-row gap-4 items-center">
+                          <div className="w-full md:w-1/2">
+                            <label className="text-[10px] text-purple-400 uppercase font-bold block mb-1">A. Redirecționare Link Simplu</label>
+                            <input type="text" placeholder="https://site-ul-tau.ro/oferta" value={dynamicDestUrl} onChange={e => setDynamicDestUrl(e.target.value)} className="w-full bg-[#0B0F12] border border-purple-500/50 rounded-lg p-2.5 text-white text-xs outline-none" />
                           </div>
-                        ))}
-                        <div className="flex justify-between items-center mt-1">
-                          <button type="button" onClick={() => setGeoRules([...geoRules.slice(0, -1), { country: '', url: '' }, geoRules[geoRules.length-1]])} className="text-[10px] text-blue-400 font-bold underline">+ Adaugă regulă țară</button>
-                          {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
-                            <div className="hidden"><Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} /></div>
-                          )}
-                          <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="bg-blue-600 text-white font-bold px-4 py-1.5 rounded text-[11px] hover:bg-blue-500 transition">Activează Geo-Route</button>
-                        </div>
-                      </div>
-                    )}
-
-                    {qrType === 'landing' && (
-                      <div className="p-3 bg-blue-900/20 border border-blue-500/30 rounded flex flex-col gap-3">
-                        <div className="flex flex-col sm:flex-row gap-3">
-                          <input type="text" placeholder="Titlu (ex: Restaurantul Meu)" value={landingData.title} onChange={(e) => setLandingData({...landingData, title: e.target.value})} className="flex-1 bg-[#12181D] border border-slate-700 rounded p-2 text-white text-xs outline-none" />
-                          <input type="file" accept="image/png, image/jpeg" onChange={(e) => handleUploadGeneric(e, (url) => setLandingData({...landingData, avatarUrl: url}), 'landing_images', setIsUploadingPdf)} className="flex-1 text-[10px] text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-blue-600 file:text-white cursor-pointer" />
-                        </div>
-                        {landingData.links.map((link, idx) => (
-                          <div key={idx} className="flex gap-2">
-                            <input type="text" placeholder="Nume Buton" value={link.label} onChange={(e) => { const newLinks = [...landingData.links]; newLinks[idx].label = e.target.value; setLandingData({...landingData, links: newLinks}); }} className="w-1/3 bg-[#12181D] border border-slate-700 rounded p-1.5 text-white text-[11px] outline-none" />
-                            <input type="url" placeholder="https://..." value={link.url} onChange={(e) => { const newLinks = [...landingData.links]; newLinks[idx].url = e.target.value; setLandingData({...landingData, links: newLinks}); }} className="flex-1 bg-[#12181D] border border-slate-700 rounded p-1.5 text-white text-[11px] outline-none" />
+                          <div className="w-full md:w-1/2">
+                            <label className="text-[10px] text-purple-400 uppercase font-bold block mb-1">B. Sau Încărcare PDF</label>
+                            <input type="file" accept="application/pdf" onChange={(e) => handleUploadGeneric(e, setUploadedPdfUrl, 'qr_pdfs', setIsUploadingPdf)} className="block w-full text-xs text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-purple-600 file:text-white cursor-pointer" />
+                            {isUploadingPdf && <span className="text-[10px] text-purple-400 mt-1 block animate-pulse">Se încarcă PDF...</span>}
+                            {uploadedPdfUrl && <span className="text-[10px] text-emerald-400 mt-1 block">✅ PDF Găzduit</span>}
                           </div>
-                        ))}
-                        <div className="flex justify-between items-center">
-                          <button type="button" onClick={() => setLandingData({...landingData, links: [...landingData.links, { label: '', url: '' }]})} className="text-[10px] text-blue-400 font-bold underline block">+ Adaugă Link</button>
-                          {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
-                            <div className="hidden"><Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} /></div>
-                          )}
-                          <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="bg-blue-600 text-white font-bold px-4 py-1.5 rounded text-[11px] hover:bg-blue-500 transition">Generează Landing</button>
+                          <div className="shrink-0 w-full md:w-auto mt-2 md:mt-0">
+                            {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
+                              <div className="hidden"><Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} /></div>
+                            )}
+                            <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="w-full bg-purple-600 text-white font-bold px-5 py-2.5 rounded-lg text-xs hover:bg-purple-500 transition whitespace-nowrap">
+                              {isGeneratingShortlink ? 'Securizare...' : '🔗 Salvează'}
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
+
+                      {qrType === 'smart' && (
+                        <div className="p-4 bg-blue-900/10 border border-blue-500/20 rounded-xl flex flex-col md:flex-row gap-3 items-center">
+                          <input type="url" placeholder="🍏 Link App Store (iOS)" value={iosUrl} onChange={(e) => setIosUrl(e.target.value)} className="w-full flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-blue-500 outline-none" />
+                          <input type="url" placeholder="🤖 Link Google Play (Android)" value={androidUrl} onChange={(e) => setAndroidUrl(e.target.value)} className="w-full flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-blue-500 outline-none" />
+                          <div className="shrink-0 w-full md:w-auto">
+                            {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
+                              <div className="hidden"><Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} /></div>
+                            )}
+                            <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="w-full bg-blue-600 text-white font-bold px-5 py-2.5 rounded-lg text-xs hover:bg-blue-500 transition">Activează Routing</button>
+                          </div>
+                        </div>
+                      )}
+
+                      {qrType === 'geo' && (
+                        <div className="p-4 bg-blue-900/10 border border-blue-500/20 rounded-xl flex flex-col gap-3">
+                          {geoRules.map((rule, idx) => (
+                            <div key={idx} className="flex gap-2">
+                              <input type="text" placeholder="Cod Țară (RO, DE)" value={rule.country} onChange={(e) => { const newRules = [...geoRules]; newRules[idx].country = e.target.value.toUpperCase(); setGeoRules(newRules); }} className="w-24 bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-white text-xs text-center font-bold outline-none" disabled={rule.country === 'DEFAULT'} />
+                              <input type="url" placeholder="URL Destinație Specifică" value={rule.url} onChange={(e) => { const newRules = [...geoRules]; newRules[idx].url = e.target.value; setGeoRules(newRules); }} className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-white text-xs outline-none" />
+                            </div>
+                          ))}
+                          <div className="flex justify-between items-center mt-1">
+                            <button type="button" onClick={() => setGeoRules([...geoRules.slice(0, -1), { country: '', url: '' }, geoRules[geoRules.length-1]])} className="text-[10px] text-blue-400 font-bold underline">+ Adaugă regulă țară</button>
+                            {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
+                              <div className="hidden"><Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} /></div>
+                            )}
+                            <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="bg-blue-600 text-white font-bold px-5 py-2 rounded-lg text-[11px] hover:bg-blue-500 transition">Activează Geo-Route</button>
+                          </div>
+                        </div>
+                      )}
+
+                      {qrType === 'landing' && (
+                        <div className="p-4 bg-blue-900/10 border border-blue-500/20 rounded-xl flex flex-col gap-3">
+                          <div className="flex flex-col sm:flex-row gap-3">
+                            <input type="text" placeholder="Titlu (ex: Restaurantul Meu)" value={landingData.title} onChange={(e) => setLandingData({...landingData, title: e.target.value})} className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs outline-none" />
+                            <input type="file" accept="image/png, image/jpeg" onChange={(e) => handleUploadGeneric(e, (url) => setLandingData({...landingData, avatarUrl: url}), 'landing_images', setIsUploadingPdf)} className="flex-1 text-[10px] text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-blue-600 file:text-white cursor-pointer" />
+                          </div>
+                          {landingData.links.map((link, idx) => (
+                            <div key={idx} className="flex gap-2">
+                              <input type="text" placeholder="Nume Buton" value={link.label} onChange={(e) => { const newLinks = [...landingData.links]; newLinks[idx].label = e.target.value; setLandingData({...landingData, links: newLinks}); }} className="w-1/3 bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-white text-[11px] outline-none" />
+                              <input type="url" placeholder="https://..." value={link.url} onChange={(e) => { const newLinks = [...landingData.links]; newLinks[idx].url = e.target.value; setLandingData({...landingData, links: newLinks}); }} className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-white text-[11px] outline-none" />
+                            </div>
+                          ))}
+                          <div className="flex justify-between items-center">
+                            <button type="button" onClick={() => setLandingData({...landingData, links: [...landingData.links, { label: '', url: '' }]})} className="text-[10px] text-blue-400 font-bold underline block">+ Adaugă Link</button>
+                            {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
+                              <div className="hidden"><Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} /></div>
+                            )}
+                            <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="bg-blue-600 text-white font-bold px-5 py-2 rounded-lg text-[11px] hover:bg-blue-500 transition">Generează Landing</button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                     
-                    <div className="flex items-center gap-3 pt-2">
-                      <div className={`flex items-center gap-2 ${(!isPremium && !profil?.has_qr_branding) ? 'opacity-50 pointer-events-none' : ''}`}>
+                    {/* Branding Row */}
+                    <div className="flex items-center gap-3 pt-4 mt-4 border-t border-slate-800/50">
+                      <div className={`flex items-center gap-3 ${(!isPremium && !profil?.has_qr_branding) ? 'opacity-50 pointer-events-none' : ''}`}>
                         <label className="text-[10px] text-slate-400 font-bold uppercase shrink-0">Culoare</label>
-                        <input type="color" value={qrColor} onChange={(e) => setQrColor(e.target.value)} className="w-6 h-6 rounded cursor-pointer shrink-0 bg-transparent border-0 p-0" />
-                        <label className="text-[10px] text-slate-400 font-bold uppercase ml-2 shrink-0 border border-slate-700 p-1 rounded bg-[#12181D] cursor-pointer hover:bg-slate-800">
-                          <span className="flex items-center gap-1">🖼️ Logo Centru</span>
+                        <input type="color" value={qrColor} onChange={(e) => setQrColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer shrink-0 bg-transparent border-0 p-0" />
+                        <label className="text-[10px] text-slate-400 font-bold uppercase ml-2 shrink-0 border border-slate-700 p-2 rounded-lg bg-[#0B0F12] cursor-pointer hover:bg-slate-800 transition">
+                          <span className="flex items-center gap-1">🖼️ Încarcă Logo Centru</span>
                           <input type="file" accept="image/png, image/jpeg, image/svg+xml" onChange={handleQrLogoUpload} className="hidden" />
                         </label>
-                        {qrLogo && <button type="button" onClick={() => { setQrLogo(null); setQrLogoRatio(1); }} className="text-[10px] text-red-400 font-bold hover:underline">❌</button>}
+                        {qrLogo && <button type="button" onClick={() => { setQrLogo(null); setQrLogoRatio(1); }} className="text-[10px] text-red-400 font-bold hover:underline">Elimină ❌</button>}
                       </div>
                       {(!isPremium && !profil?.has_qr_branding) && (
-                        <button onClick={() => handleCheckout('qr_branding')} className="text-[9px] font-bold bg-amber-900/30 text-amber-500 px-2 py-0.5 rounded ml-auto">Deblochează Branding (49 RON)</button>
+                        <button onClick={() => handleCheckout('qr_branding')} className="text-[9px] font-bold bg-amber-900/30 text-amber-500 px-3 py-1 rounded-lg ml-auto">Deblochează Branding (49 RON)</button>
                       )}
                     </div>
                   </div>
 
-                  {/* Right: Render / Preview */}
-                  <div className="bg-[#16221A] rounded p-4 flex flex-col items-center justify-center border border-slate-800 shrink-0 mx-auto lg:mx-0 w-full lg:w-auto">
-                    <div className="bg-white p-2 rounded shadow-md relative flex justify-center items-center overflow-hidden mb-3">
+                  {/* Right: QR Preview Area */}
+                  <div className="w-full lg:w-[240px] shrink-0 border border-slate-800 rounded-xl bg-[#0B0F12] p-5 flex flex-col justify-center items-center">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-4 block">Live Preview</span>
+                    <div className="bg-white p-3 rounded-lg shadow-md relative flex justify-center items-center overflow-hidden mb-5">
                       <QRCodeCanvas 
                         id="contract-qr"
                         value={getQrValue()} 
-                        size={110} 
+                        size={150} 
                         level={"H"}
                         fgColor={qrColor}
                         bgColor="#FFFFFF"
                         imageSettings={qrLogo ? { 
                           src: qrLogo, 
-                          height: qrLogoRatio > 1 ? 35 / qrLogoRatio : 35, 
-                          width: qrLogoRatio > 1 ? 35 : 35 * qrLogoRatio, 
+                          height: qrLogoRatio > 1 ? 40 / qrLogoRatio : 40, 
+                          width: qrLogoRatio > 1 ? 40 : 40 * qrLogoRatio, 
                           excavate: true 
                         } : undefined}
                       />
@@ -1643,20 +1655,20 @@ export default function Home() {
                         />
                       </div>
                       {['dynamic', 'smart', 'geo', 'landing'].includes(qrType) && (
-                        <div className="absolute -bottom-1 -right-1 bg-purple-600 p-1 rounded-full shadow-md">
+                        <div className="absolute -bottom-1 -right-1 bg-purple-600 p-1.5 rounded-full shadow-md">
                           <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                         </div>
                       )}
                     </div>
 
-                    <div className="flex gap-2 w-full">
-                      <button onClick={handleDownloadQR} className="flex-1 py-1.5 bg-[#8ba888] hover:bg-[#7a9677] text-[#0B0F12] font-black rounded transition-colors flex justify-center items-center gap-1 text-[10px] uppercase tracking-wide">
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                        Salvează
+                    <div className="flex flex-col gap-2 w-full">
+                      <button onClick={handleDownloadQR} className="w-full py-2 bg-[#8ba888] hover:bg-[#7a9677] text-[#0B0F12] font-black rounded-lg transition-colors flex justify-center items-center gap-1.5 text-[11px] uppercase tracking-wide">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        Descarcă QR
                       </button>
                       {(['dynamic', 'smart', 'geo', 'landing'].includes(qrType) && (isPremium || profil?.has_qr_dynamic)) && (
-                        <button onClick={fetchStats} className="px-2 border border-purple-500 text-purple-400 hover:bg-purple-500/10 font-bold rounded transition-colors uppercase tracking-wide text-[10px]">
-                          📊
+                        <button onClick={fetchStats} className="w-full py-1.5 border border-purple-500 text-purple-400 hover:bg-purple-500/10 font-bold rounded-lg transition-colors uppercase tracking-wide text-[10px]">
+                          📊 Statistici Scanări
                         </button>
                       )}
                     </div>
