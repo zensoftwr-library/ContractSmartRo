@@ -1367,7 +1367,7 @@ export default function Home() {
                   {/* Partea stanga: Controale */}
                   <div className="flex-1 p-6 lg:border-r border-slate-800/80">
                     <div className="flex items-center gap-3 mb-6">
-                      <span className="text-2xl">🧮</span>
+                      <span className="text-2xl"></span>
                       <div>
                         <h4 className="text-white font-bold text-sm">Calculator Fiscal 2026</h4>
                         <p className="text-[11px] text-slate-400">Plafoane CASS & Impozit</p>
@@ -1455,7 +1455,7 @@ export default function Home() {
                 {/* Header integrat cu Tabs */}
                 <div className="px-6 py-4 border-b border-slate-800/80 bg-[#0B0F12]/30 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                   <div className="flex items-center gap-3 shrink-0">
-                    <span className="text-2xl">⚡</span>
+                    <span className="text-2xl"></span>
                     <div>
                       <h3 className="text-sm font-bold text-white uppercase tracking-wider block">ContractSmart QR ProStudio</h3>
                     </div>
