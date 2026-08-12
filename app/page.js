@@ -2428,10 +2428,6 @@ export default function Home() {
             <div className="flex justify-center space-x-6 text-xs text-slate-400 font-medium">
               <span onClick={() => { setStep(1); const el = document.getElementById('sectiune-preturi'); el?.scrollIntoView({ behavior: 'smooth' }); }} className="hover:text-[#8ba888] cursor-pointer transition">Planuri & Tarife</span>
               <span>•</span>
-              <Link href="/modele-contracte" className="hover:text-[#8ba888] transition">Modele Predefinite</Link>
-              <span>•</span>
-              <Link href="/baza-legala" className="hover:text-[#8ba888] transition">Articole Validitate Juridică & Cod Civil</Link>
-              <span>•</span>
               <Link href="/despre-noi" className="hover:text-[#8ba888] transition">Despre Noi</Link>
               <span>•</span>
               <Link href="/contact" className="hover:text-[#8ba888] transition">Contact</Link>
