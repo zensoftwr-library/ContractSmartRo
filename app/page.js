@@ -1153,6 +1153,8 @@ export default function Home() {
             <span className="text-slate-800">|</span>
             <Link href="/baza-legala" className="text-xs text-slate-400 hover:text-white transition">Articole Validitate Juridică</Link>
             <span className="text-slate-800">|</span>
+            <Link href="/bursa" className="text-xs text-[#8ba888] font-bold hover:text-white transition">Terminal Bursa</Link>
+            <span className="text-slate-800">|</span>
             <Link href="/termeni-si-conditii" className="text-xs text-slate-400 hover:text-white transition">Termeni și Condiții</Link>
             <span className="text-slate-800">|</span>
             <Link href="/contact" className="text-xs text-slate-400 hover:text-white transition">Contact</Link>
@@ -1186,6 +1188,7 @@ export default function Home() {
           <div className="md:hidden flex flex-col space-y-4 pt-4 mt-4 border-t border-slate-800 animate-fadeIn">
             <Link href="/modele-contracte" className="text-sm text-slate-300 hover:text-white">Modele Contracte Standard</Link>
             <Link href="/baza-legala" className="text-sm text-slate-300 hover:text-white">Articole Validitate Juridică</Link>
+            <Link href="/bursa" className="text-sm text-[#8ba888] font-bold hover:text-white">Terminal Bursa</Link>
             <Link href="/termeni-si-conditii" className="text-sm text-slate-300 hover:text-white">Termeni și Condiții</Link>
             <Link href="/contact" className="text-sm text-slate-300 hover:text-white">Contact</Link>
             
