@@ -64,7 +64,7 @@ export default function GlobalAIAssistant({ user }) {
           <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#0B0F12]">
             {aiChatMessages.length === 0 ? (
               <div className="text-center text-slate-500 text-xs mt-10">
-                <svg viewBox="0 0 240 40" className="w-[150px] h-[26px] block">
+                <svg viewBox="0 0 240 40" className="w-[150px] h-[26px] block mx-auto">
                   <g transform="translate(0, 2)">
                     <path d="M24 6 C15 6, 8 13, 8 22 C8 31, 15 38, 24 38 C31 38, 37 33, 39 27" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round"/>
                     <path d="M16 21 L21 26 L32 12" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
@@ -73,7 +73,7 @@ export default function GlobalAIAssistant({ user }) {
                     Contract<tspan fill="#8ba888">Smart</tspan>
                   </text>
                 </svg>
-                Salut! Te pot ajuta cu redactarea clauzelor, explicații din Codul Civil sau proceduri auto. Cu ce începem?
+                <p className="mt-3">Salut! Te pot ajuta cu redactarea clauzelor, explicații din Codul Civil sau proceduri auto. Cu ce începem?</p>
               </div>
             ) : (
               aiChatMessages.map((msg, idx) => (
