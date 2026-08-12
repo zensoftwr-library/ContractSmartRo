@@ -1108,6 +1108,24 @@ export default function Home() {
       }}
     >
       
+      {/* 📈 BARA TICKER DINAMICĂ LIVE */}
+      <div className="w-full bg-[#12181D] border-b border-slate-800 text-[11px] text-slate-400 py-2 overflow-hidden whitespace-nowrap relative z-50 flex">
+        <div className="animate-marquee font-mono flex gap-12 items-center shrink-0 min-w-full justify-around pr-6">
+          <span>📈 <strong>EUR/RON:</strong> {cursBnr.eur} lei</span>
+          <span>🇺🇸 <strong>USD/RON:</strong> {cursBnr.usd} lei</span>
+          <span>📊 <strong>BET Index (BVB):</strong> {indiciBursa.bet.puncte} ({indiciBursa.bet.procent})</span>
+          <span>📊 <strong>S&P 500 (US):</strong> {indiciBursa.sp500.puncte} ({indiciBursa.sp500.procent})</span>
+          <span>📊 <strong>NASDAQ (US):</strong> {indiciBursa.nasdaq.puncte} ({indiciBursa.nasdaq.procent})</span>
+        </div>
+        <div className="animate-marquee font-mono flex gap-12 items-center shrink-0 min-w-full justify-around pr-6 select-none" aria-hidden="true">
+          <span>📈 <strong>EUR/RON:</strong> {cursBnr.eur} lei</span>
+          <span>🇺🇸 <strong>USD/RON:</strong> {cursBnr.usd} lei</span>
+          <span>📊 <strong>BET Index (BVB):</strong> {indiciBursa.bet.puncte} ({indiciBursa.bet.procent})</span>
+          <span>📊 <strong>S&P 500 (US):</strong> {indiciBursa.sp500.puncte} ({indiciBursa.sp500.procent})</span>
+          <span>📊 <strong>NASDAQ (US):</strong> {indiciBursa.nasdaq.puncte} ({indiciBursa.nasdaq.procent})</span>
+        </div>
+      </div>
+
       {/* NAVBAR */}
       <nav className="sticky top-0 z-40 backdrop-blur-md bg-[#0B0F12]/90 border-b border-slate-800 py-4 px-6 shadow-md transition-all">
         <div className="flex justify-between items-center w-full">
