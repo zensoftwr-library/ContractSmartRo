@@ -5,6 +5,8 @@
 body {
   background-color: #0B0F12;
   color: #E2E8F0;
+  /* Previne scroll-ul orizontal cauzat de animatiile fundalului */
+  overflow-x: hidden; 
 }
 
 /* 📈 ANIMAȚIE CONTINUĂ PENTRU MARQUEE SENSE PRO */
@@ -15,6 +17,31 @@ body {
 
 .animate-marquee {
   animation: marquee 30s linear infinite;
+}
+
+/* ✨ ANIMAȚII PREMIUM PENTRU FUNDAL (AMBIENT BLOBS) ✨ */
+@keyframes blob-float-1 {
+  0% { transform: translate(0px, 0px) scale(1) rotate(0deg); }
+  33% { transform: translate(30px, -50px) scale(1.1) rotate(120deg); }
+  66% { transform: translate(-20px, 20px) scale(0.9) rotate(240deg); }
+  100% { transform: translate(0px, 0px) scale(1) rotate(360deg); }
+}
+
+@keyframes blob-float-2 {
+  0% { transform: translate(0px, 0px) scale(1) rotate(0deg); }
+  33% { transform: translate(-40px, 40px) scale(1.05) rotate(-120deg); }
+  66% { transform: translate(30px, -30px) scale(0.95) rotate(-240deg); }
+  100% { transform: translate(0px, 0px) scale(1) rotate(-360deg); }
+}
+
+.animate-blob-1 {
+  animation: blob-float-1 25s infinite cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.animate-blob-2 {
+  animation: blob-float-2 28s infinite cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
 }
 
 /* Stiluri utilitare opționale pentru scrollbar fin */
