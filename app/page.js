@@ -1205,8 +1205,14 @@ export default function Home() {
 
       {/* AMBIENT BLOBS */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-clip">
-        <div className="absolute w-[500px] h-[500px] rounded-full bg-[#8ba888]/5 blur-[100px] transform-gpu" style={{ top: 'calc(10% + (var(--scroll-y) * 0.3))', left: '15%' }} />
-        <div className="absolute w-[600px] h-[600px] rounded-full bg-slate-700/5 blur-[120px] transform-gpu" style={{ top: 'calc(50% - (var(--scroll-y) * 0.2))', right: '10%' }} />
+        <div 
+          className="absolute w-[500px] h-[500px] rounded-full bg-[#8ba888]/10 blur-[120px] animate-blob-1" 
+          style={{ top: 'calc(10% + (var(--scroll-y) * 0.3))', left: '15%' }} 
+        />
+        <div 
+          className="absolute w-[600px] h-[600px] rounded-full bg-slate-600/10 blur-[130px] animate-blob-2 mix-blend-screen" 
+          style={{ top: 'calc(50% - (var(--scroll-y) * 0.2))', right: '10%' }} 
+        />
       </div>
 
       <div className="relative z-10">
