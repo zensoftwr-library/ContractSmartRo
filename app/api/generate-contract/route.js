@@ -20,7 +20,8 @@ export async function POST(request) {
       tipContract, initiatorRol, obiect, valoare, moneda, 
       prestatorNume, prestatorCui, clientNume, clientCui, 
       clientEmail, semnăturaBase64, userId, adaugaProcesVerbal, captchaToken,
-      constructiiMateriale, constructiiManopera, constructiiSuprafata, constructiiPretMp
+      constructiiMateriale, constructiiManopera, constructiiSuprafata, constructiiPretMp,
+      adaugaQrPlata, ibanPlata
     } = body;
 
     // -------------------------------------------------------------------------
@@ -115,7 +116,6 @@ export async function POST(request) {
 
     let clauzeInjectateHtml = '';
     
-    // CLAUZE GENERICE - EXTINSE
     const rules = [
       { cond: body.clauzaPi && tipContract === 'inchiriere_imobil', html: `<li><strong>ART. 4.1. CLAUZĂ DE INVESTIRE CU TITLU EXECUTORIU:</strong> În conformitate cu art. 1798 Cod Civil, prezentul contract constituie titlu executoriu de drept pentru recuperarea chiriilor restante și pentru evacuarea rapidă a Locatarului la expirarea termenului sau în caz de neplată, fără somație și fără procedură judecătorească prealabilă.</li>` },
       { cond: body.clauzaPi && tipContract === 'cda', html: `<li><strong>ART. 4.1. TRANSFER CONDIȚIONAT DE REMUNERAȚIE:</strong> Drepturile patrimoniale de exploatare a operei se transferă exclusiv condiționat de decontarea integrală, efectivă și confirmată bancar a prețului. Orice utilizare anterioară constituie delict civil și încălcare a drepturilor de autor.</li>` },
@@ -246,6 +246,16 @@ export async function POST(request) {
             font-style: italic; 
             padding-top: 20px; 
           }
+          .qr-pay-box {
+            margin: 25px auto; 
+            padding: 15px; 
+            border: 2px dashed #cbd5e1; 
+            background-color: #f8fafc; 
+            text-align: center; 
+            max-width: 320px; 
+            page-break-inside: avoid;
+            border-radius: 8px;
+          }
           .legal-footer { 
             margin-top: 70px; 
             border-top: 1px solid #e2e8f0; 
@@ -322,6 +332,14 @@ export async function POST(request) {
               <td style="padding: 6px; font-weight: bold;">${(parseFloat(constructiiSuprafata || 0) * parseFloat(constructiiPretMp || 0)).toFixed(2)}</td>
             </tr>
           </table>
+        </div>
+        ` : ''}
+
+        ${adaugaQrPlata && ibanPlata ? `
+        <div class="qr-pay-box">
+          <strong style="display: block; margin-bottom: 8px; font-size: 12px; text-transform: uppercase;">Atașament Încasare Rapidă (QR Pay)</strong>
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(ibanPlata)}&format=png" width="120" height="120" style="margin-bottom: 8px; border-radius: 4px;" />
+          <div style="font-size: 11px; font-family: monospace; word-break: break-all; color: #333;">Scanează pentru plată:<br><strong>${ibanPlata}</strong></div>
         </div>
         ` : ''}
 

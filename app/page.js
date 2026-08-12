@@ -34,7 +34,7 @@ const nomenclatorClauze = {
     { id: 'clauzaMedicalMalpraxis', titlu: '18. Exonerare Răspundere și Malpraxis', detaliu: 'Delimitarea răspunderii furnizorului în limitele obligațiilor de mijloace și a consimțământului informat semnat, sub acoperirea exclusivă a polizei de răspundere civilă profesională.' },
     { id: 'clauzaMedicalNoShow', titlu: '19. Politică Strictă de Anulare Programări', detaliu: 'Anularea ședințelor programate cu mai puțin de 24 de ore înainte atrage facturarea integrală a tariefelor aferente sau reținerea definitivă a creditului din pachetul achiziționat.' },
     { id: 'clauzaTranspCmr', titlu: '20. Răspundere conform Convenției CMR', detaliu: 'Angajarea răspunderii transportatorului pentru pierderea, avarierea mărfii sau depășirea termenului de livrare se guvernează strict de limitele plafonate impuse de Convenția CMR.' },
-    { id: 'clauzaTranspStationare', titlu: '21. Taxă de Staționare / Demurrage', detaliu: 'Depășirea timpului alocat pentru operațiunile de încărcare/descărcare la rampă atrage aplicarea unei taxe fixe de staționare, calculată pe fiecare order de imobilizare a autovehiculului.' }
+    { id: 'clauzaTranspStationare', titlu: '21. Taxă de Staționare / Demurrage', detaliu: 'Depășirea timpului alocat pentru operațiunile de încărcare/descărcare la rampă atrage aplicarea unei taxe fixe de staționare, calculată pe fiecare oră de imobilizare a autovehiculului.' }
   ],
   colaborare_b2b: [
     { id: 'clauzaPi', titlu: '1. Suspendare IP / Proprietate Intelectuală', detaliu: 'Drepturile patrimoniale de autor se transferă exclusiv la data stingerii integrale a obligațiilor de plată.' },
@@ -272,7 +272,8 @@ export default function Home() {
     clauzaRawFoto: false, clauzaMarketingTerti: false, clauzaAprobareTacita: false, clauzaTaxaAnulare: false,
     clauzaSplitPayment: false, clauzaRetentie: false,
     clauzaLimitareRaspundere: false, clauzaInflatie: false, adaugaProcesVerbal: false,
-    constructiiMateriale: '', constructiiManopera: '', constructiiSuprafata: '', constructiiPretMp: ''
+    constructiiMateriale: '', constructiiManopera: '', constructiiSuprafata: '', constructiiPretMp: '',
+    adaugaQrPlata: false, ibanPlata: ''
   });
 
   const [autoDocs, setAutoDocs] = useState({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon: null });
@@ -590,7 +591,7 @@ export default function Home() {
   const handleInapoiPrincipal = () => {
     setStep(1);
     setAutoStep('upload');
-    setFormData({ tipContract: 'prestari', initiatorRol: 'prestator', prestatorNume: '', prestatorCui: '', prestatorEmail: '', prestatorLogo: '', prestatorCuloare: '#8ba888', clientNume: '', clientCui: '', clientEmail: '', obiect: '', valoare: '', moneda: 'RON', emiteFacturaAvans: false, estePlatitorTVA: false, clauzaPi: true, clauzaPenalitati: true, clauzaRevizii: false, tarifOrar: '150', clauzaRawFoto: false, clauzaMarketingTerti: false, clauzaAprobareTacita: false, clauzaTaxaAnulare: false, clauzaSplitPayment: false, clauzaRetentie: false, clauzaLimitareRaspundere: false, clauzaInflatie: false, adaugaProcesVerbal: false, constructiiMateriale: '', constructiiManopera: '', constructiiSuprafata: '', constructiiPretMp: '' });
+    setFormData({ tipContract: 'prestari', initiatorRol: 'prestator', prestatorNume: '', prestatorCui: '', prestatorEmail: '', prestatorLogo: '', prestatorCuloare: '#8ba888', clientNume: '', clientCui: '', clientEmail: '', obiect: '', valoare: '', moneda: 'RON', emiteFacturaAvans: false, estePlatitorTVA: false, clauzaPi: true, clauzaPenalitati: true, clauzaRevizii: false, tarifOrar: '150', clauzaRawFoto: false, clauzaMarketingTerti: false, clauzaAprobareTacita: false, clauzaTaxaAnulare: false, clauzaSplitPayment: false, clauzaRetentie: false, clauzaLimitareRaspundere: false, clauzaInflatie: false, adaugaProcesVerbal: false, constructiiMateriale: '', constructiiManopera: '', constructiiSuprafata: '', constructiiPretMp: '', adaugaQrPlata: false, ibanPlata: '' });
     curataCanvas();
     curataCanvasAuto();
     setAutoData({ vanzatorTip: 'PF', vanzatorNume: '', vanzatorCnp: '', vanzatorCui: '', vanzatorRegCom: '', vanzatorSediu: '', cumparatorTip: 'PF', cumparatorNume: '', cumparatorCnp: '', cumparatorCui: '', cumparatorRegCom: '', cumparatorSediu: '', autoVin: '', autoMarcaModel: '', autoNumarInmatriculare: '', autoPret: '', clientEmail: '', autoAdresaVanzator: '', autoAdresaCumparator: '', pretIncludeTVA: false, autoMoneda: 'RON', semnaturaBase64: null });
@@ -1205,14 +1206,12 @@ export default function Home() {
 
       {/* PREMIUM CINEMATIC LIGHT LEAKS (FROSTED AURORA) - SAFARI OPTIMIZED */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        {/* Emerald Glow - Sursă de lumină colț stânga-sus */}
         <div 
           className="absolute -top-[20%] -left-[10%] w-[100vw] h-[100vw] min-w-[600px] min-h-[600px] rounded-full animate-glow-1"
           style={{
             background: 'radial-gradient(circle, rgba(139, 168, 136, 0.12) 0%, rgba(11, 15, 18, 0) 65%)'
           }}
         />
-        {/* Slate Glow - Sursă de lumină colț dreapta-jos */}
         <div 
           className="absolute -bottom-[20%] -right-[10%] w-[100vw] h-[100vw] min-w-[600px] min-h-[600px] rounded-full animate-glow-2"
           style={{
@@ -1377,7 +1376,7 @@ export default function Home() {
               <div className="bg-[#12181D] rounded-2xl border border-slate-800/80 shadow-xl p-6 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center gap-3 mb-6 border-b border-slate-800/80 pb-4">
-                    <span className="text-3xl"></span>
+                    <span className="text-3xl">🧮</span>
                     <div>
                       <h4 className="text-white font-bold text-sm">Calculator Fiscal 2026</h4>
                       <p className="text-[11px] text-slate-400">Plafoane CASS & Impozit</p>
@@ -1465,7 +1464,7 @@ export default function Home() {
                 {/* Header & Tabs */}
                 <div className="p-6 border-b border-slate-800/80 bg-[#0B0F12]/30 rounded-t-2xl">
                   <div className="flex items-center gap-3 mb-4">
-                    <span className="text-2xl"></span>
+                    <span className="text-2xl">⚡</span>
                     <div>
                       <h3 className="text-sm font-bold text-white uppercase tracking-wider block">ContractSmart QR ProStudio</h3>
                       <p className="text-[11px] text-slate-400 mt-0.5">Generator multifuncțional avansat.</p>
@@ -1494,9 +1493,9 @@ export default function Home() {
                 </div>
 
                 {/* Main Content Area */}
-                <div className="p-6 flex flex-col sm:flex-row gap-6 h-full">
+                <div className="p-6 flex flex-col sm:flex-row gap-6 h-auto lg:h-full">
                   {/* Left Form */}
-                  <div className="flex-1 flex flex-col justify-between space-y-4 h-full">
+                  <div className="flex-1 flex flex-col justify-between space-y-4 h-auto lg:h-full">
                     <div>
                       {qrType === 'url' && (
                         <input type="text" placeholder="https://site-ul-tau.ro" value={qrUrl} onChange={(e) => setQrUrl(e.target.value)} className="w-full bg-[#0B0F12] border border-slate-700 rounded-lg p-3 text-white text-sm focus:border-[#8ba888] outline-none" />
@@ -1519,9 +1518,9 @@ export default function Home() {
 
                       {qrType === 'wifi' && (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <input type="text" placeholder="Nume Rețea (SSID)" value={wifiData.ssid} onChange={(e) => setWifiData({...wifiData, ssid: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-[#8ba888] outline-none sm:col-span-2" />
-                          <input type="text" placeholder="Parolă Rețea" value={wifiData.password} onChange={(e) => setWifiData({...wifiData, password: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-[#8ba888] outline-none" />
-                          <select value={wifiData.type} onChange={e => setWifiData({...wifiData, type: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs outline-none">
+                          <input type="text" placeholder="Nume Rețea (SSID)" value={wifiData.ssid} onChange={(e) => setWifiData({...wifiData, ssid: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-3 text-white text-xs focus:border-[#8ba888] outline-none sm:col-span-2" />
+                          <input type="text" placeholder="Parolă Rețea" value={wifiData.password} onChange={(e) => setWifiData({...wifiData, password: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-3 text-white text-xs focus:border-[#8ba888] outline-none" />
+                          <select value={wifiData.type} onChange={e => setWifiData({...wifiData, type: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-3 text-white text-xs outline-none">
                             <option value="WPA">Securitate WPA/WPA2</option>
                             <option value="WEP">Securitate WEP</option>
                             <option value="nopass">Fără parolă (Liber)</option>
@@ -1531,67 +1530,73 @@ export default function Home() {
 
                       {qrType === 'vcard' && (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <input type="text" placeholder="Nume Complet" value={qrData.nume} onChange={(e) => setQrData({...qrData, nume: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-[#8ba888] outline-none sm:col-span-2" />
-                          <input type="text" placeholder="Funcție / Titlu" value={qrData.functie} onChange={(e) => setQrData({...qrData, functie: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-[#8ba888] outline-none sm:col-span-2" />
-                          <input type="text" placeholder="Telefon" value={qrData.telefon} onChange={(e) => setQrData({...qrData, telefon: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-[#8ba888] outline-none" />
-                          <input type="email" placeholder="Email" value={qrData.email} onChange={(e) => setQrData({...qrData, email: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-[#8ba888] outline-none" />
+                          <input type="text" placeholder="Nume Complet" value={qrData.nume} onChange={(e) => setQrData({...qrData, nume: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-3 text-white text-xs focus:border-[#8ba888] outline-none sm:col-span-2" />
+                          <input type="text" placeholder="Funcție / Titlu" value={qrData.functie} onChange={(e) => setQrData({...qrData, functie: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-3 text-white text-xs focus:border-[#8ba888] outline-none sm:col-span-2" />
+                          <input type="text" placeholder="Telefon" value={qrData.telefon} onChange={(e) => setQrData({...qrData, telefon: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-3 text-white text-xs focus:border-[#8ba888] outline-none" />
+                          <input type="email" placeholder="Email" value={qrData.email} onChange={(e) => setQrData({...qrData, email: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded-lg p-3 text-white text-xs focus:border-[#8ba888] outline-none" />
                         </div>
                       )}
 
                       {qrType === 'dynamic' && (
-                        <div className="p-4 bg-purple-900/10 border border-purple-500/20 rounded-xl space-y-4">
-                          <div>
+                        <div className="p-4 bg-purple-900/10 border border-purple-500/20 rounded-xl flex flex-col md:flex-row gap-4 items-center">
+                          <div className="w-full md:w-1/2">
                             <label className="text-[10px] text-purple-400 uppercase font-bold block mb-1">A. Redirecționare Link Simplu</label>
                             <input type="text" placeholder="https://site-ul-tau.ro/oferta" value={dynamicDestUrl} onChange={e => setDynamicDestUrl(e.target.value)} className="w-full bg-[#0B0F12] border border-purple-500/50 rounded-lg p-2.5 text-white text-xs outline-none" />
                           </div>
-                          <div>
+                          <div className="w-full md:w-1/2">
                             <label className="text-[10px] text-purple-400 uppercase font-bold block mb-1">B. Sau Încărcare PDF</label>
                             <input type="file" accept="application/pdf" onChange={(e) => handleUploadGeneric(e, setUploadedPdfUrl, 'qr_pdfs', setIsUploadingPdf)} className="block w-full text-xs text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-purple-600 file:text-white cursor-pointer" />
                             {isUploadingPdf && <span className="text-[10px] text-purple-400 mt-1 block animate-pulse">Se încarcă PDF...</span>}
                             {uploadedPdfUrl && <span className="text-[10px] text-emerald-400 mt-1 block">✅ PDF Găzduit</span>}
                           </div>
-                          {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
-                            <div className="hidden"><Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} /></div>
-                          )}
-                          <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="w-full bg-purple-600 text-white font-bold px-4 py-2.5 rounded-lg text-xs hover:bg-purple-500 transition">
-                            {isGeneratingShortlink ? 'Securizare...' : '🔗 Salvează Dinamic'}
-                          </button>
+                          <div className="shrink-0 w-full md:w-auto mt-2 md:mt-0">
+                            {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
+                              <div className="hidden"><Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} /></div>
+                            )}
+                            <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="w-full bg-purple-600 text-white font-bold px-5 py-2.5 rounded-lg text-xs hover:bg-purple-500 transition whitespace-nowrap">
+                              {isGeneratingShortlink ? 'Securizare...' : '🔗 Salvează'}
+                            </button>
+                          </div>
                         </div>
                       )}
 
                       {qrType === 'smart' && (
-                        <div className="p-4 bg-blue-900/10 border border-blue-500/20 rounded-xl space-y-3">
-                          <input type="url" placeholder="🍏 Link App Store (iOS)" value={iosUrl} onChange={(e) => setIosUrl(e.target.value)} className="w-full bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-blue-500 outline-none" />
-                          <input type="url" placeholder="🤖 Link Google Play (Android)" value={androidUrl} onChange={(e) => setAndroidUrl(e.target.value)} className="w-full bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-blue-500 outline-none" />
-                          {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
-                            <div className="hidden"><Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} /></div>
-                          )}
-                          <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="w-full bg-blue-600 text-white font-bold px-4 py-2.5 rounded-lg text-xs hover:bg-blue-500 transition">Activează Routing</button>
+                        <div className="p-4 bg-blue-900/10 border border-blue-500/20 rounded-xl flex flex-col md:flex-row gap-3 items-center">
+                          <input type="url" placeholder="🍏 Link App Store (iOS)" value={iosUrl} onChange={(e) => setIosUrl(e.target.value)} className="w-full flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-blue-500 outline-none" />
+                          <input type="url" placeholder="🤖 Link Google Play (Android)" value={androidUrl} onChange={(e) => setAndroidUrl(e.target.value)} className="w-full flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-blue-500 outline-none" />
+                          <div className="shrink-0 w-full md:w-auto">
+                            {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
+                              <div className="hidden"><Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} /></div>
+                            )}
+                            <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="w-full bg-blue-600 text-white font-bold px-5 py-2.5 rounded-lg text-xs hover:bg-blue-500 transition">Activează Routing</button>
+                          </div>
                         </div>
                       )}
 
                       {qrType === 'geo' && (
-                        <div className="p-4 bg-blue-900/10 border border-blue-500/20 rounded-xl space-y-3">
+                        <div className="p-4 bg-blue-900/10 border border-blue-500/20 rounded-xl flex flex-col gap-3">
                           {geoRules.map((rule, idx) => (
                             <div key={idx} className="flex gap-2">
-                              <input type="text" placeholder="Cod Țară (RO)" value={rule.country} onChange={(e) => { const newRules = [...geoRules]; newRules[idx].country = e.target.value.toUpperCase(); setGeoRules(newRules); }} className="w-20 bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-white text-xs text-center font-bold outline-none" disabled={rule.country === 'DEFAULT'} />
-                              <input type="url" placeholder="URL Destinație" value={rule.url} onChange={(e) => { const newRules = [...geoRules]; newRules[idx].url = e.target.value; setGeoRules(newRules); }} className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-white text-xs outline-none" />
+                              <input type="text" placeholder="Cod Țară (RO)" value={rule.country} onChange={(e) => { const newRules = [...geoRules]; newRules[idx].country = e.target.value.toUpperCase(); setGeoRules(newRules); }} className="w-24 bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-white text-xs text-center font-bold outline-none" disabled={rule.country === 'DEFAULT'} />
+                              <input type="url" placeholder="URL Destinație Specifică" value={rule.url} onChange={(e) => { const newRules = [...geoRules]; newRules[idx].url = e.target.value; setGeoRules(newRules); }} className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-white text-xs outline-none" />
                             </div>
                           ))}
                           <div className="flex justify-between items-center mt-1">
-                            <button type="button" onClick={() => setGeoRules([...geoRules.slice(0, -1), { country: '', url: '' }, geoRules[geoRules.length-1]])} className="text-[10px] text-blue-400 font-bold underline">+ Adaugă regulă</button>
+                            <button type="button" onClick={() => setGeoRules([...geoRules.slice(0, -1), { country: '', url: '' }, geoRules[geoRules.length-1]])} className="text-[10px] text-blue-400 font-bold underline">+ Adaugă regulă țară</button>
                             {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
                               <div className="hidden"><Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} /></div>
                             )}
-                            <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="bg-blue-600 text-white font-bold px-4 py-1.5 rounded-lg text-[11px] hover:bg-blue-500 transition">Activează Geo-Route</button>
+                            <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="bg-blue-600 text-white font-bold px-5 py-2 rounded-lg text-[11px] hover:bg-blue-500 transition">Activează Geo-Route</button>
                           </div>
                         </div>
                       )}
 
                       {qrType === 'landing' && (
-                        <div className="p-4 bg-blue-900/10 border border-blue-500/20 rounded-xl space-y-3 max-h-56 overflow-y-auto custom-scrollbar">
-                          <input type="text" placeholder="Titlu (ex: Restaurantul Meu)" value={landingData.title} onChange={(e) => setLandingData({...landingData, title: e.target.value})} className="w-full bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs outline-none" />
-                          <input type="file" accept="image/png, image/jpeg" onChange={(e) => handleUploadGeneric(e, (url) => setLandingData({...landingData, avatarUrl: url}), 'landing_images', setIsUploadingPdf)} className="block w-full text-[10px] text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:bg-blue-600 file:text-white cursor-pointer" />
+                        <div className="p-4 bg-blue-900/10 border border-blue-500/20 rounded-xl flex flex-col gap-3 max-h-56 overflow-y-auto custom-scrollbar">
+                          <div className="flex flex-col sm:flex-row gap-3">
+                            <input type="text" placeholder="Titlu (ex: Restaurantul Meu)" value={landingData.title} onChange={(e) => setLandingData({...landingData, title: e.target.value})} className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs outline-none" />
+                            <input type="file" accept="image/png, image/jpeg" onChange={(e) => handleUploadGeneric(e, (url) => setLandingData({...landingData, avatarUrl: url}), 'landing_images', setIsUploadingPdf)} className="flex-1 text-[10px] text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-blue-600 file:text-white cursor-pointer" />
+                          </div>
                           {landingData.links.map((link, idx) => (
                             <div key={idx} className="flex gap-2">
                               <input type="text" placeholder="Nume Buton" value={link.label} onChange={(e) => { const newLinks = [...landingData.links]; newLinks[idx].label = e.target.value; setLandingData({...landingData, links: newLinks}); }} className="w-1/3 bg-[#0B0F12] border border-slate-700 rounded-lg p-2 text-white text-[11px] outline-none" />
@@ -1599,16 +1604,16 @@ export default function Home() {
                             </div>
                           ))}
                           <div className="flex justify-between items-center">
-                            <button type="button" onClick={() => setLandingData({...landingData, links: [...landingData.links, { label: '', url: '' }]})} className="text-[10px] text-blue-400 font-bold underline">+ Adaugă Link</button>
+                            <button type="button" onClick={() => setLandingData({...landingData, links: [...landingData.links, { label: '', url: '' }]})} className="text-[10px] text-blue-400 font-bold underline block">+ Adaugă Link</button>
                             {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
                               <div className="hidden"><Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} /></div>
                             )}
-                            <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="bg-blue-600 text-white font-bold px-4 py-1.5 rounded-lg text-[11px] hover:bg-blue-500 transition">Generează Landing</button>
+                            <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="bg-blue-600 text-white font-bold px-5 py-1.5 rounded-lg text-[11px] hover:bg-blue-500 transition">Generează Landing</button>
                           </div>
                         </div>
                       )}
                     </div>
-
+                    
                     {/* Branding Bar sub form */}
                     <div className="flex items-center gap-3 pt-4 border-t border-slate-800/50 mt-4">
                       <div className={`flex items-center gap-3 ${(!isPremium && !profil?.has_qr_branding) ? 'opacity-50 pointer-events-none' : ''}`}>
@@ -1626,10 +1631,10 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* Right: Render / Preview */}
-                  <div className="w-full sm:w-[220px] shrink-0 border border-slate-800 rounded-xl bg-[#0B0F12]/50 p-5 flex flex-col justify-center items-center h-full">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-5 block">Live Preview QR</span>
-                    <div className="bg-white p-3 rounded-xl shadow-md relative flex justify-center items-center overflow-hidden mb-6">
+                  {/* Right: QR Preview Area */}
+                  <div className="w-full sm:w-[220px] shrink-0 border border-slate-800 rounded-xl bg-[#0B0F12]/50 p-5 flex flex-col justify-center items-center h-auto">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-4 block">Live Preview</span>
+                    <div className="bg-white p-3 rounded-xl shadow-md relative flex justify-center items-center overflow-hidden mb-5">
                       <QRCodeCanvas 
                         id="contract-qr"
                         value={getQrValue()} 
@@ -1639,8 +1644,8 @@ export default function Home() {
                         bgColor="#FFFFFF"
                         imageSettings={qrLogo ? { 
                           src: qrLogo, 
-                          height: qrLogoRatio > 1 ? 35 / qrLogoRatio : 35, 
-                          width: qrLogoRatio > 1 ? 35 : 35 * qrLogoRatio, 
+                          height: qrLogoRatio > 1 ? 40 / qrLogoRatio : 40, 
+                          width: qrLogoRatio > 1 ? 40 : 40 * qrLogoRatio, 
                           excavate: true 
                         } : undefined}
                       />
@@ -1673,7 +1678,7 @@ export default function Home() {
                         Descarcă QR
                       </button>
                       {(['dynamic', 'smart', 'geo', 'landing'].includes(qrType) && (isPremium || profil?.has_qr_dynamic)) && (
-                        <button onClick={fetchStats} className="w-full py-2 border border-purple-500/50 text-purple-400 hover:bg-purple-500/10 font-bold rounded-lg transition-colors uppercase tracking-wide text-[10px]">
+                        <button onClick={fetchStats} className="w-full py-1.5 border border-purple-500/50 text-purple-400 hover:bg-purple-500/10 font-bold rounded-lg transition-colors uppercase tracking-wide text-[10px]">
                           📊 Statistici Scanări
                         </button>
                       )}
@@ -1826,6 +1831,25 @@ export default function Home() {
                         </label>
                       </div>
                     )}
+
+                    {/* QR PAY OPTION - NOU */}
+                    <div className="pt-4 border-t border-slate-800 space-y-3">
+                      <span className="text-xs font-bold text-[#8ba888] uppercase block">Opțiuni Încasare & QR Pay</span>
+                      <label className="flex items-center p-3 bg-[#0B0F12] border border-slate-800 rounded cursor-pointer transition hover:border-slate-700">
+                        <input type="checkbox" checked={formData.adaugaQrPlata} onChange={e => setFormData({...formData, adaugaQrPlata: e.target.checked})} className="mr-3 accent-[#8ba888]" />
+                        <span className="text-xs text-white font-bold">Atașează Cod QR de Plată pe Contract</span>
+                      </label>
+                      {formData.adaugaQrPlata && (
+                        <input 
+                          type="text" 
+                          placeholder="Introdu Contul IBAN sau Link de Plată (Stripe/Revolut)" 
+                          value={formData.ibanPlata} 
+                          onChange={e => setFormData({...formData, ibanPlata: e.target.value})} 
+                          className="w-full p-2.5 bg-[#12181D] border border-[#8ba888]/50 rounded text-xs text-white focus:border-[#8ba888] outline-none font-mono transition" 
+                        />
+                      )}
+                    </div>
+
                   </div>
 
                   <div className="pt-4 border-t border-slate-800 space-y-3">
