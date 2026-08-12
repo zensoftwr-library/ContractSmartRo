@@ -632,28 +632,6 @@ export default function Home() {
     return () => subscription?.unsubscribe?.();
   }, []);
 
-  useEffect(() => {
-    fetch('https://open.er-api.com/v6/latest/EUR')
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.rates) {
-          setCursBnr({
-            eur: data.rates.RON ? data.rates.RON.toFixed(4) : '4.9752',
-            usd: (data.rates.RON / data.rates.USD) ? (data.rates.RON / data.rates.USD).toFixed(4) : '4.5820'
-          });
-        }
-      }).catch(() => {});
-
-    const incarcaStiriSecurizat = async () => {
-      try {
-        const res = await fetch('/api/stiri');
-        const data = await res.json();
-        if (data?.success) setStiriLive(data.stiri);
-      } catch (e) {}
-    };
-    incarcaStiriSecurizat();
-  }, []);
-
   const handleCumparaPremium = async (tipProdus = 'founder') => {
     if (isProcessingForm.current) return;
     
@@ -1088,8 +1066,6 @@ export default function Home() {
             <span className="text-slate-800">|</span>
             <Link href="/baza-legala" className="text-xs text-slate-400 hover:text-white transition">Articole Validitate Juridică</Link>
             <span className="text-slate-800">|</span>
-            <Link href="/bursa" className="text-xs text-[#8ba888] font-bold hover:text-white transition">Terminal Bursa</Link>
-            <span className="text-slate-800">|</span>
             <Link href="/contact" className="text-xs text-slate-400 hover:text-white transition">Contact</Link>
             <span className="text-slate-800">|</span>
             
@@ -1121,7 +1097,7 @@ export default function Home() {
           <div className="md:hidden flex flex-col space-y-4 pt-4 mt-4 border-t border-slate-800 animate-fadeIn">
             <Link href="/modele-contracte" className="text-sm text-slate-300 hover:text-white">Modele Contracte Standard</Link>
             <Link href="/baza-legala" className="text-sm text-slate-300 hover:text-white">Articole Validitate Juridică</Link>
-            <Link href="/bursa" className="text-sm text-[#8ba888] font-bold hover:text-white">Terminal Bursa</Link>
+            <Link href="/termeni-si-conditii" className="text-sm text-slate-300 hover:text-white">Termeni și Condiții</Link>
             <Link href="/contact" className="text-sm text-slate-300 hover:text-white">Contact</Link>
             
             {!user ? (
@@ -1314,7 +1290,7 @@ export default function Home() {
                   <div className="flex items-center gap-3 mb-6 border-b border-slate-800/80 pb-4">
                     <span className="text-3xl">🧮</span>
                     <div>
-                      <h4 className="text-[#8ba888] font-bold text-sm">Calculator Fiscal 2026</h4>
+                      <h4 className="text-[#8ba888] font-bold text-sm">CALCULATOR FISCAL 2026</h4>
                       <p className="text-[11px] text-slate-400">Plafoane CASS & Impozit</p>
                     </div>
                   </div>
@@ -2337,6 +2313,34 @@ export default function Home() {
               </div>
               <button onClick={() => handleCumparaPremium('qr_vcard')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded text-xs hover:bg-slate-900">Cumpără 13.99 €</button>
             </div>
+          </div>
+        </div>
+
+        {/* ȘTIRI LIVE - GLOBALE CU THUMBNAILS UI/UX */}
+        <div className="max-w-7xl mx-auto px-6 mt-12 mb-12">
+          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-4">Flux Monitorizare Mediativă Legală Real-Time</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {stiriLive.slice(0, 6).map((stire, i) => (
+              <a href={stire.link} target="_blank" rel="noreferrer" key={i} className="group flex flex-col bg-[#12181D] border border-slate-800 rounded-lg overflow-hidden hover:border-[#8ba888]/50 hover:shadow-[0_0_15px_rgba(139,168,136,0.1)] transition-all h-full">
+                {stire.imagine ? (
+                  <div className="w-full h-32 overflow-hidden border-b border-slate-800">
+                    <img src={stire.imagine} alt="News thumbnail" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  </div>
+                ) : (
+                  <div className="w-full h-2 bg-[#16221A]"></div>
+                )}
+                <div className="p-5 flex flex-col justify-between flex-1">
+                  <div>
+                    <span className="text-[10px] font-bold text-[#8ba888] bg-[#16221A] px-2 py-0.5 rounded border border-emerald-900/50 uppercase inline-block mb-3">{stire.sursa || "Presă Economică"}</span>
+                    <h3 className="text-sm font-bold text-white leading-snug group-hover:text-[#8ba888] transition-colors">{stire.titlu || stire.title}</h3>
+                  </div>
+                  <div className="mt-4 pt-3 border-t border-slate-800/60 flex justify-between items-center">
+                    <span className="text-[10px] text-slate-500">Actualizat Live</span>
+                    <span className="text-xs font-bold text-[#8ba888] group-hover:underline">Citește mai mult &rarr;</span>
+                  </div>
+                </div>
+              </a>
+            ))}
           </div>
         </div>
 
