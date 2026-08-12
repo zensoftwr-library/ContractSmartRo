@@ -1186,7 +1186,6 @@ export default function Home() {
           <div className="md:hidden flex flex-col space-y-4 pt-4 mt-4 border-t border-slate-800 animate-fadeIn">
             <Link href="/modele-contracte" className="text-sm text-slate-300 hover:text-white">Modele Contracte Standard</Link>
             <Link href="/baza-legala" className="text-sm text-slate-300 hover:text-white">Articole Validitate Juridică</Link>
-            <Link href="/bursa" className="text-sm text-[#8ba888] font-bold hover:text-white">Terminal Bursa</Link>
             <Link href="/termeni-si-conditii" className="text-sm text-slate-300 hover:text-white">Termeni și Condiții</Link>
             <Link href="/contact" className="text-sm text-slate-300 hover:text-white">Contact</Link>
             
