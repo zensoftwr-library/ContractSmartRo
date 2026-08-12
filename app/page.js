@@ -2458,6 +2458,8 @@ export default function Home() {
               <span>•</span>
               <Link href="/baza-legala" className="hover:text-[#8ba888] transition">Articole Validitate Juridică & Cod Civil</Link>
               <span>•</span>
+              <Link href="/despre-noi" className="hover:text-[#8ba888] transition font-bold">Despre Noi</Link>
+              <span>•</span>
               <Link href="/contact" className="hover:text-[#8ba888] transition">Contact</Link>
             </div>
             <div className="pt-6 border-t border-slate-800/40 flex flex-col items-center gap-4">
