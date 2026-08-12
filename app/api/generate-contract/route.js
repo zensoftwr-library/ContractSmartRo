@@ -19,7 +19,8 @@ export async function POST(request) {
     const { 
       tipContract, initiatorRol, obiect, valoare, moneda, 
       prestatorNume, prestatorCui, clientNume, clientCui, 
-      clientEmail, semnăturaBase64, userId, adaugaProcesVerbal, captchaToken
+      clientEmail, semnăturaBase64, userId, adaugaProcesVerbal, captchaToken,
+      constructiiMateriale, constructiiManopera, constructiiSuprafata, constructiiPretMp
     } = body;
 
     // -------------------------------------------------------------------------
@@ -95,6 +96,18 @@ export async function POST(request) {
         titluContractOficial = "CONTRACT PRESTĂRI SERVICII EVENIMENTE (ENTERTAINMENT)";
         temeiJuridicHtml = `Încheiat în baza principiului libertății contractuale. Obligația asumată este una de mijloace, nu de rezultat. Suma achitată cu titlu de avans poartă regim de "Non-Refundable Retainer" pentru blocarea calendarului.`;
         break;
+      case 'influencer':
+        titluContractOficial = "CONTRACT DE PARTENERIAT & INFLUENCER MARKETING";
+        temeiJuridicHtml = `Încheiat conform prevederilor Codului Civil. Beneficiarul dobândește drepturi specifice de utilizare a imaginii (Usage Rights) pentru campaniile de paid media.`;
+        break;
+      case 'it_sla':
+        titluContractOficial = "CONTRACT PRESTĂRI SERVICII IT & SOFTWARE (AGILE/SLA)";
+        temeiJuridicHtml = `Guvernat de prevederile Codului Civil și legislația specifică privind drepturile de autor asupra programelor pentru calculator (Legea 8/1996), incluzând parametri de performanță (SLA).`;
+        break;
+      case 'constructii':
+        titluContractOficial = "CONTRACT DE EXECUȚIE LUCRĂRI ÎN REGIE PROPRIE & CONSTRUCȚII";
+        temeiJuridicHtml = `Încheiat în temeiul Art. 1851-1875 Cod Civil & Legii nr. 10/1995 privind calitatea în construcții. Implică execuția, recepția pe faze determinante și respectarea devizului financiar asumat.`;
+        break;
       default:
         titluContractOficial = "CONTRACT COMERCIAL GENERAL";
         temeiJuridicHtml = `Prezentul acord comercial reprezintă legea părților, fiind supus dispozițiilor generale din materia obligațiilor contractuale reglementate de Codul Civil român.`;
@@ -122,7 +135,12 @@ export async function POST(request) {
       { cond: body.clauzaLogisticaHoreca, html: `<li><strong>ART. 4.12. ASIGURARE LOGISTICĂ EVENIMENT:</strong> Beneficiarul se obligă să asigure Prestatorului acces la curent electric stabil (220V), mese calde pe durata evenimentelor ce depășesc 4 ore, și loc de parcare garantat pentru echipamente.</li>` },
       { cond: body.clauzaOriginalitate, html: `<li><strong>ART. 4.13. GARANȚIA ORIGINALITĂȚII:</strong> Autorul garantează absolut și sub sancțiunea legii penale că opera este 100% creație originală, nu încalcă drepturile terților (fără plagiat) și nu a mai fost cedată anterior.</li>` },
       { cond: body.clauzaDauneTerti, html: `<li><strong>ART. 4.14. RĂSPUNDEREA PENTRU DAUNE PROVOCATE TERȚILOR:</strong> Locatarul este 100% solidar responsabil pentru orice distrugeri (inundații, incendii din culpă, vandalism) provocate vecinilor sau spațiilor comune, degrevând total Locatorul de orice acțiune în regres.</li>` },
-      { cond: body.clauzaRiscPieire, html: `<li><strong>ART. 4.15. RISCUL PIEIRII BUNULUI:</strong> Până la semnarea formei autentice, riscul pieirii fortuite a imobilului rămâne în sarcina Promitentului-Vânzător. Orice degradare a stării fizice dă dreptul Cumpărătorului să ceară reducerea prețului sau rezilierea de drept.</li>` }
+      { cond: body.clauzaRiscPieire, html: `<li><strong>ART. 4.15. RISCUL PIEIRII BUNULUI:</strong> Până la semnarea formei autentice, riscul pieirii fortuite a imobilului rămâne în sarcina Promitentului-Vânzător. Orice degradare a stării fizice dă dreptul Cumpărătorului să ceară reducerea prețului sau rezilierea de drept.</li>` },
+      { cond: body.clauzaConstrucVicii, html: `<li><strong>ART. 4.16. GARANȚIE DE BUNĂ EXECUȚIE:</strong> Executantul garantează calitatea lucrărilor pe o perioadă de 36 de luni de la Procesul-Verbal de recepție finală, obligându-se la remedieri gratuite pentru viciile ascunse conform Legii 10/1995.</li>` },
+      { cond: body.clauzaConstrucAsigurare, html: `<li><strong>ART. 4.17. POLIZĂ DE ASIGURARE ȘANTIER (C.A.R.):</strong> Constructorul trebuie să dețină asigurare validă tip Contractors All Risks pe durata execuției, preluând 100% din răspunderea civilă pentru daunele cauzate terților pe șantier.</li>` },
+      { cond: body.clauzaConstrucGrafic, html: `<li><strong>ART. 4.18. PENALITĂȚI GRAFIC DE EXECUȚIE:</strong> Întârzierea nejustificată a predării frontului de lucru sau a lucrărilor la termenele agreate atrage penalități de 0.15% per zi de întârziere din valoarea stadiului fizic nerealizat.</li>` },
+      { cond: body.clauzaItSla, html: `<li><strong>ART. 4.19. SERVICE LEVEL AGREEMENT (SLA):</strong> Se garantează un uptime de 99.9% și un timp de răspuns la incidente critice de maximum 24h. Nerespectarea atrage credite de penalizare deduse direct din viitoarele facturi de abonament.</li>` },
+      { cond: body.clauzaItEscrow, html: `<li><strong>ART. 4.20. DEPOZITARE COD SURSĂ (ESCROW):</strong> Codul sursă va fi depozitat la o entitate terță de tip escrow, activându-se dreptul de eliberare și utilizare în beneficiul clientului exclusiv în caz de insolvență a furnizorului.</li>` }
     ];
 
     rules.forEach(r => {
@@ -282,6 +300,31 @@ export async function POST(request) {
           <strong>ART. 3.2. DECONTARE:</strong> Stingerea obligațiilor de plată se va efectua prin virament bancar, termenele stipulate în facturi fiind esențiale și de decădere.
         </div>
 
+        ${tipContract === 'constructii' ? `
+        <div class="text-paragraph">
+          <strong>ART. 3.3. DEVIZ FINANCIAR DEFALCAT:</strong> Valoarea menționată la Art. 3.1 este fundamentată conform devizului atașat lucrării:
+          <br/><br/>
+          <table style="width:90%; margin: 0 auto; border-collapse: collapse; font-size: 13px; text-align: left;" border="1">
+            <tr>
+              <th style="padding: 6px; background-color: #f0f0f0;">Categorie Deviz</th>
+              <th style="padding: 6px; background-color: #f0f0f0;">Valoare (RON)</th>
+            </tr>
+            <tr>
+              <td style="padding: 6px;">Materiale de Construcție de Bază</td>
+              <td style="padding: 6px; font-weight: bold;">${constructiiMateriale || '0'}</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px;">Manoperă Specializată & Echipă Tehnică</td>
+              <td style="padding: 6px; font-weight: bold;">${constructiiManopera || '0'}</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px;">Suprafață Acoperită (${constructiiSuprafata || '0'} mp * ${constructiiPretMp || '0'} lei/mp)</td>
+              <td style="padding: 6px; font-weight: bold;">${(parseFloat(constructiiSuprafata || 0) * parseFloat(constructiiPretMp || 0)).toFixed(2)}</td>
+            </tr>
+          </table>
+        </div>
+        ` : ''}
+
         ${clauzeInjectateHtml ? `
         <div class="capitol-title">CAPITOLUL IV. CLAUZE SPECIFICE DE ASIGURARE A PLĂȚILOR ȘI RISC</div>
         <ul class="clauze-list">${clauzeInjectateHtml}</ul>
@@ -319,7 +362,7 @@ export async function POST(request) {
         </div>
     `;
 
-    // ADAUGĂ PROCES VERBAL DACĂ E BIFAT (REPARAT CU INLINE CSS ABSOLUT ȘI SEMNĂTURI DINAMICE)
+    // ADAUGĂ PROCES VERBAL DACĂ E BIFAT
     if (adaugaProcesVerbal === true || adaugaProcesVerbal === "true") {
       htmlContract += `
         <div style="page-break-before: always; clear: both; padding-top: 40px;"></div>

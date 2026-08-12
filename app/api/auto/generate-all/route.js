@@ -126,6 +126,10 @@ export async function POST(req) {
       ? `Societatea ${field(data.cumparatorNume, "200px")}, CUI ${field(data.cumparatorCui, "100px")}, Reg. Com. ${field(data.cumparatorRegCom, "100px")}, cu sediul social în ${field(data.cumparatorSediu, "220px")}, reprezentată legal conform actelor constitutive`
       : `Subsemnatul/a ${field(data.cumparatorNume, "200px")}, CNP ${field(data.cumparatorCnp, "110px")}, cu domiciliul în localitatea ${field(data.autoAdresaCumparator, "220px")}`;
 
+    const sigHtml = data.semnaturaBase64 && data.semnaturaBase64.length > 100 
+      ? `<img src="${data.semnaturaBase64}" style="max-height: 40px; margin-top: 5px;"/>`
+      : `<span style="font-size: 9px; font-weight: normal;">(Semnătura și ștampila)</span>`;
+
     const zip = new JSZip();
 
     const tipuriExemplare = [
@@ -247,15 +251,15 @@ export async function POST(req) {
           <div class="section-title">CAP. IV - CLAUZE SPECIALE, RĂSPUNDERE ȘI GARANȚII JURIDICE</div>
           <div class="legal-clause"><strong>Art. 4.1 Garanția contra evicțiunii:</strong> Vânzătorul garantează pe Cumpărător, conform Art. 1695 Cod Civil, împotriva oricărei evicțiuni totale sau parțiale. Vânzătorul declară pe proprie răspundere, sub sancțiunea legii penale (fals în declarații), că vehiculul este proprietatea sa exclusivă, este liber de sarcini, nu este gajat, sechestrat, nu face obiectul unui litigiu sau al unei proceduri de executare silită, iar taxele/impozitele locale sunt achitate la zi.</div>
           <div class="legal-clause"><strong>Art. 4.2 Garanția pentru vicii și starea tehnică:</strong> Bunul se vinde în starea tehnică și estetică în care se află la momentul predării. Cumpărătorul declară că a inspectat vehiculul, a efectuat probele tehnice de drum și este de acord cu starea acestuia. Conform normelor imperative ale Art. 1707 Cod Civil, Vânzătorul răspunde exclusiv pentru viciile ascunse grave, existente la momentul predării, care nu puteau fi descoperite printr-o verificare rezonabilă.</div>
-          <div class="legal-clause"><strong>Art. 4.3 Transferul proprietății și al riscurilor:</strong> Dreptul de proprietate se transferă la momentul achitării prețului. Riscul pieirii fortuite și sarcina suportării oricăror cheltuieli, taxe, sancțiuni contravenționale (amenzi de circulație, C.N.A.I.R., parcări) și asigurări trec în mod irevocabil asupra Cumpărătorului din momentul semnării Procesului-Verbal de Predare-Primire.</div>
+          <div class="legal-clause"><strong>Art. 4.3 Transferul proprietății și al riscurilor:</strong> Dreptul de proprietate se transferă la momentul achitării prețului. Riscul pieirii fortuite și sarcina suportării0 oricăror cheltuieli, taxe, sancțiuni contravenționale (amenzi de circulație, C.N.A.I.R., parcări) și asigurări trec în mod irevocabil asupra Cumpărătorului din momentul semnării Procesului-Verbal de Predare-Primire.</div>
           <div class="legal-clause"><strong>Art. 4.4 Prelucrarea datelor (GDPR):</strong> Părțile consimt reciproc la prelucrarea datelor cu caracter personal înscrise în prezentul contract strict în scopul executării tranzacției și îndeplinirii obligațiilor legale privind fiscalizarea și înmatricularea/radierea, conform Regulamentului (UE) 2016/679.</div>
 
           <div class="section-title">CAP. V - DISPOZIȚII FINALE</div>
           <div class="legal-clause">Prezentul contract a fost încheiat astăzi, <strong>${dataCurenta}</strong>, în 5 (cinci) exemplare originale, având aceeași forță juridică probantă, câte unul pentru fiecare parte, și 3 exemplare pentru autoritățile competente. Eventualele litigii decurgând din executarea prezentului contract se vor soluționa pe cale amiabilă, iar în caz de eșec, de către instanțele judecătorești competente material și teritorial.</div>
 
           <div class="signature-area">
-            <div class="sig-box">VÂNZĂTOR <br/> <span style="font-size: 9px; font-weight: normal;">(Semnătura și ștampila, după caz)</span></div>
-            <div class="sig-box">CUMPĂRĂTOR <br/> <span style="font-size: 9px; font-weight: normal;">(Semnătura și ștampila, după caz)</span></div>
+            <div class="sig-box">VÂNZĂTOR <br/> ${sigHtml}</div>
+            <div class="sig-box">CUMPĂRĂTOR <br/> ${sigHtml}</div>
           </div>
         </body>
         </html>
@@ -348,8 +352,8 @@ export async function POST(req) {
         </div>
 
         <div class="sig-layout">
-          <div class="sig-box">VÂNZĂTOR <br/><span style="font-weight: normal; font-size:10px;">(Am predat vehiculul și actele)</span></div>
-          <div class="sig-box">CUMPĂRĂTOR <br/><span style="font-weight: normal; font-size:10px;">(Am primit vehiculul și actele)</span></div>
+          <div class="sig-box">VÂNZĂTOR <br/><span style="font-weight: normal; font-size:10px;">(Am predat vehiculul și actele)</span><br/>${sigHtml}</div>
+          <div class="sig-box">CUMPĂRĂTOR <br/><span style="font-weight: normal; font-size:10px;">(Am primit vehiculul și actele)</span><br/>${sigHtml}</div>
         </div>
       </body>
       </html>
@@ -408,7 +412,8 @@ export async function POST(req) {
         
         <div style="margin-top: 40px; text-align: right; font-weight: bold; padding-right: 50px;">
           Data: ${dataCurenta}<br/><br/><br/>
-          Semnătură Vânzător / Ștampilă
+          Semnătură Vânzător / Ștampilă<br/>
+          ${sigHtml}
         </div>
 
         <div class="page-break"></div>
@@ -430,7 +435,8 @@ export async function POST(req) {
         
         <div style="margin-top: 40px; text-align: right; font-weight: bold; padding-right: 50px;">
           Data: ${dataCurenta}<br/><br/><br/>
-          Semnătură Cumpărător / Ștampilă
+          Semnătură Cumpărător / Ștampilă<br/>
+          ${sigHtml}
         </div>
       </body>
       </html>

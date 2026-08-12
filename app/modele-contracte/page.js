@@ -136,6 +136,30 @@ export default function ModeleContracte() {
       tip: 'Premium (49 lei)', 
       premium: true, 
       variantType: 'sabloane' 
+    },
+    { 
+      id: 'influencer_premium', 
+      nume: '11. Contract de Parteneriat & Influencer Marketing', 
+      descriere: 'Reglementează livrarea de campanii pe social media, drepturi de utilizare a imaginii (Usage Rights), clauze de exclusivitate temporară și penalizări stricte pentru neprezentarea livrabilelor.', 
+      tip: 'Premium (49 lei)', 
+      premium: true, 
+      variantType: 'sabloane' 
+    },
+    { 
+      id: 'it_sla_premium', 
+      nume: '12. Contract de Prestări Servicii IT / Software (Agile & SLA)', 
+      descriere: 'Contract dedicat agențiilor IT. Include SLA (Service Level Agreement), faze de livrare (Milestones), clauze Escrow pentru cod sursă și transfer de IP condiționat de decont.', 
+      tip: 'Premium (49 lei)', 
+      premium: true, 
+      variantType: 'sabloane' 
+    },
+    { 
+      id: 'constructii_premium', 
+      nume: '13. Contract de Execuție Lucrări & Construcții (Deviz)', 
+      descriere: 'Adaptat Legii 10/1995. Include tabele pentru deviz separat (materiale/manoperă), grafice de execuție, recepție parțială pe faze determinante și reținere fond de garanție.', 
+      tip: 'Premium (49 lei)', 
+      premium: true, 
+      variantType: 'sabloane' 
     }
   ];
 

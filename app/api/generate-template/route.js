@@ -152,6 +152,57 @@ export async function POST(request) {
         `;
         break;
 
+      case 'influencer_premium':
+        titluOficial = "CONTRACT DE PARTENERIAT ȘI INFLUENCER MARKETING";
+        temeiLegal = "Încheiat în baza prevederilor legale privind publicitatea (Legea 148/2000), drepturile de utilizare a imaginii și libertatea contractuală.";
+        articoleSpecificeHtml = `
+          <div class="art-title">ARTICOLUL 3. DREPTURI DE UTILIZARE A IMAGINII (USAGE RIGHTS)</div>
+          <div class="paragraph">3.1. Creatorul de conținut cedează Beneficiarului dreptul de a utiliza, sponsoriza (Whitelisting/Dark Posting) și republica materialele livrate pe canalele proprii de social media, pentru o perioadă determinată de timp conform grilei anexate.</div>
+          <div class="art-title">ARTICOLUL 4. PENALITĂȚI DE NEPREZENTARE ȘI EXCLUSIVITATE</div>
+          <div class="paragraph">4.1. Creatorul se obligă la o exclusivitate sectorială negativă – interdicția de a promova produse concurente direct pe o perioadă de 6 luni de la publicare. Nepostarea materialelor la termenul agreat atrage penalități de 10% per zi de întârziere din onorariul datorat.</div>
+        `;
+        break;
+
+      case 'it_sla_premium':
+        titluOficial = "CONTRACT DE PRESTĂRI SERVICII IT & SOFTWARE DEVELOPMENT (SLA)";
+        temeiLegal = "Reglementat de Codul Civil român privind contractele de execuție la comandă și legislația privind protecția drepturilor de autor pe programe pentru calculator (Legea 8/1996).";
+        articoleSpecificeHtml = `
+          <div class="art-title">ARTICOLUL 3. S.L.A. (SERVICE LEVEL AGREEMENT) ȘI MENTENANȚĂ</div>
+          <div class="paragraph">3.1. Prestatorul garantează un timp de răspuns (Response Time) de 24h pentru tichete critice și un uptime de 99.9% pentru mediul de producție. Orice abatere tehnică nejustificată atrage compensări financiare automate aplicate facturii recurente.</div>
+          <div class="art-title">ARTICOLUL 4. PROPRIETATEA CODULUI SURSĂ ȘI CLAUZA ESCROW</div>
+          <div class="paragraph">4.1. Codul sursă compilat se transferă în proprietatea intelectuală a Beneficiarului strict proporțional cu recepția și plata fiecărui Milestone (sprint de dezvoltare). Se impune utilizarea unui depozit Escrow pentru siguranța bazei de date în caz de insolvență a Prestatorului.</div>
+        `;
+        break;
+
+      case 'constructii_premium':
+        titluOficial = "CONTRACT DE EXECUȚIE LUCRĂRI ÎN REGIE PROPRIE (CONSTRUCȚII)";
+        temeiLegal = "Încheiat în concordanță absolută cu Art. 1851-1875 Cod Civil și rigorile imperative din Legea 10/1995 privind calitatea în construcții.";
+        articoleSpecificeHtml = `
+          <div class="art-title">ARTICOLUL 3. DEVIZ FINANCIAR DEFALCAT (MATERIALE ȘI MANOPERĂ)</div>
+          <div class="paragraph">3.1. Părțile agreează următoarea structură de deviz cu execuție pe etape tehnologice:</div>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 15px; font-size: 12px; border: 1px solid #000;">
+            <tr style="background-color: #f0f0f0;">
+              <th style="border: 1px solid #000; padding: 6px; text-align: left;">Categorie Deviz</th>
+              <th style="border: 1px solid #000; padding: 6px; text-align: right; width: 120px;">Valoare Estimată</th>
+            </tr>
+            <tr>
+              <td style="border: 1px solid #000; padding: 6px;">1. Cost Total Materiale de Bază (achiziție + transport)</td>
+              <td style="border: 1px solid #000; padding: 6px; text-align: right;"><span class="linia-dinamica" style="width: 100px;">&nbsp;</span></td>
+            </tr>
+            <tr>
+              <td style="border: 1px solid #000; padding: 6px;">2. Cost Total Manoperă Echipă Tehnică</td>
+              <td style="border: 1px solid #000; padding: 6px; text-align: right;"><span class="linia-dinamica" style="width: 100px;">&nbsp;</span></td>
+            </tr>
+            <tr>
+              <td style="border: 1px solid #000; padding: 6px; font-weight: bold;">TOTAL GENERAL DEVIZ (RON/EUR)</td>
+              <td style="border: 1px solid #000; padding: 6px; text-align: right; font-weight: bold;"><span class="linia-dinamica" style="width: 100px;">&nbsp;</span></td>
+            </tr>
+          </table>
+          <div class="art-title">ARTICOLUL 4. GARANȚIE ȘI PENALIZĂRI DE ȘANTIER</div>
+          <div class="paragraph">4.1. Garanția de bună execuție este stabilită la 36 de luni de la Procesul-Verbal de recepție finală. Întârzierea nejustificată a predării frontului de lucru atrage penalități de 0.15% per zi de întârziere din valoarea stadiului fizic nerealizat. Pentru intemperiile declarate oficial (Cod Galben/Roșu), termenele se extind de drept.</div>
+        `;
+        break;
+
       default:
         titluOficial = "MODEL DE CONTRACT COMERCIAL STANDARD";
         temeiLegal = "Dispozițiile generale comerciale în conformitate cu Codul Civil român.";
