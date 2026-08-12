@@ -1502,17 +1502,21 @@ export default function Home() {
                       )}
 
                       {qrType === 'crypto' && (
-                        <div className="grid grid-cols-1 gap-3">
+                        <div className="p-4 bg-emerald-900/10 border border-[#8ba888]/30 rounded-xl space-y-4">
+                          <div>
+                            <label className="text-[10px] text-[#8ba888] uppercase font-bold block mb-1">Cerere Încasare Crypto (Wallet Request)</label>
+                            <p className="text-[10px] text-slate-400 leading-tight">Generează un cod QR scanabil direct din aplicații precum Binance sau Trust Wallet pentru a primi fonduri instant în portofelul tău.</p>
+                          </div>
                           <div className="flex gap-3">
                             <select value={cryptoData.coin} onChange={e => setCryptoData({...cryptoData, coin: e.target.value})} className="w-1/3 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs outline-none">
-                              <option value="bitcoin">BTC</option>
-                              <option value="ethereum">ETH</option>
-                              <option value="solana">SOL</option>
-                              <option value="tether">USDT</option>
+                              <option value="bitcoin">Bitcoin (BTC)</option>
+                              <option value="ethereum">Ethereum (ETH)</option>
+                              <option value="solana">Solana (SOL)</option>
+                              <option value="tether">Tether (USDT)</option>
                             </select>
                             <input type="number" placeholder="Sumă (Opțional)" value={cryptoData.amount} onChange={(e) => setCryptoData({...cryptoData, amount: e.target.value})} className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-[#8ba888] outline-none" />
                           </div>
-                          <input type="text" placeholder="Adresă Wallet Crypto" value={cryptoData.address} onChange={(e) => setCryptoData({...cryptoData, address: e.target.value})} className="w-full bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-[#8ba888] outline-none font-mono" />
+                          <input type="text" placeholder="Adresă Publică Portofel (ex: 0x... sau bc1...)" value={cryptoData.address} onChange={(e) => setCryptoData({...cryptoData, address: e.target.value})} className="w-full bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-[#8ba888] outline-none font-mono" />
                         </div>
                       )}
 
