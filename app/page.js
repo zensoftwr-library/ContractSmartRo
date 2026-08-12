@@ -1203,15 +1203,21 @@ export default function Home() {
         )}
       </nav>
 
-      {/* PREMIUM CINEMATIC LIGHT LEAKS (FROSTED AURORA) */}
+      {/* PREMIUM CINEMATIC LIGHT LEAKS (FROSTED AURORA) - SAFARI OPTIMIZED */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         {/* Emerald Glow - Sursă de lumină colț stânga-sus */}
         <div 
-          className="absolute -top-[20%] -left-[10%] w-[70vw] h-[70vh] rounded-[100%] bg-[#8ba888] blur-[160px] animate-glow-1 mix-blend-screen" 
+          className="absolute -top-[20%] -left-[10%] w-[100vw] h-[100vw] min-w-[600px] min-h-[600px] rounded-full animate-glow-1"
+          style={{
+            background: 'radial-gradient(circle, rgba(139, 168, 136, 0.12) 0%, rgba(11, 15, 18, 0) 65%)'
+          }}
         />
         {/* Slate Glow - Sursă de lumină colț dreapta-jos */}
         <div 
-          className="absolute -bottom-[20%] -right-[10%] w-[70vw] h-[70vh] rounded-[100%] bg-slate-500 blur-[180px] animate-glow-2 mix-blend-screen" 
+          className="absolute -bottom-[20%] -right-[10%] w-[100vw] h-[100vw] min-w-[600px] min-h-[600px] rounded-full animate-glow-2"
+          style={{
+            background: 'radial-gradient(circle, rgba(100, 116, 139, 0.10) 0%, rgba(11, 15, 18, 0) 65%)'
+          }}
         />
       </div>
 
