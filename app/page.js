@@ -1159,7 +1159,8 @@ export default function Home() {
             <Link href="/baza-legala" className="text-sm text-slate-300 hover:text-white">Articole Validitate Juridică</Link>
             <Link href="/termeni-si-conditii" className="text-sm text-slate-300 hover:text-white">Termeni și Condiții</Link>
             <Link href="/contact" className="text-sm text-slate-300 hover:text-white">Contact</Link>
-            
+            <Link href="/despre-noi" className="text-sm text-slate-300 hover:text-white">Despre Noi</Link>
+
             {!user ? (
               <button type="button" onClick={() => { setIsMobileMenuOpen(false); setIsSignUp(false); setShowAuthModal(true); }} className="text-sm font-bold text-[#8ba888] text-left">Autentificare / Cont Nou</button>
             ) : (
