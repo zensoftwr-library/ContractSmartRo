@@ -1960,7 +1960,7 @@ export default function Home() {
                   <div className="flex justify-between items-center pt-6 border-t border-slate-800">
                     <button type="button" onClick={handleInapoiPrincipal} className="text-xs text-slate-400 underline">Înapoi</button>
                     <button type="submit" disabled={!!loadingText} className="bg-[#8ba888] text-[#0B0F12] font-black px-8 py-4 rounded text-sm transition hover:opacity-90">
-                      {loadingText ? 'Se înregistrează...' : 'Descărcare PDF directă'}
+                      {loadingText ? 'Se înregistrează...' : 'Descărcare PDF'}
                     </button>
                   </div>
                 </form>
