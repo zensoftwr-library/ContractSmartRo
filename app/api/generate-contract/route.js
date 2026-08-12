@@ -434,16 +434,10 @@ export async function POST(request) {
 
     let browser = await puppeteer.launch(process.env.NODE_ENV === 'development' ? { headless: true, executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" } : { args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu'], headless: true });
     
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: [
-        '--no-sandbox', 
-        '--disable-setuid-sandbox', 
-        '--disable-dev-shm-usage', 
-        '--disable-gpu',
-        '--single-process' // Optimizează consumul de RAM pe VPS
-      ]
-    });
+    const page = await browser.newPage();
+    await page.setContent(htmlContract, { waitUntil: 'networkidle0' });
+    const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true, margin: { top: '40px', bottom: '40px', left: '40px', right: '40px' } });
+    await browser.close();
 
     // -------------------------------------------------------------------------
     // TRIMITE EMAIL VIA RESEND CU LOG-URI CLARE
