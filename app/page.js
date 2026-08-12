@@ -1446,7 +1446,7 @@ export default function Home() {
                 {/* Header & Tabs */}
                 <div className="p-6 border-b border-slate-800/80 bg-[#0B0F12]/30 rounded-t-2xl">
                   <div className="flex items-center gap-3 mb-4">
-                    <span className="text-2xl">⚡</span>
+                    <span className="text-2xl"></span>
                     <div>
                       <h3 className="text-sm font-bold text-[#8ba888] uppercase tracking-wider block">ContractSmart QR ProStudio</h3>
                       <p className="text-[11px] text-slate-400 mt-0.5">Generator multifuncțional avansat.</p>
