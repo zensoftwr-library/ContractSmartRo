@@ -2437,7 +2437,7 @@ export default function Home() {
             </div>
             <div className="pt-6 border-t border-slate-800/40 flex flex-col items-center gap-4">
               <p className="text-[10px] text-slate-500 font-mono max-w-3xl text-center leading-relaxed px-4">
-                <strong className="text-red-500">Disclaimer Legal:</strong> ContractSmart este o platformă de software. Nu suntem o casă de avocatură și nu oferim consultanță juridică. Utilizarea platformei reprezintă acceptarea faptului că modelele generate necesită revizuirea de către un specialist.
+                <strong className="text-red-500">Disclaimer Legal:</strong> ContractSmart este o platformă de software. <strong className="text-red-500">NU</strong> suntem o casă de avocatură și nu oferim consultanță juridică. Utilizarea platformei reprezintă acceptarea faptului că modelele generate necesită revizuirea de către un specialist.
               </p>
               <p className="text-[11px] text-slate-500 font-mono">© 2026 ContractSmart. Powered by ZenSoftware. Toate drepturile rezervate legal.</p>
             </div>
