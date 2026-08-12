@@ -11,11 +11,14 @@ export default function BursaPage() {
     { name: 'MultiversX', symbol: 'EGLD', price: '$42.10', change: '+5.2%', up: true },
   ]);
 
-  const [indiciBursa, setIndiciBursa] = useState({
-    bet: { puncte: '17,420.50', procent: '+1.24%' },
-    sp500: { puncte: '5,310.12', procent: '+0.68%' },
-    nasdaq: { puncte: '18,650.45', procent: '-0.12%' }
-  });
+  // Transformare corectă în Array pentru a evita eroarea fatală .map() -> 502
+  const [indiciBursa, setIndiciBursa] = useState([
+    { name: 'BET (România)', symbol: '^BET', points: '17,420.50', change: '+1.24%', up: true },
+    { name: 'S&P 500 (US)', symbol: '^GSPC', points: '5,310.12', change: '+0.68%', up: true },
+    { name: 'NASDAQ (US)', symbol: '^IXIC', points: '18,650.45', change: '-0.12%', up: false },
+    { name: 'DAX (Germania)', symbol: '^GDAXI', points: '18,430.20', change: '+0.45%', up: true },
+    { name: 'NIKKEI 225 (Japonia)', symbol: '^N225', points: '38,900.50', change: '-1.10%', up: false }
+  ]);
 
   const [marfuri, setMarfuri] = useState([
     { name: 'Aur (Gold)', price: '$2,340.50 / oz', change: '+0.8%', up: true },
@@ -41,6 +44,10 @@ export default function BursaPage() {
     // În producție aici poți chema /api/bursa pentru restul datelor
   }, []);
 
+  // Helper-funcții sigure pentru a trage datele în Ticker fără erori
+  const getIndexPoint = (sym) => indiciBursa.find(i => i.symbol === sym)?.points || '0.00';
+  const getIndexChange = (sym) => indiciBursa.find(i => i.symbol === sym)?.change || '0.00%';
+
   return (
     <div className="min-h-screen bg-[#0B0F12] text-slate-200 font-sans pb-16 relative">
       
@@ -49,16 +56,16 @@ export default function BursaPage() {
         <div className="animate-marquee font-mono flex gap-12 items-center shrink-0 min-w-full justify-around pr-6">
           <span>📈 <strong>EUR/RON:</strong> {cursBnr.eur} lei</span>
           <span>🇺🇸 <strong>USD/RON:</strong> {cursBnr.usd} lei</span>
-          <span>📊 <strong>BET Index (BVB):</strong> {indiciBursa.bet.puncte} ({indiciBursa.bet.procent})</span>
-          <span>📊 <strong>S&P 500 (US):</strong> {indiciBursa.sp500.puncte} ({indiciBursa.sp500.procent})</span>
-          <span>📊 <strong>NASDAQ (US):</strong> {indiciBursa.nasdaq.puncte} ({indiciBursa.nasdaq.procent})</span>
+          <span>📊 <strong>BET Index (BVB):</strong> {getIndexPoint('^BET')} ({getIndexChange('^BET')})</span>
+          <span>📊 <strong>S&P 500 (US):</strong> {getIndexPoint('^GSPC')} ({getIndexChange('^GSPC')})</span>
+          <span>📊 <strong>NASDAQ (US):</strong> {getIndexPoint('^IXIC')} ({getIndexChange('^IXIC')})</span>
         </div>
         <div className="animate-marquee font-mono flex gap-12 items-center shrink-0 min-w-full justify-around pr-6 select-none" aria-hidden="true">
           <span>📈 <strong>EUR/RON:</strong> {cursBnr.eur} lei</span>
           <span>🇺🇸 <strong>USD/RON:</strong> {cursBnr.usd} lei</span>
-          <span>📊 <strong>BET Index (BVB):</strong> {indiciBursa.bet.puncte} ({indiciBursa.bet.procent})</span>
-          <span>📊 <strong>S&P 500 (US):</strong> {indiciBursa.sp500.puncte} ({indiciBursa.sp500.procent})</span>
-          <span>📊 <strong>NASDAQ (US):</strong> {indiciBursa.nasdaq.puncte} ({indiciBursa.nasdaq.procent})</span>
+          <span>📊 <strong>BET Index (BVB):</strong> {getIndexPoint('^BET')} ({getIndexChange('^BET')})</span>
+          <span>📊 <strong>S&P 500 (US):</strong> {getIndexPoint('^GSPC')} ({getIndexChange('^GSPC')})</span>
+          <span>📊 <strong>NASDAQ (US):</strong> {getIndexPoint('^IXIC')} ({getIndexChange('^IXIC')})</span>
         </div>
       </div>
 
@@ -174,48 +181,24 @@ export default function BursaPage() {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {/* BET */}
-                <div className="bg-[#0B0F12] border border-slate-800/60 p-4 rounded-xl flex flex-col justify-between hover:border-slate-700 transition">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <strong className="text-sm text-slate-200 block">^BET</strong>
-                      <span className="text-[10px] text-slate-500">BET (România)</span>
+                {indiciBursa.map((index, i) => (
+                  <div key={i} className="bg-[#0B0F12] border border-slate-800/60 p-4 rounded-xl flex flex-col justify-between hover:border-slate-700 transition">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <strong className="text-sm text-slate-200 block">{index.symbol}</strong>
+                        <span className="text-[10px] text-slate-500">{index.name}</span>
+                      </div>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${index.up ? 'bg-emerald-900/20 text-emerald-400 border border-emerald-900/50' : 'bg-red-900/20 text-red-400 border border-red-900/50'}`}>
+                        {index.change}
+                      </span>
                     </div>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-900/20 text-emerald-400 border border-emerald-900/50">
-                      {indiciBursa.bet.procent}
-                    </span>
-                  </div>
-                  <div className="text-xl font-mono font-black text-white">{indiciBursa.bet.puncte}</div>
-                </div>
-
-                {/* S&P 500 */}
-                <div className="bg-[#0B0F12] border border-slate-800/60 p-4 rounded-xl flex flex-col justify-between hover:border-slate-700 transition">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <strong className="text-sm text-slate-200 block">^GSPC</strong>
-                      <span className="text-[10px] text-slate-500">S&P 500 (US)</span>
+                    <div className="text-xl font-mono font-black text-white">
+                      {index.points}
                     </div>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-900/20 text-emerald-400 border border-emerald-900/50">
-                      {indiciBursa.sp500.procent}
-                    </span>
                   </div>
-                  <div className="text-xl font-mono font-black text-white">{indiciBursa.sp500.puncte}</div>
-                </div>
-
-                {/* NASDAQ */}
-                <div className="bg-[#0B0F12] border border-slate-800/60 p-4 rounded-xl flex flex-col justify-between hover:border-slate-700 transition">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <strong className="text-sm text-slate-200 block">^IXIC</strong>
-                      <span className="text-[10px] text-slate-500">NASDAQ (US)</span>
-                    </div>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-red-900/20 text-red-400 border border-red-900/50">
-                      {indiciBursa.nasdaq.procent}
-                    </span>
-                  </div>
-                  <div className="text-xl font-mono font-black text-white">{indiciBursa.nasdaq.puncte}</div>
-                </div>
+                ))}
               </div>
+            </div>
 
             {/* CRYPTO & MĂRFURI GRID SPLIT */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
