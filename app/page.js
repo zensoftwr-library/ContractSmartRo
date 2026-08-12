@@ -1157,6 +1157,8 @@ export default function Home() {
             <span className="text-slate-800">|</span>
             <Link href="/contact" className="text-xs text-slate-400 hover:text-white transition">Contact</Link>
             <span className="text-slate-800">|</span>
+            <Link href="/despre-noi" className="hover:text-[#8ba888] transition font-bold">Despre Noi</Link>
+            <span>•</span>
             
             {!user ? (
               <button type="button" onClick={() => { setIsSignUp(false); setShowAuthModal(true); }} className="text-xs font-bold text-slate-300 hover:text-[#8ba888] transition">Autentificare / Cont Nou</button>
