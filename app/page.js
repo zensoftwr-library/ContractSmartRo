@@ -650,14 +650,12 @@ export default function Home() {
   useEffect(() => {
     const actualizeazaIndiciLive = async () => {
       try {
-        const targetUrl = encodeURIComponent('https://query1.finance.yahoo.com/v7/finance/quote?symbols=^BET,^GSPC,^IXIC');
-        const res = await fetch(`https://api.allorigins.win/get?url=${targetUrl}`);
+        const res = await fetch('/api/bursa');
         if (!res.ok) return;
-        const wrapper = await res.json();
-        const data = typeof wrapper.contents === 'string' ? JSON.parse(wrapper.contents) : wrapper.contents;
-        const quotes = data?.quoteResponse?.result;
+        const data = await res.json();
+        const quotes = data?.quotes || [];
 
-        if (quotes && quotes.length > 0) {
+        if (quotes.length > 0) {
           const betQuote = quotes.find(q => q.symbol === '^BET') || quotes[0];
           const sp500Quote = quotes.find(q => q.symbol === '^GSPC') || quotes[1];
           const nasdaqQuote = quotes.find(q => q.symbol === '^IXIC') || quotes[2];
