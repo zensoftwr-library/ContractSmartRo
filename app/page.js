@@ -1620,7 +1620,7 @@ export default function Home() {
                         <label className="text-[10px] text-slate-400 font-bold uppercase shrink-0">Culoare</label>
                         <input type="color" value={qrColor} onChange={(e) => setQrColor(e.target.value)} className="w-7 h-7 rounded cursor-pointer shrink-0 bg-transparent border-0 p-0" />
                         <label className="text-[10px] text-slate-400 font-bold uppercase ml-2 shrink-0 border border-slate-700 p-2 rounded-lg bg-[#0B0F12] cursor-pointer hover:bg-slate-800 transition">
-                          <span className="flex items-center gap-1">🖼️ Logo Centru</span>
+                          <span className="flex items-center gap-1">Adauga Logo Central</span>
                           <input type="file" accept="image/png, image/jpeg, image/svg+xml" onChange={handleQrLogoUpload} className="hidden" />
                         </label>
                         {qrLogo && <button type="button" onClick={() => { setQrLogo(null); setQrLogoRatio(1); }} className="text-[10px] text-red-400 font-bold hover:underline">Elimină ❌</button>}
@@ -2213,7 +2213,7 @@ export default function Home() {
                       <div className="flex justify-between items-center pt-2">
                         <button type="button" onClick={handleInapoiPrincipal} className="text-xs text-slate-400 underline">Înapoi la panou</button>
                         <button type="submit" disabled={isUploading || !!loadingText} className="bg-[#8ba888] text-black font-black px-6 py-2.5 rounded text-xs tracking-tight transition hover:opacity-90">
-                          {loadingText ? 'Se procesează...' : `Generează Pachet Securizat Auto .ZIP (${autoData.autoMoneda === 'EUR' ? `${Math.round(99 / cursBnr.eur)} EUR` : '19.99 €'})`}
+                          {loadingText ? 'Se procesează...' : `Generează Pachet Auto .ZIP (${autoData.autoMoneda === 'EUR' ? `${Math.round(99 / cursBnr.eur)} EUR` : '19.99 €'})`}
                         </button>
                       </div>
                     </div>
