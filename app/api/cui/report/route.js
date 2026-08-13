@@ -15,7 +15,7 @@ export async function POST(request) {
       return NextResponse.json({ success: false, message: 'Date incomplete.' }, { status: 400 });
     }
 
-    const cleanCui = cui.replace(/[^0-9]/g, '');
+    const cleanCui = String(cui).replace(/[^0-9]/g, '');
 
     // 1. Verificare Utilizator
     const { data: profile } = await supabase.from('profiles').select('subscription_tier, credits_remaining, is_pro').eq('id', userId).single();
