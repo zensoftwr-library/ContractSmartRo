@@ -2411,11 +2411,11 @@ export default function Home() {
                         </div>
                         {(() => {
                           const textStare = cuiDataResult.stare?.toUpperCase() || '';
-                          const esteActiv = textStare.includes('ACTIV') && !textStare.includes('INACTIV');
+                          const esteInactiv = textStare.includes('INACTIV') || textStare.includes('RADIAT') || textStare.includes('SUSPENDAT');
                           return (
                             <div className="flex items-center gap-1.5">
-                              <span className={`w-2.5 h-2.5 rounded-full ${esteActiv ? 'bg-emerald-500' : 'bg-red-500 animate-pulse'}`}></span>
-                              <span className={`px-2 py-1 rounded text-[9px] font-black uppercase ${esteActiv ? 'bg-emerald-900/40 text-emerald-400 border border-emerald-900' : 'bg-red-900/40 text-red-400 border border-red-900'}`}>
+                              <span className={`w-2.5 h-2.5 rounded-full ${esteInactiv ? 'bg-red-500 animate-pulse' : 'bg-emerald-500'}`}></span>
+                              <span className={`px-2 py-1 rounded text-[9px] font-black uppercase ${esteInactiv ? 'bg-red-900/40 text-red-400 border border-red-900' : 'bg-emerald-900/40 text-emerald-400 border border-emerald-900'}`}>
                                 {cuiDataResult.stare || 'Necunoscut'}
                               </span>
                             </div>
