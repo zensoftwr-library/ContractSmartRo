@@ -2426,6 +2426,10 @@ export default function Home() {
                         </div>
                       </div>
                       <p className="text-[10px] text-slate-500 mb-4 pb-4 border-b border-slate-800">{cuiDataResult.adresa}</p>
+                      <button onClick={() => handleDownloadPremiumReport(cuiDataResult.cui)} className="w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold py-2.5 rounded-lg text-xs transition flex justify-center items-center gap-2">
+                        <svg className="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        Descarcă Raport Financiar Complet (19 RON (~3.99 €))
+                      </button>
                     </div>
                   )}
                 </div>
