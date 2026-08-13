@@ -2409,8 +2409,9 @@ export default function Home() {
                           <h4 className="text-sm font-bold text-white uppercase">{cuiDataResult.denumire}</h4>
                           <span className="text-[10px] text-slate-400 font-mono">CUI: {cuiDataResult.cui} | REG: {cuiDataResult.regCom}</span>
                         </div>
-                        <div className="flex items-center justify-between w-full">
-                          <span className="text-[10px] text-slate-400 font-medium">
+                        <div className="flex items-center gap-1.5">
+                          <span className={`w-2.5 h-2.5 rounded-full ${cuiDataResult.stare?.toLowerCase().includes('inactiv') ? 'bg-red-500 animate-pulse' : 'bg-emerald-500'}`}></span>
+                          <span className={`px-2 py-1 rounded text-[9px] font-black uppercase ${cuiDataResult.stare?.toLowerCase().includes('inactiv') ? 'bg-red-900/40 text-red-400 border border-red-900' : 'bg-emerald-900/40 text-emerald-400 border border-emerald-900'}`}>
                             {cuiDataResult.stare || 'Necunoscut'}
                           </span>
                         </div>
