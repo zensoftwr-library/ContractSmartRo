@@ -38,24 +38,24 @@ export async function GET(request) {
       console.warn(`[CUI API] Sursa primară a eșuat (Timeout/Eroare) pentru CUI: ${cui}. Trecem la Fallback...`);
     }
 
-    // 🚀 PASUL 2: Fallback pe FirmeAPI.ro (Limita de 100/zi)
-    // Se execută DOAR dacă Pasul 1 a picat sau a dat eroare 404
-    const apiKey = process.env.FIRMEAPI_KEY; // Cheia ta gratuită din .env.local
+    // 🚀 PASUL 2: Fallback pe FirmeAPI.ro
+    const apiKey = process.env.FIRMEAPI_KEY; 
     
-    const resSecondary = await fetch(`https://api.firmeapi.ro/v1/firme/${cui}`, {
-      headers: { 'Authorization': `Bearer ${apiKey}` }
+    const resSecondary = await fetch(`https://www.firmeapi.ro/api/v1/firma/${cui}`, {
+      headers: { 'Authorization': `Bearer ${apiKey}`, 'Accept': 'application/json' }
     });
 
     if (resSecondary.ok) {
-      const data = await resSecondary.json();
+      const raw = await resSecondary.json();
+      const data = raw.data;
       return NextResponse.json({
         success: true,
         source: 'firmeapi-fallback',
         data: {
-          denumire: data.nume,
+          denumire: data.denumire,
           cui: data.cui,
-          regCom: data.numar_inmatriculare,
-          adresa: `${data.adresa.judet}, ${data.adresa.localitate}`,
+          regCom: data.nr_reg_com,
+          adresa: data.adresa ? `${data.adresa.judet || ''}, ${data.adresa.localitate || ''}` : '',
           stare: data.stare
         }
       });
