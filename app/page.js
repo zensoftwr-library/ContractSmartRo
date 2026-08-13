@@ -339,6 +339,26 @@ export default function Home() {
       }
     } catch (e) {}
   };
+  
+  // Declansare automata (Debounce) pentru Prestator
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (formData.prestatorCui?.replace(/[^0-9]/g, '').length >= 5) {
+        handleAutofillCui(formData.prestatorCui, 'prestator');
+      }
+    }, 800);
+    return () => clearTimeout(delayDebounceFn);
+  }, [formData.prestatorCui]);
+
+  // Declansare automata (Debounce) pentru Client
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (formData.clientCui?.replace(/[^0-9]/g, '').length >= 5) {
+        handleAutofillCui(formData.clientCui, 'client');
+      }
+    }, 800);
+    return () => clearTimeout(delayDebounceFn);
+  }, [formData.clientCui]);
 
   const [fiscal, setFiscal] = useState({
     venitLunar: 45000,
