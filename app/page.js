@@ -498,6 +498,9 @@ export default function Home() {
   }, []);
 
   const handleDownloadQR = () => {
+    if (!getQrValue() || getQrValue().trim() === "") {
+  return alert("Completează datele înainte de descărcare!");
+}
     const canvas = document.getElementById('contract-qr-download');
     if (canvas) {
       try {
@@ -1770,19 +1773,37 @@ export default function Home() {
                       )}
                     </div>
                     
-                    {/* Branding Bar sub form - Liber pentru toți */}
+                    {/* Branding Bar sub form */}
                     <div className="flex items-center gap-3 pt-4 border-t border-slate-800/50 mt-4">
                       <div className="flex items-center gap-3 w-full">
                         <label className="text-[10px] text-slate-400 font-bold uppercase shrink-0">Culoare</label>
                         <input type="color" value={qrColor} onChange={(e) => setQrColor(e.target.value)} className="w-7 h-7 rounded cursor-pointer shrink-0 bg-transparent border-0 p-0" />
-                        <label className="text-[10px] text-slate-400 font-bold uppercase ml-2 shrink-0 border border-slate-700 p-2 rounded-lg bg-[#0B0F12] cursor-pointer hover:bg-slate-800 transition">
-                          <span className="flex items-center gap-1">Incarca Logo Central</span>
-                          <input type="file" accept="image/png, image/jpeg, image/svg+xml" onChange={handleQrLogoUpload} className="hidden" />
-                        </label>
-                        {qrLogo && <button type="button" onClick={() => { setQrLogo(null); setQrLogoRatio(1); }} className="text-[10px] text-red-400 font-bold hover:underline">Elimină ❌</button>}
+                        
+                        {/* Verificam daca are premium/dreptul la branding */}
+                        {!isPremium ? (
+                          <a 
+                            href="https://zensoftware.gumroad.com/l/qr-branding" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="relative text-[10px] text-slate-400 font-bold uppercase ml-2 shrink-0 border border-slate-700 p-2 rounded-lg bg-[#0B0F12] cursor-pointer hover:bg-slate-800 transition flex items-center gap-1"
+                          >
+                            Incarca Logo Central
+                            <span className="absolute -top-2 -right-2 text-[8px] bg-amber-500 text-black px-1.5 py-0.5 rounded-full shadow-md z-10">49 RON</span>
+                          </a>
+                        ) : (
+                          <label className="text-[10px] text-slate-400 font-bold uppercase ml-2 shrink-0 border border-slate-700 p-2 rounded-lg bg-[#0B0F12] cursor-pointer hover:bg-slate-800 transition">
+                            <span className="flex items-center gap-1">Incarca Logo Central</span>
+                            <input type="file" accept="image/png, image/jpeg, image/svg+xml" onChange={handleQrLogoUpload} className="hidden" />
+                          </label>
+                        )}
+
+                        {qrLogo && (
+                          <button type="button" onClick={() => { setQrLogo(null); setQrLogoRatio(1); }} className="text-[10px] text-red-400 font-bold hover:underline">
+                            Elimină ❌
+                          </button>
+                        )}
                       </div>
                     </div>
-                  </div>
 
                   {/* Right: QR Preview Area */}
                   <div className="w-full sm:w-[220px] shrink-0 border border-slate-800 rounded-xl bg-[#0B0F12]/50 p-5 flex flex-col justify-center items-center h-auto">
@@ -2412,8 +2433,8 @@ export default function Home() {
                 <div className="absolute -right-20 -top-20 w-64 h-64 bg-[#8ba888]/5 rounded-full blur-3xl pointer-events-none"></div>
                 <div className="flex-1 w-full relative z-10">
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="text-2xl">🏢</span>
-                    <h3 className="text-xl font-black text-white uppercase tracking-tight">Verificare Firmă ANAF</h3>
+                    <span className="text-2xl"></span>
+                    <h3 className="text-sm font-bold text-[#8ba888] uppercase tracking-wider block">Verificare Firmă ANAF</h3>
                   </div>
                   <p className="text-xs text-slate-400 mb-6 max-w-md leading-relaxed">Interoghează rapid orice companie din România. Sistem hibrid de auto-completare cu descărcare rapoarte fiscale (datorii, bilanț, litigii) în format PDF.</p>
                   
