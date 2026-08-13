@@ -498,37 +498,42 @@ export default function Home() {
   }, []);
 
   const handleDownloadQR = () => {
-    if (!getQrValue() || getQrValue().trim() === "") {
-  return alert("Completează datele înainte de descărcare!");
-}
-    const canvas = document.getElementById('contract-qr-download');
-    if (canvas) {
-      try {
-        const dataUrl = canvas.toDataURL('image/png', 1.0);
-        const arr = dataUrl.split(',');
-        const mime = arr[0].match(/:(.*?);/)[1];
-        const bstr = atob(arr[1]);
-        let n = bstr.length;
-        const u8arr = new Uint8Array(n);
-        while (n--) {
-          u8arr[n] = bstr.charCodeAt(n);
-        }
-        const blob = new Blob([u8arr], { type: mime });
-        const blobUrl = URL.createObjectURL(blob);
-        const downloadLink = document.createElement('a');
-        downloadLink.href = blobUrl;
-        downloadLink.download = 'ContractSmart-QR-HighRes.png';
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-        setTimeout(() => window.URL.revokeObjectURL(blobUrl), 200);
-      } catch (e) {
-        alert("Codul QR s-a generat, dar browserul acestui telefon blochează descărcarea automată.");
+  const value = getQrValue();
+  
+  // Verificare strictă dacă este gol, sau conține doar structuri goale predefinite
+  if (!value || value.trim() === "" || value === "WIFI:S:;T:WPA;P:;;; " || value === "bitcoin:?amount=&label=") {
+    alert("Te rugăm să completezi datele înainte de descărcare!");
+    return;
+  }
+
+  const canvas = document.getElementById('contract-qr-download');
+  if (canvas) {
+    try {
+      const dataUrl = canvas.toDataURL('image/png', 1.0);
+      const arr = dataUrl.split(',');
+      const mime = arr[0].match(/:(.*?);/)[1];
+      const bstr = atob(arr[1]);
+      let n = bstr.length;
+      const u8arr = new Uint8Array(n);
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
       }
-    } else {
-      alert("Eroare: Codul QR nu a putut fi generat pentru descărcare.");
+      const blob = new Blob([u8arr], { type: mime });
+      const blobUrl = URL.createObjectURL(blob);
+      const downloadLink = document.createElement('a');
+      downloadLink.href = blobUrl;
+      downloadLink.download = 'ContractSmart-QR-HighRes.png';
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 200);
+    } catch (e) {
+      alert("Codul QR s-a generat, dar browserul acestui telefon blochează descărcarea automată.");
     }
-  };
+  } else {
+    alert("Eroare: Codul QR nu a putut fi generat pentru descărcare.");
+  }
+};
 
   const calculeazaTaxeComplet = () => {
     const SALARIU_MINIM_2026 = 4050;
