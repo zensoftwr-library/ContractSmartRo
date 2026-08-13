@@ -1779,7 +1779,6 @@ export default function Home() {
                         <label className="text-[10px] text-slate-400 font-bold uppercase shrink-0">Culoare</label>
                         <input type="color" value={qrColor} onChange={(e) => setQrColor(e.target.value)} className="w-7 h-7 rounded cursor-pointer shrink-0 bg-transparent border-0 p-0" />
                         
-                        {/* Verificam daca are premium/dreptul la branding */}
                         {!isPremium ? (
                           <a 
                             href="https://zensoftware.gumroad.com/l/qr-branding" 
@@ -1804,6 +1803,7 @@ export default function Home() {
                         )}
                       </div>
                     </div>
+                  </div>
 
                   {/* Right: QR Preview Area */}
                   <div className="w-full sm:w-[220px] shrink-0 border border-slate-800 rounded-xl bg-[#0B0F12]/50 p-5 flex flex-col justify-center items-center h-auto">
