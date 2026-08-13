@@ -44,7 +44,8 @@ export async function POST(request) {
     const rawFirma = await firmaRes.json();
     const rawDatorii = datoriiRes && datoriiRes.ok ? await datoriiRes.json() : {};
     const rawFinante = finanteRes && finanteRes.ok ? await finanteRes.json() : {};
-
+      console.log("--- DEBUG CUI:", cleanCui);
+    console.log("--- RĂSPUNS FINANCIARE CAUTA-FIRMA:", JSON.stringify(rawFinante, null, 2));
     const dataFirma = rawFirma.data || {};
     const dataDatorii = rawDatorii.data || {};
 
