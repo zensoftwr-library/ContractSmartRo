@@ -322,46 +322,6 @@ export default function Home() {
     }
   };
 
-  const handleAutofillCui = async (cuiValue, rol) => {
-    const cleanCui = cuiValue.replace(/[^0-9]/g, '');
-    if (cleanCui.length < 5) return;
-    try {
-      const res = await fetch(`/api/cui?cui=${cleanCui}`);
-      const data = await res.json();
-      if (data.success) {
-        if (rol === 'prestator') {
-          setFormData(prev => ({ ...prev, prestatorNume: data.data.denumire }));
-          setPrestatorCuiStatus(data.data.stare);
-        } else {
-          setFormData(prev => ({ ...prev, clientNume: data.data.denumire }));
-          setClientCuiStatus(data.data.stare);
-        }
-      }
-    } catch (e) {}
-  };
-
-  // Declansare automata (Debounce) pentru Prestator
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      if (formData.prestatorCui?.replace(/[^0-9]/g, '').length >= 5) {
-        handleAutofillCui(formData.prestatorCui, 'prestator');
-      }
-    }, 800);
-    return () => clearTimeout(delayDebounceFn);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formData.prestatorCui]);
-
-  // Declansare automata (Debounce) pentru Client
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      if (formData.clientCui?.replace(/[^0-9]/g, '').length >= 5) {
-        handleAutofillCui(formData.clientCui, 'client');
-      }
-    }, 800);
-    return () => clearTimeout(delayDebounceFn);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formData.clientCui]);
-
   const [fiscal, setFiscal] = useState({
     venitLunar: 45000,
     formaJuridica: 'SRL', 
@@ -384,6 +344,46 @@ export default function Home() {
     constructiiMateriale: '', constructiiManopera: '', constructiiSuprafata: '', constructiiPretMp: '',
     adaugaQrPlata: false, ibanPlata: ''
   });
+
+  const handleAutofillCui = async (cuiValue, rol) => {
+    const cleanCui = cuiValue.replace(/[^0-9]/g, '');
+    if (cleanCui.length < 5) return;
+    try {
+      const res = await fetch(`/api/cui?cui=${cleanCui}`);
+      const data = await res.json();
+      if (data.success) {
+        if (rol === 'prestator') {
+          setFormData(prev => ({ ...prev, prestatorNume: data.data.denumire }));
+          setPrestatorCuiStatus(data.data.stare);
+        } else {
+          setFormData(prev => ({ ...prev, clientNume: data.data.denumire }));
+          setClientCuiStatus(data.data.stare);
+        }
+      }
+    } catch (e) {}
+  };
+  
+  // Declansare automata (Debounce) pentru Prestator
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (formData.prestatorCui?.replace(/[^0-9]/g, '').length >= 5) {
+        handleAutofillCui(formData.prestatorCui, 'prestator');
+      }
+    }, 800);
+    return () => clearTimeout(delayDebounceFn);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData.prestatorCui]);
+
+  // Declansare automata (Debounce) pentru Client
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (formData.clientCui?.replace(/[^0-9]/g, '').length >= 5) {
+        handleAutofillCui(formData.clientCui, 'client');
+      }
+    }, 800);
+    return () => clearTimeout(delayDebounceFn);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData.clientCui]);
 
   const [autoDocs, setAutoDocs] = useState({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon: null });
   const [isUploading, setIsUploading] = useState(false);
