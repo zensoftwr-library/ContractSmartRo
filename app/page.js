@@ -339,7 +339,7 @@ export default function Home() {
       }
     } catch (e) {}
   };
-  
+
   // Declansare automata (Debounce) pentru Prestator
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
