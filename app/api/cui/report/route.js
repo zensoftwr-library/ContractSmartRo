@@ -28,35 +28,36 @@ export async function POST(request) {
       return NextResponse.json({ success: false, needsPayment: true, message: 'Fonduri insuficiente.' }, { status: 403 });
     }
 
-    // 2. Extragere PARALELĂ: FirmeAPI (Bază + Datorii) + API Local ContractSmart (Bilanț)
+    // 2. Extragere PARALELĂ: FirmeAPI (Bază + Datorii) + Cauta-Firma.ro (Bilanțuri directe)
     const apiKey = process.env.OPENAPI_KEY || process.env.FIRMEAPI_KEY; 
     const reqHeaders = { 'Authorization': `Bearer ${apiKey}`, 'Accept': 'application/json' };
 
-    const [firmaRes, datoriiRes, localApiRes] = await Promise.all([
+    const [firmaRes, datoriiRes, finanteRes] = await Promise.all([
       fetch(`https://www.firmeapi.ro/api/v1/firma/${cleanCui}`, { headers: reqHeaders }).catch(() => null),
       fetch(`https://www.firmeapi.ro/api/v1/datorii/${cleanCui}`, { headers: reqHeaders }).catch(() => null),
-      fetch(`http://localhost:3001/api/v1/firma/${cleanCui}`).catch(() => null)
+      fetch(`https://api.cauta-firma.ro/firma/${cleanCui}`).catch(() => null)
     ]);
 
     if (!firmaRes || !firmaRes.ok) throw new Error("Eroare la extragerea datelor firmei.");
 
     const rawFirma = await firmaRes.json();
     const rawDatorii = datoriiRes && datoriiRes.ok ? await datoriiRes.json() : {};
+    const rawFinante = finanteRes && finanteRes.ok ? await finanteRes.json() : {};
 
     const dataFirma = rawFirma.data || {};
     const dataDatorii = rawDatorii.data || {};
 
-    // Extragere date financiare din API-ul local
-    let cifraAfaceri = 0, profitNet = 0, nrAngajati = 0, anBilant = 'N/A';
+    // Extragere date financiare corectate
+    let cifraAfaceri = null, profitNet = null, nrAngajati = null, anBilant = 'N/A';
     
-    if (localApiRes && localApiRes.ok) {
-      const localData = await localApiRes.json();
-      if (localData.success && localData.data) {
-        cifraAfaceri = localData.data.cifra_afaceri || 0;
-        profitNet = localData.data.profit_net || 0;
-        nrAngajati = localData.data.angajati || 0;
-        anBilant = localData.data.an_bilant || 'N/A';
-      }
+    const finanteArray = rawFinante.finante || rawFinante.bilanturi || [];
+    if (Array.isArray(finanteArray) && finanteArray.length > 0) {
+      // Găsim cel mai recent an disponibil
+      const ultimeleFinante = finanteArray.sort((a, b) => (b.an || 0) - (a.an || 0))[0];
+      cifraAfaceri = ultimeleFinante.cifra_afaceri || ultimeleFinante.cifraAfaceri || 0;
+      profitNet = ultimeleFinante.profit_net || ultimeleFinante.profitNet || ultimeleFinante.profit || 0;
+      nrAngajati = ultimeleFinante.angajati || ultimeleFinante.numar_angajati || 0;
+      anBilant = ultimeleFinante.an || ultimeleFinante.an_bilant || 'N/A';
     }
 
     // Mapare Date Formatate
@@ -75,6 +76,10 @@ export async function POST(request) {
 
     // 4. Istoric
     await supabase.from('company_reports').insert([{ user_id: userId, cui: cleanCui, company_name: dataFirma.denumire }]);
+
+    // Funcții de formatare sigure (care acceptă valoarea 0 fără să dea fals)
+    const formatMoney = (val) => val !== null && val !== undefined ? Number(val).toLocaleString('ro-RO') + ' RON' : 'Date indisponibile';
+    const formatNumber = (val) => val !== null && val !== undefined ? val : 'Date indisponibile';
 
     // 5. PDF Premium
     const htmlReport = `
@@ -119,10 +124,10 @@ export async function POST(request) {
         <div class="section">
           <div class="section-title">2. Date Financiare și Datorii (Ultimul Bilanț: Anul ${anBilant})</div>
             <table>
-              <tr><th>Cifră de Afaceri Netă:</th><td>${cifraAfaceri ? Number(cifraAfaceri).toLocaleString('ro-RO') + ' RON' : 'Date indisponibile'}</td></tr>
-              <tr><th>Profit Net:</th><td>${profitNet ? Number(profitNet).toLocaleString('ro-RO') + ' RON' : 'Date indisponibile'}</td></tr>
+              <tr><th>Cifră de Afaceri Netă:</th><td>${formatMoney(cifraAfaceri)}</td></tr>
+              <tr><th>Profit Net:</th><td>${formatMoney(profitNet)}</td></tr>
               <tr><th>Datorii Totale ANAF:</th><td style="color: ${datoriiTotale > 0 ? '#dc2626' : '#166534'}; font-weight:bold;">${datoriiTotale.toLocaleString('ro-RO')} RON</td></tr>
-              <tr><th>Număr Mediu Angajați:</th><td>${nrAngajati ? nrAngajati : 'Date indisponibile'}</td></tr>
+              <tr><th>Număr Mediu Angajați:</th><td>${formatNumber(nrAngajati)}</td></tr>
             </table>
         </div>
 

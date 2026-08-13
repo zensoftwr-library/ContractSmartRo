@@ -1625,10 +1625,10 @@ export default function Home() {
                           </div>
                           <div className="flex gap-3">
                             <select value={cryptoData.coin} onChange={e => setCryptoData({...cryptoData, coin: e.target.value})} className="w-1/3 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs outline-none">
-                              <option value="bitcoin">Bitcoin (BTC)</option>
-                              <option value="ethereum">Ethereum (ETH)</option>
-                              <option value="solana">Solana (SOL)</option>
-                              <option value="tether">Tether (USDT)</option>
+                              <option value="bitcoin">BTC</option>
+                              <option value="ethereum">ETH</option>
+                              <option value="solana">SOL</option>
+                              <option value="tether">USDT</option>
                             </select>
                             <input type="number" placeholder="Sumă (Opțional)" value={cryptoData.amount} onChange={(e) => setCryptoData({...cryptoData, amount: e.target.value})} className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-[#8ba888] outline-none" />
                           </div>
@@ -2442,17 +2442,19 @@ export default function Home() {
                           <span className="text-[10px] text-slate-400 font-mono">CUI: {cuiDataResult.cui} | REG: {cuiDataResult.regCom}</span>
                         </div>
                         <div className="flex items-center gap-1.5">
-                          <span className={`w-2.5 h-2.5 rounded-full ${cuiDataResult.stare?.toLowerCase().includes('inactiv') ? 'bg-red-500 animate-pulse' : 'bg-emerald-500'}`}></span>
-                          <span className={`px-2 py-1 rounded text-[9px] font-black uppercase ${cuiDataResult.stare?.toLowerCase().includes('inactiv') ? 'bg-red-900/40 text-red-400 border border-red-900' : 'bg-emerald-900/40 text-emerald-400 border border-emerald-900'}`}>
+                          <span className={`w-2.5 h-2.5 rounded-full ${cuiDataResult.stare?.toUpperCase().includes('INACTIV') || cuiDataResult.stare?.toUpperCase().includes('RADIAT') ? 'bg-red-500 animate-pulse' : 'bg-emerald-500'}`}></span>
+                          <span className={`px-2 py-1 rounded text-[9px] font-black uppercase ${cuiDataResult.stare?.toLowerCase().includes('inactiv') || cuiDataResult.stare?.toLowerCase().includes('radiat') ? 'bg-red-900/40 text-red-400 border border-red-900' : 'bg-emerald-900/40 text-emerald-400 border border-emerald-900'}`}>
                             {cuiDataResult.stare || 'Necunoscut'}
                           </span>
                         </div>
                       </div>
                       <p className="text-[10px] text-slate-500 mb-4 pb-4 border-b border-slate-800">{cuiDataResult.adresa}</p>
                     <div className="mt-6">
-                      <button 
-                        onClick={handleDownloadReport} 
-                        className="w-full flex items-center justify-center gap-2 bg-[#8ba888] hover:bg-[#7a9477] text-white font-bold py-3 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
+                      <a 
+                        href="https://zensoftware.gumroad.com/l/raport-companie" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="w-full flex items-center justify-center gap-2 bg-[#8ba888] hover:bg-[#7a9477] text-[#0B0F12] font-black py-3 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
                       >
                         <svg 
                           className="w-5 h-5" 
@@ -2465,11 +2467,11 @@ export default function Home() {
                             strokeLinecap="round" 
                             strokeLinejoin="round" 
                             strokeWidth={2} 
-                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" 
+                            d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" 
                           />
                         </svg>
-                        Descarcă Raport Detaliat
-                      </button>
+                        Deblochează Raport Detaliat (19 RON / €3.99)
+                      </a>
                     </div>
                     </div>
                   )}
