@@ -18,7 +18,7 @@ export async function POST(request) {
     const body = await request.json();
     const { 
       tipContract, initiatorRol, obiect, valoare, moneda, 
-      prestatorNume, prestatorCui, clientNume, clientCui, 
+      prestatorNume, prestatorCui, prestatorReprezentant, clientNume, clientCui, clientReprezentant, 
       clientEmail, semnăturaBase64, userId, adaugaProcesVerbal, captchaToken,
       constructiiMateriale, constructiiManopera, constructiiSuprafata, constructiiPretMp,
       adaugaQrPlata, ibanPlata
@@ -287,11 +287,11 @@ export async function POST(request) {
         
         <div class="capitol-title">CAPITOLUL I. PĂRȚILE CONTRACTANTE</div>
         <div class="text-paragraph">
-          <strong>SOCIETATEA COMERCIALĂ / ENTITATEA JURIDICĂ:</strong> ${fieldHtml(prestatorNume, "220px")}, având date de identificare fiscală CUI/CNP: ${fieldHtml(prestatorCui, "120px")}, reprezentată legal în capacitate juridică deplină, denumită <strong>PRESTATOR / LOCATOR / VÂNZĂTOR</strong>, pe de o parte,
+          <strong>SOCIETATEA COMERCIALĂ / ENTITATEA JURIDICĂ:</strong> ${fieldHtml(prestatorNume, "220px")}, având date de identificare fiscală CUI/CNP: ${fieldHtml(prestatorCui, "120px")}, legal reprezentată prin Administrator / Reprezentant: <strong>${fieldHtml(prestatorReprezentant, "150px")}</strong>, denumită <strong>PRESTATOR / LOCATOR / VÂNZĂTOR</strong>, pe de o parte,
         </div>
         <div class="text-paragraph" style="text-align: center; text-indent: 0;">și</div>
         <div class="text-paragraph">
-          <strong>SOCIETATEA COMERCIALĂ / ENTITATEA JURIDICĂ:</strong> ${fieldHtml(clientNume, "220px")}, având date de identificare fiscală CUI/CNP: ${fieldHtml(clientCui, "120px")}, reprezentată legal, denumită <strong>BENEFICIAR / LOCATAR / CUMPĂRĂTOR</strong>, pe altă parte.
+          <strong>SOCIETATEA COMERCIALĂ / ENTITATEA JURIDICĂ:</strong> ${fieldHtml(clientNume, "220px")}, având date de identificare fiscală CUI/CNP: ${fieldHtml(clientCui, "120px")}, legal reprezentată prin Administrator / Reprezentant: <strong>${fieldHtml(clientReprezentant, "150px")}</strong>, denumită <strong>BENEFICIAR / LOCATAR / CUMPĂRĂTOR</strong>, pe altă parte.
         </div>
 
         <div class="capitol-title">CAPITOLUL II. OBIECTUL CONTRACTULUI ȘI TEMEIUL LEGAL</div>

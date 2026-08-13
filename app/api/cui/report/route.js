@@ -43,7 +43,13 @@ export async function POST(request) {
     const rawDatorii = await datoriiRes.json().catch(() => ({}));
 
     const dataFirma = rawFirma.data || {};
-    const dataBilant = (Array.isArray(rawBilant.data) && rawBilant.data.length > 0) ? rawBilant.data[0] : {}; // Ultimul an disponibil
+    const bilantRaw = rawBilant.data || rawBilant;
+    const dataBilant = Array.isArray(bilantRaw) ? (bilantRaw[0] || {}) : bilantRaw;
+
+    const anBilant = dataBilant.an || dataBilant.an_fiscal || dataBilant.anFiscal || '2024';
+    const cifraAfaceri = dataBilant.cifra_de_afaceri || dataBilant.venituri_nete || dataBilant.cifraAfaceri || 0;
+    const profitNet = dataBilant.profit_net || dataBilant.profit || 0;
+    const nrAngajati = dataBilant.numar_mediu_angajati || dataBilant.angajati || 0;
     const dataDatorii = rawDatorii.data || {};
 
     // Mapare Date Formatate

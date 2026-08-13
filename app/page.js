@@ -333,8 +333,8 @@ export default function Home() {
   const [formData, setFormData] = useState({
     tipContract: 'prestari', 
     initiatorRol: 'prestator', 
-    prestatorNume: '', prestatorCui: '', prestatorEmail: '', prestatorLogo: '', prestatorCuloare: '#8ba888',
-    clientNume: '', clientCui: '', clientEmail: '',
+    prestatorNume: '', prestatorCui: '', prestatorEmail: '', prestatorLogo: '', prestatorCuloare: '#8ba888', prestatorReprezentant: '',
+    clientNume: '', clientCui: '', clientEmail: '', clientReprezentant:'',
     obiect: '', valoare: '', moneda: 'RON', emiteFacturaAvans: false,
     estePlatitorTVA: false,
     clauzaPi: true, clauzaPenalitati: true, clauzaRevizii: false, tarifOrar: '150',
@@ -1880,6 +1880,7 @@ export default function Home() {
                       <div className="flex flex-col space-y-1">
                         <label className="text-[10px] text-slate-500 font-bold uppercase">Denumire Furnizor / Nume</label>
                         <input type="text" placeholder="Denumire Firma / Nume Complet" autoComplete="new-password" value={formData.prestatorNume} onChange={e => setFormData({...formData, prestatorNume: e.target.value})} className="p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none" />
+                        <input type="text" placeholder="Nume Administrator / Reprezentant Prestator" autoComplete="new-password" value={formData.prestatorReprezentant} onChange={e => setFormData({...formData, prestatorReprezentant: e.target.value})} className="mt-2 p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none w-full" />
                       </div>
                     </div>
                   </div>
@@ -1894,6 +1895,7 @@ export default function Home() {
                         )}
                       </div>
                       <input type="text" placeholder="Companie Client / Nume" autoComplete="new-password" value={formData.clientNume} onChange={e => setFormData({...formData, clientNume: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white" />
+                      <input type="text" placeholder="Nume Administrator / Reprezentant Client" autoComplete="new-password" value={formData.clientReprezentant} onChange={e => setFormData({...formData, clientReprezentant: e.target.value})} className="mt-2 p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white w-full" />
                     </div>
                     
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
@@ -2381,8 +2383,8 @@ export default function Home() {
                 <div className="absolute -right-20 -top-20 w-64 h-64 bg-[#8ba888]/5 rounded-full blur-3xl pointer-events-none"></div>
                 <div className="flex-1 w-full relative z-10">
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="text-2xl">🏢</span>
-                    <h3 className="text-xl font-black text-white uppercase tracking-tight">Verificare Firmă ANAF</h3>
+                    <span className="text-2xl"></span>
+                    <h3 className="text-xl font-black text-white uppercase tracking-tight"><strong className="text-[#8ba888]">Verificare Firmă ANAF</strong></h3>
                   </div>
                   <p className="text-xs text-slate-400 mb-6 max-w-md leading-relaxed">Interoghează rapid orice companie din România. Sistem hibrid de auto-completare cu descărcare rapoarte fiscale (datorii, bilanț, litigii) în format PDF.</p>
                   
@@ -2407,14 +2409,17 @@ export default function Home() {
                           <h4 className="text-sm font-bold text-white uppercase">{cuiDataResult.denumire}</h4>
                           <span className="text-[10px] text-slate-400 font-mono">CUI: {cuiDataResult.cui} | REG: {cuiDataResult.regCom}</span>
                         </div>
-                        <span className={`px-2 py-1 rounded text-[9px] font-black uppercase ${cuiDataResult.stare === 'Activ' ? 'bg-emerald-900/40 text-emerald-400 border border-emerald-900' : 'bg-red-900/40 text-red-400 border border-red-900'}`}>
-                          {cuiDataResult.stare || 'Necunoscut'}
-                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <span className={`w-2.5 h-2.5 rounded-full ${cuiDataResult.stare?.toLowerCase().includes('inactiv') ? 'bg-red-500 animate-pulse' : 'bg-emerald-500'}`}></span>
+                          <span className={`px-2 py-1 rounded text-[9px] font-black uppercase ${cuiDataResult.stare?.toLowerCase().includes('inactiv') ? 'bg-red-900/40 text-red-400 border border-red-900' : 'bg-emerald-900/40 text-emerald-400 border border-emerald-900'}`}>
+                            {cuiDataResult.stare || 'Necunoscut'}
+                          </span>
+                        </div>
                       </div>
                       <p className="text-[10px] text-slate-500 mb-4 pb-4 border-b border-slate-800">{cuiDataResult.adresa}</p>
                       <button onClick={() => handleDownloadPremiumReport(cuiDataResult.cui)} className="w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold py-2.5 rounded-lg text-xs transition flex justify-center items-center gap-2">
                         <svg className="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8V7a4 4 0 00-8 0v4h8z"></path></svg>
-                        Descarcă Raport Financiar Complet (1 Credit / 15 RON)
+                        Descarcă Raport Financiar Complet (19 RON (~3.99 €))
                       </button>
                     </div>
                   )}
