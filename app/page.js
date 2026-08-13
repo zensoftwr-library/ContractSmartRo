@@ -2415,8 +2415,8 @@ export default function Home() {
                 <div className="absolute -right-20 -top-20 w-64 h-64 bg-[#8ba888]/5 rounded-full blur-3xl pointer-events-none"></div>
                 <div className="flex-1 w-full relative z-10">
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="text-2xl"></span>
-                    <h3 className="text-xl font-black text-white uppercase tracking-tight"><strong className="text-[#8ba888]">Verificare Firmă ANAF</strong></h3>
+                    <span className="text-2xl">🏢</span>
+                    <h3 className="text-xl font-black text-white uppercase tracking-tight">Verificare Firmă ANAF</h3>
                   </div>
                   <p className="text-xs text-slate-400 mb-6 max-w-md leading-relaxed">Interoghează rapid orice companie din România. Sistem hibrid de auto-completare cu descărcare rapoarte fiscale (datorii, bilanț, litigii) în format PDF.</p>
                   
@@ -2441,38 +2441,15 @@ export default function Home() {
                           <h4 className="text-sm font-bold text-white uppercase">{cuiDataResult.denumire}</h4>
                           <span className="text-[10px] text-slate-400 font-mono">CUI: {cuiDataResult.cui} | REG: {cuiDataResult.regCom}</span>
                         </div>
-                        <div className="flex items-center gap-1.5">
-                          <span className={`w-2.5 h-2.5 rounded-full ${cuiDataResult.stare?.toUpperCase().includes('INACTIV') || cuiDataResult.stare?.toUpperCase().includes('RADIAT') ? 'bg-red-500 animate-pulse' : 'bg-emerald-500'}`}></span>
-                          <span className={`px-2 py-1 rounded text-[9px] font-black uppercase ${cuiDataResult.stare?.toLowerCase().includes('inactiv') || cuiDataResult.stare?.toLowerCase().includes('radiat') ? 'bg-red-900/40 text-red-400 border border-red-900' : 'bg-emerald-900/40 text-emerald-400 border border-emerald-900'}`}>
-                            {cuiDataResult.stare || 'Necunoscut'}
-                          </span>
-                        </div>
+                        <span className={`px-2 py-1 rounded text-[9px] font-black uppercase ${cuiDataResult.stare?.toLowerCase().includes('inactiv') || cuiDataResult.stare?.toLowerCase().includes('radiat') ? 'bg-red-900/40 text-red-400 border border-red-900' : 'bg-emerald-900/40 text-emerald-400 border border-emerald-900'}`}>
+                          {cuiDataResult.stare || 'Necunoscut'}
+                        </span>
                       </div>
                       <p className="text-[10px] text-slate-500 mb-4 pb-4 border-b border-slate-800">{cuiDataResult.adresa}</p>
-                    <div className="mt-6">
-                      <a 
-                        href="https://zensoftware.gumroad.com/l/raport-companie" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="w-full flex items-center justify-center gap-2 bg-[#8ba888] hover:bg-[#7a9477] text-[#0B0F12] font-black py-3 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
-                      >
-                        <svg 
-                          className="w-5 h-5" 
-                          fill="none" 
-                          stroke="currentColor" 
-                          viewBox="0 0 24 24" 
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path 
-                            strokeLinecap="round" 
-                            strokeLinejoin="round" 
-                            strokeWidth={2} 
-                            d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" 
-                          />
-                        </svg>
-                        Deblochează Raport Detaliat (19 RON / €3.99)
-                      </a>
-                    </div>
+                      <button onClick={() => handleDownloadPremiumReport(cuiDataResult.cui)} className="w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold py-2.5 rounded-lg text-xs transition flex justify-center items-center gap-2">
+                        <svg className="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        Descarcă Raport Financiar Complet (1 Credit / 15 RON)
+                      </button>
                     </div>
                   )}
                 </div>
