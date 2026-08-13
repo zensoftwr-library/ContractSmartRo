@@ -260,6 +260,7 @@ export default function Home() {
   // STATE-URI PENTRU WIDGET CUI & AUTOCOMPLETARE
   const [cuiSearch, setCuiSearch] = useState('');
   const [cuiDataResult, setCuiDataResult] = useState(null);
+  useEffect(() => { setCuiDataResult(null); setCuiSearch(''); }, []);
   const [isSearchingCui, setIsSearchingCui] = useState(false);
   const [prestatorCuiStatus, setPrestatorCuiStatus] = useState(null);
   const [clientCuiStatus, setClientCuiStatus] = useState(null);
@@ -368,6 +369,10 @@ export default function Home() {
     const delayDebounceFn = setTimeout(() => {
       if (formData.prestatorCui?.replace(/[^0-9]/g, '').length >= 5) {
         handleAutofillCui(formData.prestatorCui, 'prestator');
+      } else if (!formData.prestatorCui || formData.prestatorCui.trim() === '') {
+        // Când CUI-ul e sters, resetăm câmpurile
+        setFormData(prev => ({ ...prev, prestatorNume: '', prestatorReprezentant: '' }));
+        setPrestatorCuiStatus('');
       }
     }, 800);
     return () => clearTimeout(delayDebounceFn);
@@ -379,6 +384,10 @@ export default function Home() {
     const delayDebounceFn = setTimeout(() => {
       if (formData.clientCui?.replace(/[^0-9]/g, '').length >= 5) {
         handleAutofillCui(formData.clientCui, 'client');
+      } else if (!formData.clientCui || formData.clientCui.trim() === '') {
+        // Când CUI-ul e sters, resetăm câmpurile
+        setFormData(prev => ({ ...prev, clientNume: '', clientReprezentant: '' }));
+        setClientCuiStatus('');
       }
     }, 800);
     return () => clearTimeout(delayDebounceFn);

@@ -15,6 +15,8 @@ export async function POST(request) {
       return NextResponse.json({ success: false, message: 'Date incomplete.' }, { status: 400 });
     }
 
+    const cleanCui = cui.replace(/[^0-9]/g, '');
+
     // 1. Verificare Utilizator
     const { data: profile } = await supabase.from('profiles').select('subscription_tier, credits_remaining, is_pro').eq('id', userId).single();
     
@@ -26,31 +28,35 @@ export async function POST(request) {
       return NextResponse.json({ success: false, needsPayment: true, message: 'Fonduri insuficiente.' }, { status: 403 });
     }
 
-    // 2. Extragere PARALELĂ: Baza + Bilanț + Datorii
+    // 2. Extragere PARALELĂ: FirmeAPI (Bază + Datorii) + API Local ContractSmart (Bilanț)
     const apiKey = process.env.OPENAPI_KEY || process.env.FIRMEAPI_KEY; 
     const reqHeaders = { 'Authorization': `Bearer ${apiKey}`, 'Accept': 'application/json' };
 
-    const [firmaRes, bilantRes, datoriiRes] = await Promise.all([
-      fetch(`https://www.firmeapi.ro/api/v1/firma/${cui}`, { headers: reqHeaders }),
-      fetch(`https://www.firmeapi.ro/api/v1/bilanturi/${cui}`, { headers: reqHeaders }),
-      fetch(`https://www.firmeapi.ro/api/v1/datorii/${cui}`, { headers: reqHeaders })
+    const [firmaRes, datoriiRes, localApiRes] = await Promise.all([
+      fetch(`https://www.firmeapi.ro/api/v1/firma/${cleanCui}`, { headers: reqHeaders }).catch(() => null),
+      fetch(`https://www.firmeapi.ro/api/v1/datorii/${cleanCui}`, { headers: reqHeaders }).catch(() => null),
+      fetch(`http://localhost:3001/api/v1/firma/${cleanCui}`).catch(() => null)
     ]);
 
-    if (!firmaRes.ok) throw new Error("Eroare la extragerea datelor firmei.");
+    if (!firmaRes || !firmaRes.ok) throw new Error("Eroare la extragerea datelor firmei.");
 
     const rawFirma = await firmaRes.json();
-    const rawBilant = await bilantRes.json().catch(() => ({}));
-    const rawDatorii = await datoriiRes.json().catch(() => ({}));
+    const rawDatorii = datoriiRes && datoriiRes.ok ? await datoriiRes.json() : {};
 
     const dataFirma = rawFirma.data || {};
-    const bilantRaw = rawBilant.data || rawBilant;
-    const dataBilant = Array.isArray(bilantRaw) ? (bilantRaw[0] || {}) : bilantRaw;
-
-    const anBilant = dataBilant.an || dataBilant.an_fiscal || dataBilant.anFiscal || '2024';
-    const cifraAfaceri = dataBilant.cifra_de_afaceri || dataBilant.venituri_nete || dataBilant.cifraAfaceri || 0;
-    const profitNet = dataBilant.profit_net || dataBilant.profit || 0;
-    const nrAngajati = dataBilant.numar_mediu_angajati || dataBilant.angajati || 0;
     const dataDatorii = rawDatorii.data || {};
+
+    // Extragere date financiare din API-ul local
+    let cifraAfaceri = 0, profitNet = 0, nrAngajati = 0, anBilant = 'N/A';
+    if (localApiRes && localApiRes.ok) {
+      const localData = await localApiRes.json();
+      if (localData.success && localData.data) {
+        cifraAfaceri = localData.data.cifra_afaceri || 0;
+        profitNet = localData.data.profit_net || 0;
+        nrAngajati = localData.data.angajati || 0;
+        anBilant = localData.data.an_bilant || 'N/A';
+      }
+    }
 
     // Mapare Date Formatate
     const stareFiscala = dataFirma.status_inactiv?.inactiv ? 'INACTIV FISCAL (RISC MAJOR)' : 'ACTIV FISCAL';
@@ -67,7 +73,7 @@ export async function POST(request) {
     }
 
     // 4. Istoric
-    await supabase.from('company_reports').insert([{ user_id: userId, cui: cui, company_name: dataFirma.denumire }]);
+    await supabase.from('company_reports').insert([{ user_id: userId, cui: cleanCui, company_name: dataFirma.denumire }]);
 
     // 5. PDF Premium
     const htmlReport = `
@@ -110,12 +116,12 @@ export async function POST(request) {
         </div>
 
         <div class="section">
-          <div class="section-title">2. Date Financiare și Datorii (Ultimul Bilanț: Anul ${dataBilant.an || 'N/A'})</div>
+          <div class="section-title">2. Date Financiare și Datorii (Ultimul Bilanț: Anul ${anBilant})</div>
           <table>
-            <tr><th>Cifră de Afaceri Netă:</th><td>${dataBilant.cifra_de_afaceri != null ? dataBilant.cifra_de_afaceri.toLocaleString('ro-RO') + ' RON' : 'Date indisponibile'}</td></tr>
-            <tr><th>Profit Net:</th><td>${dataBilant.profit_net != null ? dataBilant.profit_net.toLocaleString('ro-RO') + ' RON' : 'Date indisponibile'}</td></tr>
+            <tr><th>Cifră de Afaceri Netă:</th><td>${cifraAfaceri ? Number(cifraAfaceri).toLocaleString('ro-RO') + ' RON' : 'Date indisponibile'}</td></tr>
+            <tr><th>Profit Net:</th><td>${profitNet ? Number(profitNet).toLocaleString('ro-RO') + ' RON' : 'Date indisponibile'}</td></tr>
             <tr><th>Datorii Totale ANAF:</th><td style="color: ${datoriiTotale > 0 ? '#dc2626' : '#166534'}; font-weight:bold;">${datoriiTotale.toLocaleString('ro-RO')} RON</td></tr>
-            <tr><th>Număr Mediu Angajați:</th><td>${dataBilant.numar_mediu_angajati ?? 'Date indisponibile'}</td></tr>
+            <tr><th>Număr Mediu Angajați:</th><td>${nrAngajati ? nrAngajati : 'Date indisponibile'}</td></tr>
           </table>
         </div>
 
@@ -134,7 +140,7 @@ export async function POST(request) {
 
     return new NextResponse(pdfBuffer, { 
       status: 200, 
-      headers: { 'Content-Type': 'application/pdf', 'Content-Disposition': `attachment; filename=Raport_${cui}.pdf` }
+      headers: { 'Content-Type': 'application/pdf', 'Content-Disposition': `attachment; filename=Raport_${cleanCui}.pdf` }
     });
 
   } catch (error) {

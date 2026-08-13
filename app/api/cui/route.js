@@ -9,33 +9,33 @@ export async function GET(request) {
   }
 
   try {
-    // 🛡️ PASUL 1: Sursa Open-Source Nelimitată (Primary)
-    // Folosim un controller de abort pentru a nu bloca request-ul dacă API-ul răspunde greu
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 2500); // Max 2.5 secunde așteptare
 
+    // 🛡️ PASUL 1: Microserviciul Local (Sursa primară care rezolvă bulina roșie/verde)
     try {
-      const resPrimary = await fetch(`https://api.lista-firme.info/v1/cui/${cui}`, {
+      const resPrimary = await fetch(`http://localhost:3001/api/v1/firma/${cui}`, {
         signal: controller.signal
       });
       clearTimeout(timeoutId);
 
       if (resPrimary.ok) {
-        const data = await resPrimary.json();
+        const result = await resPrimary.json();
+        const data = result.data || {};
         return NextResponse.json({
           success: true,
-          source: 'lista-firme-os',
+          source: 'local-microservice',
           data: {
-            denumire: data.nume,
-            cui: data.cui,
-            regCom: data.nr_reg_com,
-            adresa: data.adresa,
-            stare: data.stare // ex: "Activ" sau "Inactiv"
+            denumire: data.denumire || data.nume || '',
+            cui: cui,
+            regCom: data.regCom || data.nr_reg_com || '',
+            adresa: data.adresa || '',
+            stare: data.stare // Aceasta returnează "INACTIV" și activează corect bulina roșie
           }
         });
       }
     } catch (err) {
-      console.warn(`[CUI API] Sursa primară a eșuat (Timeout/Eroare) pentru CUI: ${cui}. Trecem la Fallback...`);
+      console.warn(`[CUI API] Sursa locală a eșuat pentru CUI: ${cui}. Trecem la Fallback...`);
     }
 
     // 🚀 PASUL 2: Fallback pe FirmeAPI.ro
@@ -47,7 +47,7 @@ export async function GET(request) {
 
     if (resSecondary.ok) {
       const raw = await resSecondary.json();
-      const data = raw.data;
+      const data = raw.data || {};
       return NextResponse.json({
         success: true,
         source: 'firmeapi-fallback',
@@ -55,14 +55,14 @@ export async function GET(request) {
           denumire: data.denumire,
           cui: data.cui,
           regCom: data.nr_reg_com,
-          adresa: data.adresa ? `${data.adresa.judet || ''}, ${data.adresa.localitate || ''}` : '',
+          adresa: typeof data.adresa === 'string' ? data.adresa : (data.adresa ? `${data.adresa.judet || ''}, ${data.adresa.localitate || ''}` : ''),
           stare: data.stare
         }
       });
     }
 
-    // 🛑 Dacă absolut ambele au picat
-    return NextResponse.json({ success: false, message: 'Nu a fost găsită.' }, { status: 404 });
+    // 🛑 Dacă ambele surse pică
+    return NextResponse.json({ success: false, message: 'Firma nu a fost găsită.' }, { status: 404 });
   } catch (error) {
     console.error("[CUI ERROR]:", error);
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
