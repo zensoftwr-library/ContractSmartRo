@@ -348,6 +348,7 @@ export default function Home() {
       }
     }, 800);
     return () => clearTimeout(delayDebounceFn);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.prestatorCui]);
 
   // Declansare automata (Debounce) pentru Client
@@ -358,6 +359,7 @@ export default function Home() {
       }
     }, 800);
     return () => clearTimeout(delayDebounceFn);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.clientCui]);
 
   const [fiscal, setFiscal] = useState({
