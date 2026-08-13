@@ -2411,7 +2411,8 @@ export default function Home() {
                         </div>
                         {(() => {
                           const textStare = cuiDataResult.stare?.toUpperCase() || '';
-                          const esteInactiv = textStare.includes('INACTIV') || textStare.includes('RADIAT') || textStare.includes('SUSPENDAT');
+                          // Verificăm dacă textul conține explicit indicii de inactivitate sau lipsă de activitate fiscală
+                          const esteInactiv = textStare.includes('INACTIV') || textStare.includes('RADIAT') || textStare.includes('SUSPENDAT') || textStare.includes('EXPIRAT');
                           return (
                             <div className="flex items-center gap-1.5">
                               <span className={`w-2.5 h-2.5 rounded-full ${esteInactiv ? 'bg-red-500 animate-pulse' : 'bg-emerald-500'}`}></span>
