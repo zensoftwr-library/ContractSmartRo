@@ -285,6 +285,15 @@ export default function Home() {
     }
   };
 
+  const handleDownloadReport = () => {
+    if (cuiDataResult?.cui) {
+      // Apelăm funcția ta premium care gestionează generarea PDF-ului și creditele
+      handleDownloadPremiumReport(cuiDataResult.cui);
+    } else {
+      alert("Te rog să cauți o firmă mai întâi.");
+    }
+  };
+
   const handleDownloadPremiumReport = async (cuiTarget) => {
     if (!user) return alert("Trebuie să fii autentificat pentru a descărca rapoarte.");
     if (!isPremium && user.credits <= 0) {
