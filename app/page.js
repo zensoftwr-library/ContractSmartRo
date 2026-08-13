@@ -1475,18 +1475,32 @@ export default function Home() {
                         <label htmlFor="venitLunar" className="text-slate-400 text-[10px] font-bold uppercase">Valoare Factură / Venit</label>
                         <span className="text-[#8ba888] font-mono text-[11px] font-bold">{fiscal.venitLunar} RON</span>
                       </div>
-                      <input 
-                        id="venitLunar"
-                        name="venitLunar"
-                        type="range" 
-                        min="0" 
-                        max="50000" 
-                        step="1" 
-                        value={fiscal.venitLunar} 
-                        onChange={e => setFiscal({...fiscal, venitLunar: Number(e.target.value)})} 
-                        className="w-full h-1.5 bg-slate-800 rounded appearance-none cursor-pointer accent-[#8ba888]" 
-                      />
-                    </div>
+                        <input 
+                          id="venitLunar"
+                          name="venitLunar"
+                          type="range" 
+                          min="0" 
+                          max="50000" 
+                          step="1" 
+                          value={fiscal.venitLunar} 
+                          onChange={e => setFiscal({...fiscal, venitLunar: Number(e.target.value)})} 
+                          className="w-full h-1.5 bg-slate-800 rounded appearance-none cursor-pointer accent-[#8ba888]" 
+                        />
+                        
+                        {/* Câmpul nou pentru introducere manuală din tastatură */}
+                        <div className="mt-3 flex items-center gap-2">
+                          <input 
+                            type="number" 
+                            min="0" 
+                            max="50000" 
+                            value={fiscal.venitLunar} 
+                            onChange={e => setFiscal({...fiscal, venitLunar: Number(e.target.value)})} 
+                            className="w-full p-2 bg-slate-800 text-white rounded border border-slate-700 focus:outline-none focus:border-[#8ba888]"
+                            placeholder="Introdu suma dorită..."
+                          />
+                          <span className="text-gray-400 font-medium">RON</span>
+                        </div>
+                      </div>
                     
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
@@ -2426,7 +2440,28 @@ export default function Home() {
                         </div>
                       </div>
                       <p className="text-[10px] text-slate-500 mb-4 pb-4 border-b border-slate-800">{cuiDataResult.adresa}</p>
-                    
+                    <div className="mt-6">
+                      <button 
+                        onClick={handleDownloadReport} 
+                        className="w-full flex items-center justify-center gap-2 bg-[#8ba888] hover:bg-[#7a9477] text-white font-bold py-3 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
+                      >
+                        <svg 
+                          className="w-5 h-5" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          viewBox="0 0 24 24" 
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round" 
+                            strokeWidth={2} 
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" 
+                          />
+                        </svg>
+                        Descarcă Raport Detaliat
+                      </button>
+                    </div>
                     </div>
                   )}
                 </div>
