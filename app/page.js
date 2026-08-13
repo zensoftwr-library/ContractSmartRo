@@ -1770,9 +1770,9 @@ export default function Home() {
                       )}
                     </div>
                     
-                    {/* Branding Bar sub form */}
+                    {/* Branding Bar sub form - Liber pentru toți */}
                     <div className="flex items-center gap-3 pt-4 border-t border-slate-800/50 mt-4">
-                      <div className={`flex items-center gap-3 ${(!isPremium && !profil?.has_qr_branding) ? 'opacity-50 pointer-events-none' : ''}`}>
+                      <div className="flex items-center gap-3 w-full">
                         <label className="text-[10px] text-slate-400 font-bold uppercase shrink-0">Culoare</label>
                         <input type="color" value={qrColor} onChange={(e) => setQrColor(e.target.value)} className="w-7 h-7 rounded cursor-pointer shrink-0 bg-transparent border-0 p-0" />
                         <label className="text-[10px] text-slate-400 font-bold uppercase ml-2 shrink-0 border border-slate-700 p-2 rounded-lg bg-[#0B0F12] cursor-pointer hover:bg-slate-800 transition">
@@ -1781,9 +1781,6 @@ export default function Home() {
                         </label>
                         {qrLogo && <button type="button" onClick={() => { setQrLogo(null); setQrLogoRatio(1); }} className="text-[10px] text-red-400 font-bold hover:underline">Elimină ❌</button>}
                       </div>
-                      {(!isPremium && !profil?.has_qr_branding) && (
-                        <button onClick={() => handleCheckout('qr_branding')} className="text-[9px] font-bold bg-amber-900/30 text-amber-500 px-3 py-1 rounded-lg ml-auto">Deblochează Branding (49 RON)</button>
-                      )}
                     </div>
                   </div>
 
@@ -2448,7 +2445,7 @@ export default function Home() {
                       <p className="text-[10px] text-slate-500 mb-4 pb-4 border-b border-slate-800">{cuiDataResult.adresa}</p>
                       <button onClick={() => handleDownloadPremiumReport(cuiDataResult.cui)} className="w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold py-2.5 rounded-lg text-xs transition flex justify-center items-center gap-2">
                         <svg className="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8V7a4 4 0 00-8 0v4h8z"></path></svg>
-                        Descarcă Raport Financiar Complet 19 Ron (3.99€)
+                        Descarcă Raport Financiar Complet 19 Ron (~3.99€)
                       </button>
                     </div>
                   )}

@@ -32,10 +32,11 @@ export async function POST(request) {
     const apiKey = process.env.OPENAPI_KEY || process.env.FIRMEAPI_KEY; 
     const reqHeaders = { 'Authorization': `Bearer ${apiKey}`, 'Accept': 'application/json' };
 
+    // Apelăm endpoint-ul PRINCIPAL pentru bilanțuri
     const [firmaRes, datoriiRes, finanteRes] = await Promise.all([
       fetch(`https://www.firmeapi.ro/api/v1/firma/${cleanCui}`, { headers: reqHeaders }).catch(() => null),
       fetch(`https://www.firmeapi.ro/api/v1/datorii/${cleanCui}`, { headers: reqHeaders }).catch(() => null),
-      fetch(`https://api.cauta-firma.ro/firma/${cleanCui}`).catch(() => null)
+      fetch(`https://cauta-firma.ro/api/company/${cleanCui}`).catch(() => fetch(`https://api.cauta-firma.ro/firma/${cleanCui}`).catch(() => null))
     ]);
 
     if (!firmaRes || !firmaRes.ok) throw new Error("Eroare la extragerea datelor firmei.");
@@ -50,9 +51,11 @@ export async function POST(request) {
     // Extragere date financiare corectate
     let cifraAfaceri = null, profitNet = null, nrAngajati = null, anBilant = 'N/A';
     
-    const finanteArray = rawFinante.finante || rawFinante.bilanturi || [];
+    // Căutăm proprietatea corectă (bilant sau finante)
+    const finanteArray = rawFinante.bilant || rawFinante.finante || rawFinante.bilanturi || [];
+    
     if (Array.isArray(finanteArray) && finanteArray.length > 0) {
-      // Găsim cel mai recent an disponibil
+      // Găsim cel mai recent an (ex: 2023, 2022)
       const ultimeleFinante = finanteArray.sort((a, b) => (b.an || 0) - (a.an || 0))[0];
       cifraAfaceri = ultimeleFinante.cifra_afaceri || ultimeleFinante.cifraAfaceri || 0;
       profitNet = ultimeleFinante.profit_net || ultimeleFinante.profitNet || ultimeleFinante.profit || 0;
@@ -77,7 +80,7 @@ export async function POST(request) {
     // 4. Istoric
     await supabase.from('company_reports').insert([{ user_id: userId, cui: cleanCui, company_name: dataFirma.denumire }]);
 
-    // Funcții de formatare sigure (care acceptă valoarea 0 fără să dea fals)
+    // Funcții de formatare
     const formatMoney = (val) => val !== null && val !== undefined ? Number(val).toLocaleString('ro-RO') + ' RON' : 'Date indisponibile';
     const formatNumber = (val) => val !== null && val !== undefined ? val : 'Date indisponibile';
 
