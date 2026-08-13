@@ -48,6 +48,7 @@ export async function POST(request) {
 
     // Extragere date financiare din API-ul local
     let cifraAfaceri = 0, profitNet = 0, nrAngajati = 0, anBilant = 'N/A';
+    
     if (localApiRes && localApiRes.ok) {
       const localData = await localApiRes.json();
       if (localData.success && localData.data) {
@@ -117,12 +118,12 @@ export async function POST(request) {
 
         <div class="section">
           <div class="section-title">2. Date Financiare și Datorii (Ultimul Bilanț: Anul ${anBilant})</div>
-          <table>
-            <tr><th>Cifră de Afaceri Netă:</th><td>${cifraAfaceri ? Number(cifraAfaceri).toLocaleString('ro-RO') + ' RON' : 'Date indisponibile'}</td></tr>
-            <tr><th>Profit Net:</th><td>${profitNet ? Number(profitNet).toLocaleString('ro-RO') + ' RON' : 'Date indisponibile'}</td></tr>
-            <tr><th>Datorii Totale ANAF:</th><td style="color: ${datoriiTotale > 0 ? '#dc2626' : '#166534'}; font-weight:bold;">${datoriiTotale.toLocaleString('ro-RO')} RON</td></tr>
-            <tr><th>Număr Mediu Angajați:</th><td>${nrAngajati ? nrAngajati : 'Date indisponibile'}</td></tr>
-          </table>
+            <table>
+              <tr><th>Cifră de Afaceri Netă:</th><td>${cifraAfaceri ? Number(cifraAfaceri).toLocaleString('ro-RO') + ' RON' : 'Date indisponibile'}</td></tr>
+              <tr><th>Profit Net:</th><td>${profitNet ? Number(profitNet).toLocaleString('ro-RO') + ' RON' : 'Date indisponibile'}</td></tr>
+              <tr><th>Datorii Totale ANAF:</th><td style="color: ${datoriiTotale > 0 ? '#dc2626' : '#166534'}; font-weight:bold;">${datoriiTotale.toLocaleString('ro-RO')} RON</td></tr>
+              <tr><th>Număr Mediu Angajați:</th><td>${nrAngajati ? nrAngajati : 'Date indisponibile'}</td></tr>
+            </table>
         </div>
 
         <div class="footer">
