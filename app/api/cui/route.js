@@ -62,12 +62,9 @@ export async function GET(request) {
     }
 
     // 🛑 Dacă absolut ambele au picat
-    return NextResponse.json({ 
-      success: false, 
-      message: 'Firma nu a putut fi extrasă automat. Te rugăm să completezi manual.' 
-    }, { status: 404 });
-
+    return NextResponse.json({ success: false, message: 'Nu a fost găsită.' }, { status: 404 });
   } catch (error) {
-    return NextResponse.json({ success: false, message: 'Eroare internă de server.' }, { status: 500 });
+    console.error("[CUI ERROR]:", error);
+    return NextResponse.json({ success: false, message: error.message }, { status: 500 });
   }
 }
