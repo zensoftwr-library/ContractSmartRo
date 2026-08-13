@@ -2409,23 +2409,11 @@ export default function Home() {
                           <h4 className="text-sm font-bold text-white uppercase">{cuiDataResult.denumire}</h4>
                           <span className="text-[10px] text-slate-400 font-mono">CUI: {cuiDataResult.cui} | REG: {cuiDataResult.regCom}</span>
                         </div>
-                        {(() => {
-                          const textStare = cuiDataResult.stare?.toUpperCase() || '';
-                          const esteInactiv = textStare.includes('INACTIV') || textStare.includes('RADIAT') || textStare.includes('SUSPENDAT');
-                          return (
-                            <div className="flex items-center justify-between w-full">
-                              <span className="text-[10px] text-emerald-400 font-medium">
-                                {cuiDataResult.stare}
-                              </span>
-                              <div className="flex items-center gap-1.5 ml-2">
-                                <span className={`w-2.5 h-2.5 rounded-full ${esteInactiv ? 'bg-red-500 animate-pulse' : 'bg-emerald-500'}`}></span>
-                                <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase ${esteInactiv ? 'bg-red-900/40 text-red-400 border border-red-900' : 'bg-emerald-900/40 text-emerald-400 border border-emerald-900'}`}>
-                                  {esteInactiv ? 'INACTIV' : 'ACTIV'}
-                                </span>
-                              </div>
-                            </div>
-                          );
-                        })()}
+                        <div className="flex items-center justify-between w-full">
+                          <span className="text-[10px] text-slate-400 font-medium">
+                            {cuiDataResult.stare || 'Necunoscut'}
+                          </span>
+                        </div>
                       </div>
                       <p className="text-[10px] text-slate-500 mb-4 pb-4 border-b border-slate-800">{cuiDataResult.adresa}</p>
                       <button onClick={() => handleDownloadPremiumReport(cuiDataResult.cui)} className="w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold py-2.5 rounded-lg text-xs transition flex justify-center items-center gap-2">
