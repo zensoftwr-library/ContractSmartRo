@@ -69,6 +69,9 @@ export async function POST(req) {
       case 'contract-b2b':
         updatePayload = { credits_remaining: currentCredits + 1 };
         break;
+      case 'raport-companie': // <--- AICI ESTE NOUL PRODUS ADAUGAT
+        updatePayload = { credits_remaining: currentCredits + 1 };
+        break;
       case 'sablon-tipizat-legal':
         await supabase.from('user_purchases').insert({ user_id: userId, product_id: 'prestari_gratuit' });
         break;

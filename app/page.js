@@ -123,7 +123,8 @@ const gumroadLinks = {
   qr_branding: 'https://zensoftware.gumroad.com/l/qr-branding',
   qr_dynamic: 'https://zensoftware.gumroad.com/l/qr-dinamic',
   sablon_tipizat: 'https://zensoftware.gumroad.com/l/sablon-tipizat-legal',
-  one_time_contract: 'https://zensoftware.gumroad.com/l/contract-b2b'
+  one_time_contract: 'https://zensoftware.gumroad.com/l/contract-b2b',
+  raport_detaliat: 'https://zensoftware.gumroad.com/l/raport-companie'
 };
 
 export default function Home() {
@@ -256,7 +257,88 @@ export default function Home() {
   const [widgetCompany, setWidgetCompany] = useState(null);
   const [widgetLoading, setWidgetLoading] = useState(false);
 
-  const [anafCui, setAnafCui] = useState('');
+  // STATE-URI PENTRU WIDGET CUI & AUTOCOMPLETARE
+  const [cuiSearch, setCuiSearch] = useState('');
+  const [cuiDataResult, setCuiDataResult] = useState(null);
+  const [isSearchingCui, setIsSearchingCui] = useState(false);
+  const [prestatorCuiStatus, setPrestatorCuiStatus] = useState(null);
+  const [clientCuiStatus, setClientCuiStatus] = useState(null);
+
+  const handleCautareCuiWidget = async (e) => {
+    e.preventDefault();
+    if (!cuiSearch || cuiSearch.length < 5) return alert("Introdu un CUI valid.");
+    setIsSearchingCui(true);
+    setCuiDataResult(null);
+    try {
+      const res = await fetch(`/api/cui?cui=${cuiSearch.replace(/[^0-9]/g, '')}`);
+      const data = await res.json();
+      if (data.success) {
+        setCuiDataResult(data.data);
+      } else {
+        alert(data.message || 'Firma nu a fost găsită.');
+      }
+    } catch (err) {
+      alert("Eroare de rețea.");
+    } finally {
+      setIsSearchingCui(false);
+    }
+  };
+
+  const handleDownloadPremiumReport = async (cuiTarget) => {
+    if (!user) return alert("Trebuie să fii autentificat pentru a descărca rapoarte.");
+    if (!isPremium && user.credits <= 0) {
+      return handleCumparaPremium('raport_detaliat');
+    }
+    setLoadingText({ title: "GENERARE RAPORT...", desc: "Preluăm datele financiare și generăm PDF-ul." });
+    try {
+      const res = await fetch('/api/cui/report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cui: cuiTarget, userId: user.id })
+      });
+      if (res.ok) {
+        const blob = await res.blob();
+        const urlDownload = window.URL.createObjectURL(blob);
+        const elementA = document.createElement('a');
+        elementA.href = urlDownload;
+        elementA.download = `Raport_Financiar_${cuiTarget}.pdf`;
+        document.body.appendChild(elementA);
+        elementA.click();
+        document.body.removeChild(elementA);
+        window.URL.revokeObjectURL(urlDownload);
+        alert("Raportul a fost descărcat cu succes!");
+        if(!isPremium) {
+           setUser(prev => ({...prev, credits: prev.credits - 1})); // update UI credit
+        }
+      } else {
+        const textEroare = await res.json();
+        if (textEroare.needsPayment) handleCumparaPremium('raport_detaliat');
+        else alert(textEroare.message);
+      }
+    } catch {
+      alert("Eroare server.");
+    } finally {
+      setLoadingText(null);
+    }
+  };
+
+  const handleAutofillCui = async (cuiValue, rol) => {
+    const cleanCui = cuiValue.replace(/[^0-9]/g, '');
+    if (cleanCui.length < 5) return;
+    try {
+      const res = await fetch(`/api/cui?cui=${cleanCui}`);
+      const data = await res.json();
+      if (data.success) {
+        if (rol === 'prestator') {
+          setFormData(prev => ({ ...prev, prestatorNume: data.data.denumire }));
+          setPrestatorCuiStatus(data.data.stare);
+        } else {
+          setFormData(prev => ({ ...prev, clientNume: data.data.denumire }));
+          setClientCuiStatus(data.data.stare);
+        }
+      }
+    } catch (e) {}
+  };
 
   const [fiscal, setFiscal] = useState({
     venitLunar: 45000,
@@ -1766,21 +1848,16 @@ export default function Home() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="flex flex-col space-y-1">
                         <label className="text-[10px] text-slate-500 font-bold uppercase">CUI / CNP Prestator</label>
-                        <input type="text" placeholder="CUI / CNP Prestator" autoComplete="new-password" value={formData.prestatorCui} onChange={e => setFormData({...formData, prestatorCui: e.target.value})} className="w-full p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none focus:border-[#8ba888]" />
+                        <div className="relative">
+                          <input type="text" placeholder="CUI / CNP Prestator" autoComplete="new-password" value={formData.prestatorCui} onChange={e => setFormData({...formData, prestatorCui: e.target.value})} onBlur={(e) => handleAutofillCui(e.target.value, 'prestator')} className="w-full p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none focus:border-[#8ba888] pr-20" />
+                          {prestatorCuiStatus && (
+                            <span className={`absolute right-2 top-2 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase ${prestatorCuiStatus === 'Activ' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>{prestatorCuiStatus}</span>
+                          )}
+                        </div>
                       </div>
                       <div className="flex flex-col space-y-1">
                         <label className="text-[10px] text-slate-500 font-bold uppercase">Denumire Furnizor / Nume</label>
                         <input type="text" placeholder="Denumire Firma / Nume Complet" autoComplete="new-password" value={formData.prestatorNume} onChange={e => setFormData({...formData, prestatorNume: e.target.value})} className="p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none" />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center pt-2">
-                      <div className="flex flex-col space-y-1">
-                        <label className="text-[10px] text-slate-400 font-bold uppercase">Link Siglă (.png)</label>
-                        <input type="text" placeholder="Link Siglă (.png)" value={formData.prestatorLogo} onChange={e => setFormData({...formData, prestatorLogo: e.target.value})} className="p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none" />
-                      </div>
-                      <div className="flex flex-col">
-                        <label className="text-[10px] text-slate-400 font-bold mb-1 uppercase">Culoare Elements Portal</label>
-                        <input type="color" value={formData.prestatorCuloare} onChange={e => setFormData({...formData, prestatorCuloare: e.target.value})} className="w-full h-9 bg-transparent cursor-pointer rounded" />
                       </div>
                     </div>
                   </div>
@@ -1788,7 +1865,12 @@ export default function Home() {
                   <div className="space-y-4 pt-6 border-t border-slate-800/80 mt-6 block clear-both">
                     <span className="text-xs font-bold text-slate-400 uppercase block tracking-wider">Identificare Beneficiar Contract</span>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <input type="text" placeholder="CUI / CNP Client" autoComplete="new-password" value={formData.clientCui} onChange={e => setFormData({...formData, clientCui: e.target.value})} className="w-full p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white outline-none focus:border-[#8ba888]" />
+                      <div className="relative">
+                        <input type="text" placeholder="CUI / CNP Client" autoComplete="new-password" value={formData.clientCui} onChange={e => setFormData({...formData, clientCui: e.target.value})} onBlur={(e) => handleAutofillCui(e.target.value, 'client')} className="w-full p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white outline-none focus:border-[#8ba888] pr-20" />
+                        {clientCuiStatus && (
+                          <span className={`absolute right-2 top-2 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase ${clientCuiStatus === 'Activ' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>{clientCuiStatus}</span>
+                        )}
+                      </div>
                       <input type="text" placeholder="Companie Client / Nume" autoComplete="new-password" value={formData.clientNume} onChange={e => setFormData({...formData, clientNume: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white" />
                     </div>
                     
@@ -2270,6 +2352,53 @@ export default function Home() {
             <p className="text-xs text-slate-500 mt-3 font-mono">URL Securizat: <a href={qrGeneratedUrl} target="_blank" rel="noreferrer" className="underline text-[#8ba888]">{qrGeneratedUrl}</a></p>
           </div>
         )}
+
+        {/* WIDGET INTEROGARE CUI ANAF */}
+            <div className="max-w-7xl mx-auto px-6 mt-6">
+              <div className="bg-[#12181D] rounded-2xl border border-slate-800/80 shadow-xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
+                <div className="absolute -right-20 -top-20 w-64 h-64 bg-[#8ba888]/5 rounded-full blur-3xl pointer-events-none"></div>
+                <div className="flex-1 w-full relative z-10">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="text-2xl">🏢</span>
+                    <h3 className="text-xl font-black text-white uppercase tracking-tight">Verificare Firmă ANAF</h3>
+                  </div>
+                  <p className="text-xs text-slate-400 mb-6 max-w-md leading-relaxed">Interoghează rapid orice companie din România. Sistem hibrid de auto-completare cu descărcare rapoarte fiscale (datorii, bilanț, litigii) în format PDF.</p>
+                  
+                  <form onSubmit={handleCautareCuiWidget} className="flex gap-2 w-full max-w-md">
+                    <input type="text" placeholder="Introdu CUI (ex: 123456)" value={cuiSearch} onChange={e => setCuiSearch(e.target.value)} className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-3 text-sm text-white font-mono outline-none focus:border-[#8ba888] transition" required />
+                    <button type="submit" disabled={isSearchingCui} className="bg-[#8ba888] text-[#0B0F12] font-black px-6 py-3 rounded-lg text-xs transition hover:opacity-90 whitespace-nowrap">
+                      {isSearchingCui ? 'Se caută...' : 'Caută'}
+                    </button>
+                  </form>
+                </div>
+
+                <div className="flex-1 w-full relative z-10">
+                  {!cuiDataResult ? (
+                    <div className="h-full min-h-[140px] flex flex-col items-center justify-center border-2 border-dashed border-slate-800/60 rounded-xl bg-[#0B0F12]/30 text-slate-500">
+                      <svg className="w-8 h-8 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                      <span className="text-xs font-bold uppercase tracking-wider">Așteaptă Căutarea</span>
+                    </div>
+                  ) : (
+                    <div className="bg-[#0B0F12] border border-slate-700 rounded-xl p-5 animate-fadeIn">
+                      <div className="flex justify-between items-start mb-3">
+                        <div>
+                          <h4 className="text-sm font-bold text-white uppercase">{cuiDataResult.denumire}</h4>
+                          <span className="text-[10px] text-slate-400 font-mono">CUI: {cuiDataResult.cui} | REG: {cuiDataResult.regCom}</span>
+                        </div>
+                        <span className={`px-2 py-1 rounded text-[9px] font-black uppercase ${cuiDataResult.stare === 'Activ' ? 'bg-emerald-900/40 text-emerald-400 border border-emerald-900' : 'bg-red-900/40 text-red-400 border border-red-900'}`}>
+                          {cuiDataResult.stare || 'Necunoscut'}
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-slate-500 mb-4 pb-4 border-b border-slate-800">{cuiDataResult.adresa}</p>
+                      <button onClick={() => handleDownloadPremiumReport(cuiDataResult.cui)} className="w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold py-2.5 rounded-lg text-xs transition flex justify-center items-center gap-2">
+                        <svg className="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        Descarcă Raport Financiar Complet (1 Credit / 15 RON)
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
 
         {/* SECȚIUNE PREȚURI PERFECTĂ */}
         <div id="sectiune-preturi" className="max-w-7xl mx-auto px-6 mt-16 scroll-mt-20">
