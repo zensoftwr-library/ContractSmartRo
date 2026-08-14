@@ -265,20 +265,7 @@ export default function Home() {
   const [prestatorCuiStatus, setPrestatorCuiStatus] = useState(null);
   const [clientCuiStatus, setClientCuiStatus] = useState(null);
 
-  // Cutare automată cu debounce corect și curățare de timer
-  useEffect(() => {
-    const cleanCui = cuiSearch.replace(/[^0-9]/g, '');
-    
-    // Declanșăm căutarea automată doar când CUI-ul are între 6 și 10 cifre
-    if (cleanCui.length >= 6 && cleanCui.length <= 10) {
-      const timer = setTimeout(() => {
-        executaCautareSilentioasa(cleanCui);
-      }, 600); // Așteaptă 0.6 secunde după ce utilizatorul s-a oprit din tastat
-
-      return () => clearTimeout(timer); // Curăță timerul vechi la fiecare tastă nouă
-    }
-  }, [cuiSearch]);
-
+  // Funcția principală de completare date în generatorul de contracte
   const handleAutofillCui = async (cuiValue, rol) => {
     const cleanCui = cuiValue.replace(/[^0-9]/g, '');
     if (cleanCui.length < 5) return;
@@ -293,8 +280,13 @@ export default function Home() {
       try {
         const anafRes = await fetch(`http://localhost:3002/api/v1/demoanaf/${cleanCui}`);
         const anafData = await anafRes.json();
-        if (anafData.success && anafData.data?.administrator) {
-          numeAdmin = anafData.data.administrator; // Numele sau numele multiple concatenate
+        
+        if (anafData.success && anafData.data) {
+          if (anafData.data.administrator) {
+            numeAdmin = anafData.data.administrator;
+          } else if (anafData.data.administrators && anafData.data.administrators.length > 0) {
+            numeAdmin = anafData.data.administrators[0].name;
+          }
         }
       } catch (err) {
         console.error("Eroare preluare administrator extern:", err);
@@ -304,15 +296,17 @@ export default function Home() {
         if (rol === 'prestator') {
           setFormData(prev => ({ 
             ...prev, 
-            prestatorNume: data.data.denumire,                 // Din SQLite
-            prestatorReprezentant: numeAdmin || prev.prestatorReprezentant // Din DemoANAF
+            prestatorNume: data.data.denumire || '',
+            prestatorAdresa: data.data.adresa || '',                
+            prestatorReprezentant: numeAdmin || prev.prestatorReprezentant
           }));
           setPrestatorCuiStatus(data.data.stare);
         } else {
           setFormData(prev => ({ 
             ...prev, 
-            clientNume: data.data.denumire,                    // Din SQLite
-            clientReprezentant: numeAdmin || prev.clientReprezentant       // Din DemoANAF
+            clientNume: data.data.denumire || '',   
+            clientAdresa: data.data.adresa || '',                 
+            clientReprezentant: numeAdmin || prev.clientReprezentant
           }));
           setClientCuiStatus(data.data.stare);
         }
@@ -322,7 +316,7 @@ export default function Home() {
     }
   };
 
-  // Funcția păstrată pentru butonul manual sau Enter (care poate da alertă dacă e invalid)
+  // Funcția păstrată exclusiv pentru butonul manual sau Enter în widget
   const handleCautareCuiWidget = async (e) => {
     e.preventDefault();
     const cleanCui = cuiSearch.replace(/[^0-9]/g, '');
