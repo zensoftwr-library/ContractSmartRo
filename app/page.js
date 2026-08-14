@@ -1852,7 +1852,15 @@ export default function Home() {
                     </div>
 
                     <div className="flex flex-col gap-2 w-full">
-                      <button onClick={handleDownloadQR} className="w-full py-2.5 bg-[#8ba888] hover:bg-[#7a9677] text-[#0B0F12] font-black rounded-lg transition-colors flex justify-center items-center gap-1.5 text-[11px] uppercase tracking-wide shadow-md shadow-[#8ba888]/10">
+                      <button 
+                        onClick={handleDownloadQR} 
+                        disabled={!getQrValue() || getQrValue().trim() === "" || getQrValue() === "WIFI:S:;T:WPA;P:;;; " || getQrValue() === "bitcoin:?amount=&label="}
+                        className={`w-full py-2.5 font-black rounded-lg transition-colors flex justify-center items-center gap-1.5 text-[11px] uppercase tracking-wide shadow-md ${
+                          (!getQrValue() || getQrValue().trim() === "" || getQrValue() === "WIFI:S:;T:WPA;P:;;; " || getQrValue() === "bitcoin:?amount=&label=") 
+                            ? 'bg-slate-800 text-slate-500 cursor-not-allowed opacity-50' 
+                            : 'bg-[#8ba888] hover:bg-[#7a9677] text-[#0B0F12] shadow-[#8ba888]/10'
+                        }`}
+                      >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                         Descarcă QR
                       </button>

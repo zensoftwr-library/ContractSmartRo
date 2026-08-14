@@ -32,11 +32,11 @@ export async function POST(request) {
     const apiKey = process.env.OPENAPI_KEY || process.env.FIRMEAPI_KEY; 
     const reqHeaders = { 'Authorization': `Bearer ${apiKey}`, 'Accept': 'application/json' };
 
-    // Apelăm endpoint-ul PRINCIPAL pentru bilanțuri
+    // Apelăm API-ul local de pe VPS care știe să returneze bilanțul complet
     const [firmaRes, datoriiRes, finanteRes] = await Promise.all([
-      fetch(`https://www.firmeapi.ro/api/v1/firma/${cleanCui}`, { headers: reqHeaders }).catch(() => null),
-      fetch(`https://www.firmeapi.ro/api/v1/datorii/${cleanCui}`, { headers: reqHeaders }).catch(() => null),
-      fetch(`https://cauta-firma.ro/api/company/${cleanCui}`).catch(() => fetch(`https://api.cauta-firma.ro/firma/${cleanCui}`).catch(() => null))
+      fetch(`http://localhost:3001/api/firma/${cleanCui}`).catch(() => null),
+      fetch(`http://localhost:3001/api/datorii/${cleanCui}`).catch(() => null),
+      fetch(`http://localhost:3001/api/finante/${cleanCui}`).catch(() => null)
     ]);
 
     if (!firmaRes || !firmaRes.ok) throw new Error("Eroare la extragerea datelor firmei.");
