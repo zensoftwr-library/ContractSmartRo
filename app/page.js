@@ -403,8 +403,13 @@ export default function Home() {
       try {
         const anafRes = await fetch(`http://localhost:3002/api/v1/demoanaf/${cleanCui}`);
         const anafData = await anafRes.json();
-        if (anafData.success && anafData.data?.administrator) {
-          numeAdmin = anafData.data.administrator;
+        if (anafData.success && anafData.data) {
+          // Verificăm fie câmpul direct, fie primul element din array-ul de administratori
+          if (anafData.data.administrator) {
+            numeAdmin = anafData.data.administrator;
+          } else if (anafData.data.administrators && anafData.data.administrators.length > 0) {
+            numeAdmin = anafData.data.administrators[0].name;
+          }
         }
       } catch (err) {
         console.error("Eroare preluare administrator extern:", err);
