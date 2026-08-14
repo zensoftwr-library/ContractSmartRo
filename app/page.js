@@ -336,7 +336,13 @@ export default function Home() {
   const GUMROAD_LINK = "https://link-ul-tau.gumroad.com/l/raport-companie";
   
   // Extragem rolul din obiectul tău user (dacă nu ai un field 'role', te folosești de isPremium)
-  const userRole = user?.role || (isPremium ? 'pro' : 'free'); 
+  // Verificăm dacă e founder după rol, metadate sau direct după adresa de email
+  const isFounder = 
+    user?.role === 'founder' || 
+    user?.publicMetadata?.role === 'founder' || 
+    user?.emailAddresses?.[0]?.emailAddress === 'emailul-tau@gmail.com'; // Treci aici emailul tău real de fondator
+
+  const userRole = isFounder ? 'founder' : (isPremium ? 'pro' : 'free'); 
   // Extragem rapoartele folosite în luna curentă (trebuie să te asiguri că îl trimiți din backend)
   const proReportsUsed = user?.proReportsUsed || 0;
 
