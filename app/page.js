@@ -363,10 +363,10 @@ export default function Home() {
       const data = await res.json();
       if (data.success) {
         if (rol === 'prestator') {
-          setFormData(prev => ({ ...prev, prestatorNume: data.data.denumire }));
+          setFormData(prev => ({ ...prev, prestatorNume: data.data.denumire, prestatorReprezentant: data.data.administrator || '' }));
           setPrestatorCuiStatus(data.data.stare);
         } else {
-          setFormData(prev => ({ ...prev, clientNume: data.data.denumire }));
+          setFormData(prev => ({ ...prev, clientNume: data.data.denumire, clientReprezentant: data.data.administrator || '' }));
           setClientCuiStatus(data.data.stare);
         }
       }

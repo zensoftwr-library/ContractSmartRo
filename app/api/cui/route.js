@@ -22,6 +22,17 @@ export async function GET(request) {
       if (resPrimary.ok) {
         const result = await resPrimary.json();
         const data = result.data || {};
+        
+        // Extragem administratorul în fundal din DemoANAF (microserviciul de pe portul 3002)
+        let numeAdmin = '';
+        try {
+          const resAdmin = await fetch(`http://localhost:3002/api/v1/demoanaf/${cui}`);
+          if (resAdmin.ok) {
+            const admData = await resAdmin.json();
+            if (admData.data?.administrator) numeAdmin = admData.data.administrator;
+          }
+        } catch (e) {}
+
         return NextResponse.json({
           success: true,
           source: 'local-microservice',
@@ -30,7 +41,8 @@ export async function GET(request) {
             cui: cui,
             regCom: data.regCom || data.nr_reg_com || '',
             adresa: data.adresa || '',
-            stare: data.stare // Aceasta returnează "INACTIV" și activează corect bulina roșie
+            stare: data.stare, // Aceasta returnează "INACTIV" și activează corect bulina roșie
+            administrator: numeAdmin
           }
         });
       }
