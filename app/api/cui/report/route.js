@@ -6,7 +6,7 @@ async function generatePdfBuffer(cuiClean) {
     throw new Error('CUI invalid sau lipsă');
   }
 
-  // Apelăm microserviciul de pe portul 3002
+  // Apelăm microserviciul nostru de pe portul 3002
   const response = await fetch(`http://localhost:3002/api/v1/demoanaf/${cuiClean}`);
   const result = await response.json();
   
@@ -18,7 +18,7 @@ async function generatePdfBuffer(cuiClean) {
   const formatMoney = (val) => Number(val || 0).toLocaleString('ro-RO') + ' RON';
   const formatNumber = (val) => Number(val || 0).toLocaleString('ro-RO');
 
-  // Șablonul HTML complet cu toate datele extinse
+  // Șablonul HTML complet, cu logo-ul SVG inclus și toate datele extinse
   const htmlContent = `
     <!DOCTYPE html>
     <html>
@@ -26,9 +26,7 @@ async function generatePdfBuffer(cuiClean) {
         <meta charset="utf-8">
         <style>
           body { font-family: DejaVu Sans, Arial, sans-serif; font-size: 11px; color: #1f2937; line-height: 1.4; margin: 0; padding: 20px; }
-          .header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; }
-          .header h2 { margin: 0; color: #111827; font-size: 18px; }
-          .header p { margin: 5px 0 0; color: #6b7280; font-size: 10px; }
+          .header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px; }
           .section { margin-bottom: 20px; }
           .section-title { background: #f3f4f6; padding: 6px 10px; font-weight: bold; font-size: 12px; border-left: 4px solid #2563eb; margin-bottom: 10px; color: #1f2937; }
           table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
@@ -42,9 +40,21 @@ async function generatePdfBuffer(cuiClean) {
       </head>
       <body>
         <div class="header">
-          <h1 style="margin: 0; color: #2563eb; font-size: 24px;">ContractSmart</h1>
-          <h2 style="margin: 5px 0 0; color: #111827; font-size: 18px;">RAPORT FINANCIAR & JURIDIC DETALIAT</h2>
-          <p style="margin: 5px 0 0; color: #6b7280; font-size: 10px;">Generat digital la: ${new Date().toLocaleString('ro-RO')}</p>
+          <!-- Logo SVG Vectorial -->
+          <div style="width: 160px; height: 28px; margin: 0 auto 10px auto; display: inline-block;">
+            <svg viewBox="0 0 240 40" style="width: 100%; height: 100%;">
+              <g transform="translate(0, 2)">
+                <path d="M24 6 C15 6, 8 13, 8 22 C8 31, 15 38, 24 38 C31 38, 37 33, 39 27" fill="none" stroke="#8ba888" stroke-width="4" stroke-linecap="round"/>
+                <path d="M16 21 L21 26 L32 12" fill="none" stroke="#8ba888" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+              </g>
+              <text x="48" y="26" fontFamily="system-ui, -apple-system, sans-serif" fontWeight="900" fontSize="20" fill="#111827" letterSpacing="-0.5">
+                Contract<tspan fill="#8ba888">Smart</tspan>
+              </text>
+            </svg>
+          </div>
+          
+          <h2 style="margin: 0; color: #111827; font-size: 16px;">RAPORT FINANCIAR & JURIDIC DETALIAT</h2>
+          <p style="margin: 4px 0 0; color: #6b7280; font-size: 10px;">Generat digital la: ${new Date().toLocaleString('ro-RO')}</p>
         </div>
 
         <div class="section">
@@ -55,7 +65,7 @@ async function generatePdfBuffer(cuiClean) {
             <tr><th>Stare Fiscală / ANAF:</th><td><span class="badge">${dataFirma.stare}</span></td></tr>
             <tr><th>Administrator / Reprezentant:</th><td>${dataFirma.administrator || 'N/A'}</td></tr>
             <tr><th>Adresă Sediu Social:</th><td>${dataFirma.adresa}</td></tr>
-            <tr><th>Domeniu de Activitate (CAEN):</th><td>${dataFirma.caen_code ? `${dataFirma.caen_code} - ${dataFirma.caen_description}` : 'N/A'}</td></tr>
+            <tr><th>Domeniu de Activitate (CAEN):</th><td>${dataFirma.caen || 'N/A'}</td></tr>
             <tr><th>Plătitor de TVA:</th><td>${dataFirma.tva}</td></tr>
           </table>
         </div>
@@ -88,7 +98,6 @@ async function generatePdfBuffer(cuiClean) {
     </html>
   `;
 
-  // Generăm PDF-ul binar prin Puppeteer
   const browser = await puppeteer.launch({ 
     headless: "new", 
     args: ['--no-sandbox', '--disable-setuid-sandbox'] 

@@ -360,35 +360,35 @@ export default function Home() {
     if (cleanCui.length < 5) return;
     
     try {
-      // 1. Luăm instant datele firmei din SQLite-ul local (prin ruta ta /api/cui)
+      // 1. Preluăm instant datele de bază din baza locală SQLite
       const res = await fetch(`/api/cui?cui=${cleanCui}`);
       const data = await res.json();
 
-      // 2. Extragem administratorul în fundal din microserviciul DemoANAF (port 3002)
+      // 2. Preluăm administratorul din microserviciul DemoANAF (port 3002)
       let numeAdmin = '';
       try {
         const anafRes = await fetch(`http://localhost:3002/api/v1/demoanaf/${cleanCui}`);
         const anafData = await anafRes.json();
         if (anafData.success && anafData.data?.administrator) {
-          numeAdmin = anafData.data.administrator;
+          numeAdmin = anafData.data.administrator; // Numele sau numele multiple concatenate
         }
       } catch (err) {
-        // Dacă DemoANAF nu răspunde momentan, nu blocăm aplicația; continuăm cu datele din SQLite
+        console.error("Eroare preluare administrator extern:", err);
       }
 
       if (data.success) {
         if (rol === 'prestator') {
           setFormData(prev => ({ 
             ...prev, 
-            prestatorNume: data.data.denumire, 
-            prestatorReprezentant: numeAdmin || prev.prestatorReprezentant 
+            prestatorNume: data.data.denumire,                 // Din SQLite
+            prestatorReprezentant: numeAdmin || prev.prestatorReprezentant // Din DemoANAF
           }));
           setPrestatorCuiStatus(data.data.stare);
         } else {
           setFormData(prev => ({ 
             ...prev, 
-            clientNume: data.data.denumire, 
-            clientReprezentant: numeAdmin || prev.clientReprezentant 
+            clientNume: data.data.denumire,                    // Din SQLite
+            clientReprezentant: numeAdmin || prev.clientReprezentant       // Din DemoANAF
           }));
           setClientCuiStatus(data.data.stare);
         }
