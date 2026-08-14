@@ -296,37 +296,6 @@ export default function Home() {
     }
   };
 
-  // Cutare automată cu debounce corect și curățare de timer
-  useEffect(() => {
-    const cleanCui = cuiSearch.replace(/[^0-9]/g, '');
-    
-    // Declanșăm căutarea automată doar când CUI-ul are între 6 și 10 cifre
-    if (cleanCui.length >= 6 && cleanCui.length <= 10) {
-      const timer = setTimeout(() => {
-        executaCautareSilentioasa(cleanCui);
-      }, 600); // Așteaptă 0.6 secunde după ce utilizatorul s-a oprit din tastat
-
-      return () => clearTimeout(timer); // Curăță timerul vechi la fiecare tastă nouă
-    }
-  }, [cuiSearch]);
-
-  // Funcție silențioasă pentru auto-căutare (fără alerte deranjante în timp ce scrii)
-  const executaCautareSilentioasa = async (cuiCurat) => {
-    setIsSearchingCui(true);
-    setCuiDataResult(null);
-    try {
-      const res = await fetch(`/api/anaf?cui=${cuiCurat}`);
-      const data = await res.json();
-      if (data.success) {
-        setCuiDataResult(data.data);
-      }
-    } catch (err) {
-      // Ignorăm erorile silențioase în timpul tastării
-    } finally {
-      setIsSearchingCui(false);
-    }
-  };
-
   // Funcția păstrată pentru butonul manual sau Enter (care poate da alertă dacă e invalid)
   const handleCautareCuiWidget = async (e) => {
     e.preventDefault();
