@@ -394,27 +394,13 @@ export default function Home() {
     if (cleanCui.length < 5) return;
     
     try {
-      // 1. Preluăm datele din API-ul tău local (care citește din SQLite / ANAF)
       const res = await fetch(`/api/anaf?cui=${cleanCui}`);
       const data = await res.json();
 
-      // 2. Preluăm numele administratorului din microserviciul DemoANAF (port 3002)
-      let numeAdmin = '';
-      try {
-        const anafRes = await fetch(`http://localhost:3002/api/v1/demoanaf/${cleanCui}`);
-        const anafData = await anafRes.json();
-        if (anafData.success && anafData.data) {
-          if (anafData.data.administrator) {
-            numeAdmin = anafData.data.administrator;
-          } else if (anafData.data.administrators && anafData.data.administrators.length > 0) {
-            numeAdmin = anafData.data.administrators[0].name;
-          }
-        }
-      } catch (err) {
-        console.error("Eroare preluare administrator extern:", err);
-      }
+      if (data.success && data.data) {
+        // Preluăm administratorul direct din datele aduse de rutele interne
+        const numeAdmin = data.data.administrator || (data.data.administrators?.[0]?.name) || '';
 
-      if (data.success) {
         if (rol === 'prestator') {
           setFormData(prev => ({ 
             ...prev, 
