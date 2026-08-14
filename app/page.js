@@ -394,8 +394,8 @@ export default function Home() {
     if (cleanCui.length < 5) return;
     
     try {
-      // 1. Preluăm datele locale din SQLite (denumire, adresă, stare fiscală)
-      const res = await fetch(`/api/cui?cui=${cleanCui}`);
+      // 1. Preluăm datele din API-ul tău local (care citește din SQLite / ANAF)
+      const res = await fetch(`/api/anaf?cui=${cleanCui}`);
       const data = await res.json();
 
       // 2. Preluăm numele administratorului din microserviciul DemoANAF (port 3002)
@@ -404,7 +404,6 @@ export default function Home() {
         const anafRes = await fetch(`http://localhost:3002/api/v1/demoanaf/${cleanCui}`);
         const anafData = await anafRes.json();
         if (anafData.success && anafData.data) {
-          // Verificăm fie câmpul direct, fie primul element din array-ul de administratori
           if (anafData.data.administrator) {
             numeAdmin = anafData.data.administrator;
           } else if (anafData.data.administrators && anafData.data.administrators.length > 0) {
