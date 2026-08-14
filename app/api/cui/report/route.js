@@ -63,7 +63,6 @@ async function generatePdfBuffer(cuiClean) {
             <tr><th>Denumire Companie:</th><td><strong>${dataFirma.denumire}</strong></td></tr>
             <tr><th>CUI / Reg. Com.:</th><td>${dataFirma.cui} / ${dataFirma.regCom || 'N/A'}</td></tr>
             <tr><th>Stare Fiscală / ANAF:</th><td><span class="badge">${dataFirma.stare}</span></td></tr>
-            <tr><th>Stare Juridică / Activitate:</th><td><span class="text-red">${dataFirma.stare_juridica}</span></td></tr> <!-- Adaugă doar acest rând -->
             <tr><th>Administrator / Reprezentant:</th><td>${dataFirma.administrator || 'N/A'}</td></tr>
             <tr><th>Adresă Sediu Social:</th><td>${dataFirma.adresa}</td></tr>
             <tr><th>Domeniu de Activitate (CAEN):</th><td>${dataFirma.caen || 'N/A'}</td></tr>

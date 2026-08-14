@@ -296,6 +296,37 @@ export default function Home() {
     }
   };
 
+  // Cutare automată cu debounce corect și curățare de timer
+  useEffect(() => {
+    const cleanCui = cuiSearch.replace(/[^0-9]/g, '');
+    
+    // Declanșăm căutarea automată doar când CUI-ul are între 6 și 10 cifre
+    if (cleanCui.length >= 6 && cleanCui.length <= 10) {
+      const timer = setTimeout(() => {
+        executaCautareSilentioasa(cleanCui);
+      }, 600); // Așteaptă 0.6 secunde după ce utilizatorul s-a oprit din tastat
+
+      return () => clearTimeout(timer); // Curăță timerul vechi la fiecare tastă nouă
+    }
+  }, [cuiSearch]);
+
+  // Funcție silențioasă pentru auto-căutare (fără alerte deranjante în timp ce scrii)
+  const executaCautareSilentioasa = async (cuiCurat) => {
+    setIsSearchingCui(true);
+    setCuiDataResult(null);
+    try {
+      const res = await fetch(`/api/anaf?cui=${cuiCurat}`);
+      const data = await res.json();
+      if (data.success) {
+        setCuiDataResult(data.data);
+      }
+    } catch (err) {
+      // Ignorăm erorile silențioase în timpul tastării
+    } finally {
+      setIsSearchingCui(false);
+    }
+  };
+
   // Funcția păstrată pentru butonul manual sau Enter (care poate da alertă dacă e invalid)
   const handleCautareCuiWidget = async (e) => {
     e.preventDefault();
@@ -394,24 +425,35 @@ export default function Home() {
     if (cleanCui.length < 5) return;
     
     try {
+      // 1. Preluăm instant datele de bază din baza locală SQLite
       const res = await fetch(`/api/cui?cui=${cleanCui}`);
       const data = await res.json();
 
-      if (data.success && data.data) {
+      // 2. Preluăm administratorul din microserviciul DemoANAF (port 3002)
+      let numeAdmin = '';
+      try {
+        const anafRes = await fetch(`http://localhost:3002/api/v1/demoanaf/${cleanCui}`);
+        const anafData = await anafRes.json();
+        if (anafData.success && anafData.data?.administrator) {
+          numeAdmin = anafData.data.administrator; // Numele sau numele multiple concatenate
+        }
+      } catch (err) {
+        console.error("Eroare preluare administrator extern:", err);
+      }
+
+      if (data.success) {
         if (rol === 'prestator') {
           setFormData(prev => ({ 
             ...prev, 
-            prestatorNume: data.data.denumire || '',          
-            prestatorAdresa: data.data.adresa || '',          
-            prestatorReprezentant: data.data.administrator || prev.prestatorReprezentant 
+            prestatorNume: data.data.denumire,                 // Din SQLite
+            prestatorReprezentant: numeAdmin || prev.prestatorReprezentant // Din DemoANAF
           }));
           setPrestatorCuiStatus(data.data.stare);
         } else {
           setFormData(prev => ({ 
             ...prev, 
-            clientNume: data.data.denumire || '',             
-            clientAdresa: data.data.adresa || '',             
-            clientReprezentant: data.data.administrator || prev.clientReprezentant       
+            clientNume: data.data.denumire,                    // Din SQLite
+            clientReprezentant: numeAdmin || prev.clientReprezentant       // Din DemoANAF
           }));
           setClientCuiStatus(data.data.stare);
         }
