@@ -42,8 +42,9 @@ async function generatePdfBuffer(cuiClean) {
       </head>
       <body>
         <div class="header">
-          <h2>RAPORT FINANCIAR & JURIDIC DETALIAT</h2>
-          <p>Generat digital la: ${new Date().toLocaleString('ro-RO')}</p>
+          <h1 style="margin: 0; color: #2563eb; font-size: 24px;">ContractSmart</h1>
+          <h2 style="margin: 5px 0 0; color: #111827; font-size: 18px;">RAPORT FINANCIAR & JURIDIC DETALIAT</h2>
+          <p style="margin: 5px 0 0; color: #6b7280; font-size: 10px;">Generat digital la: ${new Date().toLocaleString('ro-RO')}</p>
         </div>
 
         <div class="section">
