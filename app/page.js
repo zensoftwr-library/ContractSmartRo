@@ -279,20 +279,46 @@ export default function Home() {
     }
   }, [cuiSearch]);
 
-  // Funcție silențioasă pentru auto-căutare (fără alerte deranjante în timp ce scrii)
-  const executaCautareSilentioasa = async (cuiCurat) => {
-    setIsSearchingCui(true);
-    setCuiDataResult(null);
+  const handleAutofillCui = async (cuiValue, rol) => {
+    const cleanCui = cuiValue.replace(/[^0-9]/g, '');
+    if (cleanCui.length < 5) return;
+    
     try {
-      const res = await fetch(`/api/anaf?cui=${cuiCurat}`);
+      // 1. Preluăm instant datele de bază din baza locală SQLite
+      const res = await fetch(`/api/cui?cui=${cleanCui}`);
       const data = await res.json();
-      if (data.success) {
-        setCuiDataResult(data.data);
+
+      // 2. Preluăm administratorul din microserviciul DemoANAF (port 3002)
+      let numeAdmin = '';
+      try {
+        const anafRes = await fetch(`http://localhost:3002/api/v1/demoanaf/${cleanCui}`);
+        const anafData = await anafRes.json();
+        if (anafData.success && anafData.data?.administrator) {
+          numeAdmin = anafData.data.administrator; // Numele sau numele multiple concatenate
+        }
+      } catch (err) {
+        console.error("Eroare preluare administrator extern:", err);
       }
-    } catch (err) {
-      // Ignorăm erorile silențioase în timpul tastării
-    } finally {
-      setIsSearchingCui(false);
+
+      if (data.success) {
+        if (rol === 'prestator') {
+          setFormData(prev => ({ 
+            ...prev, 
+            prestatorNume: data.data.denumire,                 // Din SQLite
+            prestatorReprezentant: numeAdmin || prev.prestatorReprezentant // Din DemoANAF
+          }));
+          setPrestatorCuiStatus(data.data.stare);
+        } else {
+          setFormData(prev => ({ 
+            ...prev, 
+            clientNume: data.data.denumire,                    // Din SQLite
+            clientReprezentant: numeAdmin || prev.clientReprezentant       // Din DemoANAF
+          }));
+          setClientCuiStatus(data.data.stare);
+        }
+      }
+    } catch (e) {
+      console.error("Eroare la autocompletarea CUI:", e);
     }
   };
 
