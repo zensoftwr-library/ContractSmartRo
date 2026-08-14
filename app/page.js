@@ -394,22 +394,22 @@ export default function Home() {
     if (cleanCui.length < 5) return;
     
     try {
-      // 1. Preluăm datele locale din SQLite (denumire, adresă, stare fiscală) - Cauta Firma
+      // 1. Preluăm datele locale din baza ta sigură (Cauta Firma - SQLite)
       const res = await fetch(`/api/cui?cui=${cleanCui}`);
       const data = await res.json();
 
-      // 2. Preluăm numele administratorului din microserviciul DemoANAF (port 3002)
+      // 2. Preluăm numele administratorului separat, din DemoANAF (port 3002)
       let numeAdmin = '';
       try {
         const anafRes = await fetch(`http://localhost:3002/api/v1/demoanaf/${cleanCui}`);
         const anafData = await anafRes.json();
         
         if (anafData.success && anafData.data) {
-          // REPARARE AICI: DemoANAF trimite un array 'administrators'
-          if (anafData.data.administrator) {
-            numeAdmin = anafData.data.administrator;
-          } else if (anafData.data.administrators && anafData.data.administrators.length > 0) {
+          // AICI ERA PROBLEMA: DemoANAF trimite o listă "administrators", nu un câmp "administrator"
+          if (anafData.data.administrators && anafData.data.administrators.length > 0) {
             numeAdmin = anafData.data.administrators[0].name;
+          } else if (anafData.data.administrator) {
+            numeAdmin = anafData.data.administrator;
           }
         }
       } catch (err) {
@@ -421,7 +421,7 @@ export default function Home() {
           setFormData(prev => ({ 
             ...prev, 
             prestatorNume: data.data.denumire || '',          
-            prestatorAdresa: data.data.adresa || '',          
+            prestatorAdresa: data.data.adresa || '', // Se completează adresa        
             prestatorReprezentant: numeAdmin || prev.prestatorReprezentant 
           }));
           setPrestatorCuiStatus(data.data.stare);
@@ -429,7 +429,7 @@ export default function Home() {
           setFormData(prev => ({ 
             ...prev, 
             clientNume: data.data.denumire || '',             
-            clientAdresa: data.data.adresa || '',             
+            clientAdresa: data.data.adresa || '',    // Se completează adresa         
             clientReprezentant: numeAdmin || prev.clientReprezentant       
           }));
           setClientCuiStatus(data.data.stare);
