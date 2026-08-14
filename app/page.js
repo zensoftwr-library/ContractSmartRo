@@ -425,35 +425,26 @@ export default function Home() {
     if (cleanCui.length < 5) return;
     
     try {
-      // 1. Preluăm instant datele de bază din baza locală SQLite
+      // Facem un singur request curat către backend-ul tău Next.js
+      // care se ocupă el de fallback-uri, SQLite și DemoANAF în spate.
       const res = await fetch(`/api/cui?cui=${cleanCui}`);
       const data = await res.json();
 
-      // 2. Preluăm administratorul din microserviciul DemoANAF (port 3002)
-      let numeAdmin = '';
-      try {
-        const anafRes = await fetch(`http://localhost:3002/api/v1/demoanaf/${cleanCui}`);
-        const anafData = await anafRes.json();
-        if (anafData.success && anafData.data?.administrator) {
-          numeAdmin = anafData.data.administrator; // Numele sau numele multiple concatenate
-        }
-      } catch (err) {
-        console.error("Eroare preluare administrator extern:", err);
-      }
-
-      if (data.success) {
+      if (data.success && data.data) {
         if (rol === 'prestator') {
           setFormData(prev => ({ 
             ...prev, 
-            prestatorNume: data.data.denumire,                 // Din SQLite
-            prestatorReprezentant: numeAdmin || prev.prestatorReprezentant // Din DemoANAF
+            prestatorNume: data.data.denumire || '',          
+            prestatorAdresa: data.data.adresa || '',          
+            prestatorReprezentant: data.data.administrator || prev.prestatorReprezentant 
           }));
           setPrestatorCuiStatus(data.data.stare);
         } else {
           setFormData(prev => ({ 
             ...prev, 
-            clientNume: data.data.denumire,                    // Din SQLite
-            clientReprezentant: numeAdmin || prev.clientReprezentant       // Din DemoANAF
+            clientNume: data.data.denumire || '',             
+            clientAdresa: data.data.adresa || '',             
+            clientReprezentant: data.data.administrator || prev.clientReprezentant       
           }));
           setClientCuiStatus(data.data.stare);
         }
