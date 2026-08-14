@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 async function generateReportData(cuiClean) {
   if (!cuiClean) {
-    return { success: false, error: 'CUI invalid sau lipsă' }, 400;
+    return [{ success: false, error: 'CUI invalid sau lipsă' }, 400];
   }
 
   try {
@@ -10,7 +10,7 @@ async function generateReportData(cuiClean) {
     const result = await response.json();
 
     if (!result.success || !result.data) {
-      return { success: false, error: 'Nu s-au putut prelua datele financiare pentru acest CUI' }, 404;
+      return [{ success: false, error: 'Nu s-au putut prelua datele financiare pentru acest CUI' }, 404];
     }
 
     const dataFirma = result.data;
@@ -75,7 +75,7 @@ async function generateReportData(cuiClean) {
             <table>
               <tr><th>Active Imobilizate:</th><td>${formatMoney(dataFirma.active_imobilizate)}</td></tr>
               <tr><th>Active Circulante (Total):</th><td>${formatMoney(dataFirma.active_circulante)}</td></tr>
-              <tr><th>- Stocuri:</th><td>${formatMoney(dataFirma.stocuri)}</td></tr>
+              <tr><th>- Stocuri:</th><td>${formatMoney(dataFinnedCur = dataFirma.stocuri)}</td></tr>
               <tr><th>- Creanțe:</th><td>${formatMoney(dataFirma.creante)}</td></tr>
               <tr><th>- Casa și Conturi la Bănci (Cash):</th><td>${formatMoney(dataFirma.cash)}</td></tr>
               <tr><th>Datorii Totale:</th><td class="text-red">${formatMoney(dataFirma.datorii)}</td></tr>
@@ -86,10 +86,10 @@ async function generateReportData(cuiClean) {
       </html>
     `;
 
-    return { success: true, html: htmlContent }, 200;
+    return [{ success: true, html: htmlContent }, 200];
   } catch (error) {
     console.error('Eroare internă raport:', error);
-    return { success: false, error: 'Eroare internă server' }, 500;
+    return [{ success: false, error: 'Eroare internă server' }, 500];
   }
 }
 
