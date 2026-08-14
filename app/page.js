@@ -358,29 +358,44 @@ export default function Home() {
   const handleAutofillCui = async (cuiValue, rol) => {
     const cleanCui = cuiValue.replace(/[^0-9]/g, '');
     if (cleanCui.length < 5) return;
+    
     try {
-      // 1. Căutare instantă în baza locală
+      // 1. Luăm instant datele firmei din SQLite-ul local (prin ruta ta /api/cui)
       const res = await fetch(`/api/cui?cui=${cleanCui}`);
       const data = await res.json();
-      
-      // 2. Extragere administrator via DemoANAF în fundal
+
+      // 2. Extragem administratorul în fundal din microserviciul DemoANAF (port 3002)
       let numeAdmin = '';
       try {
-        const anafRes = await fetch(`/api/anaf?cui=${cleanCui}`);
+        const anafRes = await fetch(`http://localhost:3002/api/v1/demoanaf/${cleanCui}`);
         const anafData = await anafRes.json();
-        if (anafData.data?.administrator) numeAdmin = anafData.data.administrator;
-      } catch(e) {}
+        if (anafData.success && anafData.data?.administrator) {
+          numeAdmin = anafData.data.administrator;
+        }
+      } catch (err) {
+        // Dacă DemoANAF nu răspunde momentan, nu blocăm aplicația; continuăm cu datele din SQLite
+      }
 
       if (data.success) {
         if (rol === 'prestator') {
-          setFormData(prev => ({ ...prev, prestatorNume: data.data.denumire, prestatorReprezentant: numeAdmin }));
+          setFormData(prev => ({ 
+            ...prev, 
+            prestatorNume: data.data.denumire, 
+            prestatorReprezentant: numeAdmin || prev.prestatorReprezentant 
+          }));
           setPrestatorCuiStatus(data.data.stare);
         } else {
-          setFormData(prev => ({ ...prev, clientNume: data.data.denumire, clientReprezentant: numeAdmin }));
+          setFormData(prev => ({ 
+            ...prev, 
+            clientNume: data.data.denumire, 
+            clientReprezentant: numeAdmin || prev.clientReprezentant 
+          }));
           setClientCuiStatus(data.data.stare);
         }
       }
-    } catch (e) {}
+    } catch (e) {
+      console.error("Eroare la autocompletarea CUI:", e);
+    }
   };
   
   // Declansare automata (Debounce) pentru Prestator
