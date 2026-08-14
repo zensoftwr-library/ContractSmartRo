@@ -265,6 +265,11 @@ export default function Home() {
   const [prestatorCuiStatus, setPrestatorCuiStatus] = useState(null);
   const [clientCuiStatus, setClientCuiStatus] = useState(null);
 
+  useEffect(() => {
+  if (cuiSearch.replace(/[^0-9]/g, '').length >= 6) {
+    setTimeout(() => handleCautareCuiWidget({ preventDefault: () => {} }), 500);
+  }
+}, [cuiSearch]);
   const handleCautareCuiWidget = async (e) => {
     e.preventDefault();
     if (!cuiSearch || cuiSearch.length < 5) return alert("Introdu un CUI valid.");
@@ -360,17 +365,17 @@ export default function Home() {
     if (cleanCui.length < 5) return;
     
     try {
-      // 1. Preluăm instant datele de bază din baza locală SQLite
+      // 1. Preluăm datele locale din SQLite (denumire, adresă, stare fiscală)
       const res = await fetch(`/api/cui?cui=${cleanCui}`);
       const data = await res.json();
 
-      // 2. Preluăm administratorul din microserviciul DemoANAF (port 3002)
+      // 2. Preluăm numele administratorului din microserviciul DemoANAF (port 3002)
       let numeAdmin = '';
       try {
         const anafRes = await fetch(`http://localhost:3002/api/v1/demoanaf/${cleanCui}`);
         const anafData = await anafRes.json();
         if (anafData.success && anafData.data?.administrator) {
-          numeAdmin = anafData.data.administrator; // Numele sau numele multiple concatenate
+          numeAdmin = anafData.data.administrator;
         }
       } catch (err) {
         console.error("Eroare preluare administrator extern:", err);
@@ -380,15 +385,17 @@ export default function Home() {
         if (rol === 'prestator') {
           setFormData(prev => ({ 
             ...prev, 
-            prestatorNume: data.data.denumire,                 // Din SQLite
-            prestatorReprezentant: numeAdmin || prev.prestatorReprezentant // Din DemoANAF
+            prestatorNume: data.data.denumire || '',          
+            prestatorAdresa: data.data.adresa || '',          
+            prestatorReprezentant: numeAdmin || prev.prestatorReprezentant 
           }));
           setPrestatorCuiStatus(data.data.stare);
         } else {
           setFormData(prev => ({ 
             ...prev, 
-            clientNume: data.data.denumire,                    // Din SQLite
-            clientReprezentant: numeAdmin || prev.clientReprezentant       // Din DemoANAF
+            clientNume: data.data.denumire || '',             
+            clientAdresa: data.data.adresa || '',             
+            clientReprezentant: numeAdmin || prev.clientReprezentant       
           }));
           setClientCuiStatus(data.data.stare);
         }
@@ -1972,6 +1979,7 @@ export default function Home() {
                         <label className="text-[10px] text-slate-500 font-bold uppercase">Denumire Furnizor / Nume</label>
                         <input type="text" placeholder="Denumire Firma / Nume Complet" autoComplete="new-password" value={formData.prestatorNume} onChange={e => setFormData({...formData, prestatorNume: e.target.value})} className="p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none" />
                         <input type="text" placeholder="Nume Administrator / Reprezentant Prestator" autoComplete="new-password" value={formData.prestatorReprezentant} onChange={e => setFormData({...formData, prestatorReprezentant: e.target.value})} className="mt-2 p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none w-full" />
+                        <input type="text" placeholder="Adresă Sediu Social Prestator" autoComplete="new-password" value={formData.prestatorAdresa || ''} onChange={e => setFormData({...formData, prestatorAdresa: e.target.value})} className="mt-2 p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none w-full" />
                       </div>
                     </div>
                   </div>
