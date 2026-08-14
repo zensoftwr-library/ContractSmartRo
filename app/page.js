@@ -477,12 +477,13 @@ export default function Home() {
   };
 
   const getQrValue = () => {
-    if (qrType === 'vcard') return `BEGIN:VCARD\nVERSION:3.0\nFN:${qrData.nume}\nTITLE:${qrData.functie}\nTEL:${qrData.telefon}\nEMAIL:${qrData.email}\nEND:VCARD`;
-    if (qrType === 'wifi') return `WIFI:T:${wifiData.type};S:${wifiData.ssid};P:${wifiData.password};;`;
-    if (qrType === 'whatsapp') return `https://wa.me/${waData.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(waData.message)}`;
-    if (qrType === 'crypto') return `${cryptoData.coin}:${cryptoData.address}${cryptoData.amount ? '?amount='+cryptoData.amount : ''}`;
-    if (['dynamic', 'smart', 'geo', 'landing'].includes(qrType)) return generatedDynamicUrl || 'https://contractsmart.ro';
-    return qrUrl || 'https://contractsmart.ro';
+    if (qrType === 'url') return qrUrl.trim();
+    if (qrType === 'vcard') return qrData.nume ? `BEGIN:VCARD\nVERSION:3.0\nFN:${qrData.nume}\nTITLE:${qrData.functie}\nTEL:${qrData.telefon}\nEMAIL:${qrData.email}\nEND:VCARD` : '';
+    if (qrType === 'wifi') return wifiData.ssid ? `WIFI:T:${wifiData.type};S:${wifiData.ssid};P:${wifiData.password};;` : '';
+    if (qrType === 'whatsapp') return waData.phone ? `https://wa.me/${waData.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(waData.message)}` : '';
+    if (qrType === 'crypto') return cryptoData.address ? `${cryptoData.coin}:${cryptoData.address}${cryptoData.amount ? '?amount='+cryptoData.amount : ''}` : '';
+    if (['dynamic', 'smart', 'geo', 'landing'].includes(qrType)) return generatedDynamicUrl;
+    return '';
   };
 
   useEffect(() => {
