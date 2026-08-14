@@ -364,43 +364,25 @@ export default function Home() {
     if (cleanCui.length < 5) return;
     
     try {
-      // 1. Preluăm datele locale din baza ta sigură (Cauta Firma - SQLite)
+      // Preluăm toate datele (denumire, adresă, stare și administrator) direct din backend-ul tău
       const res = await fetch(`/api/cui?cui=${cleanCui}`);
       const data = await res.json();
 
-      // 2. Preluăm numele administratorului separat, din DemoANAF (port 3002)
-      let numeAdmin = '';
-      try {
-        const anafRes = await fetch(`http://localhost:3002/api/v1/demoanaf/${cleanCui}`);
-        const anafData = await anafRes.json();
-        
-        if (anafData.success && anafData.data) {
-          // Citim din array-ul administrators dacă există
-          if (anafData.data.administrators && anafData.data.administrators.length > 0) {
-            numeAdmin = anafData.data.administrators[0].name;
-          } else if (anafData.data.administrator) {
-            numeAdmin = anafData.data.administrator;
-          }
-        }
-      } catch (err) {
-        console.error("Eroare preluare administrator extern:", err);
-      }
-
-      if (data.success) {
+      if (data.success && data.data) {
         if (rol === 'prestator') {
           setFormData(prev => ({ 
             ...prev, 
             prestatorNume: data.data.denumire || '',          
-            prestatorAdresa: data.data.adresa || '', // Se completează adresa        
-            prestatorReprezentant: numeAdmin || prev.prestatorReprezentant 
+            prestatorAdresa: data.data.adresa || '',        
+            prestatorReprezentant: data.data.administrator || prev.prestatorReprezentant 
           }));
           setPrestatorCuiStatus(data.data.stare);
         } else {
           setFormData(prev => ({ 
             ...prev, 
             clientNume: data.data.denumire || '',             
-            clientAdresa: data.data.adresa || '',    // Se completează adresa         
-            clientReprezentant: numeAdmin || prev.clientReprezentant       
+            clientAdresa: data.data.adresa || '',         
+            clientReprezentant: data.data.administrator || prev.clientReprezentant       
           }));
           setClientCuiStatus(data.data.stare);
         }
