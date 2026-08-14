@@ -394,19 +394,16 @@ export default function Home() {
     if (cleanCui.length < 5) return;
     
     try {
-      const res = await fetch(`/api/anaf?cui=${cleanCui}`);
+      const res = await fetch(`/api/cui?cui=${cleanCui}`);
       const data = await res.json();
 
       if (data.success && data.data) {
-        // Preluăm administratorul direct din datele aduse de rutele interne
-        const numeAdmin = data.data.administrator || (data.data.administrators?.[0]?.name) || '';
-
         if (rol === 'prestator') {
           setFormData(prev => ({ 
             ...prev, 
             prestatorNume: data.data.denumire || '',          
             prestatorAdresa: data.data.adresa || '',          
-            prestatorReprezentant: numeAdmin || prev.prestatorReprezentant 
+            prestatorReprezentant: data.data.administrator || prev.prestatorReprezentant 
           }));
           setPrestatorCuiStatus(data.data.stare);
         } else {
@@ -414,7 +411,7 @@ export default function Home() {
             ...prev, 
             clientNume: data.data.denumire || '',             
             clientAdresa: data.data.adresa || '',             
-            clientReprezentant: numeAdmin || prev.clientReprezentant       
+            clientReprezentant: data.data.administrator || prev.clientReprezentant       
           }));
           setClientCuiStatus(data.data.stare);
         }
