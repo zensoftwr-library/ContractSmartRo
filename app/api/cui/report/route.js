@@ -29,7 +29,7 @@ export async function POST(request) {
     }
 
     // 2. Extragere hibridă prin microserviciul local (DemoANAF)
-    const firmaRes = await fetch(`http://localhost:3001/api/v1/firma/${cleanCui}`).catch(() => null);
+    const firmaRes = await fetch(`http://localhost:3002/api/v1/demoanaf/${cleanCui}`).catch(() => null);
 
     if (!firmaRes || !firmaRes.ok) {
       throw new Error("Eroare la extragerea datelor financiare și de identificare din sistemul local.");

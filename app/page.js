@@ -271,7 +271,7 @@ export default function Home() {
     setIsSearchingCui(true);
     setCuiDataResult(null);
     try {
-      const res = await fetch(`/api/cui?cui=${cuiSearch.replace(/[^0-9]/g, '')}`);
+      const res = await fetch(`/api/anaf?cui=${cuiSearch.replace(/[^0-9]/g, '')}`);
       const data = await res.json();
       if (data.success) {
         setCuiDataResult(data.data);
