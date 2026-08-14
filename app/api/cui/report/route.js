@@ -1,29 +1,23 @@
 import { NextResponse } from 'next/server';
 
-export async function GET(request) {
-  const { searchParams } = new URL(request.url);
-  const cui = searchParams.get('cui');
-
-  if (!cui) {
-    return NextResponse.json({ success: false, error: 'CUI invalid sau lipsă' }, { status: 400 });
+async function generateReportData(cuiClean) {
+  if (!cuiClean) {
+    return { success: false, error: 'CUI invalid sau lipsă' }, 400;
   }
 
   try {
-    // 1. Apelăm microserviciul nostru de pe portul 3002 care returnează datele extinse din OpenAPI/DemoANAF
-    const response = await fetch(`http://localhost:3002/api/v1/demoanaf/${cui}`);
+    const response = await fetch(`http://localhost:3002/api/v1/demoanaf/${cuiClean}`);
     const result = await response.json();
 
     if (!result.success || !result.data) {
-      return NextResponse.json({ success: false, error: 'Nu s-au putut prelua datele financiare pentru acest CUI' }, { status: 404 });
+      return { success: false, error: 'Nu s-au putut prelua datele financiare pentru acest CUI' }, 404;
     }
 
     const dataFirma = result.data;
 
-    // Funcții de formatare sume și numere
     const formatMoney = (val) => Number(val || 0).toLocaleString('ro-RO') + ' RON';
     const formatNumber = (val) => Number(val || 0).toLocaleString('ro-RO');
 
-    // 2. Construim șablonul HTML extins pentru PDF
     const htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -92,16 +86,29 @@ export async function GET(request) {
       </html>
     `;
 
-    // Aici apelezi libraria ta de generat PDF (ex: html-pdf-node, puppeteer, etc.) pe baza lui `htmlContent`
-    // Exemplu de return buffer PDF:
-    // const pdfBuffer = ...;
-    // return new NextResponse(pdfBuffer, { headers: { 'Content-Type': 'application/pdf' } });
-
-    // Momentan returnăm HTML-ul direct sau logica ta curentă de PDF generat:
-    return NextResponse.json({ success: true, html: htmlContent });
-
+    return { success: true, html: htmlContent }, 200;
   } catch (error) {
-    console.error('Eroare la generarea raportului PDF:', error);
-    return NextResponse.json({ success: false, error: 'Eroare internă server' }, { status: 500 });
+    console.error('Eroare internă raport:', error);
+    return { success: false, error: 'Eroare internă server' }, 500;
   }
+}
+
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+  const cui = searchParams.get('cui');
+  const [result, status] = await generateReportData(cui);
+  return NextResponse.json(result, { status });
+}
+
+export async function POST(request) {
+  let cui = null;
+  try {
+    const body = await request.json();
+    cui = body.cui;
+  } catch (e) {
+    const { searchParams } = new URL(request.url);
+    cui = searchParams.get('cui');
+  }
+  const [result, status] = await generateReportData(cui);
+  return NextResponse.json(result, { status });
 }
