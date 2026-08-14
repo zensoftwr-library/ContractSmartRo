@@ -28,11 +28,7 @@ export async function POST(request) {
       return NextResponse.json({ success: false, needsPayment: true, message: 'Fonduri insuficiente.' }, { status: 403 });
     }
 
-    // 2. Extragere PARALELĂ: FirmeAPI (Bază + Datorii) + Cauta-Firma.ro (Bilanțuri directe)
-    const apiKey = process.env.OPENAPI_KEY || process.env.FIRMEAPI_KEY; 
-    const reqHeaders = { 'Authorization': `Bearer ${apiKey}`, 'Accept': 'application/json' };
-
-    // Apelăm microserviciul local de pe portul 3001
+    // 2. Extragere date prin microserviciul local de pe portul 3001
     const firmaRes = await fetch(`http://localhost:3001/api/v1/firma/${cleanCui}`).catch(() => null);
 
     if (!firmaRes || !firmaRes.ok) throw new Error("Eroare la extragerea datelor din microserviciul local.");
@@ -40,7 +36,7 @@ export async function POST(request) {
     const rawResponse = await firmaRes.json();
     const dataFirma = rawResponse.data || {};
 
-    // Extragere date financiare livrate de serverul local
+    // Extragere date financiare și generale livrate de serverul local
     const cifraAfaceri = dataFirma.cifra_afaceri || 0;
     const profitNet = dataFirma.profit_net || 0;
     const nrAngajati = dataFirma.angajati || 0;
@@ -50,40 +46,6 @@ export async function POST(request) {
     const tvaStatus = 'Conform ANAF';
     const adresaCompletata = dataFirma.adresa || 'Sediu social principal';
     const datoriiTotale = 0;
-
-    if (!firmaRes || !firmaRes.ok) throw new Error("Eroare la extragerea datelor firmei.");
-
-    const rawFirma = await firmaRes.json();
-    const rawDatorii = datoriiRes && datoriiRes.ok ? await datoriiRes.json() : {};
-    const rawFinante = finanteRes && finanteRes.ok ? await finanteRes.json() : {};
-      console.log("--- DEBUG CUI:", cleanCui);
-    console.log("--- RĂSPUNS FINANCIARE CAUTA-FIRMA:", JSON.stringify(rawFinante, null, 2));
-    const dataFirma = rawFirma.data || {};
-    const dataDatorii = rawDatorii.data || {};
-
-    // Extragere date financiare corectate
-    let cifraAfaceri = null, profitNet = null, nrAngajati = null, anBilant = 'N/A';
-    
-    // Căutăm proprietatea corectă (bilant sau finante)
-    const finanteArray = rawFinante.bilant || rawFinante.finante || rawFinante.bilanturi || [];
-    
-    if (Array.isArray(finanteArray) && finanteArray.length > 0) {
-      // Găsim cel mai recent an (ex: 2023, 2022)
-      const ultimeleFinante = finanteArray.sort((a, b) => (b.an || 0) - (a.an || 0))[0];
-      cifraAfaceri = ultimeleFinante.cifra_afaceri || ultimeleFinante.cifraAfaceri || 0;
-      profitNet = ultimeleFinante.profit_net || ultimeleFinante.profitNet || ultimeleFinante.profit || 0;
-      nrAngajati = ultimeleFinante.angajati || ultimeleFinante.numar_angajati || 0;
-      anBilant = ultimeleFinante.an || ultimeleFinante.an_bilant || 'N/A';
-    }
-
-    // Mapare Date Formatate
-    const stareFiscala = dataFirma.status_inactiv?.inactiv ? 'INACTIV FISCAL (RISC MAJOR)' : 'ACTIV FISCAL';
-    const tvaStatus = dataFirma.tva?.platitor ? 'DA' : 'NU';
-    const adresaCompletata = typeof dataFirma.adresa === 'string' 
-      ? dataFirma.adresa 
-      : Object.values(dataFirma.adresa || {}).filter(Boolean).join(', ');
-
-    const datoriiTotale = dataDatorii.total_datorii || dataDatorii.buget_stat_total || 0;
 
     // 3. Consumăm creditul
     if (!isPremium && availableCredits > 0) {
@@ -129,10 +91,9 @@ export async function POST(request) {
           <div class="section-title">1. Date de Identificare Principale</div>
           <table>
             <tr><th>Denumire Companie:</th><td><strong>${dataFirma.denumire || 'N/A'}</strong></td></tr>
-            <tr><th>Cod Unic Înregistrare (CUI):</th><td>${dataFirma.cui || 'N/A'}</td></tr>
-            <tr><th>Nr. Înmatriculare (ONRC):</th><td>${dataFirma.nr_reg_com || 'N/A'}</td></tr>
+            <tr><th>Cod Unic Înregistrare (CUI):</th><td>${dataFirma.cui || cleanCui}</td></tr>
             <tr><th>Stare ANAF:</th><td><span class="badge">${stareFiscala}</span></td></tr>
-            <tr><th>Adresă Sediu Social:</th><td>${adresaCompletata || 'Adresă indisponibilă'}</td></tr>
+            <tr><th>Adresă Sediu Social:</th><td>${adresaCompletata}</td></tr>
             <tr><th>Plătitor de TVA:</th><td>${tvaStatus}</td></tr>
           </table>
         </div>
