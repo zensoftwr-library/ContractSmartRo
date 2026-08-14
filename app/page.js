@@ -265,18 +265,47 @@ export default function Home() {
   const [prestatorCuiStatus, setPrestatorCuiStatus] = useState(null);
   const [clientCuiStatus, setClientCuiStatus] = useState(null);
 
+  // Cutare automată cu debounce corect și curățare de timer
   useEffect(() => {
-  if (cuiSearch.replace(/[^0-9]/g, '').length >= 6) {
-    setTimeout(() => handleCautareCuiWidget({ preventDefault: () => {} }), 500);
-  }
-}, [cuiSearch]);
-  const handleCautareCuiWidget = async (e) => {
-    e.preventDefault();
-    if (!cuiSearch || cuiSearch.length < 5) return alert("Introdu un CUI valid.");
+    const cleanCui = cuiSearch.replace(/[^0-9]/g, '');
+    
+    // Declanșăm căutarea automată doar când CUI-ul are între 6 și 10 cifre
+    if (cleanCui.length >= 6 && cleanCui.length <= 10) {
+      const timer = setTimeout(() => {
+        executaCautareSilentioasa(cleanCui);
+      }, 600); // Așteaptă 0.6 secunde după ce utilizatorul s-a oprit din tastat
+
+      return () => clearTimeout(timer); // Curăță timerul vechi la fiecare tastă nouă
+    }
+  }, [cuiSearch]);
+
+  // Funcție silențioasă pentru auto-căutare (fără alerte deranjante în timp ce scrii)
+  const executaCautareSilentioasa = async (cuiCurat) => {
     setIsSearchingCui(true);
     setCuiDataResult(null);
     try {
-      const res = await fetch(`/api/anaf?cui=${cuiSearch.replace(/[^0-9]/g, '')}`);
+      const res = await fetch(`/api/anaf?cui=${cuiCurat}`);
+      const data = await res.json();
+      if (data.success) {
+        setCuiDataResult(data.data);
+      }
+    } catch (err) {
+      // Ignorăm erorile silențioase în timpul tastării
+    } finally {
+      setIsSearchingCui(false);
+    }
+  };
+
+  // Funcția păstrată pentru butonul manual sau Enter (care poate da alertă dacă e invalid)
+  const handleCautareCuiWidget = async (e) => {
+    e.preventDefault();
+    const cleanCui = cuiSearch.replace(/[^0-9]/g, '');
+    if (!cleanCui || cleanCui.length < 5) return alert("Introdu un CUI valid.");
+    
+    setIsSearchingCui(true);
+    setCuiDataResult(null);
+    try {
+      const res = await fetch(`/api/anaf?cui=${cleanCui}`);
       const data = await res.json();
       if (data.success) {
         setCuiDataResult(data.data);
@@ -1987,17 +2016,24 @@ export default function Home() {
                   <div className="space-y-4 pt-6 border-t border-slate-800/80 mt-6 block clear-both">
                     <span className="text-xs font-bold text-slate-400 uppercase block tracking-wider">Identificare Beneficiar Contract</span>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="relative">
-                        <input type="text" placeholder="CUI / CNP Client" autoComplete="new-password" value={formData.clientCui} onChange={e => setFormData({...formData, clientCui: e.target.value})} onBlur={(e) => handleAutofillCui(e.target.value, 'client')} className="w-full p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white outline-none focus:border-[#8ba888] pr-20" />
-                        {clientCuiStatus && (
-                          <span className={`absolute right-2 top-2 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase ${clientCuiStatus === 'Activ' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>{clientCuiStatus}</span>
-                        )}
+                      <div className="flex flex-col space-y-1">
+                        <label className="text-[10px] text-slate-500 font-bold uppercase">CUI / CNP Client</label>
+                        <div className="relative">
+                          <input type="text" placeholder="CUI / CNP Client" autoComplete="new-password" value={formData.clientCui} onChange={e => setFormData({...formData, clientCui: e.target.value})} onBlur={(e) => handleAutofillCui(e.target.value, 'client')} className="w-full p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white outline-none focus:border-[#8ba888] pr-20" />
+                          {clientCuiStatus && (
+                            <span className={`absolute right-2 top-2 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase ${clientCuiStatus === 'Activ' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>{clientCuiStatus}</span>
+                          )}
+                        </div>
                       </div>
-                      <input type="text" placeholder="Companie Client / Nume" autoComplete="new-password" value={formData.clientNume} onChange={e => setFormData({...formData, clientNume: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white" />
-                      <input type="text" placeholder="Nume Administrator / Reprezentant Client" autoComplete="new-password" value={formData.clientReprezentant} onChange={e => setFormData({...formData, clientReprezentant: e.target.value})} className="mt-2 p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white w-full" />
+                      <div className="flex flex-col space-y-1">
+                        <label className="text-[10px] text-slate-500 font-bold uppercase">Companie Client / Nume</label>
+                        <input type="text" placeholder="Companie Client / Nume" autoComplete="new-password" value={formData.clientNume} onChange={e => setFormData({...formData, clientNume: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white outline-none" />
+                        <input type="text" placeholder="Nume Administrator / Reprezentant Client" autoComplete="new-password" value={formData.clientReprezentant} onChange={e => setFormData({...formData, clientReprezentant: e.target.value})} className="mt-2 p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white outline-none w-full" />
+                        <input type="text" placeholder="Adresă Sediu Social Client" autoComplete="new-password" value={formData.clientAdresa || ''} onChange={e => setFormData({...formData, clientAdresa: e.target.value})} className="mt-2 p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white outline-none w-full" />
+                      </div>
                     </div>
                     
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center pt-2">
                       <input type="email" placeholder="Email Client" autoComplete="new-password" value={formData.clientEmail} onChange={e => setFormData({...formData, clientEmail: e.target.value})} className="w-full p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white focus:border-[#8ba888] outline-none" required />
                       
                       <label className="flex items-center p-2.5 bg-[#0B0F12] rounded border border-slate-800/60 cursor-pointer select-none text-xs text-slate-300 h-full">
@@ -2015,7 +2051,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="space-y-4">
+                  <div className="space-y-4 pt-4">
                     <span className="text-xs font-bold text-slate-400 uppercase block">Obiectul Serviciilor / Tranzacției și Remunerație</span>
                     <textarea placeholder="Descrierea explicită a sarcinilor, termenelor și obiectivelor..." value={formData.obiect} onChange={e => setFormData({...formData, obiect: e.target.value})} className="w-full p-3 bg-[#0B0F12] border border-slate-700 rounded text-xs h-16 text-white resize-none" required></textarea>
                     
