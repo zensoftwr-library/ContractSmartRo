@@ -397,8 +397,8 @@ export default function Home() {
   const [formData, setFormData] = useState({
     tipContract: 'prestari', 
     initiatorRol: 'prestator', 
-    prestatorNume: '', prestatorCui: '', prestatorEmail: '', prestatorLogo: '', prestatorCuloare: '#8ba888', prestatorReprezentant: '',
-    clientNume: '', clientCui: '', clientEmail: '', clientReprezentant:'',
+    prestatorNume: '', prestatorCui: '', prestatorEmail: '', prestatorLogo: '', prestatorCuloare: '#8ba888', prestatorReprezentant: '', prestatorAdresa: '',
+    clientNume: '', clientCui: '', clientEmail: '', clientReprezentant: '', clientAdresa: '',
     obiect: '', valoare: '', moneda: 'RON', emiteFacturaAvans: false,
     estePlatitorTVA: false,
     clauzaPi: true, clauzaPenalitati: true, clauzaRevizii: false, tarifOrar: '150',
@@ -415,7 +415,6 @@ export default function Home() {
     if (cleanCui.length < 5) return;
     
     try {
-      // Preluăm toate datele (denumire, adresă, stare și administrator) direct din backend-ul tău
       const res = await fetch(`/api/cui?cui=${cleanCui}`);
       const data = await res.json();
 
@@ -425,7 +424,7 @@ export default function Home() {
             ...prev, 
             prestatorNume: data.data.denumire || '',          
             prestatorAdresa: data.data.adresa || '',        
-            prestatorReprezentant: data.data.administrator || prev.prestatorReprezentant 
+            prestatorReprezentant: data.data.administrator || '' 
           }));
           setPrestatorCuiStatus(data.data.stare);
         } else {
@@ -433,7 +432,7 @@ export default function Home() {
             ...prev, 
             clientNume: data.data.denumire || '',             
             clientAdresa: data.data.adresa || '',         
-            clientReprezentant: data.data.administrator || prev.clientReprezentant       
+            clientReprezentant: data.data.administrator || ''        
           }));
           setClientCuiStatus(data.data.stare);
         }
