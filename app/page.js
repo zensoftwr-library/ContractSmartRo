@@ -2441,51 +2441,53 @@ export default function Home() {
         )}
 
         {/* WIDGET INTEROGARE CUI ANAF */}
-            <div className="max-w-7xl mx-auto px-6 mt-6">
-              <div className="bg-[#12181D] rounded-2xl border border-slate-800/80 shadow-xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
-                <div className="absolute -right-20 -top-20 w-64 h-64 bg-[#8ba888]/5 rounded-full blur-3xl pointer-events-none"></div>
-                <div className="flex-1 w-full relative z-10">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="text-2xl"></span>
-                    <h3 className="text-sm font-bold text-[#8ba888] uppercase tracking-wider block">Verificare Firmă ANAF</h3>
-                  </div>
-                  <p className="text-xs text-slate-400 mb-6 max-w-md leading-relaxed">Interoghează rapid orice companie din România. Sistem hibrid de auto-completare cu descărcare rapoarte fiscale (datorii, bilanț, litigii) în format PDF.</p>
-                  
-                  <form onSubmit={handleCautareCuiWidget} className="flex gap-2 w-full max-w-md">
-                    <input type="text" placeholder="Introdu CUI (ex: 123456)" value={cuiSearch} onChange={e => setCuiSearch(e.target.value)} className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-3 text-sm text-white font-mono outline-none focus:border-[#8ba888] transition" required />
-                    <button type="submit" disabled={isSearchingCui} className="bg-[#8ba888] text-[#0B0F12] font-black px-6 py-3 rounded-lg text-xs transition hover:opacity-90 whitespace-nowrap">
-                      {isSearchingCui ? 'Se caută...' : 'Caută'}
-                    </button>
-                  </form>
+        {step === 1 && (
+          <div className="max-w-7xl mx-auto px-6 mt-6">
+            <div className="bg-[#12181D] rounded-2xl border border-slate-800/80 shadow-xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
+              <div className="absolute -right-20 -top-20 w-64 h-64 bg-[#8ba888]/5 rounded-full blur-3xl pointer-events-none"></div>
+              <div className="flex-1 w-full relative z-10">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-2xl"></span>
+                  <h3 className="text-sm font-bold text-[#8ba888] uppercase tracking-wider block">Verificare Firmă ANAF</h3>
                 </div>
+                <p className="text-xs text-slate-400 mb-6 max-w-md leading-relaxed">Interoghează rapid orice companie din România. Sistem hibrid de auto-completare cu descărcare rapoarte fiscale (datorii, bilanț, litigii) în format PDF.</p>
+                
+                <form onSubmit={handleCautareCuiWidget} className="flex gap-2 w-full max-w-md">
+                  <input type="text" placeholder="Introdu CUI (ex: 123456)" value={cuiSearch} onChange={e => setCuiSearch(e.target.value)} className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-3 text-sm text-white font-mono outline-none focus:border-[#8ba888] transition" required />
+                  <button type="submit" disabled={isSearchingCui} className="bg-[#8ba888] text-[#0B0F12] font-black px-6 py-3 rounded-lg text-xs transition hover:opacity-90 whitespace-nowrap">
+                    {isSearchingCui ? 'Se caută...' : 'Caută'}
+                  </button>
+                </form>
+              </div>
 
-                <div className="flex-1 w-full relative z-10">
-                  {!cuiDataResult ? (
-                    <div className="h-full min-h-[140px] flex flex-col items-center justify-center border-2 border-dashed border-slate-800/60 rounded-xl bg-[#0B0F12]/30 text-slate-500">
-                      <svg className="w-8 h-8 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                      <span className="text-xs font-bold uppercase tracking-wider">Așteaptă Căutarea</span>
-                    </div>
-                  ) : (
-                    <div className="bg-[#0B0F12] border border-slate-700 rounded-xl p-5 animate-fadeIn">
-                      <div className="flex justify-between items-start mb-3">
-                        <div>
-                          <h4 className="text-sm font-bold text-white uppercase">{cuiDataResult.denumire}</h4>
-                          <span className="text-[10px] text-slate-400 font-mono">CUI: {cuiDataResult.cui} | REG: {cuiDataResult.regCom}</span>
-                        </div>
-                        <span className={`px-2 py-1 rounded text-[9px] font-black uppercase ${cuiDataResult.stare?.toLowerCase().includes('inactiv') || cuiDataResult.stare?.toLowerCase().includes('radiat') ? 'bg-red-900/40 text-red-400 border border-red-900' : 'bg-emerald-900/40 text-emerald-400 border border-emerald-900'}`}>
-                          {cuiDataResult.stare || 'Necunoscut'}
-                        </span>
+              <div className="flex-1 w-full relative z-10">
+                {!cuiDataResult ? (
+                  <div className="h-full min-h-[140px] flex flex-col items-center justify-center border-2 border-dashed border-slate-800/60 rounded-xl bg-[#0B0F12]/30 text-slate-500">
+                    <svg className="w-8 h-8 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <span className="text-xs font-bold uppercase tracking-wider">Așteaptă Căutarea</span>
+                  </div>
+                ) : (
+                  <div className="bg-[#0B0F12] border border-slate-700 rounded-xl p-5 animate-fadeIn">
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <h4 className="text-sm font-bold text-white uppercase">{cuiDataResult.denumire}</h4>
+                        <span className="text-[10px] text-slate-400 font-mono">CUI: {cuiDataResult.cui} | REG: {cuiDataResult.regCom}</span>
                       </div>
-                      <p className="text-[10px] text-slate-500 mb-4 pb-4 border-b border-slate-800">{cuiDataResult.adresa}</p>
-                      <button onClick={() => handleDownloadPremiumReport(cuiDataResult.cui)} className="w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold py-2.5 rounded-lg text-xs transition flex justify-center items-center gap-2">
-                        <svg className="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8V7a4 4 0 00-8 0v4h8z"></path></svg>
-                        Descarcă Raport Financiar Complet 19 Ron (~3.99€)
-                      </button>
+                      <span className={`px-2 py-1 rounded text-[9px] font-black uppercase ${cuiDataResult.stare?.toLowerCase().includes('inactiv') || cuiDataResult.stare?.toLowerCase().includes('radiat') ? 'bg-red-900/40 text-red-400 border border-red-900' : 'bg-emerald-900/40 text-emerald-400 border border-emerald-900'}`}>
+                        {cuiDataResult.stare || 'Necunoscut'}
+                      </span>
                     </div>
-                  )}
-                </div>
+                    <p className="text-[10px] text-slate-500 mb-4 pb-4 border-b border-slate-800">{cuiDataResult.adresa}</p>
+                    <button onClick={() => handleDownloadPremiumReport(cuiDataResult.cui)} className="w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold py-2.5 rounded-lg text-xs transition flex justify-center items-center gap-2">
+                      <svg className="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8V7a4 4 0 00-8 0v4h8z"></path></svg>
+                      Descarcă Raport Financiar Complet 19 Ron (~3.99€)
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
+          </div>
+        )}
 
         {/* SECȚIUNE PREȚURI PERFECTĂ */}
         <div id="sectiune-preturi" className="max-w-7xl mx-auto px-6 mt-16 scroll-mt-20">
