@@ -359,14 +359,24 @@ export default function Home() {
     const cleanCui = cuiValue.replace(/[^0-9]/g, '');
     if (cleanCui.length < 5) return;
     try {
+      // 1. Căutare instantă în baza locală
       const res = await fetch(`/api/cui?cui=${cleanCui}`);
       const data = await res.json();
+      
+      // 2. Extragere administrator via DemoANAF în fundal
+      let numeAdmin = '';
+      try {
+        const anafRes = await fetch(`/api/anaf?cui=${cleanCui}`);
+        const anafData = await anafRes.json();
+        if (anafData.data?.administrator) numeAdmin = anafData.data.administrator;
+      } catch(e) {}
+
       if (data.success) {
         if (rol === 'prestator') {
-          setFormData(prev => ({ ...prev, prestatorNume: data.data.denumire, prestatorReprezentant: data.data.administrator || '' }));
+          setFormData(prev => ({ ...prev, prestatorNume: data.data.denumire, prestatorReprezentant: numeAdmin }));
           setPrestatorCuiStatus(data.data.stare);
         } else {
-          setFormData(prev => ({ ...prev, clientNume: data.data.denumire, clientReprezentant: data.data.administrator || '' }));
+          setFormData(prev => ({ ...prev, clientNume: data.data.denumire, clientReprezentant: numeAdmin }));
           setClientCuiStatus(data.data.stare);
         }
       }
@@ -598,6 +608,8 @@ export default function Home() {
       if (e.persisted) {
         setLoadingText(null);
         isProcessingForm.current = false;
+        setCuiSearch('');
+        setCuiDataResult(null);
       }
     };
 
