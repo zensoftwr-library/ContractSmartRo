@@ -297,8 +297,8 @@ export default function Home() {
     }
   };
 
+  // Funcția care doar generează și descarcă PDF-ul
   const handleDownloadPremiumReport = async (cuiTarget) => {
-    if (!user) return alert("Trebuie să fii autentificat pentru a descărca rapoarte.");
     setLoadingText({ title: "GENERARE RAPORT...", desc: "Preluăm datele financiare și generăm PDF-ul." });
     try {
       const res = await fetch('/api/cui/report', {
@@ -317,13 +317,13 @@ export default function Home() {
         document.body.removeChild(elementA);
         window.URL.revokeObjectURL(urlDownload);
         alert("Raportul a fost descărcat cu succes!");
-        if(!isPremium) {
-           setUser(prev => ({...prev, credits: prev.credits - 1})); // update UI credit
-        }
+        
+        // Aici va trebui mai târziu să scazi/incrementezi din baza de date
+        // supabase.rpc('increment_pro_report', { user_id: user.id })
+        
       } else {
         const textEroare = await res.json();
-        if (textEroare.needsPayment) handleCumparaPremium('raport_detaliat');
-        else alert(textEroare.message);
+        alert(textEroare.message || "Eroare la generare");
       }
     } catch {
       alert("Eroare server.");
@@ -332,20 +332,19 @@ export default function Home() {
     }
   };
 
-  // --- LOGICĂ NOUĂ PENTRU BUTON RAPORT DETALIAT ---
-  const GUMROAD_LINK = "https://link-ul-tau.gumroad.com/l/raport-companie";
+  // --- LOGICA NOUĂ PENTRU BUTON (Aici definim rolurile dinamic) ---
   
-  // Extragem rolul din obiectul tău user (dacă nu ai un field 'role', te folosești de isPremium)
-  // Verificăm dacă e founder după rol, metadate sau direct după adresa de email
-  const isFounder = 
-    user?.role === 'founder' || 
-    user?.publicMetadata?.role === 'founder' || 
-    user?.emailAddresses?.[0]?.emailAddress === 'emailul-tau@gmail.com'; // Treci aici emailul tău real de fondator
-
-  const userRole = isFounder ? 'founder' : (isPremium ? 'pro' : 'free'); 
-  // Extragem rapoartele folosite în luna curentă (trebuie să te asiguri că îl trimiți din backend)
+  // Verificăm dacă are rolul de founder salvat în obiectul tău user (dacă folosești alt nume de câmp, de ex. 'plan', modifică mai jos)
+  const isFounder = user?.role === 'founder' || user?.plan === 'founder';
+  
+  // Setăm rolul real:
+  const userRole = isFounder ? 'founder' : (isPremium ? 'pro' : 'free');
+  
+  // Preia numărul de rapoarte folosite. Dacă nu-l ai încă în DB, pornește de la 0.
   const proReportsUsed = user?.proReportsUsed || 0;
+  const GUMROAD_LINK = "https://link-ul-tau.gumroad.com/l/raport-companie";
 
+  // Funcția apelată când dă click pe buton
   const handleReportAction = async () => {
     if (!user) return alert("Trebuie să fii autentificat pentru a descărca rapoarte.");
 
@@ -367,6 +366,7 @@ export default function Home() {
     }
   };
 
+  // Dinamizarea textului și iconiței de pe buton
   let buttonText = "Descarcă Raport Financiar Complet 19 Ron (~3.99€)";
   let isLocked = true; 
 
@@ -383,6 +383,7 @@ export default function Home() {
       isLocked = true;
     }
   }
+ 
   // --- SFÂRȘIT LOGICĂ NOUĂ ---
 
   const [fiscal, setFiscal] = useState({
