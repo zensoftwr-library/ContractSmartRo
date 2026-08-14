@@ -342,7 +342,7 @@ export default function Home() {
   
   // Preia numărul de rapoarte folosite. Dacă nu-l ai încă în DB, pornește de la 0.
   const proReportsUsed = user?.proReportsUsed || 0;
-  const GUMROAD_LINK = "https://link-ul-tau.gumroad.com/l/raport-companie";
+  const GUMROAD_LINK = "https://zensoftware.gumroad.com/l/raport-companie";
 
   // Funcția apelată când dă click pe buton
   const handleReportAction = async () => {
