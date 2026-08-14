@@ -17,7 +17,39 @@ async function generatePdfBuffer(cuiClean) {
   const dataFirma = result.data;
   const formatMoney = (val) => Number(val || 0).toLocaleString('ro-RO') + ' RON';
   const formatNumber = (val) => Number(val || 0).toLocaleString('ro-RO');
+  // Construim dinamic tabelul cu istoricul pe 8 ani
+  let istoricHtml = '';
+  if (dataFirma.istoric_financiar && dataFirma.istoric_financiar.length > 0) {
+    const randuriTabel = dataFirma.istoric_financiar.map(an => `
+      <tr>
+        <td style="text-align: center;"><strong>${an.an_bilant}</strong></td>
+        <td style="text-align: right;">${formatMoney(an.cifra_afaceri)}</td>
+        <td style="text-align: right;" class="${an.profit_net > 0 ? 'text-green' : 'text-red'}">${formatMoney(an.profit_net)}</td>
+        <td style="text-align: right;" class="text-red">${formatMoney(an.datorii)}</td>
+        <td style="text-align: center;">${formatNumber(an.angajati)}</td>
+      </tr>
+    `).join('');
 
+    istoricHtml = `
+      <div class="section">
+        <div class="section-title">4. ISTORIC FINANCIAR (PÂNĂ LA 8 ANI)</div>
+        <table>
+          <thead style="background: #f9fafb;">
+            <tr>
+              <th style="text-align: center;">An</th>
+              <th style="text-align: right;">Cifră de Afaceri</th>
+              <th style="text-align: right;">Profit Net</th>
+              <th style="text-align: right;">Datorii Totale</th>
+              <th style="text-align: center;">Angajați</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${randuriTabel}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
   // Șablonul HTML complet, cu logo-ul SVG inclus și toate datele extinse
   const htmlContent = `
     <!DOCTYPE html>
@@ -95,6 +127,8 @@ async function generatePdfBuffer(cuiClean) {
             <tr><th>Capitaluri Proprii:</th><td>${formatMoney(dataFirma.capitaluri_proprii)}</td></tr>
           </table>
         </div>
+        <!-- Tabelul dinamic cu istoricul financiar pe 8 ani -->
+        ${istoricHtml}
       </body>
     </html>
   `;

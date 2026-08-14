@@ -299,9 +299,6 @@ export default function Home() {
 
   const handleDownloadPremiumReport = async (cuiTarget) => {
     if (!user) return alert("Trebuie să fii autentificat pentru a descărca rapoarte.");
-    if (!isPremium && user.credits <= 0) {
-      return handleCumparaPremium('raport_detaliat');
-    }
     setLoadingText({ title: "GENERARE RAPORT...", desc: "Preluăm datele financiare și generăm PDF-ul." });
     try {
       const res = await fetch('/api/cui/report', {
@@ -334,6 +331,53 @@ export default function Home() {
       setLoadingText(null);
     }
   };
+
+  // --- LOGICĂ NOUĂ PENTRU BUTON RAPORT DETALIAT ---
+  const GUMROAD_LINK = "https://link-ul-tau.gumroad.com/l/raport-companie";
+  
+  // Extragem rolul din obiectul tău user (dacă nu ai un field 'role', te folosești de isPremium)
+  const userRole = user?.role || (isPremium ? 'pro' : 'free'); 
+  // Extragem rapoartele folosite în luna curentă (trebuie să te asiguri că îl trimiți din backend)
+  const proReportsUsed = user?.proReportsUsed || 0;
+
+  const handleReportAction = async () => {
+    if (!user) return alert("Trebuie să fii autentificat pentru a descărca rapoarte.");
+
+    if (userRole === 'free') {
+      window.open(GUMROAD_LINK, '_blank');
+      return;
+    }
+    if (userRole === 'pro') {
+      if (proReportsUsed < 3) {
+        await handleDownloadPremiumReport(cuiDataResult.cui);
+      } else {
+        window.open(GUMROAD_LINK, '_blank');
+      }
+      return;
+    }
+    if (userRole === 'founder') {
+      await handleDownloadPremiumReport(cuiDataResult.cui);
+      return;
+    }
+  };
+
+  let buttonText = "Descarcă Raport Financiar Complet 19 Ron (~3.99€)";
+  let isLocked = true; 
+
+  if (userRole === 'founder') {
+    buttonText = "Descarcă Raport Complet (Gratuit - Fondator)";
+    isLocked = false;
+  } else if (userRole === 'pro') {
+    if (proReportsUsed < 3) {
+      const rapoarteRamase = 3 - proReportsUsed;
+      buttonText = `Descarcă Raport (Gratuit PRO - Mai ai ${rapoarteRamase}/3)`;
+      isLocked = false;
+    } else {
+      buttonText = "Ai atins limita PRO. Descarcă cu 19 Ron";
+      isLocked = true;
+    }
+  }
+  // --- SFÂRȘIT LOGICĂ NOUĂ ---
 
   const [fiscal, setFiscal] = useState({
     venitLunar: 45000,
@@ -2508,9 +2552,20 @@ export default function Home() {
                       </span>
                     </div>
                     <p className="text-[10px] text-slate-500 mb-4 pb-4 border-b border-slate-800">{cuiDataResult.adresa}</p>
-                    <button onClick={() => handleDownloadPremiumReport(cuiDataResult.cui)} className="w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold py-2.5 rounded-lg text-xs transition flex justify-center items-center gap-2">
-                      <svg className="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8V7a4 4 0 00-8 0v4h8z"></path></svg>
-                      Descarcă Raport Financiar Complet 19 Ron (~3.99€)
+                    <button 
+                      onClick={handleReportAction} 
+                      className="w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold py-2.5 rounded-lg text-xs transition flex justify-center items-center gap-2"
+                    >
+                      {isLocked ? (
+                        <svg className="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8V7a4 4 0 00-8 0v4h8z"></path>
+                        </svg>
+                      ) : (
+                        <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
+                        </svg>
+                      )}
+                      {buttonText}
                     </button>
                   </div>
                 )}
