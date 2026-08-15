@@ -306,6 +306,7 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cui: cuiTarget, userId: user.id })
       });
+      
       if (res.ok) {
         const blob = await res.blob();
         const urlDownload = window.URL.createObjectURL(blob);
@@ -318,8 +319,24 @@ export default function Home() {
         window.URL.revokeObjectURL(urlDownload);
         alert("Raportul a fost descărcat cu succes!");
         
-        // Aici va trebui mai târziu să scazi/incrementezi din baza de date
-        // supabase.rpc('increment_pro_report', { user_id: user.id })
+        // --- LOGICA NOUĂ: SCĂDEM UN RAPORT PENTRU CONTURILE PRO ---
+        if (user?.status === 'pro') {
+          const rapoarteConsumateAcum = (user.proReportsUsed || 0) + 1;
+          
+          // 1. Salvăm în baza de date
+          const { error } = await supabase
+            .from('profiles')
+            .update({ pro_reports_used: rapoarteConsumateAcum })
+            .eq('id', user.id);
+            
+          if (!error) {
+            // 2. Actualizăm starea vizuală pe loc (să scadă din 3 direct pe ecran)
+            setUser(prevUser => ({ ...prevUser, proReportsUsed: rapoarteConsumateAcum }));
+          } else {
+            console.error("Eroare la update supabase:", error);
+          }
+        }
+        // -----------------------------------------------------------
         
       } else {
         const textEroare = await res.json();
@@ -331,7 +348,6 @@ export default function Home() {
       setLoadingText(null);
     }
   };
-
   // --- LOGICA NOUĂ PENTRU BUTON (Aici definim rolurile dinamic) ---
   
   // Verificăm dacă are rolul de founder salvat în obiectul tău user (dacă folosești alt nume de câmp, de ex. 'plan', modifică mai jos)
