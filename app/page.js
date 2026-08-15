@@ -348,16 +348,20 @@ export default function Home() {
   const handleReportAction = async () => {
     if (!user) return alert("Trebuie să fii autentificat pentru a descărca rapoarte.");
 
-    if (userRole === 'free') {
+    if (user?.status === 'free') {
       window.open(GUMROAD_LINK, '_blank');
       return;
     }
-    if (userRole === 'pro') {
+    if (user?.status === 'pro') {
       if (user.proReportsUsed < 3) {
         await handleDownloadPremiumReport(cuiDataResult.cui);
       } else {
         window.open(GUMROAD_LINK, '_blank');
       }
+      return;
+    }
+    if (user?.status === 'founder') {
+      await handleDownloadPremiumReport(cuiDataResult.cui);
       return;
     }
     if (userRole === 'founder') {
