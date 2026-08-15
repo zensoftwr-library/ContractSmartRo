@@ -367,11 +367,11 @@ export default function Home() {
   };
 
   // Dinamizarea textului și iconiței de pe buton
-  let buttonText = "Descarcă Raport Financiar Complet 19 Ron (~3.99€)";
+  let buttonText = "Descarcă Raport ( Pret 19 Ron ( 3.99€ ) / Raport )";
   let isLocked = true; 
 
   if (userRole === 'founder') {
-    buttonText = "Descarcă Raport Complet (Gratuit - Fondator)";
+    buttonText = "Descarcă Raport Detaliat";
     isLocked = false;
   } else if (userRole === 'pro') {
     if (proReportsUsed < 3) {
@@ -379,7 +379,7 @@ export default function Home() {
       buttonText = `Descarcă Raport (Gratuit PRO - Mai ai ${rapoarteRamase}/3)`;
       isLocked = false;
     } else {
-      buttonText = "Ai atins limita PRO. Descarcă cu 19 Ron";
+      buttonText = "Descarcă Raport ( Pret 19 Ron ( 3.99€ ) / Raport )";
       isLocked = true;
     }
   }
@@ -1340,6 +1340,11 @@ export default function Home() {
                   <span className="text-[10px] uppercase font-bold bg-[#16221A] text-[#8ba888] px-2 py-0.5 rounded border border-emerald-900/40">
                     {user.status}
                   </span>
+                  {userRole === 'pro' && (
+                    <span className="text-[10px] uppercase font-bold bg-blue-900/20 text-blue-400 px-2 py-0.5 rounded border border-blue-900/50 shadow-sm">
+                      {3 - (user?.proReportsUsed || 0)}/3 RAPOARTE
+                    </span>
+                  )}
                   {!isPremium && (
                     <span className="text-[10px] uppercase font-bold bg-amber-900/20 text-amber-500 px-2 py-0.5 rounded border border-amber-900/50">
                       {user.credits} CREDITE
@@ -1367,7 +1372,24 @@ export default function Home() {
               <button type="button" onClick={() => { setIsMobileMenuOpen(false); setIsSignUp(false); setShowAuthModal(true); }} className="text-sm font-bold text-[#8ba888] text-left">Autentificare / Cont Nou</button>
             ) : (
               <div className="flex flex-col space-y-2 border-t border-slate-800/50 pt-2">
-                <span className="text-xs text-slate-400">Logat ca: {user.email}</span>
+                <div className="flex flex-col space-y-1.5 mb-2">
+                  <span className="text-xs text-slate-400">Logat ca: <strong className="text-white">{user.email}</strong></span>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[10px] uppercase font-bold bg-[#16221A] text-[#8ba888] px-2 py-0.5 rounded border border-emerald-900/40">
+                      {user.status}
+                    </span>
+                    {userRole === 'pro' && (
+                      <span className="text-[10px] uppercase font-bold bg-blue-900/20 text-blue-400 px-2 py-0.5 rounded border border-blue-900/50 shadow-sm">
+                        {3 - (user?.proReportsUsed || 0)}/3 RAPOARTE
+                      </span>
+                    )}
+                    {!isPremium && (
+                      <span className="text-[10px] uppercase font-bold bg-amber-900/20 text-amber-500 px-2 py-0.5 rounded border border-amber-900/50">
+                        {user.credits} CREDITE
+                      </span>
+                    )}
+                  </div>
+                </div>
                 <div className="flex space-x-4 pt-1">
                   <button type="button" onClick={handleLogout} className="text-slate-300 text-sm font-bold text-left hover:text-white">Ieșire</button>
                   <button type="button" onClick={stergeCont} className="text-red-500 text-sm font-bold text-left hover:underline">Șterge Cont</button>
