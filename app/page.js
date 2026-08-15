@@ -353,7 +353,7 @@ export default function Home() {
       return;
     }
     if (user?.status === 'pro') {
-      if (user.proReportsUsed < 3) {
+      if ((user?.proReportsUsed || 0) < 3) {
         await handleDownloadPremiumReport(cuiDataResult.cui);
       } else {
         window.open(GUMROAD_LINK, '_blank');
@@ -364,22 +364,18 @@ export default function Home() {
       await handleDownloadPremiumReport(cuiDataResult.cui);
       return;
     }
-    if (userRole === 'founder') {
-      await handleDownloadPremiumReport(cuiDataResult.cui);
-      return;
-    }
   };
 
-  // Dinamizarea textului și iconiței de pe buton
+ // Dinamizarea textului și iconiței de pe buton
   let buttonText = "Descarcă Raport ( Pret 19 Ron ( 3.99€ ) / Raport )";
   let isLocked = true; 
 
-  if (userRole === 'founder') {
+  if (user?.status === 'founder') {
     buttonText = "Descarcă Raport Detaliat";
     isLocked = false;
-  } else if (userRole === 'pro') {
-    if (user.proReportsUsed < 3) {
-      const rapoarteRamase = 3 - user.proReportsUsed; // Aici am scos "< 3" de la final
+  } else if (user?.status === 'pro') {
+    if (user?.proReportsUsed < 3) {
+      const rapoarteRamase = 3 - (user?.proReportsUsed || 0);
       buttonText = `Descarcă Raport (Gratuit PRO - Mai ai ${rapoarteRamase}/3)`;
       isLocked = false;
     } else {
