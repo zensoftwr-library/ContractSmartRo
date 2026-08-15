@@ -353,7 +353,7 @@ export default function Home() {
       return;
     }
     if (userRole === 'pro') {
-      if (proReportsUsed < 3) {
+      if (user.proReportsUsed < 3) {
         await handleDownloadPremiumReport(cuiDataResult.cui);
       } else {
         window.open(GUMROAD_LINK, '_blank');
@@ -374,8 +374,8 @@ export default function Home() {
     buttonText = "Descarcă Raport Detaliat";
     isLocked = false;
   } else if (userRole === 'pro') {
-    if (proReportsUsed < 3) {
-      const rapoarteRamase = 3 - proReportsUsed;
+    if (user.proReportsUsed < 3) {
+      const rapoarteRamase = 3 - user.proReportsUsed; // Aici am scos "< 3" de la final
       buttonText = `Descarcă Raport (Gratuit PRO - Mai ai ${rapoarteRamase}/3)`;
       isLocked = false;
     } else {
@@ -808,12 +808,13 @@ export default function Home() {
   useEffect(() => {
     const fetchUserProfile = async (userId, email) => {
       try {
-        const { data: profile } = await supabase.from('profiles').select('subscription_tier, credits_remaining, has_qr_branding, has_qr_vcard, has_qr_dynamic, has_qr_pdf, is_pro, is_enterprise').eq('id', userId).single();
+        const { data: profile } = await supabase.from('profiles').select('subscription_tier, credits_remaining, has_qr_branding, has_qr_vcard, has_qr_dynamic, has_qr_pdf, is_pro, is_enterprise, pro_reports_used').eq('id', userId).single();
         setUser({ 
           id: userId, 
           email: email, 
           status: profile?.subscription_tier || 'free', 
-          credits: profile?.credits_remaining ?? 0 
+          credits: profile?.credits_remaining ?? 0,
+          proReportsUsed: profile?.pro_reports_used || 0
         });
         setProfil(profile);
         setUserTier(profile?.subscription_tier || 'free');
@@ -1340,7 +1341,7 @@ export default function Home() {
                   <span className="text-[10px] uppercase font-bold bg-[#16221A] text-[#8ba888] px-2 py-0.5 rounded border border-emerald-900/40">
                     {user.status}
                   </span>
-                  {userRole === 'pro' && (
+                  {user.status === 'pro' && (
                     <span className="text-[10px] uppercase font-bold bg-blue-900/20 text-blue-400 px-2 py-0.5 rounded border border-blue-900/50 shadow-sm">
                       {3 - (user?.proReportsUsed || 0)}/3 RAPOARTE
                     </span>
@@ -1378,7 +1379,7 @@ export default function Home() {
                     <span className="text-[10px] uppercase font-bold bg-[#16221A] text-[#8ba888] px-2 py-0.5 rounded border border-emerald-900/40">
                       {user.status}
                     </span>
-                    {userRole === 'pro' && (
+                    {user.status === 'pro' && (
                       <span className="text-[10px] uppercase font-bold bg-blue-900/20 text-blue-400 px-2 py-0.5 rounded border border-blue-900/50 shadow-sm">
                         {3 - (user?.proReportsUsed || 0)}/3 RAPOARTE
                       </span>
