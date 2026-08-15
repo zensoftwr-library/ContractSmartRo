@@ -12,6 +12,16 @@ export async function GET(request) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 2500); // Max 2.5 secunde așteptare
 
+    // 🕵️ Extragem administratorul în fundal din DemoANAF (microserviciul de pe portul 3002) la nivel global
+    let numeAdmin = '';
+    try {
+      const resAdmin = await fetch(`http://localhost:3002/api/v1/demoanaf/${cui}`);
+      if (resAdmin.ok) {
+        const admData = await resAdmin.json();
+        if (admData.data?.administrator) numeAdmin = admData.data.administrator;
+      }
+    } catch (e) {}
+
     // 🛡️ PASUL 1: Microserviciul Local (Sursa primară care rezolvă bulina roșie/verde)
     try {
       const resPrimary = await fetch(`http://localhost:3001/api/v1/firma/${cui}`, {
@@ -23,16 +33,6 @@ export async function GET(request) {
         const result = await resPrimary.json();
         const data = result.data || {};
         
-        // Extragem administratorul în fundal din DemoANAF (microserviciul de pe portul 3002)
-        let numeAdmin = '';
-        try {
-          const resAdmin = await fetch(`http://localhost:3002/api/v1/demoanaf/${cui}`);
-          if (resAdmin.ok) {
-            const admData = await resAdmin.json();
-            if (admData.data?.administrator) numeAdmin = admData.data.administrator;
-          }
-        } catch (e) {}
-
         return NextResponse.json({
           success: true,
           source: 'local-microservice',
@@ -68,7 +68,8 @@ export async function GET(request) {
           cui: data.cui,
           regCom: data.nr_reg_com,
           adresa: typeof data.adresa === 'string' ? data.adresa : (data.adresa ? `${data.adresa.judet || ''}, ${data.adresa.localitate || ''}` : ''),
-          stare: data.stare
+          stare: data.stare,
+          administrator: numeAdmin // Adăugat aici pentru a merge și pe Fallback
         }
       });
     }
