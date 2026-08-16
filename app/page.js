@@ -465,7 +465,7 @@ export default function Home() {
         handleAutofillCui(formData.prestatorCui, 'prestator');
       } else if (!formData.prestatorCui || formData.prestatorCui.trim() === '') {
         // Când CUI-ul e sters, resetăm câmpurile
-        setFormData(prev => ({ ...prev, prestatorNume: '', prestatorReprezentant: '' }));
+        setFormData(prev => ({ ...prev, prestatorNume: '', prestatorReprezentant: '', prestatorAdresa: '' }));
         setPrestatorCuiStatus('');
       }
     }, 800);
@@ -480,7 +480,7 @@ export default function Home() {
         handleAutofillCui(formData.clientCui, 'client');
       } else if (!formData.clientCui || formData.clientCui.trim() === '') {
         // Când CUI-ul e sters, resetăm câmpurile
-        setFormData(prev => ({ ...prev, clientNume: '', clientReprezentant: '' }));
+        setFormData(prev => ({ ...prev, clientNume: '', clientReprezentant: '', clientAdresa: '' }));
         setClientCuiStatus('');
       }
     }, 800);
