@@ -1,5 +1,21 @@
 import { NextResponse } from 'next/server';
 
+// 🛠️ Funcție inteligentă care extrage ANUL din RegCom dacă firma e Activă
+function formateazaStare(stareOriginala, regCom) {
+  let stare = stareOriginala || 'ÎNREGISTRAT';
+  
+  if (stare.toUpperCase().includes('ACTIV') && !stare.toUpperCase().includes('INACTIV')) {
+    // Căutăm orice an care începe cu 19.. sau 20.. în numărul de RegCom (ex: J.../2013)
+    const anMatch = regCom ? regCom.match(/(19|20)\d{2}/) : null;
+    if (anMatch) {
+      return `ACTIV FISCAL (din ${anMatch[0]})`;
+    }
+    return `ACTIV FISCAL`;
+  }
+  
+  return stare;
+}
+
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const cui = searchParams.get('cui');
@@ -31,7 +47,7 @@ export async function GET(request) {
             cui: cui,
             regCom: data.regCom || data.nr_reg_com || '',
             adresa: data.adresa || '',
-            stare: (data.stare?.toUpperCase().includes('ACTIV') && !data.stare?.toUpperCase().includes('INACTIV') && (data.data_inregistrare || data.data_infiintare)) ? `ACTIV FISCAL (din ${data.data_inregistrare || data.data_infiintare})` : (data.stare || 'ÎNREGISTRAT'), 
+            stare: formateazaStare(data.stare, data.regCom || data.nr_reg_com), 
             administrator: data.administrator || data.reprezentant || ''
           }
         });
@@ -39,7 +55,7 @@ export async function GET(request) {
     } catch (err) {
       console.warn(`[CUI API] Nu s-a găsit în DB local CUI: ${cui}. Trecem la DemoANAF...`);
     }
-    clearTimeout(timeoutId); // Curățăm timeout-ul dacă localul a eșuat curat
+    clearTimeout(timeoutId);
 
     // 🚀 PASUL 2: Fallback pe DemoANAF (Doar dacă e CUI nou și lipsește din baza locală)
     let numeAdmin = '';
@@ -59,7 +75,7 @@ export async function GET(request) {
             cui: cui,
             regCom: dateFirma.regCom || '',
             adresa: dateFirma.adresa || '',
-            stare: (dateFirma.stare?.toUpperCase().includes('ACTIV') && !dateFirma.stare?.toUpperCase().includes('INACTIV') && (dateFirma.data_inregistrare || dateFirma.data_infiintare)) ? `ACTIV FISCAL (din ${dateFirma.data_inregistrare || dateFirma.data_infiintare})` : (dateFirma.stare || 'ÎNREGISTRAT'),
+            stare: formateazaStare(dateFirma.stare, dateFirma.regCom),
             administrator: numeAdmin
           }
         });
@@ -86,7 +102,7 @@ export async function GET(request) {
             cui: data.cui,
             regCom: data.nr_reg_com,
             adresa: typeof data.adresa === 'string' ? data.adresa : (data.adresa ? `${data.adresa.judet || ''}, ${data.adresa.localitate || ''}` : ''),
-            stare: (data.stare?.toUpperCase().includes('ACTIV') && !data.stare?.toUpperCase().includes('INACTIV') && (data.data_inregistrare || data.data_infiintare)) ? `ACTIV FISCAL (din ${data.data_inregistrare || data.data_infiintare})` : (data.stare || 'ÎNREGISTRAT'),
+            stare: formateazaStare(data.stare, data.nr_reg_com),
             administrator: numeAdmin
           }
         });

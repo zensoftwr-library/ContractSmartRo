@@ -18,21 +18,16 @@ export async function GET(request) {
           data.data.administrator = data.data.administrators[0].name;
         }
         
-        // --- LOGICĂ NOUĂ: Lipim data la statusul ACTIV ---
+        // --- LOGICĂ NOUĂ: Lipim data la statusul ACTIV extrăgând anul din RegCom ---
         if (data.data.stare && data.data.stare.toUpperCase().includes('ACTIV') && !data.data.stare.toUpperCase().includes('INACTIV')) {
           
-          // ANAF v8 ascunde data in date_generale, asa ca verificam toate variantele:
-          const dataInreg = data.data.data_inregistrare || 
-                            data.data.data_infiintare || 
-                            data.data.date_generale?.data_inregistrare || 
-                            '';
-                            
-          if (dataInreg) {
-            data.data.stare = `ACTIV FISCAL (din ${dataInreg})`;
+          const anMatch = data.data.regCom ? data.data.regCom.match(/(19|20)\d{2}/) : null;
+          if (anMatch) {
+            data.data.stare = `ACTIV FISCAL (din ${anMatch[0]})`;
           } else {
-            // Daca nu o gaseste, va printa in terminal sa vedem cum arata datele pe bune!
-            console.log("\n🚨 DEBUG ANAF: Nu am gasit data! Structura primita este:", JSON.stringify(data.data, null, 2));
+            data.data.stare = `ACTIV FISCAL`;
           }
+          
         }
         // -------------------------------------------------
       }
