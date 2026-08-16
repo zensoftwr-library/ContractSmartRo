@@ -19,10 +19,10 @@ export async function GET(request) {
         }
         
         // --- LOGICĂ NOUĂ: Lipim data la statusul ACTIV ---
-        if (data.data.stare && data.data.stare.toUpperCase().trim() === 'ACTIV') {
+        if (data.data.stare && data.data.stare.toUpperCase().includes('ACTIV') && !data.data.stare.toUpperCase().includes('INACTIV')) {
           const dataInreg = data.data.data_inregistrare || data.data.data_infiintare || '';
           if (dataInreg) {
-            data.data.stare = `ACTIV DIN DATA DE: ${dataInreg}`;
+            data.data.stare = `ACTIV FISCAL (din ${dataInreg})`;
           }
         }
         // -------------------------------------------------
