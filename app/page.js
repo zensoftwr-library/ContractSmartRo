@@ -2047,7 +2047,7 @@ export default function Home() {
                         <div className="relative">
                           <input type="text" placeholder="CUI / CNP Prestator" autoComplete="new-password" value={formData.prestatorCui} onChange={e => setFormData({...formData, prestatorCui: e.target.value})} onBlur={(e) => handleAutofillCui(e.target.value, 'prestator')} className="w-full p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none focus:border-[#8ba888] pr-20" />
                           {prestatorCuiStatus && (
-                            <span className={`absolute right-2 top-2 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase ${prestatorCuiStatus === 'Activ' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>{prestatorCuiStatus}</span>
+                            <span className={`absolute right-2 top-2 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase ${prestatorCuiStatus?.toUpperCase().includes('INACTIV') || prestatorCuiStatus?.toUpperCase().includes('RADIAT') ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/20 text-emerald-400'}`}>{prestatorCuiStatus}</span>
                           )}
                         </div>
                       </div>
@@ -2068,7 +2068,7 @@ export default function Home() {
                         <div className="relative">
                           <input type="text" placeholder="CUI / CNP Client" autoComplete="new-password" value={formData.clientCui} onChange={e => setFormData({...formData, clientCui: e.target.value})} onBlur={(e) => handleAutofillCui(e.target.value, 'client')} className="w-full p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white outline-none focus:border-[#8ba888] pr-20" />
                           {clientCuiStatus && (
-                            <span className={`absolute right-2 top-2 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase ${clientCuiStatus === 'Activ' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>{clientCuiStatus}</span>
+                            <span className={`absolute right-2 top-2 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase ${clientCuiStatus?.toUpperCase().includes('INACTIV') || clientCuiStatus?.toUpperCase().includes('RADIAT') ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/20 text-emerald-400'}`}>{clientCuiStatus}</span>
                           )}
                         </div>
                       </div>
@@ -2571,7 +2571,7 @@ export default function Home() {
                 </div>
                 <p className="text-xs text-slate-400 mb-6 max-w-md leading-relaxed">Interoghează rapid orice companie din România. Sistem hibrid de auto-completare cu descărcare rapoarte fiscale (datorii, bilanț, litigii) în format PDF.</p>
                 
-                <form onSubmit={handleCautareCuiWidget} className="flex gap-2 w-full max-w-md">
+                <form onSubmit={handleCautareCuiWidget} className="flex flex-col sm:flex-row gap-2 w-full max-w-md">
                   <input type="text" placeholder="Introdu CUI (ex: 123456)" value={cuiSearch} onChange={e => setCuiSearch(e.target.value)} className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-3 text-sm text-white font-mono outline-none focus:border-[#8ba888] transition" required />
                   <button type="submit" disabled={isSearchingCui} className="bg-[#8ba888] text-[#0B0F12] font-black px-6 py-3 rounded-lg text-xs transition hover:opacity-90 whitespace-nowrap">
                     {isSearchingCui ? 'Se caută...' : 'Caută'}
