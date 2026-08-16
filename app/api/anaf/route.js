@@ -17,6 +17,15 @@ export async function GET(request) {
         if (!data.data.administrator && data.data.administrators && data.data.administrators.length > 0) {
           data.data.administrator = data.data.administrators[0].name;
         }
+        
+        // --- LOGICĂ NOUĂ: Lipim data la statusul ACTIV ---
+        if (data.data.stare && data.data.stare.toUpperCase().trim() === 'ACTIV') {
+          const dataInreg = data.data.data_inregistrare || data.data.data_infiintare || '';
+          if (dataInreg) {
+            data.data.stare = `ACTIV DIN DATA DE: ${dataInreg}`;
+          }
+        }
+        // -------------------------------------------------
       }
       return NextResponse.json(data);
     } else {

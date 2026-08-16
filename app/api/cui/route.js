@@ -31,7 +31,7 @@ export async function GET(request) {
             cui: cui,
             regCom: data.regCom || data.nr_reg_com || '',
             adresa: data.adresa || '',
-            stare: data.stare || 'ÎNREGISTRAT', 
+            stare: (data.stare?.toUpperCase().trim() === 'ACTIV' && (data.data_inregistrare || data.data_infiintare)) ? `ACTIV DIN DATA DE: ${data.data_inregistrare || data.data_infiintare}` : (data.stare || 'ÎNREGISTRAT'), 
             administrator: data.administrator || data.reprezentant || ''
           }
         });
@@ -59,7 +59,7 @@ export async function GET(request) {
             cui: cui,
             regCom: dateFirma.regCom || '',
             adresa: dateFirma.adresa || '',
-            stare: dateFirma.stare || 'ÎNREGISTRAT',
+            stare: (dateFirma.stare?.toUpperCase().trim() === 'ACTIV' && (dateFirma.data_inregistrare || dateFirma.data_infiintare)) ? `ACTIV DIN DATA DE: ${dateFirma.data_inregistrare || dateFirma.data_infiintare}` : (dateFirma.stare || 'ÎNREGISTRAT'),
             administrator: numeAdmin
           }
         });
@@ -86,7 +86,7 @@ export async function GET(request) {
             cui: data.cui,
             regCom: data.nr_reg_com,
             adresa: typeof data.adresa === 'string' ? data.adresa : (data.adresa ? `${data.adresa.judet || ''}, ${data.adresa.localitate || ''}` : ''),
-            stare: data.stare,
+            stare: (data.stare?.toUpperCase().trim() === 'ACTIV' && (data.data_inregistrare || data.data_infiintare)) ? `ACTIV DIN DATA DE: ${data.data_inregistrare || data.data_infiintare}` : (data.stare || 'ÎNREGISTRAT'),
             administrator: numeAdmin
           }
         });
