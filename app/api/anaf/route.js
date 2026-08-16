@@ -7,25 +7,33 @@ export async function GET(request) {
   if (!cui) return NextResponse.json({ success: false, message: 'CUI lipsă' }, { status: 400 });
 
   try {
-    // Interogăm direct noul server DemoANAF de pe portul 3002
     const res = await fetch(`http://localhost:3002/api/v1/demoanaf/${cui}`);
     const data = await res.json();
 
     if (res.ok && data.success) {
-      // Asigurăm-ne că extragem numele administratorului din array-ul returnat de DemoANAF
       if (data.data) {
+        
+        // Extragere administrator
         if (!data.data.administrator && data.data.administrators && data.data.administrators.length > 0) {
           data.data.administrator = data.data.administrators[0].name;
         }
         
-        // --- LOGICĂ NOUĂ: Lipim data la statusul ACTIV extrăgând anul din RegCom ---
+        // --- LOGICĂ NOUĂ: Lipim data completă SAU anul ---
         if (data.data.stare && data.data.stare.toUpperCase().includes('ACTIV') && !data.data.stare.toUpperCase().includes('INACTIV')) {
           
-          const anMatch = data.data.regCom ? data.data.regCom.match(/(19|20)\d{2}/) : null;
-          if (anMatch) {
-            data.data.stare = `ACTIV FISCAL (din ${anMatch[0]})`;
+          const dataCompleta = data.data.data_inregistrare || data.data.data_infiintare || '';
+          
+          if (dataCompleta) {
+            // Dacă găsește data completă, o pune pe toată!
+            data.data.stare = `ACTIV FISCAL (din ${dataCompleta})`;
           } else {
-            data.data.stare = `ACTIV FISCAL`;
+            // Dacă nu o găsește (cazul Pepco), pune măcar anul din RegCom!
+            const anMatch = data.data.regCom ? data.data.regCom.match(/(19|20)\d{2}/) : null;
+            if (anMatch) {
+              data.data.stare = `ACTIV FISCAL (din ${anMatch[0]})`;
+            } else {
+              data.data.stare = `ACTIV FISCAL`;
+            }
           }
           
         }
