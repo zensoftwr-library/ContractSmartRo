@@ -422,7 +422,7 @@ export default function Home() {
     clauzaSplitPayment: false, clauzaRetentie: false,
     clauzaLimitareRaspundere: false, clauzaInflatie: false, adaugaProcesVerbal: false,
     constructiiMateriale: '', constructiiManopera: '', constructiiSuprafata: '', constructiiPretMp: '',
-    adaugaQrPlata: false, ibanPlata: ''
+    adaugaQrPlata: false, ibanPlata: '', clauzaCustom: ''
   });
 
   // Funcția principală de completare date în generatorul de contracte
@@ -814,7 +814,7 @@ export default function Home() {
   const handleInapoiPrincipal = () => {
     setStep(1);
     setAutoStep('upload');
-    setFormData({ tipContract: 'prestari', initiatorRol: 'prestator', prestatorNume: '', prestatorCui: '', prestatorEmail: '', prestatorLogo: '', prestatorCuloare: '#8ba888', clientNume: '', clientCui: '', clientEmail: '', obiect: '', valoare: '', moneda: 'RON', emiteFacturaAvans: false, estePlatitorTVA: false, clauzaPi: true, clauzaPenalitati: true, clauzaRevizii: false, tarifOrar: '150', clauzaRawFoto: false, clauzaMarketingTerti: false, clauzaAprobareTacita: false, clauzaTaxaAnulare: false, clauzaSplitPayment: false, clauzaRetentie: false, clauzaLimitareRaspundere: false, clauzaInflatie: false, adaugaProcesVerbal: false, constructiiMateriale: '', constructiiManopera: '', constructiiSuprafata: '', constructiiPretMp: '', adaugaQrPlata: false, ibanPlata: '' });
+    setFormData({ tipContract: 'prestari', initiatorRol: 'prestator', prestatorNume: '', prestatorCui: '', prestatorEmail: '', prestatorLogo: '', prestatorCuloare: '#8ba888', clientNume: '', clientCui: '', clientEmail: '', obiect: '', valoare: '', moneda: 'RON', emiteFacturaAvans: false, estePlatitorTVA: false, clauzaPi: true, clauzaPenalitati: true, clauzaRevizii: false, tarifOrar: '150', clauzaRawFoto: false, clauzaMarketingTerti: false, clauzaAprobareTacita: false, clauzaTaxaAnulare: false, clauzaSplitPayment: false, clauzaRetentie: false, clauzaLimitareRaspundere: false, clauzaInflatie: false, adaugaProcesVerbal: false, constructiiMateriale: '', constructiiManopera: '', constructiiSuprafata: '', constructiiPretMp: '', adaugaQrPlata: false, ibanPlata: '', clauzaCustom: '' });
     curataCanvas();
     curataCanvasAuto();
     setAutoData({ vanzatorTip: 'PF', vanzatorNume: '', vanzatorCnp: '', vanzatorCui: '', vanzatorRegCom: '', vanzatorSediu: '', cumparatorTip: 'PF', cumparatorNume: '', cumparatorCnp: '', cumparatorCui: '', cumparatorRegCom: '', cumparatorSediu: '', autoVin: '', autoMarcaModel: '', autoNumarInmatriculare: '', autoPret: '', clientEmail: '', autoAdresaVanzator: '', autoAdresaCumparator: '', pretIncludeTVA: false, autoMoneda: 'RON', semnaturaBase64: null });
@@ -2193,6 +2193,21 @@ export default function Home() {
                       ))}
                     </div>
                   </div>
+
+                  {/* CLAUZĂ CUSTOM ADĂUGATĂ MANUAL */}
+                    <div className="pt-4 border-t border-slate-800 space-y-3 mt-4">
+                      <label className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-[#8ba888] uppercase tracking-wider block">Adaugă Clauză Specifică (Opțional)</span>
+                        <span className="bg-[#16221A] text-[#8ba888] text-[9px] px-2 py-0.5 rounded border border-[#8ba888]/30">Auto-Numerotare</span>
+                      </label>
+                      <p className="text-[10px] text-slate-500 leading-tight mb-2">Dacă lipsește ceva din lista de mai sus, redactează aici. Sistemul o va numerota și o va integra automat la finalul clauzelor standard pe contract.</p>
+                      <textarea 
+                        placeholder="Ex: Părțile convin ca predarea materialelor să se facă exclusiv pe un hard-disk extern furnizat de Beneficiar..." 
+                        value={formData.clauzaCustom} 
+                        onChange={e => setFormData({...formData, clauzaCustom: e.target.value})} 
+                        className="w-full p-3 bg-[#0B0F12] border border-slate-700 rounded text-xs h-20 text-white resize-none focus:border-[#8ba888] outline-none transition" 
+                      ></textarea>
+                    </div>
 
                   {/* SISTEM AVANSAT DE SEMNĂTURI */}
                   <div className="bg-[#0B0F12] p-5 rounded-lg border border-slate-800 space-y-4">

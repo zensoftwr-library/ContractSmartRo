@@ -21,7 +21,7 @@ export async function POST(request) {
       prestatorNume, prestatorCui, prestatorReprezentant, clientNume, clientCui, clientReprezentant, 
       clientEmail, semnăturaBase64, userId, adaugaProcesVerbal, captchaToken,
       constructiiMateriale, constructiiManopera, constructiiSuprafata, constructiiPretMp,
-      adaugaQrPlata, ibanPlata
+      adaugaQrPlata, ibanPlata, clauzaCustom
     } = body;
 
     // -------------------------------------------------------------------------
@@ -143,9 +143,19 @@ export async function POST(request) {
       { cond: body.clauzaItEscrow, html: `<li><strong>ART. 4.20. DEPOZITARE COD SURSĂ (ESCROW):</strong> Codul sursă va fi depozitat la o entitate terță de tip escrow, activându-se dreptul de eliberare și utilizare în beneficiul clientului exclusiv în caz de insolvență a furnizorului.</li>` }
     ];
 
+    let nrClauzeBifate = 0;
     rules.forEach(r => {
-      if (r.cond) clauzeInjectateHtml += r.html;
+      if (r.cond) {
+        clauzeInjectateHtml += r.html;
+        nrClauzeBifate++;
+      }
     });
+
+    // --- MAGIA PENTRU CLAUZA CUSTOM ---
+    if (clauzaCustom && clauzaCustom.trim() !== '') {
+      const numarUrmator = nrClauzeBifate + 1;
+      clauzeInjectateHtml += `<li><strong>ART. 4.${numarUrmator}. CLAUZĂ SPECIALĂ ADIȚIONALĂ:</strong> ${clauzaCustom.trim()}</li>`;
+    }
 
     const fieldHtml = (valoare, minWidth = "120px") => {
       if (valoare && valoare.toString().trim() !== '') {
