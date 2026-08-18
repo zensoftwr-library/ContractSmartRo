@@ -1375,6 +1375,7 @@ export default function Home() {
             <Link href="/modele-contracte" className="text-sm text-slate-300 hover:text-white">Modele Contracte Standard</Link>
             <Link href="/baza-legala" className="text-sm text-slate-300 hover:text-white">Articole Validitate Juridică</Link>
             <Link href="/termeni-si-conditii" className="text-sm text-slate-300 hover:text-white">Termeni și Condiții</Link>
+            <Link href="/politica-si-confidentialitate" className="text-sm text-slate-300 hover:text-white">Politică de Confidențialitate</Link>
             <Link href="/contact" className="text-sm text-slate-300 hover:text-white">Contact</Link>
             <Link href="/despre-noi" className="text-sm text-slate-300 hover:text-white">Despre Noi</Link>
 
@@ -1555,13 +1556,13 @@ export default function Home() {
             <div className="max-w-4xl mx-auto text-center py-16 px-4">
               
               {/* LOGO MARE DEASUPRA BUTOANELOR */}
-              <div className="w-[300px] h-[60px] mx-auto flex items-center justify-center mb-10">
-                <svg viewBox="0 0 240 40" className="w-full h-full">
+              <div className="w-[320px] h-[60px] mx-auto flex items-center justify-center mb-10">
+                <svg viewBox="0 0 370 50" className="w-full h-full">
                   <g transform="translate(0, 2)">
                     <path d="M24 6 C15 6, 8 13, 8 22 C8 31, 15 38, 24 38 C31 38, 37 33, 39 27" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round"/>
                     <path d="M16 21 L21 26 L32 12" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
                   </g>
-                  <text x="48" y="32" fontFamily="system-ui, -apple-system, sans-serif" fontWeight="900" fontSize="30" fill="#FFFFFF" letterSpacing="-0.5">
+                  <text x="50" y="35" fontFamily="system-ui, -apple-system, sans-serif" fontWeight="900" fontSize="26" fill="#FFFFFF" letterSpacing="-0.5">
                     Contract<tspan fill="#8ba888">Smart</tspan>
                   </text>
                 </svg>

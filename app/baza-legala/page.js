@@ -33,7 +33,7 @@ export default function BazaLegalaIndex() {
             </p>
           </div>
           <div className="bg-[#16221A] text-[#8ba888] border border-emerald-900/40 px-3 py-1.5 rounded-lg text-[10px] font-mono font-bold uppercase tracking-wider h-fit">
-            Actualizat Live (Sistem Aleatoriu)
+            Actualizat Live
           </div>
         </div>
 
