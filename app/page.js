@@ -1309,12 +1309,12 @@ export default function Home() {
       <nav className="sticky top-0 z-40 backdrop-blur-md bg-[#0B0F12]/90 border-b border-slate-800 py-4 px-6 shadow-md transition-all">
         <div className="flex justify-between items-center w-full">
           <a href="/" onClick={(e) => { e.preventDefault(); handleInapoiPrincipal(); }} className="w-[180px] h-[30px] flex items-center cursor-pointer">
-            <svg viewBox="0 0 240 40" className="w-full h-full">
-              <g transform="translate(0, 2)">
+            <svg viewBox="0 0 240 50" className="w-full h-full">
+              <g transform="translate(0, 5)">
                 <path d="M24 6 C15 6, 8 13, 8 22 C8 31, 15 38, 24 38 C31 38, 37 33, 39 27" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round"/>
                 <path d="M16 21 L21 26 L32 12" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
               </g>
-              <text x="48" y="26" fontFamily="system-ui, -apple-system, sans-serif" fontWeight="900" fontSize="20" fill="#FFFFFF" letterSpacing="-0.5">
+              <text x="48" y="32" fontFamily="system-ui, -apple-system, sans-serif" fontWeight="900" fontSize="22" fill="#FFFFFF" letterSpacing="-0.5">
                 Contract<tspan fill="#8ba888">Smart</tspan>
               </text>
             </svg>
@@ -1557,12 +1557,12 @@ export default function Home() {
               
               {/* TEXT ELEGANT ÎN DOUĂ CULORI */}
               <div className="mb-10 text-center">
-                <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight uppercase">
-                  Contracte Inteligente
-                </h1>
                 <p className="text-2xl sm:text-4xl font-black text-[#8ba888] tracking-tight uppercase mt-1">
-                  Prin Management de Clauze
+                  Contracte Inteligente
                 </p>
+                <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight uppercase">
+                  Prin Management de Clauze
+                </h1>
               </div>
 
               <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto px-4">
