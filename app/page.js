@@ -1622,52 +1622,6 @@ export default function Home() {
             {/* ADAUGAM PREȚURILE AICI ÎN PASUL 1 */}
             {renderCarduriPreturi()}
 
-            {/* PREȚURI SECUNDARE: Șabloane & QR Individual (Apar doar pe prima pagină) */}
-            <div className="max-w-7xl mx-auto px-6 mb-12">
-              <div className="border-t border-slate-800 pt-8 pb-4 mb-4 text-center">
-                <h3 className="text-2xl font-black text-white tracking-tight">Șabloane & Extensii QR (Plată Unică)</h3>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
-                
-                <div className="bg-[#12181D] border border-slate-800 rounded-lg p-4 flex flex-col justify-between">
-                  <div>
-                    <h4 className="text-sm font-bold text-white mt-1">Șablon Tipizat Legal</h4>
-                    <p className="text-[10px] text-slate-400 mt-1">Contracte PDF gata redactate.</p>
-                    <div className="text-lg font-black text-white mt-2 mb-3">49 RON <span className="text-[10px] text-slate-500 font-normal">(~9.99 €)</span></div>
-                  </div>
-                  <button onClick={() => handleCumparaPremium('sablon_tipizat')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded text-xs hover:bg-slate-900">Cumpără 9.99 €</button>
-                </div>
-
-                <div className="bg-[#12181D] border border-slate-800 rounded-lg p-4 flex flex-col justify-between">
-                  <div>
-                    <h4 className="text-sm font-bold text-white mt-1">Pachet QR Branding</h4>
-                    <p className="text-[10px] text-slate-400 mt-1">Adaugă logo-ul tău pe centru.</p>
-                    <div className="text-lg font-black text-white mt-2 mb-3">49 RON <span className="text-[10px] text-slate-500 font-normal">(~9.99 €)</span></div>
-                  </div>
-                  <button onClick={() => handleCumparaPremium('qr_branding')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded text-xs hover:bg-slate-900">Cumpără 9.99 €</button>
-                </div>
-
-                <div className="bg-[#12181D] border border-slate-800 rounded-lg p-4 flex flex-col justify-between">
-                  <div>
-                    <h4 className="text-sm font-bold text-white mt-1">Pachet QR Dynamic</h4>
-                    <p className="text-[10px] text-slate-400 mt-1">Schimbă destinația + Găzduire PDF.</p>
-                    <div className="text-lg font-black text-white mt-2 mb-3">39 RON <span className="text-[10px] text-slate-500 font-normal">(~7.99 €)</span></div>
-                  </div>
-                  <button onClick={() => handleCumparaPremium('qr_dynamic')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded text-xs hover:bg-slate-900">Cumpără 7.99 €</button>
-                </div>
-
-                <div className="bg-[#12181D] border border-slate-800 rounded-lg p-4 flex flex-col justify-between">
-                  <div>
-                    <h4 className="text-sm font-bold text-white mt-1">Pachet QR vCard Pro</h4>
-                    <p className="text-[10px] text-slate-400 mt-1">Carte de vizită cu salvare în agendă.</p>
-                    <div className="text-lg font-black text-white mt-2 mb-3">69 RON <span className="text-[10px] text-slate-500 font-normal">(~13.99 €)</span></div>
-                  </div>
-                  <button onClick={() => handleCumparaPremium('qr_vcard')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded text-xs hover:bg-slate-900">Cumpără 13.99 €</button>
-                </div>
-
-              </div>
-            </div>
-
             {/* QR CODE STUDIO */}
             <div className="max-w-5xl mx-auto px-6 mt-6">              
               <div className="bg-[#12181D] rounded-2xl border border-slate-800/80 shadow-xl flex flex-col">
@@ -1965,6 +1919,52 @@ export default function Home() {
                   </div>
 
                 </div>
+              </div>
+            </div>
+
+            {/* PREȚURI SECUNDARE: Șabloane & QR Individual (Apar doar pe prima pagină) */}
+            <div className="max-w-7xl mx-auto px-6 mb-12">
+              <div className="border-t border-slate-800 pt-8 pb-4 mb-4 text-center">
+                <h3 className="text-2xl font-black text-white tracking-tight">Șabloane & Extensii QR (Plată Unică)</h3>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
+                
+                <div className="bg-[#12181D] border border-slate-800 rounded-lg p-4 flex flex-col justify-between">
+                  <div>
+                    <h4 className="text-sm font-bold text-white mt-1">Șablon Tipizat Legal</h4>
+                    <p className="text-[10px] text-slate-400 mt-1">Contracte PDF gata redactate.</p>
+                    <div className="text-lg font-black text-white mt-2 mb-3">49 RON <span className="text-[10px] text-slate-500 font-normal">(~9.99 €)</span></div>
+                  </div>
+                  <button onClick={() => handleCumparaPremium('sablon_tipizat')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded text-xs hover:bg-slate-900">Cumpără 9.99 €</button>
+                </div>
+
+                <div className="bg-[#12181D] border border-slate-800 rounded-lg p-4 flex flex-col justify-between">
+                  <div>
+                    <h4 className="text-sm font-bold text-white mt-1">Pachet QR Branding</h4>
+                    <p className="text-[10px] text-slate-400 mt-1">Adaugă logo-ul tău pe centru.</p>
+                    <div className="text-lg font-black text-white mt-2 mb-3">49 RON <span className="text-[10px] text-slate-500 font-normal">(~9.99 €)</span></div>
+                  </div>
+                  <button onClick={() => handleCumparaPremium('qr_branding')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded text-xs hover:bg-slate-900">Cumpără 9.99 €</button>
+                </div>
+
+                <div className="bg-[#12181D] border border-slate-800 rounded-lg p-4 flex flex-col justify-between">
+                  <div>
+                    <h4 className="text-sm font-bold text-white mt-1">Pachet QR Dynamic</h4>
+                    <p className="text-[10px] text-slate-400 mt-1">Schimbă destinația + Găzduire PDF.</p>
+                    <div className="text-lg font-black text-white mt-2 mb-3">39 RON <span className="text-[10px] text-slate-500 font-normal">(~7.99 €)</span></div>
+                  </div>
+                  <button onClick={() => handleCumparaPremium('qr_dynamic')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded text-xs hover:bg-slate-900">Cumpără 7.99 €</button>
+                </div>
+
+                <div className="bg-[#12181D] border border-slate-800 rounded-lg p-4 flex flex-col justify-between">
+                  <div>
+                    <h4 className="text-sm font-bold text-white mt-1">Pachet QR vCard Pro</h4>
+                    <p className="text-[10px] text-slate-400 mt-1">Carte de vizită cu salvare în agendă.</p>
+                    <div className="text-lg font-black text-white mt-2 mb-3">69 RON <span className="text-[10px] text-slate-500 font-normal">(~13.99 €)</span></div>
+                  </div>
+                  <button onClick={() => handleCumparaPremium('qr_vcard')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded text-xs hover:bg-slate-900">Cumpără 13.99 €</button>
+                </div>
+
               </div>
             </div>
 
