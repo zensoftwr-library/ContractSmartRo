@@ -1619,6 +1619,21 @@ export default function Home() {
               </div>
             </div>
 
+            {/* BRIDGE SELLING / VALUE PROPOSITION */}
+            <div className="max-w-3xl mx-auto px-6 mt-10 mb-8 text-center animate-fadeIn">
+              <div className="inline-flex items-center justify-center gap-2 bg-[#8ba888]/10 border border-[#8ba888]/20 px-4 py-1.5 rounded-full mb-5">
+                <span className="w-2 h-2 rounded-full bg-[#8ba888] animate-pulse"></span>
+                <span className="text-[10px] uppercase font-black text-[#8ba888] tracking-widest">Protecție Completă</span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-black text-white mb-3 tracking-tight">
+                Generezi ocazional sau vrei <span className="text-[#8ba888]">siguranță pe termen lung?</span>
+              </h2>
+              <p className="text-sm text-slate-400 leading-relaxed max-w-2xl mx-auto">
+                Testează platforma gratuit pentru nevoi urgente, dar nu lăsa birocrația viitoare la voia întâmplării. 
+                Treci la un plan Premium și deblochează contracte nelimitate, verificări ANAF și ecosistemul complet de încasări rapide prin QR Studio.
+              </p>
+            </div>
+
             {/* ADAUGAM PREȚURILE AICI ÎN PASUL 1 */}
             {renderCarduriPreturi()}
 
@@ -2622,30 +2637,58 @@ export default function Home() {
                         </div>
                         
                         <div className="w-full relative z-10 flex flex-col justify-center flex-1">
-                          <form onSubmit={handleCautareCuiWidget} className="flex gap-2 w-full mb-6">
-                            <input type="text" placeholder="Introdu CUI (ex: 123456)" value={cuiSearch} onChange={e => setCuiSearch(e.target.value)} className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-3 text-sm text-white font-mono outline-none focus:border-[#8ba888] transition text-center" required />
-                            <button type="submit" disabled={isSearchingCui} className="bg-[#8ba888] text-[#0B0F12] font-black px-6 rounded-lg text-xs transition hover:opacity-90">
-                              {isSearchingCui ? '...' : 'Caută'}
+                          
+                          {/* FORMULAR CĂUTARE - AJUSTAT PENTRU MOBILE & DESKTOP */}
+                          <form onSubmit={handleCautareCuiWidget} className="flex flex-col sm:flex-row gap-3 w-full max-w-md mx-auto mb-6">
+                            <input 
+                              type="text" 
+                              placeholder="Introdu CUI (ex: 123456)" 
+                              value={cuiSearch} 
+                              onChange={e => setCuiSearch(e.target.value)} 
+                              className="w-full sm:w-7/12 bg-[#0B0F12] border border-slate-700 rounded-xl p-3.5 text-sm text-white font-mono outline-none focus:border-[#8ba888] transition text-center shadow-inner" 
+                              required 
+                            />
+                            <button 
+                              type="submit" 
+                              disabled={isSearchingCui} 
+                              className="w-full sm:w-5/12 bg-[#8ba888] text-[#0B0F12] font-black px-2 py-3.5 rounded-xl text-sm transition hover:opacity-90 shadow-md shadow-[#8ba888]/20"
+                            >
+                              {isSearchingCui ? 'Se caută...' : 'Caută la ANAF'}
                             </button>
                           </form>
 
                           {!cuiDataResult ? (
-                            <div className="w-full py-6 flex flex-col items-center justify-center border-2 border-dashed border-slate-800/60 rounded-xl bg-[#0B0F12]/30 text-slate-500">
+                            <div className="w-full max-w-md mx-auto py-8 flex flex-col items-center justify-center border-2 border-dashed border-slate-800/60 rounded-xl bg-[#0B0F12]/30 text-slate-500">
                               <svg className="w-6 h-6 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                               <span className="text-[10px] font-bold uppercase tracking-wider">Așteaptă Căutarea</span>
                             </div>
                           ) : (
-                            <div className="w-full bg-[#0B0F12] border border-slate-700 rounded-xl p-5 animate-fadeIn">
+                            <div className="w-full max-w-md mx-auto bg-[#0B0F12] border border-slate-700 rounded-xl p-5 animate-fadeIn text-left">
                               <div className="flex justify-between items-start mb-3">
                                 <div>
-                                  <h4 className="text-sm font-bold text-white uppercase">{cuiDataResult.denumire}</h4>
-                                  <span className="text-[10px] text-slate-400 font-mono">CUI: {cuiDataResult.cui}</span>
+                                  <h4 className="text-sm font-bold text-white uppercase pr-2">{cuiDataResult.denumire}</h4>
+                                  <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1.5">
+                                    <span className="text-[11px] text-slate-400 font-mono">CUI: <strong className="text-white">{cuiDataResult.cui}</strong></span>
+                                    {(cuiDataResult.nrRegCom || cuiDataResult.numar_reg_com || cuiDataResult.reg_com) && (
+                                      <span className="text-[11px] text-slate-400 font-mono">
+                                        Reg: <strong className="text-white">{cuiDataResult.nrRegCom || cuiDataResult.numar_reg_com || cuiDataResult.reg_com}</strong>
+                                      </span>
+                                    )}
+                                  </div>
                                 </div>
-                                <span className={`px-2 py-1 rounded text-[9px] font-black uppercase ${cuiDataResult.stare?.toLowerCase().includes('inactiv') || cuiDataResult.stare?.toLowerCase().includes('radiat') ? 'bg-red-900/40 text-red-400 border border-red-900' : 'bg-emerald-900/40 text-emerald-400 border border-emerald-900'}`}>
+                                <span className={`px-2 py-1 rounded text-[9px] font-black uppercase shrink-0 mt-0.5 ${cuiDataResult.stare?.toLowerCase().includes('inactiv') || cuiDataResult.stare?.toLowerCase().includes('radiat') ? 'bg-red-900/40 text-red-400 border border-red-900' : 'bg-emerald-900/40 text-emerald-400 border border-emerald-900'}`}>
                                   {cuiDataResult.stare || 'Necunoscut'}
                                 </span>
                               </div>
-                              <button onClick={(e) => { e.preventDefault(); handleReportAction(); }} className="w-full mt-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold py-2.5 rounded-lg text-xs transition">
+                              
+                              {cuiDataResult.adresa && (
+                                <div className="mb-5 mt-4 text-[11px] text-slate-400 bg-[#12181D] p-3 rounded-lg border border-slate-800/80 leading-relaxed">
+                                  <strong className="text-slate-500 uppercase text-[9px] block mb-1">Sediu Social Declarat:</strong>
+                                  {cuiDataResult.adresa}
+                                </div>
+                              )}
+
+                              <button onClick={(e) => { e.preventDefault(); handleReportAction(); }} className="w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold py-3.5 rounded-lg text-xs transition shadow-lg">
                                 {buttonText}
                               </button>
                             </div>
