@@ -1553,10 +1553,10 @@ export default function Home() {
         {/* STEP 1: DASHBOARD / HOME */}
         {step === 1 && (
           <div className="w-full">
-            <div className="max-w-4xl mx-auto text-center py-16 px-4">
+            <div className="max-w-3xl mx-auto py-16 px-4 text-center">
               
-              {/* LOGO MARE DEASUPRA BUTOANELOR */}
-              <div className="w-[320px] h-[60px] mx-auto flex items-center justify-center mb-10">
+              {/* LOGO MARE CENTRAT PERFECT */}
+              <div className="w-[280px] sm:w-[320px] h-[50px] sm:h-[60px] mx-auto flex items-center justify-center mb-10">
                 <svg viewBox="0 0 370 50" className="w-full h-full">
                   <g transform="translate(0, 2)">
                     <path d="M24 6 C15 6, 8 13, 8 22 C8 31, 15 38, 24 38 C31 38, 37 33, 39 27" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round"/>
@@ -1595,19 +1595,19 @@ export default function Home() {
                     <button onClick={() => setQrType('wifi')} className={`px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'wifi' ? 'bg-[#8ba888] text-[#0B0F12]' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>📶 Wi-Fi</button>
                     <button onClick={() => setQrType('crypto')} className={`px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'crypto' ? 'bg-[#8ba888] text-[#0B0F12]' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>₿ Crypto</button>
                     <button onClick={() => { if(!isPremium && !profil?.has_qr_vcard) handleCheckout('qr_vcard'); else setQrType('vcard'); }} className={`relative px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'vcard' ? 'bg-[#8ba888] text-[#0B0F12]' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>
-                      📇 vCard {(!isPremium && !profil?.has_qr_vcard) && <span className="absolute -top-1 -right-1 text-[8px] bg-amber-500 text-black px-1.5 rounded-full shadow-md">69 RON</span>}
+                      vCard {(!isPremium && !profil?.has_qr_vcard) && <span className="absolute -top-1 -right-1 text-[8px] bg-amber-500 text-black px-1.5 rounded-full shadow-md">69 RON</span>}
                     </button>
                     <button onClick={() => { if(!isPremium && !profil?.has_qr_pdf) handleCheckout('qr_dynamic'); else setQrType('dynamic'); }} className={`relative px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'dynamic' ? 'bg-purple-600 text-white' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>
-                      📄 Dinamic {(!isPremium && !profil?.has_qr_pdf) && <span className="absolute -top-1 -right-1 text-[8px] bg-purple-500 text-white px-1.5 rounded-full shadow-md">39 RON</span>}
+                      Dinamic {(!isPremium && !profil?.has_qr_pdf) && <span className="absolute -top-1 -right-1 text-[8px] bg-purple-500 text-white px-1.5 rounded-full shadow-md">39 RON</span>}
                     </button>
                     <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('smart'); }} className={`relative px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'smart' ? 'bg-blue-600 text-white' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>
-                      📱 Smart OS {(!isPremium) && <span className="absolute -top-1 -right-1 text-[8px] bg-blue-500 text-white px-1.5 rounded-full shadow-md">PRO</span>}
+                      Smart OS {(!isPremium) && <span className="absolute -top-1 -right-1 text-[8px] bg-blue-500 text-white px-1.5 rounded-full shadow-md">PRO</span>}
                     </button>
                     <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('geo'); }} className={`relative px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'geo' ? 'bg-blue-600 text-white' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>
-                      🌍 Geo-Target {(!isPremium) && <span className="absolute -top-1 -right-1 text-[8px] bg-blue-500 text-white px-1.5 rounded-full shadow-md">PRO</span>}
+                      Geo-Target {(!isPremium) && <span className="absolute -top-1 -right-1 text-[8px] bg-blue-500 text-white px-1.5 rounded-full shadow-md">PRO</span>}
                     </button>
                     <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('landing'); }} className={`relative px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'landing' ? 'bg-blue-600 text-white' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>
-                      🔗 Landing Page {(!isPremium) && <span className="absolute -top-1 -right-1 text-[8px] bg-blue-500 text-white px-1.5 rounded-full shadow-md">PRO</span>}
+                      Landing Page {(!isPremium) && <span className="absolute -top-1 -right-1 text-[8px] bg-blue-500 text-white px-1.5 rounded-full shadow-md">PRO</span>}
                     </button>
                   </div>
                 </div>
