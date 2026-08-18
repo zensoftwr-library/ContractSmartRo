@@ -2326,7 +2326,10 @@ export default function Home() {
           </div>
         )}
 
-        {/* SECȚIUNE PREȚURI PERFECTĂ */}
+        {/* CONTINUARE STEP 1: PREȚURI, QR STUDIO ȘI ȘTIRI */}
+        {step === 1 && (
+          <>
+            {/* SECȚIUNE PREȚURI PERFECTĂ */}
         <div id="sectiune-preturi" className="max-w-7xl mx-auto px-6 mt-16 scroll-mt-20">
           
           {/* Partea 1: Servicii Complete / Abonamente */}
@@ -2760,6 +2763,9 @@ export default function Home() {
             ))}
           </div>
         </div>
+
+        </>
+        )}
 
         {/* FOOTER GENERAL CENTRAT */}
         <footer className="relative z-10 border-t border-slate-800 bg-[#0B0F12] pt-12 pb-8 mt-16 text-center">
