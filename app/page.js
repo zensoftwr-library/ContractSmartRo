@@ -53,7 +53,7 @@ const nomenclatorClauze = {
     { id: 'clauzaSuspendareFeedback', titlu: '2. Suspendare pentru Lipsă Feedback', detaliu: 'Întârzierea aprobărilor de către client decalează automat predarea și permite facturarea muncii la stadiul curent.' },
     { id: 'clauzaRevizii', titlu: '3. Plafonare Feedback / Revizii', detaliu: 'Prețul include maximum 2 runde limitate de modificări structurale.' },
     { id: 'clauzaSplitPayment', titlu: '4. Plăți Fracționate (Milestones)', detaliu: 'Decontarea și recepția fiecărei etape intermediare condiționează deblocarea execuției pentru fazele subsecvente.' },
-    { id: 'clauzaMarketingTerti', titlu: '5. Drept Portofoliu & Marketing', detaliu: 'Prestatorul își rezervă dreptul de a utiliza elemente din lucrare în portofoliul public.' }
+    { id: 'clauzaMarketingTerti', titlu: '5. Drept Portofoliu & Marketing', detaliu: 'Prestatorul își rezervă dreptul de a utilize elemente din lucrare în portofoliul public.' }
   ],
   evenimente: [
     { id: 'clauzaTaxaAnulare', titlu: '1. Reținere Avans (Non-Refundable Retainer)', detaliu: 'Sumele achitate cu titlu de avans rămân integral la Prestator dacă evenimentul este anulat.' },
@@ -134,7 +134,7 @@ export default function Home() {
   const [acordGdpr, setAcordGdpr] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
+
   const [captchaToken, setCaptchaToken] = useState(null); 
   const isProcessingForm = useRef(false);
 
@@ -148,7 +148,7 @@ export default function Home() {
   const [androidUrl, setAndroidUrl] = useState('');
   const [geoRules, setGeoRules] = useState([{ country: 'RO', url: '' }, { country: 'DE', url: '' }]);
   const [landingData, setLandingData] = useState({ avatarUrl: '', title: '', desc: '', links: [{ label: 'Website', url: '' }] });
-  
+
   const [uploadedPdfUrl, setUploadedPdfUrl] = useState('');
   const [isUploadingPdf, setIsUploadingPdf] = useState(false);
 
@@ -244,12 +244,12 @@ export default function Home() {
   const [user, setUser] = useState(null); 
   const [profil, setProfil] = useState(null);
   const [userTier, setUserTier] = useState('free');
-  
+
   const isPremium = ['founder', 'pro'].includes(profil?.subscription_tier) || profil?.is_pro;
 
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false); 
-  
+
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [authConfirmPassword, setAuthConfirmPassword] = useState('');
@@ -271,7 +271,7 @@ export default function Home() {
     e.preventDefault();
     const cleanCui = cuiSearch.replace(/[^0-9]/g, '');
     if (!cleanCui || cleanCui.length < 5) return alert("Introdu un CUI valid.");
-    
+
     setIsSearchingCui(true);
     setCuiDataResult(null);
     try {
@@ -291,7 +291,6 @@ export default function Home() {
 
   const handleDownloadReport = () => {
     if (cuiDataResult?.cui) {
-      // Apelăm funcția ta premium care gestionează generarea PDF-ului și creditele
       handleDownloadPremiumReport(cuiDataResult.cui);
     } else {
       alert("Te rog să cauți o firmă mai întâi.");
@@ -307,7 +306,7 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cui: cuiTarget, userId: user.id })
       });
-      
+
       if (res.ok) {
         const blob = await res.blob();
         const urlDownload = window.URL.createObjectURL(blob);
@@ -319,17 +318,17 @@ export default function Home() {
         document.body.removeChild(elementA);
         window.URL.revokeObjectURL(urlDownload);
         alert("Raportul a fost descărcat cu succes!");
-        
+
         // --- LOGICA NOUĂ: SCĂDEM UN RAPORT PENTRU CONTURILE PRO ---
         if (user?.status === 'pro') {
           const rapoarteConsumateAcum = (user.proReportsUsed || 0) + 1;
-          
+
           // 1. Salvăm în baza de date
           const { error } = await supabase
             .from('profiles')
             .update({ pro_reports_used: rapoarteConsumateAcum })
             .eq('id', user.id);
-            
+
           if (!error) {
             // 2. Actualizăm starea vizuală pe loc (să scadă din 3 direct pe ecran)
             setUser(prevUser => ({ ...prevUser, proReportsUsed: rapoarteConsumateAcum }));
@@ -337,8 +336,6 @@ export default function Home() {
             console.error("Eroare la update supabase:", error);
           }
         }
-        // -----------------------------------------------------------
-        
       } else {
         const textEroare = await res.json();
         alert(textEroare.message || "Eroare la generare");
@@ -349,19 +346,13 @@ export default function Home() {
       setLoadingText(null);
     }
   };
+  
   // --- LOGICA NOUĂ PENTRU BUTON (Aici definim rolurile dinamic) ---
-  
-  // Verificăm dacă are rolul de founder salvat în obiectul tău user (dacă folosești alt nume de câmp, de ex. 'plan', modifică mai jos)
   const isFounder = user?.role === 'founder' || user?.plan === 'founder';
-  
-  // Setăm rolul real:
   const userRole = isFounder ? 'founder' : (isPremium ? 'pro' : 'free');
-  
-  // Preia numărul de rapoarte folosite. Dacă nu-l ai încă în DB, pornește de la 0.
   const proReportsUsed = user?.proReportsUsed || 0;
   const GUMROAD_LINK = "https://zensoftware.gumroad.com/l/raport-companie";
 
-  // Funcția apelată când dă click pe buton
   const handleReportAction = async () => {
     if (!user) return alert("Trebuie să fii autentificat pentru a descărca rapoarte.");
 
@@ -383,7 +374,6 @@ export default function Home() {
     }
   };
 
- // Dinamizarea textului și iconiței de pe buton
   let buttonText = "Descarcă Raport ( Pret 19 Ron ( 3.99€ ) / Raport )";
   let isLocked = true; 
 
@@ -400,8 +390,6 @@ export default function Home() {
       isLocked = true;
     }
   }
- 
-  // --- SFÂRȘIT LOGICĂ NOUĂ ---
 
   const [fiscal, setFiscal] = useState({
     venitLunar: 45000,
@@ -426,11 +414,10 @@ export default function Home() {
     adaugaQrPlata: false, ibanPlata: '', clauzaCustom: ''
   });
 
-  // Funcția principală de completare date în generatorul de contracte
   const handleAutofillCui = async (cuiValue, rol) => {
     const cleanCui = cuiValue.replace(/[^0-9]/g, '');
     if (cleanCui.length < 5) return;
-    
+
     try {
       const res = await fetch(`/api/cui?cui=${cleanCui}`);
       const data = await res.json();
@@ -447,7 +434,7 @@ export default function Home() {
         } else {
           setFormData(prev => ({ 
             ...prev, 
-            clientNume: data.data.denumire || '',             
+            clientNume: data.data.denumire || '',              
             clientAdresa: data.data.adresa || '',         
             clientReprezentant: data.data.administrator || ''        
           }));
@@ -459,34 +446,28 @@ export default function Home() {
     }
   };
   
-  // Declansare automata (Debounce) pentru Prestator
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       if (formData.prestatorCui?.replace(/[^0-9]/g, '').length >= 5) {
         handleAutofillCui(formData.prestatorCui, 'prestator');
       } else if (!formData.prestatorCui || formData.prestatorCui.trim() === '') {
-        // Când CUI-ul e sters, resetăm câmpurile
         setFormData(prev => ({ ...prev, prestatorNume: '', prestatorReprezentant: '', prestatorAdresa: '' }));
         setPrestatorCuiStatus('');
       }
     }, 800);
     return () => clearTimeout(delayDebounceFn);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.prestatorCui]);
 
-  // Declansare automata (Debounce) pentru Client
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       if (formData.clientCui?.replace(/[^0-9]/g, '').length >= 5) {
         handleAutofillCui(formData.clientCui, 'client');
       } else if (!formData.clientCui || formData.clientCui.trim() === '') {
-        // Când CUI-ul e sters, resetăm câmpurile
         setFormData(prev => ({ ...prev, clientNume: '', clientReprezentant: '', clientAdresa: '' }));
         setClientCuiStatus('');
       }
     }, 800);
     return () => clearTimeout(delayDebounceFn);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.clientCui]);
 
   const [autoDocs, setAutoDocs] = useState({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon: null });
@@ -494,13 +475,11 @@ export default function Home() {
 
   const [scrollPercent, setScrollPercent] = useState(0);
 
-  // Semnătura Upgrade B2B
-  const [signatureTab, setSignatureTab] = useState('draw'); // 'draw' | 'upload'
+  const [signatureTab, setSignatureTab] = useState('draw');
   const [isDrawing, setIsDrawing] = useState(false);
   const canvasRef = useRef(null);
   const [uploadedSignature, setUploadedSignature] = useState(null);
 
-  // Semnătura & Camera Auto
   const videoRef = useRef(null);
   const autoCanvasRef = useRef(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
@@ -552,7 +531,7 @@ export default function Home() {
       canvas.height = video.videoHeight;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      
+
       canvas.toBlob(async (blob) => {
         stopCamera();
         const file = new File([blob], `scan_${targetDocType}.jpg`, { type: 'image/jpeg' });
@@ -586,8 +565,7 @@ export default function Home() {
 
   const handleDownloadQR = () => {
   const value = getQrValue();
-  
-  // Verificare strictă dacă este gol, sau conține doar structuri goale predefinite
+
   if (!value || value.trim() === "" || value === "WIFI:S:;T:WPA;P:;;; " || value === "bitcoin:?amount=&label=") {
     alert("Te rugăm să completezi datele înainte de descărcare!");
     return;
@@ -634,7 +612,7 @@ export default function Home() {
       impozitFirma = brutAnual * 0.16;
       const profitRamas = Math.max(0, brutAnual - impozitFirma);
       dividendTax = profitRamas * 0.10;
-      
+
       if (fiscal.areAngajati) {
         cas = brutAnual * 0.25;
         cass = brutAnual * 0.10;
@@ -643,7 +621,7 @@ export default function Home() {
     else if (fiscal.formaJuridica === 'PFA_SISTEM_REAL') {
       if (brutAnual >= SALARIU_MINIM_2026 * 24) cas = SALARIU_MINIM_2026 * 24 * 0.25;
       else if (brutAnual >= SALARIU_MINIM_2026 * 12) cas = SALARIU_MINIM_2026 * 12 * 0.25;
-      
+
       const bazzCass = Math.max(SALARIU_MINIM_2026 * 6, Math.min(brutAnual, SALARIU_MINIM_2026 * 60));
       cass = bazzCass * 0.10;
       impozitFirma = Math.max(0, (brutAnual - cas) * 0.10);
@@ -679,7 +657,7 @@ export default function Home() {
         setAutoStep('upload');
       }
     };
-    
+
     const handlePageShow = (e) => {
       if (e.persisted) {
         setLoadingText(null);
@@ -691,7 +669,7 @@ export default function Home() {
 
     window.addEventListener('popstate', handlePopState);
     window.addEventListener('pageshow', handlePageShow);
-    
+
     return () => {
       window.removeEventListener('popstate', handlePopState);
       window.removeEventListener('pageshow', handlePageShow);
@@ -716,10 +694,10 @@ export default function Home() {
     const ctx = canvas.getContext('2d');
     ctx.beginPath();
     const rect = canvas.getBoundingClientRect();
-    
+
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    
+
     ctx.moveTo(clientX - rect.left, clientY - rect.top);
     setIsDrawing(true);
   };
@@ -729,7 +707,7 @@ export default function Home() {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     const rect = canvas.getBoundingClientRect();
-    
+
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
@@ -742,7 +720,7 @@ export default function Home() {
   };
 
   const opresteDesenul = () => setIsDrawing(false);
-  
+
   const curataCanvas = () => {
     if (signatureTab === 'draw') {
       const canvas = canvasRef.current;
@@ -765,7 +743,6 @@ export default function Home() {
     }
   };
 
-  // Semnătura Auto
   const pornesteDesenulAuto = (e) => {
     if (autoSignatureTab !== 'draw') return;
     const canvas = autoSigCanvasRef.current;
@@ -891,7 +868,7 @@ export default function Home() {
 
   const handleCumparaPremium = async (tipProdus = 'founder') => {
     if (isProcessingForm.current) return;
-    
+
     if (!user) {
       alert('Trebuie să fii autentificat pentru a putea plasa comenzi și a atașa produsele contului tău.');
       setIsSignUp(false);
@@ -904,7 +881,7 @@ export default function Home() {
 
     isProcessingForm.current = true;
     setLoadingText({ title: "SE INIȚIAZĂ PLATA...", desc: "Redirecționare către procesatorul securizat Gumroad." });
-    
+
     setTimeout(() => {
       const destinatie = gumroadLinks[tipProdus];
       if (destinatie) {
@@ -926,10 +903,10 @@ export default function Home() {
   const handleGenerateDynamicQr = async () => {
     if (!user) return alert('Trebuie să fii autentificat pentru a salva linkurile în baza de date.');
     if (isProcessingForm.current) return;
-    
+
     isProcessingForm.current = true;
     setIsGeneratingShortlink(true);
-    
+
     const payload = {
       userId: user.id,
       type: qrType,
@@ -992,7 +969,7 @@ export default function Home() {
       alert('Pentru a continua, trebuie să fii de acord cu prelucrarea tranzitorie a datelor (GDPR).');
       return;
     }
-    
+
     if (!user) {
       alert('Pentru a descărca documentul direct în format binar, creează un cont rapid în 10 secunde.');
       setIsSignUp(false);
@@ -1024,7 +1001,7 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...formData, prestatorEmail: user.email, semnăturaBase64: imagineSemnaturaText, userId: user.id, captchaToken })
       });
-      
+
       if (res.ok) {
         const blob = await res.blob();
         const urlDownload = window.URL.createObjectURL(blob);
@@ -1057,7 +1034,7 @@ export default function Home() {
     const file = e.target.files[0];
     if (!file) return;
     setIsUploading(true);
-    
+
     const localFormData = new FormData();
     localFormData.append('file', file);
     localFormData.append('tipDocument', tipDoc);
@@ -1065,10 +1042,10 @@ export default function Home() {
     try {
       const res = await fetch('/api/auto/upload-ocr', { method: 'POST', body: localFormData });
       const data = await res.json();
-      
+
       if (data.success) {
         setAutoDocs(prev => ({ ...prev, [tipDoc]: data.fileUrl }));
-        
+
         let dateFinale = data.extractedData || null;
 
         if (dateFinale) {
@@ -1109,7 +1086,7 @@ export default function Home() {
     setAutoDocs(prev => ({ ...prev, [type]: null }));
     const elementInput = document.getElementById(`file-input-${type}`);
     if (elementInput) elementInput.value = '';
-    
+
     setAutoData(prev => {
       let updated = { ...prev };
       if (type === 'civ' || type === 'talon') {
@@ -1130,7 +1107,7 @@ export default function Home() {
       alert('Pentru a continua, trebuie să fii de acord cu prelucrarea tranzitorie a datelor (GDPR).');
       return;
     }
-    
+
     if (!user) {
       alert('Creează un cont rapid pentru a securiza și descărca documentele auto.');
       setIsSignUp(false);
@@ -1145,7 +1122,7 @@ export default function Home() {
       alert("Vă rugăm așteptați validarea anti-spam (Cloudflare).");
       return;
     }
-    
+
     isProcessingForm.current = true;
     setLoadingText({ title: "COMPILARE DOSAR AUTO...", desc: "Generăm cele 5 exemplare DITL și fișa de înmatriculare." });
 
@@ -1166,9 +1143,9 @@ export default function Home() {
         semnaturaBase64: imagineSemnaturaText,
         captchaToken
       };
-      
+
       binarFormData.append('autoDataJson', JSON.stringify(secureAutoDataPayload));
-      
+
       const inputCiv = document.getElementById('file-input-civ')?.files[0];
       const inputTalon = document.getElementById('file-input-talon')?.files[0];
       const inputBv = document.getElementById('file-input-buletin_vanzator')?.files[0];
@@ -1183,7 +1160,7 @@ export default function Home() {
         method: 'POST',
         body: binarFormData
       });
-      
+
       if (res.ok) {
         const blob = await res.blob();
         const urlDownload = window.URL.createObjectURL(blob);
@@ -1243,7 +1220,7 @@ export default function Home() {
   const handleAuthSubmit = async (e) => {
     e.preventDefault();
     if (isProcessingForm.current) return;
-    
+
     if (!authEmail || !authPassword) return alert('Introdu datele complete.');
     if (isSignUp && authPassword !== authConfirmPassword) {
       return alert('Eroare: Parolele introduse nu coincid!');
@@ -1263,7 +1240,7 @@ export default function Home() {
                throw new Error(error.message);
            }
         }
-        
+
         alert("Cont creat cu succes! Te poți autentifica acum.");
         setIsSignUp(false);
         setAuthPassword('');
@@ -1277,7 +1254,7 @@ export default function Home() {
                 throw new Error(error.message);
             }
         }
-        
+
         alert("Autentificare realizată cu succes!");
         setShowAuthModal(false);
         setAuthEmail('');
@@ -1299,7 +1276,7 @@ export default function Home() {
         <span className="text-[#8ba888] text-xs font-black uppercase tracking-widest block mb-1">Ecosistem ContractSmart</span>
         <h2 className="text-3xl font-black text-white tracking-tight">Planuri de Business & Tranzacții</h2>
       </div>
-      
+
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-5xl mx-auto mb-10">
         {/* Onetime Contract B2B */}
         <div className="bg-[#12181D] border border-slate-800 rounded-lg p-4 flex flex-col justify-between">
@@ -1336,7 +1313,7 @@ export default function Home() {
           <button type="button" onClick={() => handleCumparaPremium('pro')} className="w-full mt-4 bg-[#8ba888] text-[#0B0F12] font-black py-2 rounded text-xs transition hover:opacity-90">Abonează-te</button>
         </div>
       </div>
-      
+
       <div className="max-w-5xl mx-auto mb-12">
         {/* FOUNDER LIFETIME */}
         <div className="bg-[#16221A] border border-[#8ba888]/50 rounded-lg p-6 flex flex-col sm:flex-row justify-between items-center relative shadow-md shadow-[#8ba888]/10 text-center sm:text-left">
@@ -1373,12 +1350,12 @@ export default function Home() {
       <nav className="sticky top-0 z-40 backdrop-blur-md bg-[#0B0F12]/90 border-b border-slate-800 py-4 px-6 shadow-md transition-all">
         <div className="flex justify-between items-center w-full">
           <a href="/" onClick={(e) => { e.preventDefault(); handleInapoiPrincipal(); }} className="w-[180px] h-[30px] flex items-center cursor-pointer">
-            <svg viewBox="0 0 240 50" className="w-full h-full">
-              <g transform="translate(0, 5)">
+            <svg viewBox="0 0 240 52" className="w-full h-full">
+              <g transform="translate(0, 6)">
                 <path d="M24 6 C15 6, 8 13, 8 22 C8 31, 15 38, 24 38 C31 38, 37 33, 39 27" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round"/>
                 <path d="M16 21 L21 26 L32 12" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
               </g>
-              <text x="48" y="32" fontFamily="system-ui, -apple-system, sans-serif" fontWeight="900" fontSize="22" fill="#FFFFFF" letterSpacing="-0.5">
+              <text x="48" y="34" fontFamily="system-ui, -apple-system, sans-serif" fontWeight="900" fontSize="22" fill="#FFFFFF" letterSpacing="-0.5">
                 Contract<tspan fill="#8ba888">Smart</tspan>
               </text>
             </svg>
@@ -1493,7 +1470,7 @@ export default function Home() {
       </div>
 
       <div className="relative z-10">
-        
+
         {/* OVERLAY ELEGANT DE LOADING DINAMIC */}
         {loadingText && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#0B0F12]/80 backdrop-blur-md animate-fadeIn">
@@ -1516,7 +1493,7 @@ export default function Home() {
               <button type="button" onClick={() => { setShowAuthModal(false); setIsSignUp(false); setAuthPassword(''); setAuthConfirmPassword(''); }} className="absolute top-4 right-4 text-slate-500 hover:text-white text-md font-bold transition">✕</button>
               <h3 className="text-xl font-black text-white mb-1">{isSignUp ? 'Creează un Cont Nou' : 'Autentificare Portabilitate'}</h3>
               <p className="text-xs text-slate-500 mb-6">Securizează documentele în serverele Supabase.</p>
-              
+
               <form onSubmit={handleAuthSubmit} className="space-y-4">
                 <div>
                   <label htmlFor="authEmail" className="text-[10px] text-slate-400 uppercase font-bold block mb-1">Adresă de Email</label>
@@ -1551,7 +1528,7 @@ export default function Home() {
               <div className="w-16 h-16 bg-amber-500/10 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">🔒</div>
               <h3 className="text-xl font-black text-white mb-2">Plafon Gratuit Atins</h3>
               <p className="text-sm text-slate-400 mb-6">Ai utilizat generarea gratuită din această lună. Deblochează documentul actual sau treci la Premium pentru generări nelimitate.</p>
-              
+
               <div className="space-y-3">
                 <button onClick={() => { setShowPaymentModal(false); handleCumparaPremium('one_time_contract'); }} className="w-full bg-[#0B0F12] hover:bg-slate-900 border border-slate-700 text-white font-bold py-3 rounded-md text-sm transition flex justify-between items-center px-4">
                   <span>Cumpără 1 Contract Acum</span>
@@ -1574,7 +1551,7 @@ export default function Home() {
               <button type="button" onClick={() => { setShowStatsModal(false); setEditingQrId(null); }} className="absolute top-4 right-4 text-slate-500 hover:text-white text-md font-bold transition">✕</button>
               <h3 className="text-xl font-black text-white mb-2">Panou Analiză și Gestiune QR</h3>
               <p className="text-xs text-slate-400 mb-6">Modifică destinația codurilor tipărite în timp real sau urmărește conversiile.</p>
-              
+
               <div className="bg-[#0B0F12] rounded-md border border-slate-800 overflow-hidden">
                 <div className="max-h-80 overflow-y-auto p-4 space-y-3">
                   {qrStats.length === 0 ? (
@@ -1594,7 +1571,7 @@ export default function Home() {
                           )}
                           <p className="text-[10px] text-slate-500">ID Cod: <strong className="text-slate-300">{stat.id}</strong> | Ultimul scan: {stat.lastScan ? new Date(stat.lastScan).toLocaleString('ro-RO') : 'Niciodată'}</p>
                         </div>
-                        
+
                         <div className="flex items-center gap-6 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-0 border-slate-800 pt-3 sm:pt-0">
                           <div className="flex gap-3">
                             <button onClick={() => { setEditingQrId(stat.id); setEditQrUrl(stat.url); }} className="text-[10px] text-[#8ba888] hover:underline uppercase font-bold">Editează</button>
@@ -1614,9 +1591,12 @@ export default function Home() {
           </div>
         )}
 
-        {/* STEP 1: DASHBOARD / HOME */}
+
+        {/* =========================================================================
+                                    STEP 1: DASHBOARD / HOME 
+            ========================================================================= */}
         {step === 1 && (
-          <div className="w-full">
+          <div className="w-full animate-fadeIn">
             <div className="max-w-3xl mx-auto py-12 px-4 text-center">
               
               {/* TEXT ELEGANT ÎN DOUĂ CULORI */}
@@ -1638,833 +1618,57 @@ export default function Home() {
                 </button>
               </div>
             </div>
-          </div>
-        )}
 
-        {/* STEP 2: MULTI-FORMULAR SECREȚIONAT STRUCTURAL */}
-        {step === 2 && (
-          <div className="w-full">
-            <div className="max-w-3xl mx-auto py-6 px-4">
-            <div className="mb-4 flex items-center justify-between bg-[#12181D] border border-slate-800/80 px-5 py-3 rounded shadow-md">
-              <button type="button" onClick={handleInapoiPrincipal} className="text-xs font-bold text-[#8ba888] hover:text-white flex items-center gap-1.5 transition">
-                &larr; Înapoi la Panoul Principal
-              </button>
-              <span className="text-[10px] font-mono text-slate-500 uppercase">Configurare Securizată v2.0</span>
-            </div>
+            {/* ADAUGAM PREȚURILE AICI ÎN PASUL 1 */}
+            {renderCarduriPreturi()}
 
-            <div className="bg-[#12181D] p-8 rounded-lg border border-slate-800 shadow-lg">
-              
-              {formData.tipContract !== 'auto' ? (
-                <form onSubmit={handleLansareContract} className="space-y-6">
-                  <h2 className="text-2xl font-bold text-white mb-2">Configurator Document Comercial Electronic</h2>
-                  <div className="bg-[#0B0F12] p-4 rounded border border-slate-800">
-                    <label className="text-xs font-bold text-slate-400 uppercase block mb-1">Tipul Documentului Generat</label>
-                    <select 
-                      value={formData.tipContract} 
-                      onChange={e => setFormData({...formData, tipContract: e.target.value})} 
-                      className="w-full bg-[#12181D] border border-slate-700 rounded p-2.5 text-xs text-white outline-none focus:border-[#8ba888] appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.2em_1.2em] bg-[right_0.7rem_center] bg-no-repeat pr-10"
-                    >
-                      <option value="prestari">Contract de Prestări Servicii (General)</option>
-                      <option value="colaborare_b2b">Contract Colaborare Comercială (Freelanceri)</option>
-                      <option value="design_arhitectura">Contract Antrepriză Design / Arhitectură</option>
-                      <option value="evenimente">Contract Servicii Evenimente (Foto/Video/Trupă)</option>
-                      <option value="nda">Acord de Confidențialitate (NDA)</option>
-                      <option value="cda">Contract de Drepturi de Autor (CDA)</option>
-                      <option value="inchiriere_imobil">Contract de Închiriere Spațiu</option>
-                      <option value="promisiune_vanzare">Promisiune (Antecontract) Vânzare Imobil</option>
-                      <option value="influencer">Contract de Parteneriat & Influencer Marketing</option>
-                      <option value="it_sla">Contract Prestări Servicii IT & Software (SLA)</option>
-                      <option value="constructii">Contract de Execuție Lucrări & Construcții (Regie)</option>
-                    </select>
+            {/* PREȚURI SECUNDARE: Șabloane & QR Individual (Apar doar pe prima pagină) */}
+            <div className="max-w-7xl mx-auto px-6 mb-12">
+              <div className="border-t border-slate-800 pt-8 pb-4 mb-4 text-center">
+                <h3 className="text-2xl font-black text-white tracking-tight">Șabloane & Extensii QR (Plată Unică)</h3>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
+                
+                <div className="bg-[#12181D] border border-slate-800 rounded-lg p-4 flex flex-col justify-between">
+                  <div>
+                    <h4 className="text-sm font-bold text-white mt-1">Șablon Tipizat Legal</h4>
+                    <p className="text-[10px] text-slate-400 mt-1">Contracte PDF gata redactate.</p>
+                    <div className="text-lg font-black text-white mt-2 mb-3">49 RON <span className="text-[10px] text-slate-500 font-normal">(~9.99 €)</span></div>
                   </div>
-
-                  <div className="bg-[#0B0F12] p-4 rounded border border-slate-800 space-y-2">
-                    <span className="text-xs font-bold text-slate-400 uppercase block mb-2">Calitatea ta în acest Contract (Rol Semnatar)</span>
-                    <div className="flex gap-4 text-xs">
-                      <label className="flex items-center text-white cursor-pointer select-none">
-                        <input type="radio" name="initiatorRol" value="prestator" checked={formData.initiatorRol === 'prestator'} onChange={e => setFormData({...formData, initiatorRol: e.target.value})} className="mr-2 accent-[#8ba888]" />
-                        Eu sunt PRESTATORUL / LOCATORUL
-                      </label>
-                      <label className="flex items-center text-white cursor-pointer select-none">
-                        <input type="radio" name="initiatorRol" value="client" checked={formData.initiatorRol === 'client'} onChange={e => setFormData({...formData, initiatorRol: e.target.value})} className="mr-2 accent-[#8ba888]" />
-                        Eu sunt BENEFICIARUL / LOCATARUL
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="bg-[#0B0F12] p-5 rounded border border-slate-800 space-y-4 mb-6">
-                    <span className="text-xs font-bold text-[#8ba888] uppercase block tracking-wider">Identitate Vizuală (Branding Prestator)</span>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="flex flex-col space-y-1">
-                        <label className="text-[10px] text-slate-500 font-bold uppercase">CUI / CNP Prestator</label>
-                        <div className="relative">
-                          <input type="text" placeholder="CUI / CNP Prestator" autoComplete="new-password" value={formData.prestatorCui} onChange={e => setFormData({...formData, prestatorCui: e.target.value})} onBlur={(e) => handleAutofillCui(e.target.value, 'prestator')} className="w-full p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none focus:border-[#8ba888] pr-20" />
-                          {prestatorCuiStatus && (
-                            <span className={`absolute right-2 top-2 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase ${prestatorCuiStatus?.toUpperCase().includes('INACTIV') || prestatorCuiStatus?.toUpperCase().includes('RADIAT') ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/20 text-emerald-400'}`}>{prestatorCuiStatus}</span>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex flex-col space-y-1">
-                        <label className="text-[10px] text-slate-500 font-bold uppercase">Denumire Furnizor / Nume</label>
-                        <input type="text" placeholder="Denumire Firma / Nume Complet" autoComplete="new-password" value={formData.prestatorNume} onChange={e => setFormData({...formData, prestatorNume: e.target.value})} className="p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none" />
-                        <input type="text" placeholder="Nume Administrator / Reprezentant Prestator" autoComplete="new-password" value={formData.prestatorReprezentant} onChange={e => setFormData({...formData, prestatorReprezentant: e.target.value})} className="mt-2 p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none w-full" />
-                        <input type="text" placeholder="Adresă Sediu Social Prestator" autoComplete="new-password" value={formData.prestatorAdresa || ''} onChange={e => setFormData({...formData, prestatorAdresa: e.target.value})} className="mt-2 p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none w-full" />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4 pt-6 border-t border-slate-800/80 mt-6 block clear-both">
-                    <span className="text-xs font-bold text-slate-400 uppercase block tracking-wider">Identificare Beneficiar Contract</span>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="flex flex-col space-y-1">
-                        <label className="text-[10px] text-slate-500 font-bold uppercase">CUI / CNP Client</label>
-                        <div className="relative">
-                          <input type="text" placeholder="CUI / CNP Client" autoComplete="new-password" value={formData.clientCui} onChange={e => setFormData({...formData, clientCui: e.target.value})} onBlur={(e) => handleAutofillCui(e.target.value, 'client')} className="w-full p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white outline-none focus:border-[#8ba888] pr-20" />
-                          {clientCuiStatus && (
-                            <span className={`absolute right-2 top-2 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase ${clientCuiStatus?.toUpperCase().includes('INACTIV') || clientCuiStatus?.toUpperCase().includes('RADIAT') ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/20 text-emerald-400'}`}>{clientCuiStatus}</span>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex flex-col space-y-1">
-                        <label className="text-[10px] text-slate-500 font-bold uppercase">Companie Client / Nume</label>
-                        <input type="text" placeholder="Companie Client / Nume" autoComplete="new-password" value={formData.clientNume} onChange={e => setFormData({...formData, clientNume: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white outline-none" />
-                        <input type="text" placeholder="Nume Administrator / Reprezentant Client" autoComplete="new-password" value={formData.clientReprezentant} onChange={e => setFormData({...formData, clientReprezentant: e.target.value})} className="mt-2 p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white outline-none w-full" />
-                        <input type="text" placeholder="Adresă Sediu Social Client" autoComplete="new-password" value={formData.clientAdresa || ''} onChange={e => setFormData({...formData, clientAdresa: e.target.value})} className="mt-2 p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white outline-none w-full" />
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center pt-2">
-                      <input type="email" placeholder="Email Client" autoComplete="new-password" value={formData.clientEmail} onChange={e => setFormData({...formData, clientEmail: e.target.value})} className="w-full p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white focus:border-[#8ba888] outline-none" required />
-                      
-                      <label className="flex items-center p-2.5 bg-[#0B0F12] rounded border border-slate-800/60 cursor-pointer select-none text-xs text-slate-300 h-full">
-                        <input 
-                          type="checkbox" 
-                          checked={formData.adaugaProcesVerbal || false} 
-                          onChange={e => setFormData({...formData, adaugaProcesVerbal: e.target.checked})} 
-                          className="mr-3 accent-[#8ba888]" 
-                        />
-                        <div>
-                          <span className="font-bold block text-white">Atașează Proces Verbal</span>
-                          <span className="text-[10px] text-slate-500 block">Generează automat PV anexă.</span>
-                        </div>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4 pt-4">
-                    <span className="text-xs font-bold text-slate-400 uppercase block">Obiectul Serviciilor / Tranzacției și Remunerație</span>
-                    <textarea placeholder="Descrierea explicită a sarcinilor, termenelor și obiectivelor..." value={formData.obiect} onChange={e => setFormData({...formData, obiect: e.target.value})} className="w-full p-3 bg-[#0B0F12] border border-slate-700 rounded text-xs h-16 text-white resize-none" required></textarea>
-                    
-                    {/* Deviz specific construcții */}
-                    {formData.tipContract === 'constructii' && (
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 bg-[#0B0F12] p-4 rounded border border-slate-800">
-                        <div>
-                          <label className="text-[9px] text-slate-500 font-bold uppercase block mb-1">Cost Materiale (RON)</label>
-                          <input type="number" placeholder="0" value={formData.constructiiMateriale} onChange={e => setFormData({...formData, constructiiMateriale: e.target.value})} className="w-full p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none" />
-                        </div>
-                        <div>
-                          <label className="text-[9px] text-slate-500 font-bold uppercase block mb-1">Cost Manoperă (RON)</label>
-                          <input type="number" placeholder="0" value={formData.constructiiManopera} onChange={e => setFormData({...formData, constructiiManopera: e.target.value})} className="w-full p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none" />
-                        </div>
-                        <div>
-                          <label className="text-[9px] text-slate-500 font-bold uppercase block mb-1">Suprafață (mp)</label>
-                          <input type="number" placeholder="0" value={formData.constructiiSuprafata} onChange={e => setFormData({...formData, constructiiSuprafata: e.target.value})} className="w-full p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none" />
-                        </div>
-                        <div>
-                          <label className="text-[9px] text-slate-500 font-bold uppercase block mb-1">Preț pe mp (RON)</label>
-                          <input type="number" placeholder="0" value={formData.constructiiPretMp} onChange={e => setFormData({...formData, constructiiPretMp: e.target.value})} className="w-full p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none" />
-                        </div>
-                      </div>
-                    )}
-
-                    {formData.tipContract !== 'nda' && (
-                      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-                        <div className="flex w-full sm:w-1/2 gap-3">
-                          <input type="number" placeholder="Valoare Contractuală" autoComplete="new-password" value={formData.valoare} onChange={e => setFormData({...formData, valoare: e.target.value})} className="flex-1 p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white" required />
-                          <select value={formData.moneda} onChange={e => setFormData({...formData, moneda: e.target.value})} className="w-24 bg-[#0B0F12] border border-slate-700 rounded p-2.5 text-xs text-white outline-none focus:border-[#8ba888] appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.2em_1.2em] bg-[right_0.7rem_center] bg-no-repeat pr-10">
-                            <option value="RON">RON</option>
-                            <option value="EUR">EUR (€)</option>
-                          </select>
-                        </div>
-                        <label className="flex items-center w-full sm:w-1/2 text-xs text-slate-400 cursor-pointer select-none p-2.5 bg-[#0B0F12] border border-slate-800 rounded">
-                          <input type="checkbox" checked={formData.estePlatitorTVA} onChange={e => setFormData({...formData, estePlatitorTVA: e.target.checked})} className="mr-3 accent-[#8ba888]" />
-                          <span className="truncate">Firma e plătitoare de TVA (+21%)</span>
-                        </label>
-                      </div>
-                    )}
-
-                    {/* QR PAY OPTION */}
-                    <div className="pt-4 border-t border-slate-800 space-y-3">
-                      <span className="text-xs font-bold text-[#8ba888] uppercase block">Opțiuni Încasare & QR Pay</span>
-                      <label className="flex items-center p-3 bg-[#0B0F12] border border-slate-800 rounded cursor-pointer transition hover:border-slate-700">
-                        <input type="checkbox" checked={formData.adaugaQrPlata} onChange={e => setFormData({...formData, adaugaQrPlata: e.target.checked})} className="mr-3 accent-[#8ba888]" />
-                        <span className="text-xs text-white font-bold">Atașează Cod QR de Plată pe Contract</span>
-                      </label>
-                      {formData.adaugaQrPlata && (
-                        <input 
-                          type="text" 
-                          placeholder="Introdu Contul IBAN sau Link de Plată (Stripe/Revolut)" 
-                          value={formData.ibanPlata} 
-                          onChange={e => setFormData({...formData, ibanPlata: e.target.value})} 
-                          className="w-full p-2.5 bg-[#12181D] border border-[#8ba888]/50 rounded text-xs text-white focus:border-[#8ba888] outline-none font-mono transition" 
-                        />
-                      )}
-                    </div>
-
-                  </div>
-
-                  <div className="pt-4 border-t border-slate-800 space-y-3">
-                    <span className="text-xs font-bold text-amber-400 uppercase block">Activare Clauze Specifice de Asigurare Plată</span>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs mb-4 border-b border-slate-800/80 pb-4">
-                      <label className="flex items-start p-3 bg-amber-900/10 border border-amber-900/30 rounded cursor-pointer">
-                        <input type="checkbox" checked={!!formData.clauzaLimitareRaspundere} onChange={e => setFormData({...formData, clauzaLimitareRaspundere: e.target.checked})} className="mt-0.5 mr-3 accent-amber-500" />
-                        <div>
-                          <span className="font-bold text-amber-500 block">Limitare Răspundere Comercială</span>
-                          <span className="text-[10px] text-slate-500 block">Nu vei plăti niciodată daune mai mari decât factura încasată.</span>
-                        </div>
-                      </label>
-
-                      <label className="flex items-start p-3 bg-amber-900/10 border border-amber-900/30 rounded cursor-pointer">
-                        <input type="checkbox" checked={!!formData.clauzaInflatie} onChange={e => setFormData({...formData, clauzaInflatie: e.target.checked})} className="mt-0.5 mr-3 accent-amber-500" />
-                        <div>
-                          <span className="font-bold text-amber-500 block">Indexare Anti-Inflație (BNR)</span>
-                          <span className="text-[10px] text-slate-500 block">Actualizează automat suma dacă BNR crește cursul EUR.</span>
-                        </div>
-                      </label>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
-                      {(nomenclatorClauze[formData.tipContract] || nomenclatorClauze.prestari).map((clauza) => (
-                        <label key={clauza.id} className="flex items-start p-3 bg-[#0B0F12] border border-slate-800 rounded cursor-pointer">
-                          <input type="checkbox" checked={!!formData[clauza.id]} onChange={e => setFormData({...formData, [clauza.id]: e.target.checked})} className="mt-0.5 mr-3 accent-[#8ba888]" />
-                          <div>
-                            <span className="font-bold text-white block">{clauza.titlu}</span>
-                            <span className="text-[10px] text-slate-500 block">{clauza.detaliu || clauza.text}</span>
-                          </div>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* CLAUZĂ CUSTOM ADĂUGATĂ MANUAL */}
-                    <div className="pt-4 border-t border-slate-800 space-y-3 mt-4">
-                      <label className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-[#8ba888] uppercase tracking-wider block">Adaugă Clauză Specifică (Opțional)</span>
-                        <span className="bg-[#16221A] text-[#8ba888] text-[9px] px-2 py-0.5 rounded border border-[#8ba888]/30">Auto-Numerotare</span>
-                      </label>
-                      <p className="text-[10px] text-slate-500 leading-tight mb-2">Dacă lipsește ceva din lista de mai sus, redactează aici. Sistemul o va numerota și o va integra automat la finalul clauzelor standard pe contract.</p>
-                      <textarea 
-                        placeholder="Ex: Părțile convin ca predarea materialelor să se facă exclusiv pe un hard-disk extern furnizat de Beneficiar..." 
-                        value={formData.clauzaCustom} 
-                        onChange={e => setFormData({...formData, clauzaCustom: e.target.value})} 
-                        className="w-full p-3 bg-[#0B0F12] border border-slate-700 rounded text-xs h-20 text-white resize-none focus:border-[#8ba888] outline-none transition" 
-                      ></textarea>
-                    </div>
-
-                  {/* SISTEM AVANSAT DE SEMNĂTURI */}
-                  <div className="bg-[#0B0F12] p-5 rounded-lg border border-slate-800 space-y-4">
-                    <div className="flex justify-between items-center border-b border-slate-800 pb-2">
-                      <span className="text-xs font-bold text-slate-400 uppercase block tracking-wider">Aprobare și Semnare Document</span>
-                      <div className="flex gap-2 bg-[#12181D] p-1 rounded border border-slate-700">
-                        <button type="button" onClick={() => { setSignatureTab('draw'); curataCanvas(); }} className={`px-3 py-1 rounded text-[10px] font-bold transition-colors ${signatureTab === 'draw' ? 'bg-[#8ba888] text-black' : 'text-slate-400 hover:text-white'}`}>Desenează</button>
-                        <button type="button" onClick={() => { setSignatureTab('upload'); curataCanvas(); }} className={`px-3 py-1 rounded text-[10px] font-bold transition-colors ${signatureTab === 'upload' ? 'bg-[#8ba888] text-black' : 'text-slate-400 hover:text-white'}`}>Încarcă (PNG/JPG)</button>
-                      </div>
-                    </div>
-
-                    {signatureTab === 'draw' && (
-                      <div className="space-y-3 relative">
-                        <div className="relative border-2 border-dashed border-slate-700 rounded-lg bg-white overflow-hidden">
-                          {!isDrawing && !canvasRef.current?.toDataURL().length > 100 && (
-                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
-                              <span className="text-black text-2xl font-black italic">Semnează aici</span>
-                            </div>
-                          )}
-                          <canvas 
-                            ref={canvasRef} 
-                            width={600} 
-                            height={160} 
-                            onTouchStart={pornesteDesenul} 
-                            onTouchMove={deseneaza} 
-                            onTouchEnd={opresteDesenul} 
-                            onMouseDown={pornesteDesenul} 
-                            onMouseMove={deseneaza} 
-                            onMouseUp={opresteDesenul} 
-                            onMouseLeave={opresteDesenul} 
-                            className="w-full h-40 cursor-crosshair block touch-none relative z-10" 
-                          />
-                        </div>
-                        <div className="flex justify-end">
-                          <button type="button" onClick={curataCanvas} className="text-[10px] font-bold text-red-400 hover:text-red-300 transition-colors uppercase tracking-wider flex items-center gap-1">
-                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                            Curăță / Resemnează
-                          </button>
-                        </div>
-                      </div>
-                    )}
-
-                    {signatureTab === 'upload' && (
-                      <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-slate-700 rounded-lg bg-[#12181D]">
-                        {!uploadedSignature ? (
-                          <>
-                            <svg className="w-8 h-8 text-slate-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                            <label className="cursor-pointer bg-[#8ba888] text-black px-4 py-2 rounded text-xs font-bold hover:opacity-90 transition-opacity">
-                              Alege Imaginea (Fără fundal ideal)
-                              <input type="file" accept="image/png, image/jpeg" onChange={handleIncarcareSemnatura} className="hidden" />
-                            </label>
-                            <span className="text-[10px] text-slate-500 mt-3">Sistemul o va decupa și o va aplica direct în contract.</span>
-                          </>
-                        ) : (
-                          <div className="flex flex-col items-center w-full">
-                            <div className="bg-white p-4 rounded mb-4 w-full flex justify-center border border-slate-700">
-                              <img src={uploadedSignature} alt="Semnatura Incarcata" className="max-h-24 object-contain" />
-                            </div>
-                            <button type="button" onClick={() => setUploadedSignature(null)} className="text-[10px] font-bold text-red-400 hover:text-red-300 transition-colors uppercase tracking-wider flex items-center gap-1">
-                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                              Elimină Imaginea
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
-                    <Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} />
-                  )}
-
-                  <div className="pt-2 pb-4">
-                    <label className="flex items-start cursor-pointer group">
-                      <div className="relative flex items-center justify-center mt-0.5 shrink-0">
-                        <input type="checkbox" checked={acordGdpr} onChange={e => setAcordGdpr(e.target.checked)} className="peer appearance-none w-4 h-4 border border-slate-600 rounded bg-[#0B0F12] checked:bg-[#8ba888] checked:border-[#8ba888] transition-all cursor-pointer" />
-                        <svg className="absolute w-3 h-3 text-[#0B0F12] opacity-0 peer-checked:opacity-100 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
-                      </div>
-                      <span className="ml-3 text-[11px] text-slate-400 leading-tight select-none">
-                        Sunt de acord cu <Link href="/termeni-si-conditii" target="_blank" className="text-[#8ba888] hover:underline">Termenii și Condițiile</Link> și înțeleg că documentele încărcate sunt procesate volatil pentru OCR. Datele <strong>NU</strong> sunt stocate permanent, conform <Link href="/politica-si-confidentialitate" target="_blank" className="text-[#8ba888] hover:underline">Politicii de Confidențialitate (GDPR)</Link>.
-                      </span>
-                    </label>
-                  </div>
-
-                  <div className="flex justify-between items-center pt-6 border-t border-slate-800">
-                    <button type="button" onClick={handleInapoiPrincipal} className="text-xs text-slate-400 underline">Înapoi</button>
-                    <button type="submit" disabled={!!loadingText} className="bg-[#8ba888] text-[#0B0F12] font-black px-8 py-4 rounded text-sm transition hover:opacity-90">
-                      {loadingText ? 'Se înregistrează...' : 'Descărcare PDF'}
-                    </button>
-                  </div>
-                </form>
-              ) : (
-                <form onSubmit={handleGenereazaPachetAuto} className="space-y-6" autoComplete="off">
-                  <div className="border-b border-slate-800 pb-3">
-                    <h2 className="text-2xl font-black text-white">Asistent Automatizat de Vânzare Auto</h2>
-                    <p className="text-xs text-slate-400">Generare Contracte (5 exemplare) și Fișă Înmatriculare DITL</p>
-                  </div>
-
-                  {autoStep === 'upload' && (
-                    <div className="space-y-4">
-                      <div className="p-4 bg-[#0B0F12] border border-slate-800 rounded space-y-4">
-                        <div className="flex justify-between items-center border-b border-slate-800 pb-2">
-                          <span className="text-xs font-bold text-[#8ba888] uppercase tracking-wide">1. Identitate Persoană Vânzător</span>
-                          <div className="flex gap-2 bg-[#12181D] p-1 rounded border border-slate-800">
-                            <button type="button" onClick={() => setAutoData({...autoData, vanzatorTip: 'PF'})} className={`px-2 py-0.5 rounded text-[10px] font-bold ${autoData.vanzatorTip === 'PF' ? 'bg-[#8ba888] text-black' : 'text-slate-400'}`}>Fizică (PF)</button>
-                            <button type="button" onClick={() => setAutoData({...autoData, vanzatorTip: 'PJ'})} className={`px-2 py-0.5 rounded text-[10px] font-bold ${autoData.vanzatorTip === 'PJ' ? 'bg-[#8ba888] text-black' : 'text-slate-400'}`}>Firmă/PFA (PJ)</button>
-                          </div>
-                        </div>
-                        {autoData.vanzatorTip === 'PF' ? (
-                          <div className="grid grid-cols-2 gap-2">
-                            <input type="text" placeholder="Nume Complet Vânzător" autoComplete="new-password" value={autoData.vanzatorNume} onChange={e => setAutoData({...autoData, vanzatorNume: e.target.value})} className="bg-[#12181D] border border-slate-700 p-2 rounded text-xs text-white outline-none" />
-                            <input type="text" placeholder="CNP Vânzător" autoComplete="new-password" value={autoData.vanzatorCnp} onChange={e => setAutoData({...autoData, vanzatorCnp: e.target.value})} className="bg-[#12181D] border border-slate-700 p-2 rounded text-xs text-white font-mono outline-none" />
-                            <input type="text" placeholder="Adresă Domiciliu Vânzător (din buletin)" autoComplete="new-password" value={autoData.autoAdresaVanzator} onChange={e => setAutoData({...autoData, autoAdresaVanzator: e.target.value})} className="bg-[#12181D] border border-slate-700 p-2 rounded text-xs text-white col-span-2 outline-none" />
-                          </div>
-                        ) : (
-                          <div className="grid grid-cols-2 gap-2">
-                            <input type="text" placeholder="Denumire Companie / PFA" autoComplete="new-password" value={autoData.vanzatorNume} onChange={e => setAutoData({...autoData, vanzatorNume: e.target.value})} className="bg-[#12181D] border border-slate-700 p-2 rounded text-xs text-white outline-none" />
-                            <input type="text" placeholder="CUI / CIF Fiscal" autoComplete="new-password" value={autoData.vanzatorCui} onChange={e => setAutoData({...autoData, vanzatorCui: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded text-xs text-white font-mono outline-none" />
-                            <input type="text" placeholder="Nr. Înmatriculare Reg. Com." autoComplete="new-password" value={autoData.vanzatorRegCom} onChange={e => setAutoData({...autoData, vanzatorRegCom: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none" />
-                            <input type="text" placeholder="Sediu Social Companie" autoComplete="new-password" value={autoData.vanzatorSediu} onChange={e => setAutoData({...autoData, vanzatorSediu: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none" />
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="p-4 bg-[#0B0F12] border border-slate-800 rounded space-y-4">
-                        <div className="flex justify-between items-center border-b border-slate-800 pb-2">
-                          <span className="text-xs font-bold text-[#8ba888] uppercase tracking-wide">2. Identitate Persoană Cumpărător</span>
-                          <div className="flex gap-2 bg-[#12181D] p-1 rounded border border-slate-800">
-                            <button type="button" onClick={() => { setAutoData({...autoData, cumparatorTip: 'PF'}) }} className={`px-2 py-0.5 rounded text-[10px] font-bold ${autoData.cumparatorTip === 'PF' ? 'bg-[#8ba888] text-black' : 'text-slate-400'}`}>Fizică (PF)</button>
-                            <button type="button" onClick={() => { setAutoData({...autoData, cumparatorTip: 'PJ'}) }} className={`px-2 py-0.5 rounded text-[10px] font-bold ${autoData.cumparatorTip === 'PJ' ? 'bg-[#8ba888] text-black' : 'text-slate-400'}`}>Firmă/PFA (PJ)</button>
-                          </div>
-                        </div>
-                        {autoData.cumparatorTip === 'PF' ? (
-                          <div className="grid grid-cols-2 gap-2">
-                            <input type="text" placeholder="Nume Complet Cumpărător" autoComplete="new-password" value={autoData.cumparatorNume} onChange={e => setAutoData({...autoData, cumparatorNume: e.target.value})} className="bg-[#12181D] border border-slate-700 p-2 rounded text-xs text-white outline-none" />
-                            <input type="text" placeholder="CNP Cumpărător" autoComplete="new-password" value={autoData.cumparatorCnp} onChange={e => setAutoData({...autoData, cumparatorCnp: e.target.value})} className="bg-[#12181D] border border-slate-700 p-2 rounded text-xs text-white font-mono outline-none" />
-                            <input type="text" placeholder="Adresă Domiciliu Cumpărător" autoComplete="new-password" value={autoData.autoAdresaCumparator} onChange={e => setAutoData({...autoData, autoAdresaCumparator: e.target.value})} className="bg-[#12181D] border border-slate-700 p-2 rounded text-xs text-white col-span-2 outline-none" />
-                          </div>
-                        ) : (
-                          <div className="grid grid-cols-2 gap-2">
-                            <input type="text" placeholder="Denumire Companie / PFA Cumpărător" autoComplete="new-password" value={autoData.cumparatorNume} onChange={e => setAutoData({...autoData, cumparatorNume: e.target.value})} className="bg-[#12181D] border border-slate-700 p-2 rounded text-xs text-white outline-none" />
-                            <input type="text" placeholder="CUI / CIF Fiscal" autoComplete="new-password" value={autoData.cumparatorCui} onChange={e => setAutoData({...autoData, cumparatorCui: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded text-xs text-white font-mono outline-none" />
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="p-4 bg-[#0B0F12] border border-slate-800 rounded space-y-4">
-                        <div className="flex justify-between items-center border-b border-slate-800 pb-2">
-                          <span className="text-xs font-bold text-[#8ba888] uppercase tracking-wide">3. Scanare Automată Documente (Opțional)</span>
-                          <span className="text-[10px] text-slate-500">Adaugă actele direct sau folosește camera.</span>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                          
-                          <div className="bg-[#12181D] p-4 border border-slate-800 rounded text-center flex flex-col justify-between min-h-[140px]">
-                            <label className="text-xs text-slate-300 block mb-2 font-bold">Carte Identitate Vehicul (CIV)</label>
-                            {!autoDocs.civ ? (
-                              <div className="flex flex-col gap-2">
-                                <input type="file" id="file-input-civ" accept="image/*,application/pdf" disabled={isUploading} onChange={(e) => handleAutoFileUpload(e, 'civ')} className="text-[10px] block w-full text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-[#16221A] file:text-[#8ba888]" />
-                                <button type="button" onClick={() => startCamera('civ')} className="bg-slate-800 hover:bg-slate-700 text-xs text-white font-bold py-1.5 rounded transition">📷 Folosește Camera</button>
-                              </div>
-                            ) : (
-                              <div className="flex flex-col items-center gap-2">
-                                <span className="text-[10px] text-emerald-400 bg-[#16221A] px-2 py-1 rounded truncate w-full">✓ CIV Încărcat</span>
-                                <button type="button" onClick={() => handleEliminaDocument('civ')} className="text-[10px] text-red-400 font-bold hover:underline">Elimină ❌</button>
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="bg-[#12181D] p-4 border border-slate-800 rounded text-center flex flex-col justify-between min-h-[140px]">
-                            <label className="text-xs text-slate-300 block mb-2 font-bold">Certificat Înmatriculare (Talon)</label>
-                            {!autoDocs.talon ? (
-                              <div className="flex flex-col gap-2">
-                                <input type="file" id="file-input-talon" accept="image/*,application/pdf" disabled={isUploading} onChange={(e) => handleAutoFileUpload(e, 'talon')} className="text-[10px] block w-full text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-[#16221A] file:text-[#8ba888]" />
-                                <button type="button" onClick={() => startCamera('talon')} className="bg-slate-800 hover:bg-slate-700 text-xs text-white font-bold py-1.5 rounded transition">📷 Folosește Camera</button>
-                              </div>
-                            ) : (
-                              <div className="flex flex-col items-center gap-2">
-                                <span className="text-[10px] text-emerald-400 bg-[#16221A] px-2 py-1 rounded truncate w-full">✓ Talon Încărcat</span>
-                                <button type="button" onClick={() => handleEliminaDocument('talon')} className="text-[10px] text-red-400 font-bold hover:underline">Elimină ❌</button>
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="bg-[#12181D] p-4 border border-slate-800 rounded text-center flex flex-col justify-between min-h-[140px]">
-                            <label className="text-xs text-slate-300 block mb-2 font-bold">Act Identitate Vânzător</label>
-                            {!autoDocs.buletin_vanzator ? (
-                              <div className="flex flex-col gap-2">
-                                <input type="file" id="file-input-buletin_vanzator" accept="image/*,application/pdf" disabled={isUploading} onChange={(e) => handleAutoFileUpload(e, 'buletin_vanzator')} className="text-[10px] block w-full text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-[#16221A] file:text-[#8ba888]" />
-                                <button type="button" onClick={() => startCamera('buletin_vanzator')} className="bg-slate-800 hover:bg-slate-700 text-xs text-white font-bold py-1.5 rounded transition">📷 Folosește Camera</button>
-                              </div>
-                            ) : (
-                              <div className="flex flex-col items-center gap-2">
-                                <span className="text-[10px] text-emerald-400 bg-[#16221A] px-2 py-1 rounded truncate w-full">✓ Buletin Vânzător</span>
-                                <button type="button" onClick={() => handleEliminaDocument('buletin_vanzator')} className="text-[10px] text-red-400 font-bold hover:underline">Elimină ❌</button>
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="bg-[#12181D] p-4 border border-slate-800 rounded text-center flex flex-col justify-between min-h-[140px]">
-                            <label className="text-xs text-slate-300 block mb-2 font-bold">Act Identitate Cumpărător</label>
-                            {!autoDocs.buletin_cumparator ? (
-                              <div className="flex flex-col gap-2">
-                                <input type="file" id="file-input-buletin_cumparator" accept="image/*,application/pdf" disabled={isUploading} onChange={(e) => handleAutoFileUpload(e, 'buletin_cumparator')} className="text-[10px] block w-full text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-[#16221A] file:text-[#8ba888]" />
-                                <button type="button" onClick={() => startCamera('buletin_cumparator')} className="bg-slate-800 hover:bg-slate-700 text-xs text-white font-bold py-1.5 rounded transition">📷 Folosește Camera</button>
-                              </div>
-                            ) : (
-                              <div className="flex flex-col items-center gap-2">
-                                <span className="text-[10px] text-emerald-400 bg-[#16221A] px-2 py-1 rounded truncate w-full">✓ Buletin Cumpărător</span>
-                                <button type="button" onClick={() => handleEliminaDocument('buletin_cumparator')} className="text-[10px] text-red-400 font-bold hover:underline">Elimină ❌</button>
-                              </div>
-                            )}
-                          </div>
-
-                        </div>
-                      </div>
-
-                      {/* Modal Cameră Live OCR */}
-                      {isCameraActive && (
-                        <div className="fixed inset-0 z-[60] bg-black/95 flex flex-col items-center justify-center p-4">
-                          <div className="relative w-full max-w-lg aspect-[4/3] bg-black rounded-lg overflow-hidden border-2 border-slate-700">
-                            <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover"></video>
-                            <canvas ref={autoCanvasRef} className="hidden"></canvas>
-                            <div className="absolute inset-10 pointer-events-none flex items-center justify-center">
-                              <div className={`w-full h-full border-4 rounded-lg transition-colors duration-500 relative ${
-                                alignmentStatus === 'ready' ? 'border-emerald-400 shadow-[0_0_15px_rgba(52,211,153,0.5)]' : 'border-amber-400 animate-pulse'
-                              }`}>
-                                <span className={`absolute -top-6 left-0 text-[10px] font-bold px-2 py-0.5 rounded ${
-                                  alignmentStatus === 'ready' ? 'bg-emerald-500 text-black' : 'bg-amber-500 text-black'
-                                }`}>
-                                  {alignmentStatus === 'ready' ? 'Document Aliniat - Apasă Captură' : 'Poziționează documentul în chenar...'}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex gap-4 mt-6">
-                            <button type="button" onClick={capturePhoto} className={`px-6 py-3 rounded font-bold text-sm transition ${alignmentStatus === 'ready' ? 'bg-emerald-500 text-black animate-bounce' : 'bg-slate-700 text-slate-400'}`}>📷 Captură Optică</button>
-                            <button type="button" onClick={stopCamera} className="bg-red-900/40 text-red-400 border border-red-900 px-6 py-3 rounded font-bold text-sm hover:bg-red-900/60">Anulează</button>
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="space-y-3 pt-2">
-                        <span className="text-xs font-bold text-slate-400 uppercase block">4. Date Vehicul Extrase:</span>
-                        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-                          <input type="text" placeholder="Serie Șasiu / VIN" autoComplete="new-password" required value={autoData.autoVin} onChange={e => setAutoData({...autoData, autoVin: e.target.value.toUpperCase()})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white uppercase font-mono outline-none sm:col-span-1" />
-                          <input type="text" placeholder="Număr Înmatriculare" autoComplete="new-password" value={autoData.autoNumarInmatriculare} onChange={e => setAutoData({...autoData, autoNumarInmatriculare: e.target.value.toUpperCase()})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white uppercase font-mono outline-none sm:col-span-1" />
-                          <input type="text" placeholder="Marcă și Model" autoComplete="new-password" value={autoData.autoMarcaModel} onChange={e => setAutoData({...autoData, autoMarcaModel: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white outline-none sm:col-span-1" />
-                          <div className="flex gap-1 sm:col-span-1">
-                            <input type="number" placeholder="Preț" autoComplete="new-password" value={autoData.autoPret} onChange={e => setAutoData({...autoData, autoPret: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white outline-none w-full" />
-                            <select value={autoData.autoMoneda} onChange={e => setAutoData({...autoData, autoMoneda: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded p-1.5 text-xs text-white outline-none appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.2em_1.2em] bg-[right_0.4rem_center] bg-no-repeat pr-6">
-                              <option value="RON">RON</option>
-                              <option value="EUR">EUR</option>
-                            </select>
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                           <input type="email" placeholder="Email Contracte Finalizate" autoComplete="new-password" required value={autoData.clientEmail} onChange={e => setAutoData({...autoData, clientEmail: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white outline-none" />
-                           <label className="flex items-center text-xs text-slate-400 cursor-pointer select-none border border-slate-800 rounded p-2.5 bg-[#0B0F12]">
-                             <input type="checkbox" checked={autoData.pretIncludeTVA} onChange={e => setAutoData({...autoData, pretIncludeTVA: e.target.checked})} className="mr-2 accent-[#8ba888]" />
-                             <span>Prețul include TVA (Dacă Vânzătorul e PJ plătitor)</span>
-                           </label>
-                        </div>
-                      </div>
-
-                      {/* SECȚIUNE SEMNĂTURĂ PENTRU AUTO */}
-                      <div className="bg-[#0B0F12] p-5 rounded-lg border border-slate-800 space-y-4 mt-6">
-                        <div className="flex justify-between items-center border-b border-slate-800 pb-2">
-                          <span className="text-xs font-bold text-slate-400 uppercase block tracking-wider">Aprobare și Semnare Dosar Auto</span>
-                          <div className="flex gap-2 bg-[#12181D] p-1 rounded border border-slate-700">
-                            <button type="button" onClick={() => { setAutoSignatureTab('draw'); curataCanvasAuto(); }} className={`px-3 py-1 rounded text-[10px] font-bold transition-colors ${autoSignatureTab === 'draw' ? 'bg-[#8ba888] text-black' : 'text-slate-400 hover:text-white'}`}>Desenează</button>
-                            <button type="button" onClick={() => { setAutoSignatureTab('upload'); curataCanvasAuto(); }} className={`px-3 py-1 rounded text-[10px] font-bold transition-colors ${autoSignatureTab === 'upload' ? 'bg-[#8ba888] text-black' : 'text-slate-400 hover:text-white'}`}>Încarcă (PNG/JPG)</button>
-                          </div>
-                        </div>
-
-                        {autoSignatureTab === 'draw' && (
-                          <div className="space-y-3 relative">
-                            <div className="relative border-2 border-dashed border-slate-700 rounded-lg bg-white overflow-hidden">
-                              {!isAutoDrawing && !autoSigCanvasRef.current?.toDataURL().length > 100 && (
-                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
-                                  <span className="text-black text-2xl font-black italic">Semnează aici</span>
-                                </div>
-                              )}
-                              <canvas 
-                                ref={autoSigCanvasRef} 
-                                width={600} 
-                                height={160} 
-                                onTouchStart={pornesteDesenulAuto} 
-                                onTouchMove={deseneazaAuto} 
-                                onTouchEnd={opresteDesenulAuto} 
-                                onMouseDown={pornesteDesenulAuto} 
-                                onMouseMove={deseneazaAuto} 
-                                onMouseUp={opresteDesenulAuto} 
-                                onMouseLeave={opresteDesenulAuto} 
-                                className="w-full h-40 cursor-crosshair block touch-none relative z-10" 
-                              />
-                            </div>
-                            <div className="flex justify-end">
-                              <button type="button" onClick={curataCanvasAuto} className="text-[10px] font-bold text-red-400 hover:text-red-300 transition-colors uppercase tracking-wider flex items-center gap-1">
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                Curăță / Resemnează
-                              </button>
-                            </div>
-                          </div>
-                        )}
-
-                        {autoSignatureTab === 'upload' && (
-                          <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-slate-700 rounded-lg bg-[#12181D]">
-                            {!autoUploadedSig ? (
-                              <>
-                                <svg className="w-8 h-8 text-slate-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                                <label className="cursor-pointer bg-[#8ba888] text-black px-4 py-2 rounded text-xs font-bold hover:opacity-90 transition-opacity">
-                                  Alege Imaginea (Fără fundal ideal)
-                                  <input type="file" accept="image/png, image/jpeg" onChange={handleIncarcareSemnaturaAuto} className="hidden" />
-                                </label>
-                                <span className="text-[10px] text-slate-500 mt-3">Sistemul o va decupa și o va aplica direct în contractele DITL.</span>
-                              </>
-                            ) : (
-                              <div className="flex flex-col items-center w-full">
-                                <div className="bg-white p-4 rounded mb-4 w-full flex justify-center border border-slate-700">
-                                  <img src={autoUploadedSig} alt="Semnatura Incarcata" className="max-h-24 object-contain" />
-                                </div>
-                                <button type="button" onClick={() => setAutoUploadedSig(null)} className="text-[10px] font-bold text-red-400 hover:text-red-300 transition-colors uppercase tracking-wider flex items-center gap-1">
-                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                  Elimină Imaginea
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-
-                      {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
-                        <Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} />
-                      )}
-
-                      <div className="pt-2 pb-4">
-                        <label className="flex items-start cursor-pointer group">
-                          <div className="relative flex items-center justify-center mt-0.5 shrink-0">
-                            <input type="checkbox" checked={acordGdpr} onChange={e => setAcordGdpr(e.target.checked)} className="peer appearance-none w-4 h-4 border border-slate-600 rounded bg-[#0B0F12] checked:bg-[#8ba888] checked:border-[#8ba888] transition-all cursor-pointer" />
-                            <svg className="absolute w-3 h-3 text-[#0B0F12] opacity-0 peer-checked:opacity-100 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
-                          </div>
-                          <span className="ml-3 text-[11px] text-slate-400 leading-tight select-none">
-                            Sunt de acord cu <Link href="/termeni-si-conditii" target="_blank" className="text-[#8ba888] hover:underline">Termenii și Condițiile</Link> și înțeleg că documentele încărcate sunt procesate volatil pentru OCR. Datele <strong>NU</strong> sunt stocate permanent, conform <Link href="/politica-si-confidentialitate" target="_blank" className="text-[#8ba888] hover:underline">Politicii de Confidențialitate (GDPR)</Link>.
-                          </span>
-                        </label>
-                      </div>
-                      
-                      <div className="flex justify-between items-center pt-2">
-                        <button type="button" onClick={handleInapoiPrincipal} className="text-xs text-slate-400 underline">Înapoi la panou</button>
-                        <button type="submit" disabled={isUploading || !!loadingText} className="bg-[#8ba888] text-black font-black px-6 py-2.5 rounded text-xs tracking-tight transition hover:opacity-90">
-                          {loadingText ? 'Se procesează...' : `Generează Pachet Auto .ZIP (${autoData.autoMoneda === 'EUR' ? `${Math.round(99 / cursBnr.eur)} EUR` : '19.99 €'})`}
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {autoStep === 'success' && (
-                    <div className="bg-[#0B0F12] border border-slate-800 p-5 rounded-lg text-center space-y-4">
-                      <div className="w-12 h-12 bg-emerald-900/40 text-emerald-400 rounded-full flex items-center justify-center mx-auto text-xl font-bold">✓</div>
-                      <div>
-                        <h4 className="text-sm font-bold text-white">Pachetul Auto a fost descărcat!</h4>
-                        <p className="text-xs text-slate-400 mt-1">Arhiva conține cele 5 exemplare oficiale DITL, procesul-verbal avocațial cu km garantați și ghidul procedural post-vânzare.</p>
-                      </div>
-                      <div className="flex justify-center mt-4">
-                        <button type="button" onClick={() => { setAutoStep('upload'); setStep(1); }} className="text-xs font-bold text-[#8ba888] hover:text-white flex items-center gap-1.5 transition underline">
-                          &larr; Înapoi la Panoul Principal
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </form>
-              )}
-            </div>
-
-            {/* WIDGET-URI INTEGRATE ÎN STEP 2 (ANAF + Calculator) - Doar la B2B! */}
-            {formData.tipContract !== 'auto' && (
-              <div className="w-full max-w-6xl mx-auto mt-16 mb-12 px-4">
-                <div className="text-center mb-12">
-                  <h3 className="text-2xl font-black text-white uppercase tracking-wider">Instrumente Utile pentru Contractul Tău</h3>
-                  <p className="text-sm text-slate-400 mt-2">Verifică partenerul la ANAF sau calculează taxele aplicabile contractului.</p>
+                  <button onClick={() => handleCumparaPremium('sablon_tipizat')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded text-xs hover:bg-slate-900">Cumpără 9.99 €</button>
                 </div>
 
-                <div className="grid grid-cols-1 gap-8 items-stretch">
-                  
-                  {/* WIDGET ANAF */}
-                  <div className="w-full">
-                    <div className="bg-[#12181D] rounded-2xl border border-slate-800/80 shadow-xl p-6 md:p-8 flex flex-col items-center relative overflow-hidden h-full">
-                      <div className="absolute -right-20 -top-20 w-64 h-64 bg-[#8ba888]/5 rounded-full blur-3xl pointer-events-none"></div>
-                      
-                      <div className="w-full relative z-10 mb-6 border-b border-slate-800/80 pb-6 text-center">
-                        <h3 className="text-sm font-bold text-[#8ba888] uppercase tracking-wider block mb-2">Verificare Firmă ANAF</h3>
-                        <p className="text-[11px] text-slate-400 leading-relaxed">Interoghează rapid orice companie din România și descarcă raportul financiar.</p>
-                      </div>
-                      
-                      <div className="w-full relative z-10 flex flex-col justify-center flex-1">
-                        <form onSubmit={handleCautareCuiWidget} className="flex gap-2 w-full mb-6">
-                          <input type="text" placeholder="Introdu CUI (ex: 123456)" value={cuiSearch} onChange={e => setCuiSearch(e.target.value)} className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-3 text-sm text-white font-mono outline-none focus:border-[#8ba888] transition text-center" required />
-                          <button type="submit" disabled={isSearchingCui} className="bg-[#8ba888] text-[#0B0F12] font-black px-6 rounded-lg text-xs transition hover:opacity-90">
-                            {isSearchingCui ? '...' : 'Caută'}
-                          </button>
-                        </form>
-
-                        {!cuiDataResult ? (
-                          <div className="w-full py-6 flex flex-col items-center justify-center border-2 border-dashed border-slate-800/60 rounded-xl bg-[#0B0F12]/30 text-slate-500">
-                            <svg className="w-6 h-6 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                            <span className="text-[10px] font-bold uppercase tracking-wider">Așteaptă Căutarea</span>
-                          </div>
-                        ) : (
-                          <div className="w-full bg-[#0B0F12] border border-slate-700 rounded-xl p-5 animate-fadeIn">
-                            <div className="flex justify-between items-start mb-3">
-                              <div>
-                                <h4 className="text-sm font-bold text-white uppercase">{cuiDataResult.denumire}</h4>
-                                <span className="text-[10px] text-slate-400 font-mono">CUI: {cuiDataResult.cui}</span>
-                              </div>
-                              <span className={`px-2 py-1 rounded text-[9px] font-black uppercase ${cuiDataResult.stare?.toLowerCase().includes('inactiv') || cuiDataResult.stare?.toLowerCase().includes('radiat') ? 'bg-red-900/40 text-red-400 border border-red-900' : 'bg-emerald-900/40 text-emerald-400 border border-emerald-900'}`}>
-                                {cuiDataResult.stare || 'Necunoscut'}
-                              </span>
-                            </div>
-                            <button onClick={(e) => { e.preventDefault(); handleReportAction(); }} className="w-full mt-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold py-2.5 rounded-lg text-xs transition">
-                              {buttonText}
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                <div className="bg-[#12181D] border border-slate-800 rounded-lg p-4 flex flex-col justify-between">
+                  <div>
+                    <h4 className="text-sm font-bold text-white mt-1">Pachet QR Branding</h4>
+                    <p className="text-[10px] text-slate-400 mt-1">Adaugă logo-ul tău pe centru.</p>
+                    <div className="text-lg font-black text-white mt-2 mb-3">49 RON <span className="text-[10px] text-slate-500 font-normal">(~9.99 €)</span></div>
                   </div>
-
-                  {/* CALCULATOR FISCAL */}
-                  <div className="w-full">
-                    <div className="bg-[#12181D] rounded-2xl border border-slate-800/80 shadow-xl p-6 flex flex-col justify-between h-full">
-                      <div>
-                        <div className="flex items-center gap-3 mb-6 border-b border-slate-800/80 pb-4">
-                          <span className="text-3xl"></span>
-                          <div>
-                            <h4 className="text-[#8ba888] font-bold text-sm">CALCULATOR FISCAL 2026</h4>
-                            <p className="text-[11px] text-slate-400">Plafoane CASS & Impozit</p>
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-6">
-                          <div>
-                            <div className="flex justify-between items-center mb-1">
-                              <label className="text-slate-400 text-[10px] font-bold uppercase">Valoare Factură / Venit</label>
-                              <span className="text-[#8ba888] font-mono text-[11px] font-bold">{fiscal.venitLunar} RON</span>
-                            </div>
-                            <input type="range" min="0" max="50000" step="1" value={fiscal.venitLunar} onChange={e => setFiscal({...fiscal, venitLunar: Number(e.target.value)})} className="w-full h-1.5 bg-slate-800 rounded appearance-none cursor-pointer accent-[#8ba888]" />
-                            <div className="mt-3 flex items-center gap-2">
-                              <input type="number" min="0" max="50000" value={fiscal.venitLunar} onChange={e => setFiscal({...fiscal, venitLunar: Number(e.target.value)})} className="w-full p-2 bg-[#0B0F12] text-white rounded border border-slate-700 focus:outline-none focus:border-[#8ba888] text-xs" placeholder="Introdu suma..." />
-                              <span className="text-gray-400 font-medium text-xs">RON</span>
-                            </div>
-                          </div>
-                        
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                              <label className="text-slate-400 text-[10px] font-bold uppercase mb-1 block">Formă Juridică</label>
-                              <select value={fiscal.formaJuridica} onChange={e => setFiscal({...fiscal, formaJuridica: e.target.value})} className="w-full bg-[#0B0F12] border border-slate-700 rounded-lg py-2.5 px-3 text-white outline-none text-xs">
-                                <option value="SRL">SRL (Microîntreprindere)</option>
-                                <option value="PFA_SISTEM_REAL">PFA (Sistem Real)</option>
-                              </select>
-                            </div>
-                            {fiscal.formaJuridica !== 'PFA_SISTEM_REAL' && (
-                              <div className="flex gap-2 items-end">
-                                <label className="flex-1 flex items-center justify-center bg-[#0B0F12] h-[36px] rounded-lg border border-slate-800 cursor-pointer text-[10px] text-white hover:bg-slate-900 transition">
-                                  <input type="checkbox" checked={fiscal.areAngajati} onChange={e => setFiscal({...fiscal, areAngajati: e.target.checked})} className="mr-1.5 accent-[#8ba888]" /> Angajați
-                                </label>
-                                <label className="flex-1 flex items-center justify-center bg-[#0B0F12] h-[36px] rounded-lg border border-slate-800/60 cursor-pointer text-[10px] text-white hover:bg-slate-900 transition">
-                                  <input type="checkbox" checked={fiscal.platitorTva} onChange={e => setFiscal({...fiscal, platitorTva: e.target.checked})} className="mr-1.5 accent-[#8ba888]" /> TVA
-                                </label>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="mt-6 pt-4 border-t border-slate-800/50">
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4 font-mono text-[11px]">
-                          <div className="bg-[#0B0F12] p-3 rounded-lg border border-slate-800/40 flex flex-col justify-center">
-                            <span className="text-slate-500 text-[10px] block mb-1">Impozit micro:</span>
-                            <span className="text-slate-200 font-bold">{rezultateFiscale.defalcare.impozit} RON</span>
-                          </div>
-                          <div className="bg-[#0B0F12] p-3 rounded-lg border border-slate-800/40 flex flex-col justify-center">
-                            <span className="text-slate-500 text-[10px] block mb-1">CAS/CASS:</span>
-                            <span className="text-slate-200 font-bold">{rezultateFiscale.defalcare.sociale} RON</span>
-                          </div>
-                          {fiscal.formaJuridica === 'SRL' && (
-                            <div className="bg-[#0B0F12] p-3 rounded-lg border border-slate-800/40 flex flex-col justify-center">
-                              <span className="text-slate-500 text-[10px] block mb-1">Dividende(10%):</span>
-                              <span className="text-slate-200 font-bold">{rezultateFiscale.defalcare.dividende} RON</span>
-                            </div>
-                          )}
-                          {fiscal.platitorTva && (
-                            <div className="bg-[#0B0F12] p-3 rounded-lg border border-slate-800/40 flex flex-col justify-center">
-                              <span className="text-slate-500 text-[10px] block mb-1">TVA (21%):</span>
-                              <span className="text-slate-200 font-bold">{rezultateFiscale.tvaLunar} RON</span>
-                            </div>
-                          )}
-                        </div>
-                        <div className="bg-[#16221A] border border-[#8ba888]/30 p-4 rounded-xl flex justify-between items-center">
-                          <div>
-                            <span className="text-slate-400 block text-[10px] uppercase font-bold mb-0.5">Dări Stat (Total Lunar)</span>
-                            <strong className="text-red-400 font-mono text-sm">{rezultateFiscale.taxeLunare} RON</strong>
-                          </div>
-                          <div className="text-right">
-                            <span className="text-[#8ba888] block text-[10px] uppercase font-bold mb-0.5">Profit Curat Net / Lună</span>
-                            <strong className="text-white text-xl font-mono tracking-tight">{rezultateFiscale.netLunar} RON</strong>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
+                  <button onClick={() => handleCumparaPremium('qr_branding')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded text-xs hover:bg-slate-900">Cumpără 9.99 €</button>
                 </div>
-              </div>
-            )}
 
-            {/* PUNEM PREȚURILE LA FINALUL LUI STEP 2 */}
-            <div className="mt-8">
-              {renderCarduriPreturi()}
-            </div>
+                <div className="bg-[#12181D] border border-slate-800 rounded-lg p-4 flex flex-col justify-between">
+                  <div>
+                    <h4 className="text-sm font-bold text-white mt-1">Pachet QR Dynamic</h4>
+                    <p className="text-[10px] text-slate-400 mt-1">Schimbă destinația + Găzduire PDF.</p>
+                    <div className="text-lg font-black text-white mt-2 mb-3">39 RON <span className="text-[10px] text-slate-500 font-normal">(~7.99 €)</span></div>
+                  </div>
+                  <button onClick={() => handleCumparaPremium('qr_dynamic')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded text-xs hover:bg-slate-900">Cumpără 7.99 €</button>
+                </div>
 
-          </div>
-        )}
+                <div className="bg-[#12181D] border border-slate-800 rounded-lg p-4 flex flex-col justify-between">
+                  <div>
+                    <h4 className="text-sm font-bold text-white mt-1">Pachet QR vCard Pro</h4>
+                    <p className="text-[10px] text-slate-400 mt-1">Carte de vizită cu salvare în agendă.</p>
+                    <div className="text-lg font-black text-white mt-2 mb-3">69 RON <span className="text-[10px] text-slate-500 font-normal">(~13.99 €)</span></div>
+                  </div>
+                  <button onClick={() => handleCumparaPremium('qr_vcard')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded text-xs hover:bg-slate-900">Cumpără 13.99 €</button>
+                </div>
 
-        {/* QR CODE REDIRECT STEP 2 */}
-        {step === 2 && qrGeneratedUrl && qrGeneratedUrl.includes('/semneaza/') && (
-          <div className="max-w-3xl mx-auto mt-6 p-6 bg-[#12181D] border border-slate-800 rounded-lg flex flex-col items-center justify-center text-center shadow-lg">
-            <h3 className="text-lg font-bold text-[#8ba888] mb-2">Contractul a fost publicat</h3>
-            <p className="text-xs text-slate-400 mb-4">Scanează codul QR pentru a deschide direct fluxul electronic de semnare:</p>
-            <div className="p-4 bg-white border rounded shadow-md">
-              <QRCodeSVG value={qrGeneratedUrl} size={150} />
-            </div>
-            <p className="text-xs text-slate-500 mt-3 font-mono">URL Securizat: <a href={qrGeneratedUrl} target="_blank" rel="noreferrer" className="underline text-[#8ba888]">{qrGeneratedUrl}</a></p>
-          </div>
-        )}
-
-        {/* CONTINUARE STEP 1: PREȚURI, QR STUDIO ȘI ȘTIRI */}
-        {step === 1 && (
-          <>
-            {/* SECȚIUNE PREȚURI PERFECTĂ */}
-        <div id="sectiune-preturi" className="max-w-7xl mx-auto px-6 mt-16 scroll-mt-20">
-          
-          {/* Partea 1: Servicii Complete / Abonamente */}
-          <div className="border-b border-slate-800 pb-4 mb-8 text-center">
-            <span className="text-[#8ba888] text-xs font-black uppercase tracking-widest block mb-1">Ecosistem ContractSmart</span>
-            <h2 className="text-3xl font-black text-white tracking-tight">Planuri de Business & Tranzacții</h2>
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-5xl mx-auto mb-10">
-            {/* Onetime Contract B2B */}
-            <div className="bg-[#12181D] border border-slate-800 rounded-lg p-4 flex flex-col justify-between">
-              <div>
-                <span className="text-[10px] font-mono text-emerald-500 font-bold block uppercase">Plată Unică</span>
-                <h4 className="text-sm font-bold text-white mt-1">1x Contract B2B</h4>
-                <div className="text-lg font-black text-[#8ba888] mt-2 mb-1">19 RON <span className="text-[10px] text-slate-500 font-normal">(~3.99 €)</span></div>
-                <p className="text-[11px] text-slate-400 leading-relaxed mb-3">Plătești strict pe contractul de servicii descărcat.</p>
-              </div>
-              <button type="button" onClick={() => handleCumparaPremium('one_time_contract')} className="w-full mt-4 bg-[#0B0F12] border border-slate-700 hover:bg-slate-900 text-white font-bold py-2 rounded text-xs transition">Cumpără 3.99 €</button>
-            </div>
-
-            {/* Onetime Auto */}
-            <div className="bg-[#12181D] border border-slate-800 rounded-lg p-4 flex flex-col justify-between relative ring-1 ring-blue-500/30">
-              <span className="absolute -top-2 right-4 bg-blue-600 text-white text-[8px] uppercase font-black px-2 py-0.5 rounded">Auto</span>
-              <div>
-                <span className="text-[10px] font-mono text-blue-400 font-bold block uppercase">Plată Unică</span>
-                <h4 className="text-sm font-bold text-white mt-1">Pachet Acte Auto</h4>
-                <div className="text-lg font-black text-white mt-2 mb-3">99 RON <span className="text-[10px] text-slate-500 font-normal">(~19.99 €)</span></div>
-                <p className="text-[11px] text-slate-300 leading-relaxed">Generare pachet complet vânzare auto (contracte, DITL, PV).</p>
-              </div>
-              <button type="button" onClick={() => handleCumparaPremium('contract_auto')} className="w-full mt-4 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded text-xs transition">Cumpără 19.99 €</button>
-            </div>
-
-            {/* PRO */}
-            <div className="bg-[#12181D] border border-slate-800 rounded-lg p-4 flex flex-col justify-between relative ring-2 ring-[#8ba888]/20">
-              <span className="absolute -top-2 right-4 bg-[#8ba888] text-[#0B0F12] text-[8px] uppercase font-black px-2 py-0.5 rounded">Popular</span>
-              <div>
-                <span className="text-[10px] font-mono text-[#8ba888] block uppercase">Abonament</span>
-                <h4 className="text-sm font-bold text-white mt-1">Abonament PRO</h4>
-                <div className="text-lg font-black text-white mt-2 mb-3">99 RON <span className="text-[10px] text-slate-500 font-normal">/ lună (~19.99 €)</span></div>
-                <p className="text-[11px] text-slate-300 leading-relaxed">Contracte B2B nelimitate + Mega-QR Studio (Smart, Geo, PDF, Landing).</p>
-              </div>
-              <button type="button" onClick={() => handleCumparaPremium('pro')} className="w-full mt-4 bg-[#8ba888] text-[#0B0F12] font-black py-2 rounded text-xs transition hover:opacity-90">Abonează-te</button>
-            </div>
-          </div>
-          
-          <div className="max-w-5xl mx-auto mb-12">
-            {/* FOUNDER LIFETIME */}
-            <div className="bg-[#16221A] border border-[#8ba888]/50 rounded-lg p-6 flex flex-col sm:flex-row justify-between items-center relative shadow-md shadow-[#8ba888]/10 text-center sm:text-left">
-              <span className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-amber-200 to-yellow-500 text-black text-[10px] uppercase font-black px-3 py-1 rounded shadow-md">Oferta Limitata</span>
-              <div className="w-full sm:w-2/3 pt-2">
-                <span className="text-[10px] font-mono text-amber-500 font-bold block uppercase">VIP Acces pe Viață</span>
-                <h4 className="text-xl font-black text-white mt-1">Membru Fondator - Lifetime</h4>
-                <p className="text-xs text-slate-300 leading-relaxed mt-2 max-w-lg">Cumperi o singură dată și ai acces nelimitat pe viață la absolut toate funcțiile platformei curente și viitoare: contracte, pachet auto, module QR, hosting, totul.</p>
-              </div>
-              <div className="w-full sm:w-1/3 flex flex-col items-center sm:items-end mt-4 sm:mt-0">
-                <div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-500 mb-1">999 RON</div>
-                <div className="text-xs text-slate-400 mb-3">(~199.99 €)</div>
-                <button type="button" onClick={() => handleCumparaPremium('founder')} className="bg-gradient-to-r from-amber-200 to-yellow-500 hover:opacity-90 text-black font-black py-3 px-8 rounded text-sm transition">Devino Fondator</button>
               </div>
             </div>
-          </div>
 
-          {/* QR CODE STUDIO */}
+            {/* QR CODE STUDIO */}
             <div className="max-w-5xl mx-auto px-6 mt-6">              
               <div className="bg-[#12181D] rounded-2xl border border-slate-800/80 shadow-xl flex flex-col">
                 {/* Header & Tabs */}
@@ -2764,79 +1968,799 @@ export default function Home() {
               </div>
             </div>
 
-          {/* Partea 2: Șabloane & QR Individual */}
-          <div className="border-t border-slate-800 pt-8 pb-4 mb-4 text-center">
-            <h3 className="text-2xl font-black text-white tracking-tight">Șabloane & Extensii QR (Plată Unică)</h3>
+            {/* ȘTIRI LIVE - GLOBALE CU THUMBNAILS UI/UX */}
+            <div className="max-w-7xl mx-auto px-6 mt-12 mb-12">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-4">Flux Monitorizare Mediativă Legală Real-Time</span>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {stiriLive.slice(0, 6).map((stire, i) => (
+                  <a href={stire.link} target="_blank" rel="noreferrer" key={i} className="group flex flex-col bg-[#12181D] border border-slate-800 rounded-lg overflow-hidden hover:border-[#8ba888]/50 hover:shadow-[0_0_15px_rgba(139,168,136,0.1)] transition-all h-full">
+                    {stire.imagine ? (
+                      <div className="w-full h-32 overflow-hidden border-b border-slate-800">
+                        <img src={stire.imagine} alt="News thumbnail" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      </div>
+                    ) : (
+                      <div className="w-full h-2 bg-[#16221A]"></div>
+                    )}
+                    <div className="p-5 flex flex-col justify-between flex-1">
+                      <div>
+                        <span className="text-[10px] font-bold text-[#8ba888] bg-[#16221A] px-2 py-0.5 rounded border border-emerald-900/50 uppercase inline-block mb-3">{stire.sursa || "Presă Economică"}</span>
+                        <h3 className="text-sm font-bold text-white leading-snug group-hover:text-[#8ba888] transition-colors">{stire.titlu || stire.title}</h3>
+                      </div>
+                      <div className="mt-4 pt-3 border-t border-slate-800/60 flex justify-between items-center">
+                        <span className="text-[10px] text-slate-500">Actualizat Live</span>
+                        <span className="text-xs font-bold text-[#8ba888] group-hover:underline">Citește mai mult &rarr;</span>
+                      </div>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
-            
-            <div className="bg-[#12181D] border border-slate-800 rounded-lg p-4 flex flex-col justify-between">
-              <div>
-                <h4 className="text-sm font-bold text-white mt-1">Șablon Tipizat Legal</h4>
-                <p className="text-[10px] text-slate-400 mt-1">Contracte PDF gata redactate.</p>
-                <div className="text-lg font-black text-white mt-2 mb-3">49 RON <span className="text-[10px] text-slate-500 font-normal">(~9.99 €)</span></div>
-              </div>
-              <button onClick={() => handleCumparaPremium('sablon_tipizat')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded text-xs hover:bg-slate-900">Cumpără 9.99 €</button>
-            </div>
+        )}
 
-            <div className="bg-[#12181D] border border-slate-800 rounded-lg p-4 flex flex-col justify-between">
-              <div>
-                <h4 className="text-sm font-bold text-white mt-1">Pachet QR Branding</h4>
-                <p className="text-[10px] text-slate-400 mt-1">Adaugă logo-ul tău pe centru.</p>
-                <div className="text-lg font-black text-white mt-2 mb-3">49 RON <span className="text-[10px] text-slate-500 font-normal">(~9.99 €)</span></div>
+        {/* =========================================================================
+                                    STEP 2: FORMULARE GENERATOR B2B / AUTO
+            ========================================================================= */}
+        {step === 2 && (
+          <div className="w-full animate-fadeIn">
+            <div className="max-w-3xl mx-auto py-6 px-4">
+              <div className="mb-4 flex items-center justify-between bg-[#12181D] border border-slate-800/80 px-5 py-3 rounded shadow-md">
+                <button type="button" onClick={handleInapoiPrincipal} className="text-xs font-bold text-[#8ba888] hover:text-white flex items-center gap-1.5 transition">
+                  &larr; Înapoi la Panoul Principal
+                </button>
+                <span className="text-[10px] font-mono text-slate-500 uppercase">Configurare Securizată v2.0</span>
               </div>
-              <button onClick={() => handleCumparaPremium('qr_branding')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded text-xs hover:bg-slate-900">Cumpără 9.99 €</button>
-            </div>
 
-            <div className="bg-[#12181D] border border-slate-800 rounded-lg p-4 flex flex-col justify-between">
-              <div>
-                <h4 className="text-sm font-bold text-white mt-1">Pachet QR Dynamic</h4>
-                <p className="text-[10px] text-slate-400 mt-1">Schimbă destinația + Găzduire PDF.</p>
-                <div className="text-lg font-black text-white mt-2 mb-3">39 RON <span className="text-[10px] text-slate-500 font-normal">(~7.99 €)</span></div>
-              </div>
-              <button onClick={() => handleCumparaPremium('qr_dynamic')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded text-xs hover:bg-slate-900">Cumpără 7.99 €</button>
-            </div>
+              <div className="bg-[#12181D] p-8 rounded-lg border border-slate-800 shadow-lg">
+                
+                {formData.tipContract !== 'auto' ? (
+                  <form onSubmit={handleLansareContract} className="space-y-6">
+                    <h2 className="text-2xl font-bold text-white mb-2">Configurator Document Comercial Electronic</h2>
+                    <div className="bg-[#0B0F12] p-4 rounded border border-slate-800">
+                      <label className="text-xs font-bold text-slate-400 uppercase block mb-1">Tipul Documentului Generat</label>
+                      <select 
+                        value={formData.tipContract} 
+                        onChange={e => setFormData({...formData, tipContract: e.target.value})} 
+                        className="w-full bg-[#12181D] border border-slate-700 rounded p-2.5 text-xs text-white outline-none focus:border-[#8ba888] appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.2em_1.2em] bg-[right_0.7rem_center] bg-no-repeat pr-10"
+                      >
+                        <option value="prestari">Contract de Prestări Servicii (General)</option>
+                        <option value="colaborare_b2b">Contract Colaborare Comercială (Freelanceri)</option>
+                        <option value="design_arhitectura">Contract Antrepriză Design / Arhitectură</option>
+                        <option value="evenimente">Contract Servicii Evenimente (Foto/Video/Trupă)</option>
+                        <option value="nda">Acord de Confidențialitate (NDA)</option>
+                        <option value="cda">Contract de Drepturi de Autor (CDA)</option>
+                        <option value="inchiriere_imobil">Contract de Închiriere Spațiu</option>
+                        <option value="promisiune_vanzare">Promisiune (Antecontract) Vânzare Imobil</option>
+                        <option value="influencer">Contract de Parteneriat & Influencer Marketing</option>
+                        <option value="it_sla">Contract Prestări Servicii IT & Software (SLA)</option>
+                        <option value="constructii">Contract de Execuție Lucrări & Construcții (Regie)</option>
+                      </select>
+                    </div>
 
-            <div className="bg-[#12181D] border border-slate-800 rounded-lg p-4 flex flex-col justify-between">
-              <div>
-                <h4 className="text-sm font-bold text-white mt-1">Pachet QR vCard Pro</h4>
-                <p className="text-[10px] text-slate-400 mt-1">Carte de vizită cu salvare în agendă.</p>
-                <div className="text-lg font-black text-white mt-2 mb-3">69 RON <span className="text-[10px] text-slate-500 font-normal">(~13.99 €)</span></div>
-              </div>
-              <button onClick={() => handleCumparaPremium('qr_vcard')} className="w-full bg-[#0B0F12] border border-slate-700 text-white font-bold py-2 rounded text-xs hover:bg-slate-900">Cumpără 13.99 €</button>
-            </div>
-          </div>
-        </div>
+                    <div className="bg-[#0B0F12] p-4 rounded border border-slate-800 space-y-2">
+                      <span className="text-xs font-bold text-slate-400 uppercase block mb-2">Calitatea ta în acest Contract (Rol Semnatar)</span>
+                      <div className="flex gap-4 text-xs">
+                        <label className="flex items-center text-white cursor-pointer select-none">
+                          <input type="radio" name="initiatorRol" value="prestator" checked={formData.initiatorRol === 'prestator'} onChange={e => setFormData({...formData, initiatorRol: e.target.value})} className="mr-2 accent-[#8ba888]" />
+                          Eu sunt PRESTATORUL / LOCATORUL
+                        </label>
+                        <label className="flex items-center text-white cursor-pointer select-none">
+                          <input type="radio" name="initiatorRol" value="client" checked={formData.initiatorRol === 'client'} onChange={e => setFormData({...formData, initiatorRol: e.target.value})} className="mr-2 accent-[#8ba888]" />
+                          Eu sunt BENEFICIARUL / LOCATARUL
+                        </label>
+                      </div>
+                    </div>
 
-        {/* ȘTIRI LIVE - GLOBALE CU THUMBNAILS UI/UX */}
-        <div className="max-w-7xl mx-auto px-6 mt-12 mb-12">
-          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-4">Flux Monitorizare Mediativă Legală Real-Time</span>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {stiriLive.slice(0, 6).map((stire, i) => (
-              <a href={stire.link} target="_blank" rel="noreferrer" key={i} className="group flex flex-col bg-[#12181D] border border-slate-800 rounded-lg overflow-hidden hover:border-[#8ba888]/50 hover:shadow-[0_0_15px_rgba(139,168,136,0.1)] transition-all h-full">
-                {stire.imagine ? (
-                  <div className="w-full h-32 overflow-hidden border-b border-slate-800">
-                    <img src={stire.imagine} alt="News thumbnail" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                  </div>
+                    <div className="bg-[#0B0F12] p-5 rounded border border-slate-800 space-y-4 mb-6">
+                      <span className="text-xs font-bold text-[#8ba888] uppercase block tracking-wider">Identitate Vizuală (Branding Prestator)</span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="flex flex-col space-y-1">
+                          <label className="text-[10px] text-slate-500 font-bold uppercase">CUI / CNP Prestator</label>
+                          <div className="relative">
+                            <input type="text" placeholder="CUI / CNP Prestator" autoComplete="new-password" value={formData.prestatorCui} onChange={e => setFormData({...formData, prestatorCui: e.target.value})} onBlur={(e) => handleAutofillCui(e.target.value, 'prestator')} className="w-full p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none focus:border-[#8ba888] pr-20" />
+                            {prestatorCuiStatus && (
+                              <span className={`absolute right-2 top-2 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase ${prestatorCuiStatus?.toUpperCase().includes('INACTIV') || prestatorCuiStatus?.toUpperCase().includes('RADIAT') ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/20 text-emerald-400'}`}>{prestatorCuiStatus}</span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex flex-col space-y-1">
+                          <label className="text-[10px] text-slate-500 font-bold uppercase">Denumire Furnizor / Nume</label>
+                          <input type="text" placeholder="Denumire Firma / Nume Complet" autoComplete="new-password" value={formData.prestatorNume} onChange={e => setFormData({...formData, prestatorNume: e.target.value})} className="p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none" />
+                          <input type="text" placeholder="Nume Administrator / Reprezentant Prestator" autoComplete="new-password" value={formData.prestatorReprezentant} onChange={e => setFormData({...formData, prestatorReprezentant: e.target.value})} className="mt-2 p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none w-full" />
+                          <input type="text" placeholder="Adresă Sediu Social Prestator" autoComplete="new-password" value={formData.prestatorAdresa || ''} onChange={e => setFormData({...formData, prestatorAdresa: e.target.value})} className="mt-2 p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none w-full" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4 pt-6 border-t border-slate-800/80 mt-6 block clear-both">
+                      <span className="text-xs font-bold text-slate-400 uppercase block tracking-wider">Identificare Beneficiar Contract</span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="flex flex-col space-y-1">
+                          <label className="text-[10px] text-slate-500 font-bold uppercase">CUI / CNP Client</label>
+                          <div className="relative">
+                            <input type="text" placeholder="CUI / CNP Client" autoComplete="new-password" value={formData.clientCui} onChange={e => setFormData({...formData, clientCui: e.target.value})} onBlur={(e) => handleAutofillCui(e.target.value, 'client')} className="w-full p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white outline-none focus:border-[#8ba888] pr-20" />
+                            {clientCuiStatus && (
+                              <span className={`absolute right-2 top-2 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase ${clientCuiStatus?.toUpperCase().includes('INACTIV') || clientCuiStatus?.toUpperCase().includes('RADIAT') ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/20 text-emerald-400'}`}>{clientCuiStatus}</span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex flex-col space-y-1">
+                          <label className="text-[10px] text-slate-500 font-bold uppercase">Companie Client / Nume</label>
+                          <input type="text" placeholder="Companie Client / Nume" autoComplete="new-password" value={formData.clientNume} onChange={e => setFormData({...formData, clientNume: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white outline-none" />
+                          <input type="text" placeholder="Nume Administrator / Reprezentant Client" autoComplete="new-password" value={formData.clientReprezentant} onChange={e => setFormData({...formData, clientReprezentant: e.target.value})} className="mt-2 p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white outline-none w-full" />
+                          <input type="text" placeholder="Adresă Sediu Social Client" autoComplete="new-password" value={formData.clientAdresa || ''} onChange={e => setFormData({...formData, clientAdresa: e.target.value})} className="mt-2 p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white outline-none w-full" />
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center pt-2">
+                        <input type="email" placeholder="Email Client" autoComplete="new-password" value={formData.clientEmail} onChange={e => setFormData({...formData, clientEmail: e.target.value})} className="w-full p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white focus:border-[#8ba888] outline-none" required />
+                        
+                        <label className="flex items-center p-2.5 bg-[#0B0F12] rounded border border-slate-800/60 cursor-pointer select-none text-xs text-slate-300 h-full">
+                          <input 
+                            type="checkbox" 
+                            checked={formData.adaugaProcesVerbal || false} 
+                            onChange={e => setFormData({...formData, adaugaProcesVerbal: e.target.checked})} 
+                            className="mr-3 accent-[#8ba888]" 
+                          />
+                          <div>
+                            <span className="font-bold block text-white">Atașează Proces Verbal</span>
+                            <span className="text-[10px] text-slate-500 block">Generează automat PV anexă.</span>
+                          </div>
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4 pt-4">
+                      <span className="text-xs font-bold text-slate-400 uppercase block">Obiectul Serviciilor / Tranzacției și Remunerație</span>
+                      <textarea placeholder="Descrierea explicită a sarcinilor, termenelor și obiectivelor..." value={formData.obiect} onChange={e => setFormData({...formData, obiect: e.target.value})} className="w-full p-3 bg-[#0B0F12] border border-slate-700 rounded text-xs h-16 text-white resize-none" required></textarea>
+                      
+                      {/* Deviz specific construcții */}
+                      {formData.tipContract === 'constructii' && (
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 bg-[#0B0F12] p-4 rounded border border-slate-800">
+                          <div>
+                            <label className="text-[9px] text-slate-500 font-bold uppercase block mb-1">Cost Materiale (RON)</label>
+                            <input type="number" placeholder="0" value={formData.constructiiMateriale} onChange={e => setFormData({...formData, constructiiMateriale: e.target.value})} className="w-full p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none" />
+                          </div>
+                          <div>
+                            <label className="text-[9px] text-slate-500 font-bold uppercase block mb-1">Cost Manoperă (RON)</label>
+                            <input type="number" placeholder="0" value={formData.constructiiManopera} onChange={e => setFormData({...formData, constructiiManopera: e.target.value})} className="w-full p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none" />
+                          </div>
+                          <div>
+                            <label className="text-[9px] text-slate-500 font-bold uppercase block mb-1">Suprafață (mp)</label>
+                            <input type="number" placeholder="0" value={formData.constructiiSuprafata} onChange={e => setFormData({...formData, constructiiSuprafata: e.target.value})} className="w-full p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none" />
+                          </div>
+                          <div>
+                            <label className="text-[9px] text-slate-500 font-bold uppercase block mb-1">Preț pe mp (RON)</label>
+                            <input type="number" placeholder="0" value={formData.constructiiPretMp} onChange={e => setFormData({...formData, constructiiPretMp: e.target.value})} className="w-full p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none" />
+                          </div>
+                        </div>
+                      )}
+
+                      {formData.tipContract !== 'nda' && (
+                        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                          <div className="flex w-full sm:w-1/2 gap-3">
+                            <input type="number" placeholder="Valoare Contractuală" autoComplete="new-password" value={formData.valoare} onChange={e => setFormData({...formData, valoare: e.target.value})} className="flex-1 p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white" required />
+                            <select value={formData.moneda} onChange={e => setFormData({...formData, moneda: e.target.value})} className="w-24 bg-[#0B0F12] border border-slate-700 rounded p-2.5 text-xs text-white outline-none focus:border-[#8ba888] appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.2em_1.2em] bg-[right_0.7rem_center] bg-no-repeat pr-10">
+                              <option value="RON">RON</option>
+                              <option value="EUR">EUR (€)</option>
+                            </select>
+                          </div>
+                          <label className="flex items-center w-full sm:w-1/2 text-xs text-slate-400 cursor-pointer select-none p-2.5 bg-[#0B0F12] border border-slate-800 rounded">
+                            <input type="checkbox" checked={formData.estePlatitorTVA} onChange={e => setFormData({...formData, estePlatitorTVA: e.target.checked})} className="mr-3 accent-[#8ba888]" />
+                            <span className="truncate">Firma e plătitoare de TVA (+21%)</span>
+                          </label>
+                        </div>
+                      )}
+
+                      {/* QR PAY OPTION */}
+                      <div className="pt-4 border-t border-slate-800 space-y-3">
+                        <span className="text-xs font-bold text-[#8ba888] uppercase block">Opțiuni Încasare & QR Pay</span>
+                        <label className="flex items-center p-3 bg-[#0B0F12] border border-slate-800 rounded cursor-pointer transition hover:border-slate-700">
+                          <input type="checkbox" checked={formData.adaugaQrPlata} onChange={e => setFormData({...formData, adaugaQrPlata: e.target.checked})} className="mr-3 accent-[#8ba888]" />
+                          <span className="text-xs text-white font-bold">Atașează Cod QR de Plată pe Contract</span>
+                        </label>
+                        {formData.adaugaQrPlata && (
+                          <input 
+                            type="text" 
+                            placeholder="Introdu Contul IBAN sau Link de Plată (Stripe/Revolut)" 
+                            value={formData.ibanPlata} 
+                            onChange={e => setFormData({...formData, ibanPlata: e.target.value})} 
+                            className="w-full p-2.5 bg-[#12181D] border border-[#8ba888]/50 rounded text-xs text-white focus:border-[#8ba888] outline-none font-mono transition" 
+                          />
+                        )}
+                      </div>
+
+                    </div>
+
+                    <div className="pt-4 border-t border-slate-800 space-y-3">
+                      <span className="text-xs font-bold text-amber-400 uppercase block">Activare Clauze Specifice de Asigurare Plată</span>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs mb-4 border-b border-slate-800/80 pb-4">
+                        <label className="flex items-start p-3 bg-amber-900/10 border border-amber-900/30 rounded cursor-pointer">
+                          <input type="checkbox" checked={!!formData.clauzaLimitareRaspundere} onChange={e => setFormData({...formData, clauzaLimitareRaspundere: e.target.checked})} className="mt-0.5 mr-3 accent-amber-500" />
+                          <div>
+                            <span className="font-bold text-amber-500 block">Limitare Răspundere Comercială</span>
+                            <span className="text-[10px] text-slate-500 block">Nu vei plăti niciodată daune mai mari decât factura încasată.</span>
+                          </div>
+                        </label>
+
+                        <label className="flex items-start p-3 bg-amber-900/10 border border-amber-900/30 rounded cursor-pointer">
+                          <input type="checkbox" checked={!!formData.clauzaInflatie} onChange={e => setFormData({...formData, clauzaInflatie: e.target.checked})} className="mt-0.5 mr-3 accent-amber-500" />
+                          <div>
+                            <span className="font-bold text-amber-500 block">Indexare Anti-Inflație (BNR)</span>
+                            <span className="text-[10px] text-slate-500 block">Actualizează automat suma dacă BNR crește cursul EUR.</span>
+                          </div>
+                        </label>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                        {(nomenclatorClauze[formData.tipContract] || nomenclatorClauze.prestari).map((clauza) => (
+                          <label key={clauza.id} className="flex items-start p-3 bg-[#0B0F12] border border-slate-800 rounded cursor-pointer">
+                            <input type="checkbox" checked={!!formData[clauza.id]} onChange={e => setFormData({...formData, [clauza.id]: e.target.checked})} className="mt-0.5 mr-3 accent-[#8ba888]" />
+                            <div>
+                              <span className="font-bold text-white block">{clauza.titlu}</span>
+                              <span className="text-[10px] text-slate-500 block">{clauza.detaliu || clauza.text}</span>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* CLAUZĂ CUSTOM ADĂUGATĂ MANUAL */}
+                      <div className="pt-4 border-t border-slate-800 space-y-3 mt-4">
+                        <label className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-[#8ba888] uppercase tracking-wider block">Adaugă Clauză Specifică (Opțional)</span>
+                          <span className="bg-[#16221A] text-[#8ba888] text-[9px] px-2 py-0.5 rounded border border-[#8ba888]/30">Auto-Numerotare</span>
+                        </label>
+                        <p className="text-[10px] text-slate-500 leading-tight mb-2">Dacă lipsește ceva din lista de mai sus, redactează aici. Sistemul o va numerota și o va integra automat la finalul clauzelor standard pe contract.</p>
+                        <textarea 
+                          placeholder="Ex: Părțile convin ca predarea materialelor să se facă exclusiv pe un hard-disk extern furnizat de Beneficiar..." 
+                          value={formData.clauzaCustom} 
+                          onChange={e => setFormData({...formData, clauzaCustom: e.target.value})} 
+                          className="w-full p-3 bg-[#0B0F12] border border-slate-700 rounded text-xs h-20 text-white resize-none focus:border-[#8ba888] outline-none transition" 
+                        ></textarea>
+                      </div>
+
+                    {/* SISTEM AVANSAT DE SEMNĂTURI */}
+                    <div className="bg-[#0B0F12] p-5 rounded-lg border border-slate-800 space-y-4">
+                      <div className="flex justify-between items-center border-b border-slate-800 pb-2">
+                        <span className="text-xs font-bold text-slate-400 uppercase block tracking-wider">Aprobare și Semnare Document</span>
+                        <div className="flex gap-2 bg-[#12181D] p-1 rounded border border-slate-700">
+                          <button type="button" onClick={() => { setSignatureTab('draw'); curataCanvas(); }} className={`px-3 py-1 rounded text-[10px] font-bold transition-colors ${signatureTab === 'draw' ? 'bg-[#8ba888] text-black' : 'text-slate-400 hover:text-white'}`}>Desenează</button>
+                          <button type="button" onClick={() => { setSignatureTab('upload'); curataCanvas(); }} className={`px-3 py-1 rounded text-[10px] font-bold transition-colors ${signatureTab === 'upload' ? 'bg-[#8ba888] text-black' : 'text-slate-400 hover:text-white'}`}>Încarcă (PNG/JPG)</button>
+                        </div>
+                      </div>
+
+                      {signatureTab === 'draw' && (
+                        <div className="space-y-3 relative">
+                          <div className="relative border-2 border-dashed border-slate-700 rounded-lg bg-white overflow-hidden">
+                            {!isDrawing && !canvasRef.current?.toDataURL().length > 100 && (
+                              <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+                                <span className="text-black text-2xl font-black italic">Semnează aici</span>
+                              </div>
+                            )}
+                            <canvas 
+                              ref={canvasRef} 
+                              width={600} 
+                              height={160} 
+                              onTouchStart={pornesteDesenul} 
+                              onTouchMove={deseneaza} 
+                              onTouchEnd={opresteDesenul} 
+                              onMouseDown={pornesteDesenul} 
+                              onMouseMove={deseneaza} 
+                              onMouseUp={opresteDesenul} 
+                              onMouseLeave={opresteDesenul} 
+                              className="w-full h-40 cursor-crosshair block touch-none relative z-10" 
+                            />
+                          </div>
+                          <div className="flex justify-end">
+                            <button type="button" onClick={curataCanvas} className="text-[10px] font-bold text-red-400 hover:text-red-300 transition-colors uppercase tracking-wider flex items-center gap-1">
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                              Curăță / Resemnează
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {signatureTab === 'upload' && (
+                        <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-slate-700 rounded-lg bg-[#12181D]">
+                          {!uploadedSignature ? (
+                            <>
+                              <svg className="w-8 h-8 text-slate-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                              <label className="cursor-pointer bg-[#8ba888] text-black px-4 py-2 rounded text-xs font-bold hover:opacity-90 transition-opacity">
+                                Alege Imaginea (Fără fundal ideal)
+                                <input type="file" accept="image/png, image/jpeg" onChange={handleIncarcareSemnatura} className="hidden" />
+                              </label>
+                              <span className="text-[10px] text-slate-500 mt-3">Sistemul o va decupa și o va aplica direct în contract.</span>
+                            </>
+                          ) : (
+                            <div className="flex flex-col items-center w-full">
+                              <div className="bg-white p-4 rounded mb-4 w-full flex justify-center border border-slate-700">
+                                <img src={uploadedSignature} alt="Semnatura Incarcata" className="max-h-24 object-contain" />
+                              </div>
+                              <button type="button" onClick={() => setUploadedSignature(null)} className="text-[10px] font-bold text-red-400 hover:text-red-300 transition-colors uppercase tracking-wider flex items-center gap-1">
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                Elimină Imaginea
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
+                      <Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} />
+                    )}
+
+                    <div className="pt-2 pb-4">
+                      <label className="flex items-start cursor-pointer group">
+                        <div className="relative flex items-center justify-center mt-0.5 shrink-0">
+                          <input type="checkbox" checked={acordGdpr} onChange={e => setAcordGdpr(e.target.checked)} className="peer appearance-none w-4 h-4 border border-slate-600 rounded bg-[#0B0F12] checked:bg-[#8ba888] checked:border-[#8ba888] transition-all cursor-pointer" />
+                          <svg className="absolute w-3 h-3 text-[#0B0F12] opacity-0 peer-checked:opacity-100 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+                        </div>
+                        <span className="ml-3 text-[11px] text-slate-400 leading-tight select-none">
+                          Sunt de acord cu <Link href="/termeni-si-conditii" target="_blank" className="text-[#8ba888] hover:underline">Termenii și Condițiile</Link> și înțeleg că documentele încărcate sunt procesate volatil pentru OCR. Datele <strong>NU</strong> sunt stocate permanent, conform <Link href="/politica-si-confidentialitate" target="_blank" className="text-[#8ba888] hover:underline">Politicii de Confidențialitate (GDPR)</Link>.
+                        </span>
+                      </label>
+                    </div>
+
+                    <div className="flex justify-between items-center pt-6 border-t border-slate-800">
+                      <button type="button" onClick={handleInapoiPrincipal} className="text-xs text-slate-400 underline">Înapoi</button>
+                      <button type="submit" disabled={!!loadingText} className="bg-[#8ba888] text-[#0B0F12] font-black px-8 py-4 rounded text-sm transition hover:opacity-90">
+                        {loadingText ? 'Se înregistrează...' : 'Descărcare PDF'}
+                      </button>
+                    </div>
+                  </form>
                 ) : (
-                  <div className="w-full h-2 bg-[#16221A]"></div>
+                  <form onSubmit={handleGenereazaPachetAuto} className="space-y-6" autoComplete="off">
+                    <div className="border-b border-slate-800 pb-3">
+                      <h2 className="text-2xl font-black text-white">Asistent Automatizat de Vânzare Auto</h2>
+                      <p className="text-xs text-slate-400">Generare Contracte (5 exemplare) și Fișă Înmatriculare DITL</p>
+                    </div>
+
+                    {autoStep === 'upload' && (
+                      <div className="space-y-4">
+                        <div className="p-4 bg-[#0B0F12] border border-slate-800 rounded space-y-4">
+                          <div className="flex justify-between items-center border-b border-slate-800 pb-2">
+                            <span className="text-xs font-bold text-[#8ba888] uppercase tracking-wide">1. Identitate Persoană Vânzător</span>
+                            <div className="flex gap-2 bg-[#12181D] p-1 rounded border border-slate-800">
+                              <button type="button" onClick={() => setAutoData({...autoData, vanzatorTip: 'PF'})} className={`px-2 py-0.5 rounded text-[10px] font-bold ${autoData.vanzatorTip === 'PF' ? 'bg-[#8ba888] text-black' : 'text-slate-400'}`}>Fizică (PF)</button>
+                              <button type="button" onClick={() => setAutoData({...autoData, vanzatorTip: 'PJ'})} className={`px-2 py-0.5 rounded text-[10px] font-bold ${autoData.vanzatorTip === 'PJ' ? 'bg-[#8ba888] text-black' : 'text-slate-400'}`}>Firmă/PFA (PJ)</button>
+                            </div>
+                          </div>
+                          {autoData.vanzatorTip === 'PF' ? (
+                            <div className="grid grid-cols-2 gap-2">
+                              <input type="text" placeholder="Nume Complet Vânzător" autoComplete="new-password" value={autoData.vanzatorNume} onChange={e => setAutoData({...autoData, vanzatorNume: e.target.value})} className="bg-[#12181D] border border-slate-700 p-2 rounded text-xs text-white outline-none" />
+                              <input type="text" placeholder="CNP Vânzător" autoComplete="new-password" value={autoData.vanzatorCnp} onChange={e => setAutoData({...autoData, vanzatorCnp: e.target.value})} className="bg-[#12181D] border border-slate-700 p-2 rounded text-xs text-white font-mono outline-none" />
+                              <input type="text" placeholder="Adresă Domiciliu Vânzător (din buletin)" autoComplete="new-password" value={autoData.autoAdresaVanzator} onChange={e => setAutoData({...autoData, autoAdresaVanzator: e.target.value})} className="bg-[#12181D] border border-slate-700 p-2 rounded text-xs text-white col-span-2 outline-none" />
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-2 gap-2">
+                              <input type="text" placeholder="Denumire Companie / PFA" autoComplete="new-password" value={autoData.vanzatorNume} onChange={e => setAutoData({...autoData, vanzatorNume: e.target.value})} className="bg-[#12181D] border border-slate-700 p-2 rounded text-xs text-white outline-none" />
+                              <input type="text" placeholder="CUI / CIF Fiscal" autoComplete="new-password" value={autoData.vanzatorCui} onChange={e => setAutoData({...autoData, vanzatorCui: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded text-xs text-white font-mono outline-none" />
+                              <input type="text" placeholder="Nr. Înmatriculare Reg. Com." autoComplete="new-password" value={autoData.vanzatorRegCom} onChange={e => setAutoData({...autoData, vanzatorRegCom: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none" />
+                              <input type="text" placeholder="Sediu Social Companie" autoComplete="new-password" value={autoData.vanzatorSediu} onChange={e => setAutoData({...autoData, vanzatorSediu: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none" />
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="p-4 bg-[#0B0F12] border border-slate-800 rounded space-y-4">
+                          <div className="flex justify-between items-center border-b border-slate-800 pb-2">
+                            <span className="text-xs font-bold text-[#8ba888] uppercase tracking-wide">2. Identitate Persoană Cumpărător</span>
+                            <div className="flex gap-2 bg-[#12181D] p-1 rounded border border-slate-800">
+                              <button type="button" onClick={() => { setAutoData({...autoData, cumparatorTip: 'PF'}) }} className={`px-2 py-0.5 rounded text-[10px] font-bold ${autoData.cumparatorTip === 'PF' ? 'bg-[#8ba888] text-black' : 'text-slate-400'}`}>Fizică (PF)</button>
+                              <button type="button" onClick={() => { setAutoData({...autoData, cumparatorTip: 'PJ'}) }} className={`px-2 py-0.5 rounded text-[10px] font-bold ${autoData.cumparatorTip === 'PJ' ? 'bg-[#8ba888] text-black' : 'text-slate-400'}`}>Firmă/PFA (PJ)</button>
+                            </div>
+                          </div>
+                          {autoData.cumparatorTip === 'PF' ? (
+                            <div className="grid grid-cols-2 gap-2">
+                              <input type="text" placeholder="Nume Complet Cumpărător" autoComplete="new-password" value={autoData.cumparatorNume} onChange={e => setAutoData({...autoData, cumparatorNume: e.target.value})} className="bg-[#12181D] border border-slate-700 p-2 rounded text-xs text-white outline-none" />
+                              <input type="text" placeholder="CNP Cumpărător" autoComplete="new-password" value={autoData.cumparatorCnp} onChange={e => setAutoData({...autoData, cumparatorCnp: e.target.value})} className="bg-[#12181D] border border-slate-700 p-2 rounded text-xs text-white font-mono outline-none" />
+                              <input type="text" placeholder="Adresă Domiciliu Cumpărător" autoComplete="new-password" value={autoData.autoAdresaCumparator} onChange={e => setAutoData({...autoData, autoAdresaCumparator: e.target.value})} className="bg-[#12181D] border border-slate-700 p-2 rounded text-xs text-white col-span-2 outline-none" />
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-2 gap-2">
+                              <input type="text" placeholder="Denumire Companie / PFA Cumpărător" autoComplete="new-password" value={autoData.cumparatorNume} onChange={e => setAutoData({...autoData, cumparatorNume: e.target.value})} className="bg-[#12181D] border border-slate-700 p-2 rounded text-xs text-white outline-none" />
+                              <input type="text" placeholder="CUI / CIF Fiscal" autoComplete="new-password" value={autoData.cumparatorCui} onChange={e => setAutoData({...autoData, cumparatorCui: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded text-xs text-white font-mono outline-none" />
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="p-4 bg-[#0B0F12] border border-slate-800 rounded space-y-4">
+                          <div className="flex justify-between items-center border-b border-slate-800 pb-2">
+                            <span className="text-xs font-bold text-[#8ba888] uppercase tracking-wide">3. Scanare Automată Documente (Opțional)</span>
+                            <span className="text-[10px] text-slate-500">Adaugă actele direct sau folosește camera.</span>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            
+                            <div className="bg-[#12181D] p-4 border border-slate-800 rounded text-center flex flex-col justify-between min-h-[140px]">
+                              <label className="text-xs text-slate-300 block mb-2 font-bold">Carte Identitate Vehicul (CIV)</label>
+                              {!autoDocs.civ ? (
+                                <div className="flex flex-col gap-2">
+                                  <input type="file" id="file-input-civ" accept="image/*,application/pdf" disabled={isUploading} onChange={(e) => handleAutoFileUpload(e, 'civ')} className="text-[10px] block w-full text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-[#16221A] file:text-[#8ba888]" />
+                                  <button type="button" onClick={() => startCamera('civ')} className="bg-slate-800 hover:bg-slate-700 text-xs text-white font-bold py-1.5 rounded transition">📷 Folosește Camera</button>
+                                </div>
+                              ) : (
+                                <div className="flex flex-col items-center gap-2">
+                                  <span className="text-[10px] text-emerald-400 bg-[#16221A] px-2 py-1 rounded truncate w-full">✓ CIV Încărcat</span>
+                                  <button type="button" onClick={() => handleEliminaDocument('civ')} className="text-[10px] text-red-400 font-bold hover:underline">Elimină ❌</button>
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="bg-[#12181D] p-4 border border-slate-800 rounded text-center flex flex-col justify-between min-h-[140px]">
+                              <label className="text-xs text-slate-300 block mb-2 font-bold">Certificat Înmatriculare (Talon)</label>
+                              {!autoDocs.talon ? (
+                                <div className="flex flex-col gap-2">
+                                  <input type="file" id="file-input-talon" accept="image/*,application/pdf" disabled={isUploading} onChange={(e) => handleAutoFileUpload(e, 'talon')} className="text-[10px] block w-full text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-[#16221A] file:text-[#8ba888]" />
+                                  <button type="button" onClick={() => startCamera('talon')} className="bg-slate-800 hover:bg-slate-700 text-xs text-white font-bold py-1.5 rounded transition">📷 Folosește Camera</button>
+                                </div>
+                              ) : (
+                                <div className="flex flex-col items-center gap-2">
+                                  <span className="text-[10px] text-emerald-400 bg-[#16221A] px-2 py-1 rounded truncate w-full">✓ Talon Încărcat</span>
+                                  <button type="button" onClick={() => handleEliminaDocument('talon')} className="text-[10px] text-red-400 font-bold hover:underline">Elimină ❌</button>
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="bg-[#12181D] p-4 border border-slate-800 rounded text-center flex flex-col justify-between min-h-[140px]">
+                              <label className="text-xs text-slate-300 block mb-2 font-bold">Act Identitate Vânzător</label>
+                              {!autoDocs.buletin_vanzator ? (
+                                <div className="flex flex-col gap-2">
+                                  <input type="file" id="file-input-buletin_vanzator" accept="image/*,application/pdf" disabled={isUploading} onChange={(e) => handleAutoFileUpload(e, 'buletin_vanzator')} className="text-[10px] block w-full text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-[#16221A] file:text-[#8ba888]" />
+                                  <button type="button" onClick={() => startCamera('buletin_vanzator')} className="bg-slate-800 hover:bg-slate-700 text-xs text-white font-bold py-1.5 rounded transition">📷 Folosește Camera</button>
+                                </div>
+                              ) : (
+                                <div className="flex flex-col items-center gap-2">
+                                  <span className="text-[10px] text-emerald-400 bg-[#16221A] px-2 py-1 rounded truncate w-full">✓ Buletin Vânzător</span>
+                                  <button type="button" onClick={() => handleEliminaDocument('buletin_vanzator')} className="text-[10px] text-red-400 font-bold hover:underline">Elimină ❌</button>
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="bg-[#12181D] p-4 border border-slate-800 rounded text-center flex flex-col justify-between min-h-[140px]">
+                              <label className="text-xs text-slate-300 block mb-2 font-bold">Act Identitate Cumpărător</label>
+                              {!autoDocs.buletin_cumparator ? (
+                                <div className="flex flex-col gap-2">
+                                  <input type="file" id="file-input-buletin_cumparator" accept="image/*,application/pdf" disabled={isUploading} onChange={(e) => handleAutoFileUpload(e, 'buletin_cumparator')} className="text-[10px] block w-full text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-[#16221A] file:text-[#8ba888]" />
+                                  <button type="button" onClick={() => startCamera('buletin_cumparator')} className="bg-slate-800 hover:bg-slate-700 text-xs text-white font-bold py-1.5 rounded transition">📷 Folosește Camera</button>
+                                </div>
+                              ) : (
+                                <div className="flex flex-col items-center gap-2">
+                                  <span className="text-[10px] text-emerald-400 bg-[#16221A] px-2 py-1 rounded truncate w-full">✓ Buletin Cumpărător</span>
+                                  <button type="button" onClick={() => handleEliminaDocument('buletin_cumparator')} className="text-[10px] text-red-400 font-bold hover:underline">Elimină ❌</button>
+                                </div>
+                              )}
+                            </div>
+
+                          </div>
+                        </div>
+
+                        {/* Modal Cameră Live OCR */}
+                        {isCameraActive && (
+                          <div className="fixed inset-0 z-[60] bg-black/95 flex flex-col items-center justify-center p-4">
+                            <div className="relative w-full max-w-lg aspect-[4/3] bg-black rounded-lg overflow-hidden border-2 border-slate-700">
+                              <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover"></video>
+                              <canvas ref={autoCanvasRef} className="hidden"></canvas>
+                              <div className="absolute inset-10 pointer-events-none flex items-center justify-center">
+                                <div className={`w-full h-full border-4 rounded-lg transition-colors duration-500 relative ${
+                                  alignmentStatus === 'ready' ? 'border-emerald-400 shadow-[0_0_15px_rgba(52,211,153,0.5)]' : 'border-amber-400 animate-pulse'
+                                }`}>
+                                  <span className={`absolute -top-6 left-0 text-[10px] font-bold px-2 py-0.5 rounded ${
+                                    alignmentStatus === 'ready' ? 'bg-emerald-500 text-black' : 'bg-amber-500 text-black'
+                                  }`}>
+                                    {alignmentStatus === 'ready' ? 'Document Aliniat - Apasă Captură' : 'Poziționează documentul în chenar...'}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex gap-4 mt-6">
+                              <button type="button" onClick={capturePhoto} className={`px-6 py-3 rounded font-bold text-sm transition ${alignmentStatus === 'ready' ? 'bg-emerald-500 text-black animate-bounce' : 'bg-slate-700 text-slate-400'}`}>📷 Captură Optică</button>
+                              <button type="button" onClick={stopCamera} className="bg-red-900/40 text-red-400 border border-red-900 px-6 py-3 rounded font-bold text-sm hover:bg-red-900/60">Anulează</button>
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="space-y-3 pt-2">
+                          <span className="text-xs font-bold text-slate-400 uppercase block">4. Date Vehicul Extrase:</span>
+                          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                            <input type="text" placeholder="Serie Șasiu / VIN" autoComplete="new-password" required value={autoData.autoVin} onChange={e => setAutoData({...autoData, autoVin: e.target.value.toUpperCase()})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white uppercase font-mono outline-none sm:col-span-1" />
+                            <input type="text" placeholder="Număr Înmatriculare" autoComplete="new-password" value={autoData.autoNumarInmatriculare} onChange={e => setAutoData({...autoData, autoNumarInmatriculare: e.target.value.toUpperCase()})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white uppercase font-mono outline-none sm:col-span-1" />
+                            <input type="text" placeholder="Marcă și Model" autoComplete="new-password" value={autoData.autoMarcaModel} onChange={e => setAutoData({...autoData, autoMarcaModel: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white outline-none sm:col-span-1" />
+                            <div className="flex gap-1 sm:col-span-1">
+                              <input type="number" placeholder="Preț" autoComplete="new-password" value={autoData.autoPret} onChange={e => setAutoData({...autoData, autoPret: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white outline-none w-full" />
+                              <select value={autoData.autoMoneda} onChange={e => setAutoData({...autoData, autoMoneda: e.target.value})} className="bg-[#0B0F12] border border-slate-700 rounded p-1.5 text-xs text-white outline-none appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.2em_1.2em] bg-[right_0.4rem_center] bg-no-repeat pr-6">
+                                <option value="RON">RON</option>
+                                <option value="EUR">EUR</option>
+                              </select>
+                            </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                             <input type="email" placeholder="Email Contracte Finalizate" autoComplete="new-password" required value={autoData.clientEmail} onChange={e => setAutoData({...autoData, clientEmail: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white outline-none" />
+                             <label className="flex items-center text-xs text-slate-400 cursor-pointer select-none border border-slate-800 rounded p-2.5 bg-[#0B0F12]">
+                               <input type="checkbox" checked={autoData.pretIncludeTVA} onChange={e => setAutoData({...autoData, pretIncludeTVA: e.target.checked})} className="mr-2 accent-[#8ba888]" />
+                               <span>Prețul include TVA (Dacă Vânzătorul e PJ plătitor)</span>
+                             </label>
+                          </div>
+                        </div>
+
+                        {/* SECȚIUNE SEMNĂTURĂ PENTRU AUTO */}
+                        <div className="bg-[#0B0F12] p-5 rounded-lg border border-slate-800 space-y-4 mt-6">
+                          <div className="flex justify-between items-center border-b border-slate-800 pb-2">
+                            <span className="text-xs font-bold text-slate-400 uppercase block tracking-wider">Aprobare și Semnare Dosar Auto</span>
+                            <div className="flex gap-2 bg-[#12181D] p-1 rounded border border-slate-700">
+                              <button type="button" onClick={() => { setAutoSignatureTab('draw'); curataCanvasAuto(); }} className={`px-3 py-1 rounded text-[10px] font-bold transition-colors ${autoSignatureTab === 'draw' ? 'bg-[#8ba888] text-black' : 'text-slate-400 hover:text-white'}`}>Desenează</button>
+                              <button type="button" onClick={() => { setAutoSignatureTab('upload'); curataCanvasAuto(); }} className={`px-3 py-1 rounded text-[10px] font-bold transition-colors ${autoSignatureTab === 'upload' ? 'bg-[#8ba888] text-black' : 'text-slate-400 hover:text-white'}`}>Încarcă (PNG/JPG)</button>
+                            </div>
+                          </div>
+
+                          {autoSignatureTab === 'draw' && (
+                            <div className="space-y-3 relative">
+                              <div className="relative border-2 border-dashed border-slate-700 rounded-lg bg-white overflow-hidden">
+                                {!isAutoDrawing && !autoSigCanvasRef.current?.toDataURL().length > 100 && (
+                                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+                                    <span className="text-black text-2xl font-black italic">Semnează aici</span>
+                                  </div>
+                                )}
+                                <canvas 
+                                  ref={autoSigCanvasRef} 
+                                  width={600} 
+                                  height={160} 
+                                  onTouchStart={pornesteDesenulAuto} 
+                                  onTouchMove={deseneazaAuto} 
+                                  onTouchEnd={opresteDesenulAuto} 
+                                  onMouseDown={pornesteDesenulAuto} 
+                                  onMouseMove={deseneazaAuto} 
+                                  onMouseUp={opresteDesenulAuto} 
+                                  onMouseLeave={opresteDesenulAuto} 
+                                  className="w-full h-40 cursor-crosshair block touch-none relative z-10" 
+                                />
+                              </div>
+                              <div className="flex justify-end">
+                                <button type="button" onClick={curataCanvasAuto} className="text-[10px] font-bold text-red-400 hover:text-red-300 transition-colors uppercase tracking-wider flex items-center gap-1">
+                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                  Curăță / Resemnează
+                                </button>
+                              </div>
+                            </div>
+                          )}
+
+                          {autoSignatureTab === 'upload' && (
+                            <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-slate-700 rounded-lg bg-[#12181D]">
+                              {!autoUploadedSig ? (
+                                <>
+                                  <svg className="w-8 h-8 text-slate-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                  <label className="cursor-pointer bg-[#8ba888] text-black px-4 py-2 rounded text-xs font-bold hover:opacity-90 transition-opacity">
+                                    Alege Imaginea (Fără fundal ideal)
+                                    <input type="file" accept="image/png, image/jpeg" onChange={handleIncarcareSemnaturaAuto} className="hidden" />
+                                  </label>
+                                  <span className="text-[10px] text-slate-500 mt-3">Sistemul o va decupa și o va aplica direct în contractele DITL.</span>
+                                </>
+                              ) : (
+                                <div className="flex flex-col items-center w-full">
+                                  <div className="bg-white p-4 rounded mb-4 w-full flex justify-center border border-slate-700">
+                                    <img src={autoUploadedSig} alt="Semnatura Incarcata" className="max-h-24 object-contain" />
+                                  </div>
+                                  <button type="button" onClick={() => setAutoUploadedSig(null)} className="text-[10px] font-bold text-red-400 hover:text-red-300 transition-colors uppercase tracking-wider flex items-center gap-1">
+                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    Elimină Imaginea
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
+                          <Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} />
+                        )}
+
+                        <div className="pt-2 pb-4">
+                          <label className="flex items-start cursor-pointer group">
+                            <div className="relative flex items-center justify-center mt-0.5 shrink-0">
+                              <input type="checkbox" checked={acordGdpr} onChange={e => setAcordGdpr(e.target.checked)} className="peer appearance-none w-4 h-4 border border-slate-600 rounded bg-[#0B0F12] checked:bg-[#8ba888] checked:border-[#8ba888] transition-all cursor-pointer" />
+                              <svg className="absolute w-3 h-3 text-[#0B0F12] opacity-0 peer-checked:opacity-100 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+                            </div>
+                            <span className="ml-3 text-[11px] text-slate-400 leading-tight select-none">
+                              Sunt de acord cu <Link href="/termeni-si-conditii" target="_blank" className="text-[#8ba888] hover:underline">Termenii și Condițiile</Link> și înțeleg că documentele încărcate sunt procesate volatil pentru OCR. Datele <strong>NU</strong> sunt stocate permanent, conform <Link href="/politica-si-confidentialitate" target="_blank" className="text-[#8ba888] hover:underline">Politicii de Confidențialitate (GDPR)</Link>.
+                            </span>
+                          </label>
+                        </div>
+                        
+                        <div className="flex justify-between items-center pt-2">
+                          <button type="button" onClick={handleInapoiPrincipal} className="text-xs text-slate-400 underline">Înapoi la panou</button>
+                          <button type="submit" disabled={isUploading || !!loadingText} className="bg-[#8ba888] text-black font-black px-6 py-2.5 rounded text-xs tracking-tight transition hover:opacity-90">
+                            {loadingText ? 'Se procesează...' : `Generează Pachet Auto .ZIP (${autoData.autoMoneda === 'EUR' ? `${Math.round(99 / cursBnr.eur)} EUR` : '19.99 €'})`}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {autoStep === 'success' && (
+                      <div className="bg-[#0B0F12] border border-slate-800 p-5 rounded-lg text-center space-y-4">
+                        <div className="w-12 h-12 bg-emerald-900/40 text-emerald-400 rounded-full flex items-center justify-center mx-auto text-xl font-bold">✓</div>
+                        <div>
+                          <h4 className="text-sm font-bold text-white">Pachetul Auto a fost descărcat!</h4>
+                          <p className="text-xs text-slate-400 mt-1">Arhiva conține cele 5 exemplare oficiale DITL, procesul-verbal avocațial cu km garantați și ghidul procedural post-vânzare.</p>
+                        </div>
+                        <div className="flex justify-center mt-4">
+                          <button type="button" onClick={() => { setAutoStep('upload'); setStep(1); }} className="text-xs font-bold text-[#8ba888] hover:text-white flex items-center gap-1.5 transition underline">
+                            &larr; Înapoi la Panoul Principal
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </form>
                 )}
-                <div className="p-5 flex flex-col justify-between flex-1">
-                  <div>
-                    <span className="text-[10px] font-bold text-[#8ba888] bg-[#16221A] px-2 py-0.5 rounded border border-emerald-900/50 uppercase inline-block mb-3">{stire.sursa || "Presă Economică"}</span>
-                    <h3 className="text-sm font-bold text-white leading-snug group-hover:text-[#8ba888] transition-colors">{stire.titlu || stire.title}</h3>
+              </div>
+            </div>
+
+            {/* WIDGET-URI (DOAR LA B2B) ȘI PREȚURI (LA B2B ȘI AUTO) */}
+            <div className="w-full">
+              
+              {/* Afișăm Widget-urile doar dacă NU suntem la Auto */}
+              {formData.tipContract !== 'auto' && (
+                <div className="max-w-6xl mx-auto mt-16 mb-12 px-4">
+                  <div className="text-center mb-12">
+                    <h3 className="text-2xl font-black text-white uppercase tracking-wider">Instrumente Utile pentru Contractul Tău</h3>
+                    <p className="text-sm text-slate-400 mt-2">Verifică partenerul la ANAF sau calculează taxele aplicabile contractului.</p>
                   </div>
-                  <div className="mt-4 pt-3 border-t border-slate-800/60 flex justify-between items-center">
-                    <span className="text-[10px] text-slate-500">Actualizat Live</span>
-                    <span className="text-xs font-bold text-[#8ba888] group-hover:underline">Citește mai mult &rarr;</span>
+
+                  <div className="grid grid-cols-1 gap-8 items-stretch">
+                    
+                    {/* WIDGET ANAF */}
+                    <div className="w-full">
+                      <div className="bg-[#12181D] rounded-2xl border border-slate-800/80 shadow-xl p-6 md:p-8 flex flex-col items-center relative overflow-hidden h-full">
+                        <div className="absolute -right-20 -top-20 w-64 h-64 bg-[#8ba888]/5 rounded-full blur-3xl pointer-events-none"></div>
+                        
+                        <div className="w-full relative z-10 mb-6 border-b border-slate-800/80 pb-6 text-center">
+                          <h3 className="text-sm font-bold text-[#8ba888] uppercase tracking-wider block mb-2">Verificare Firmă ANAF</h3>
+                          <p className="text-[11px] text-slate-400 leading-relaxed">Interoghează rapid orice companie din România și descarcă raportul financiar.</p>
+                        </div>
+                        
+                        <div className="w-full relative z-10 flex flex-col justify-center flex-1">
+                          <form onSubmit={handleCautareCuiWidget} className="flex gap-2 w-full mb-6">
+                            <input type="text" placeholder="Introdu CUI (ex: 123456)" value={cuiSearch} onChange={e => setCuiSearch(e.target.value)} className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-3 text-sm text-white font-mono outline-none focus:border-[#8ba888] transition text-center" required />
+                            <button type="submit" disabled={isSearchingCui} className="bg-[#8ba888] text-[#0B0F12] font-black px-6 rounded-lg text-xs transition hover:opacity-90">
+                              {isSearchingCui ? '...' : 'Caută'}
+                            </button>
+                          </form>
+
+                          {!cuiDataResult ? (
+                            <div className="w-full py-6 flex flex-col items-center justify-center border-2 border-dashed border-slate-800/60 rounded-xl bg-[#0B0F12]/30 text-slate-500">
+                              <svg className="w-6 h-6 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                              <span className="text-[10px] font-bold uppercase tracking-wider">Așteaptă Căutarea</span>
+                            </div>
+                          ) : (
+                            <div className="w-full bg-[#0B0F12] border border-slate-700 rounded-xl p-5 animate-fadeIn">
+                              <div className="flex justify-between items-start mb-3">
+                                <div>
+                                  <h4 className="text-sm font-bold text-white uppercase">{cuiDataResult.denumire}</h4>
+                                  <span className="text-[10px] text-slate-400 font-mono">CUI: {cuiDataResult.cui}</span>
+                                </div>
+                                <span className={`px-2 py-1 rounded text-[9px] font-black uppercase ${cuiDataResult.stare?.toLowerCase().includes('inactiv') || cuiDataResult.stare?.toLowerCase().includes('radiat') ? 'bg-red-900/40 text-red-400 border border-red-900' : 'bg-emerald-900/40 text-emerald-400 border border-emerald-900'}`}>
+                                  {cuiDataResult.stare || 'Necunoscut'}
+                                </span>
+                              </div>
+                              <button onClick={(e) => { e.preventDefault(); handleReportAction(); }} className="w-full mt-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold py-2.5 rounded-lg text-xs transition">
+                                {buttonText}
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* CALCULATOR FISCAL */}
+                    <div className="w-full">
+                      <div className="bg-[#12181D] rounded-2xl border border-slate-800/80 shadow-xl p-6 flex flex-col justify-between h-full">
+                        <div>
+                          <div className="flex items-center gap-3 mb-6 border-b border-slate-800/80 pb-4">
+                            <span className="text-3xl"></span>
+                            <div>
+                              <h4 className="text-[#8ba888] font-bold text-sm">CALCULATOR FISCAL 2026</h4>
+                              <p className="text-[11px] text-slate-400">Plafoane CASS & Impozit</p>
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-6">
+                            <div>
+                              <div className="flex justify-between items-center mb-1">
+                                <label className="text-slate-400 text-[10px] font-bold uppercase">Valoare Factură / Venit</label>
+                                <span className="text-[#8ba888] font-mono text-[11px] font-bold">{fiscal.venitLunar} RON</span>
+                              </div>
+                              <input type="range" min="0" max="50000" step="1" value={fiscal.venitLunar} onChange={e => setFiscal({...fiscal, venitLunar: Number(e.target.value)})} className="w-full h-1.5 bg-slate-800 rounded appearance-none cursor-pointer accent-[#8ba888]" />
+                              <div className="mt-3 flex items-center gap-2">
+                                <input type="number" min="0" max="50000" value={fiscal.venitLunar} onChange={e => setFiscal({...fiscal, venitLunar: Number(e.target.value)})} className="w-full p-2 bg-[#0B0F12] text-white rounded border border-slate-700 focus:outline-none focus:border-[#8ba888] text-xs" placeholder="Introdu suma..." />
+                                <span className="text-gray-400 font-medium text-xs">RON</span>
+                              </div>
+                            </div>
+                          
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                              <div>
+                                <label className="text-slate-400 text-[10px] font-bold uppercase mb-1 block">Formă Juridică</label>
+                                <select value={fiscal.formaJuridica} onChange={e => setFiscal({...fiscal, formaJuridica: e.target.value})} className="w-full bg-[#0B0F12] border border-slate-700 rounded-lg py-2.5 px-3 text-white outline-none text-xs">
+                                  <option value="SRL">SRL (Microîntreprindere)</option>
+                                  <option value="PFA_SISTEM_REAL">PFA (Sistem Real)</option>
+                                </select>
+                              </div>
+                              {fiscal.formaJuridica !== 'PFA_SISTEM_REAL' && (
+                                <div className="flex gap-2 items-end">
+                                  <label className="flex-1 flex items-center justify-center bg-[#0B0F12] h-[36px] rounded-lg border border-slate-800 cursor-pointer text-[10px] text-white hover:bg-slate-900 transition">
+                                    <input type="checkbox" checked={fiscal.areAngajati} onChange={e => setFiscal({...fiscal, areAngajati: e.target.checked})} className="mr-1.5 accent-[#8ba888]" /> Angajați
+                                  </label>
+                                  <label className="flex-1 flex items-center justify-center bg-[#0B0F12] h-[36px] rounded-lg border border-slate-800/60 cursor-pointer text-[10px] text-white hover:bg-slate-900 transition">
+                                    <input type="checkbox" checked={fiscal.platitorTva} onChange={e => setFiscal({...fiscal, platitorTva: e.target.checked})} className="mr-1.5 accent-[#8ba888]" /> TVA
+                                  </label>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="mt-6 pt-4 border-t border-slate-800/50">
+                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4 font-mono text-[11px]">
+                            <div className="bg-[#0B0F12] p-3 rounded-lg border border-slate-800/40 flex flex-col justify-center">
+                              <span className="text-slate-500 text-[10px] block mb-1">Impozit micro:</span>
+                              <span className="text-slate-200 font-bold">{rezultateFiscale.defalcare.impozit} RON</span>
+                            </div>
+                            <div className="bg-[#0B0F12] p-3 rounded-lg border border-slate-800/40 flex flex-col justify-center">
+                              <span className="text-slate-500 text-[10px] block mb-1">CAS/CASS:</span>
+                              <span className="text-slate-200 font-bold">{rezultateFiscale.defalcare.sociale} RON</span>
+                            </div>
+                            {fiscal.formaJuridica === 'SRL' && (
+                              <div className="bg-[#0B0F12] p-3 rounded-lg border border-slate-800/40 flex flex-col justify-center">
+                                <span className="text-slate-500 text-[10px] block mb-1">Dividende(10%):</span>
+                                <span className="text-slate-200 font-bold">{rezultateFiscale.defalcare.dividende} RON</span>
+                              </div>
+                            )}
+                            {fiscal.platitorTva && (
+                              <div className="bg-[#0B0F12] p-3 rounded-lg border border-slate-800/40 flex flex-col justify-center">
+                                <span className="text-slate-500 text-[10px] block mb-1">TVA (21%):</span>
+                                <span className="text-slate-200 font-bold">{rezultateFiscale.tvaLunar} RON</span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="bg-[#16221A] border border-[#8ba888]/30 p-4 rounded-xl flex justify-between items-center">
+                            <div>
+                              <span className="text-slate-400 block text-[10px] uppercase font-bold mb-0.5">Dări Stat (Total Lunar)</span>
+                              <strong className="text-red-400 font-mono text-sm">{rezultateFiscale.taxeLunare} RON</strong>
+                            </div>
+                            <div className="text-right">
+                              <span className="text-[#8ba888] block text-[10px] uppercase font-bold mb-0.5">Profit Curat Net / Lună</span>
+                              <strong className="text-white text-xl font-mono tracking-tight">{rezultateFiscale.netLunar} RON</strong>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
                   </div>
                 </div>
-              </a>
-            ))}
-          </div>
-        </div>
+              )}
 
-        </>
+              {/* Tabelul de prețuri apare mereu la finalul Step 2 (și la B2B și la Auto) */}
+              <div className="mt-8">
+                {renderCarduriPreturi()}
+              </div>
+
+            </div>
+          </div>
+        )}
+
+        {/* QR CODE REDIRECT STEP 2 */}
+        {step === 2 && qrGeneratedUrl && qrGeneratedUrl.includes('/semneaza/') && (
+          <div className="max-w-3xl mx-auto mt-6 p-6 bg-[#12181D] border border-slate-800 rounded-lg flex flex-col items-center justify-center text-center shadow-lg">
+            <h3 className="text-lg font-bold text-[#8ba888] mb-2">Contractul a fost publicat</h3>
+            <p className="text-xs text-slate-400 mb-4">Scanează codul QR pentru a deschide direct fluxul electronic de semnare:</p>
+            <div className="p-4 bg-white border rounded shadow-md">
+              <QRCodeSVG value={qrGeneratedUrl} size={150} />
+            </div>
+            <p className="text-xs text-slate-500 mt-3 font-mono">URL Securizat: <a href={qrGeneratedUrl} target="_blank" rel="noreferrer" className="underline text-[#8ba888]">{qrGeneratedUrl}</a></p>
+          </div>
         )}
 
         {/* FOOTER GENERAL CENTRAT */}
@@ -2844,12 +2768,12 @@ export default function Home() {
           <div className="max-w-5xl mx-auto px-6 space-y-6">
             <div className="flex justify-center">
               <div className="w-[180px] h-[30px] cursor-pointer" onClick={handleInapoiPrincipal}>
-                <svg viewBox="0 0 240 40" className="w-full h-full mx-auto">
-                  <g transform="translate(0, 2)">
+                <svg viewBox="0 0 240 52" className="w-full h-full mx-auto">
+                  <g transform="translate(0, 6)">
                     <path d="M24 6 C15 6, 8 13, 8 22 C8 31, 15 38, 24 38 C31 38, 37 33, 39 27" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round"/>
                     <path d="M16 21 L21 26 L32 12" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
                   </g>
-                  <text x="48" y="26" fontFamily="system-ui, -apple-system, sans-serif" fontWeight="900" fontSize="20" fill="#FFFFFF" letterSpacing="-0.5">
+                  <text x="48" y="34" fontFamily="system-ui, -apple-system, sans-serif" fontWeight="900" fontSize="22" fill="#FFFFFF" letterSpacing="-0.5">
                     Contract<tspan fill="#8ba888">Smart</tspan>
                   </text>
                 </svg>
