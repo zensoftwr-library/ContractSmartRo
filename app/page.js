@@ -2585,15 +2585,18 @@ export default function Home() {
                           </label>
                         </div>
                         
-                        <div className="flex justify-between items-center pt-2">
-                          <button type="submit" disabled={isUploading || !!loadingText} className="bg-[#8ba888] text-black font-black px-6 py-2.5 rounded text-xs tracking-tight transition hover:opacity-90">
-                            {loadingText ? 'Se procesează...' : 
-                              user?.status === 'founder' 
-                                ? 'Generează Pachet Auto .ZIP' 
-                                : `Generează Pachet Auto .ZIP (${autoData.autoMoneda === 'EUR' ? `${Math.round(99 / cursBnr.eur)} EUR` : '19.99 €'})`
-                            }
-                          </button>
-                        </div>
+                        <div className="flex flex-col sm:flex-row justify-center sm:justify-between items-center pt-6 border-t border-slate-800 gap-4">
+                        <button type="button" onClick={handleInapoiPrincipal} className="text-xs text-slate-400 underline order-2 sm:order-1">
+                          Înapoi la panou
+                        </button>
+                        <button type="submit" disabled={isUploading || !!loadingText} className="bg-[#8ba888] text-black font-black px-6 py-2.5 rounded text-xs tracking-tight transition hover:opacity-90 order-1 sm:order-2">
+                          {loadingText ? 'Se procesează...' : 
+                            user?.status === 'founder' 
+                              ? 'Generează Pachet Auto .ZIP' 
+                              : `Generează Pachet Auto .ZIP (${autoData.autoMoneda === 'EUR' ? `${Math.round(99 / cursBnr.eur)} EUR` : '19.99 €'})`
+                          }
+                        </button>
+                      </div>
                       </div>
                     )}
 
