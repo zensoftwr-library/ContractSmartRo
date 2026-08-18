@@ -39,7 +39,7 @@ const nomenclatorClauze = {
     { id: 'clauzaMedicalMalpraxis', titlu: '18. Exonerare Răspundere și Malpraxis', detaliu: 'Delimitarea răspunderii furnizorului în limitele obligațiilor de mijloace și a consimțământului informat semnat, sub acoperirea exclusivă a polizei de răspundere civilă profesională.' },
     { id: 'clauzaMedicalNoShow', titlu: '19. Politică Strictă de Anulare Programări', detaliu: 'Anularea ședințelor programate cu mai puțin de 24 de ore înainte atrage facturarea integrală a tariefelor aferente sau reținerea definitivă a creditului din pachetul achiziționat.' },
     { id: 'clauzaTranspCmr', titlu: '20. Răspundere conform Convenției CMR', detaliu: 'Angajarea răspunderii transportatorului pentru pierderea, avarierea mărfii sau depășirea termenului de livrare se guvernează strict de limitele plafonate impuse de Convenția CMR.' },
-    { id: 'clauzaTranspStationare', titlu: '21. Taxă de Staționare / Demurrage', detaliu: 'Depășirea timpului alocat pentru operațiunile de încărcare/descărcare la rampă atrage aplicarea unei taxe fixe de staționare, calculată pe fiecare oră de imobilizare a autovehiculului.' }
+    { id: 'clauzaTranspStationare', titlu: '21. Taxă de Staționare / Demurrage', detaliu: 'Depășirea timpului alocat pentru operațiunile de încărcare/descărcare la rampă atrage aplicarea unei taxe fixe de staționare, calculată pe fiecare order de imobilizare a autovehiculului.' }
   ],
   colaborare_b2b: [
     { id: 'clauzaPi', titlu: '1. Suspendare IP / Proprietate Intelectuală', detaliu: 'Drepturile patrimoniale de autor se transferă exclusiv la data stingerii integrale a obligațiilor de plată.' },
@@ -131,6 +131,7 @@ export default function Home() {
   const [loadingText, setLoadingText] = useState(null);
   const [step, setStep] = useState(1);
   const [autoStep, setAutoStep] = useState('upload');
+  const [acordGdpr, setAcordGdpr] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
@@ -987,6 +988,10 @@ export default function Home() {
   const handleLansareContract = async (e) => {
     e.preventDefault();
     if (isProcessingForm.current) return;
+    if (!acordGdpr) {
+      alert('Pentru a continua, trebuie să fii de acord cu prelucrarea tranzitorie a datelor (GDPR).');
+      return;
+    }
     
     if (!user) {
       alert('Pentru a descărca documentul direct în format binar, creează un cont rapid în 10 secunde.');
@@ -1121,6 +1126,10 @@ export default function Home() {
   const handleGenereazaPachetAuto = async (e) => {
     e.preventDefault();
     if (isProcessingForm.current) return;
+    if (!acordGdpr) {
+      alert('Pentru a continua, trebuie să fii de acord cu prelucrarea tranzitorie a datelor (GDPR).');
+      return;
+    }
     
     if (!user) {
       alert('Creează un cont rapid pentru a securiza și descărca documentele auto.');
@@ -1295,24 +1304,6 @@ export default function Home() {
         '--scroll-y-reverse': `${(1 - scrollPercent) * 100}%`
       }}
     >
-      
-      {/* 📈 BARA TICKER DINAMICĂ LIVE */}
-      <div className="w-full bg-[#12181D] border-b border-slate-800 text-[11px] text-slate-400 py-2 overflow-hidden whitespace-nowrap relative z-50 flex">
-        <div className="animate-marquee font-mono flex gap-12 items-center shrink-0 min-w-full justify-around pr-6">
-          <span>📈 <strong>EUR/RON:</strong> {cursBnr.eur} lei</span>
-          <span>🇺🇸 <strong>USD/RON:</strong> {cursBnr.usd} lei</span>
-          <span>📊 <strong>BET Index (BVB):</strong> {indiciBursa.bet.puncte} ({indiciBursa.bet.procent})</span>
-          <span>📊 <strong>S&P 500 (US):</strong> {indiciBursa.sp500.puncte} ({indiciBursa.sp500.procent})</span>
-          <span>📊 <strong>NASDAQ (US):</strong> {indiciBursa.nasdaq.puncte} ({indiciBursa.nasdaq.procent})</span>
-        </div>
-        <div className="animate-marquee font-mono flex gap-12 items-center shrink-0 min-w-full justify-around pr-6 select-none" aria-hidden="true">
-          <span>📈 <strong>EUR/RON:</strong> {cursBnr.eur} lei</span>
-          <span>🇺🇸 <strong>USD/RON:</strong> {cursBnr.usd} lei</span>
-          <span>📊 <strong>BET Index (BVB):</strong> {indiciBursa.bet.puncte} ({indiciBursa.bet.procent})</span>
-          <span>📊 <strong>S&P 500 (US):</strong> {indiciBursa.sp500.puncte} ({indiciBursa.sp500.procent})</span>
-          <span>📊 <strong>NASDAQ (US):</strong> {indiciBursa.nasdaq.puncte} ({indiciBursa.nasdaq.procent})</span>
-        </div>
-      </div>
 
       {/* NAVBAR */}
       <nav className="sticky top-0 z-40 backdrop-blur-md bg-[#0B0F12]/90 border-b border-slate-800 py-4 px-6 shadow-md transition-all">
@@ -1342,6 +1333,8 @@ export default function Home() {
             <Link href="/baza-legala" className="text-xs text-slate-400 hover:text-white transition">Articole Validitate Juridică</Link>
             <span className="text-slate-800">|</span>
             <Link href="/termeni-si-conditii" className="text-xs text-slate-400 hover:text-white transition">Termeni și Condiții</Link>
+            <span className="text-slate-800">|</span>
+            <Link href="/politica-si-confidentialitate" className="text-xs text-slate-400 hover:text-white transition">Termeni și Condiții</Link>
             <span className="text-slate-800">|</span>
             <Link href="/contact" className="text-xs text-slate-400 hover:text-white transition">Contact</Link>
             <span className="text-slate-800">|</span>
@@ -1560,135 +1553,20 @@ export default function Home() {
         {step === 1 && (
           <div className="w-full">
             <div className="max-w-4xl mx-auto text-center py-16 px-4">
-              <span className="hidden md:inline-block bg-[#16221A] text-[#8ba888] border border-[#8ba888]/20 text-xs font-bold px-4 py-1.5 rounded-full tracking-wider uppercase">
-                Infrastructură Electronică de Securizare Comercială
-              </span>
-              <div className="flex md:hidden flex-wrap justify-center gap-2">
-                <span className="bg-[#16221A] text-[#8ba888] border border-[#8ba888]/20 text-[10px] sm:text-xs font-bold px-4 py-1.5 rounded-full tracking-wider uppercase">
-                  Infrastructură Electronică
-                </span>
-                <span className="bg-[#16221A] text-[#8ba888] border border-[#8ba888]/20 text-[10px] sm:text-xs font-bold px-4 py-1.5 rounded-full tracking-wider uppercase">
-                  de Securizare Comercială
-                </span>
-              </div>
-              <h1 className="text-5xl md:text-6xl font-black text-white mt-6 leading-tight tracking-tighter">Asigurarea Încasărilor <br/><span className="text-[#8ba888]">Privitor La Management de Clauze</span></h1>
-              
-              <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto px-4">
-                <button type="button" onClick={() => { setFormData(prev => ({ ...prev, tipContract: 'prestari' })); setStep(2); }} className="bg-[#8ba888] text-[#0B0F12] font-black px-4 py-4 rounded-lg shadow-md shadow-[#8ba888]/5 transition text-xs tracking-tight flex items-center justify-center gap-2">
+            
+              <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto px-4">
+                <button type="button" onClick={() => { setFormData(prev => ({ ...prev, tipContract: 'prestari' })); setStep(2); }} className="bg-[#8ba888] text-[#0B0F12] font-black px-6 py-6 rounded-xl shadow-[0_0_20px_rgba(139,168,136,0.15)] transition-all hover:scale-105 text-sm uppercase tracking-wide flex items-center justify-center gap-2">
                     Generator Contracte B2B / Servicii
                 </button>
-                <button type="button" onClick={() => { setFormData(prev => ({ ...prev, tipContract: 'auto' })); setStep(2); }} className="bg-[#12181D] border border-slate-700 text-white font-bold px-4 py-4 rounded-lg hover:border-[#8ba888]/50 transition text-xs tracking-tight flex items-center justify-center gap-2">
+                <button type="button" onClick={() => { setFormData(prev => ({ ...prev, tipContract: 'auto' })); setStep(2); }} className="bg-[#12181D] border-2 border-slate-700 text-white font-bold px-6 py-6 rounded-xl hover:border-[#8ba888]/80 transition-all hover:scale-105 text-sm uppercase tracking-wide flex items-center justify-center gap-2">
                     Generator Pachet Acte Auto
                 </button>
               </div>
             </div>
 
-            {/* BENTO GRID: CALCULATOR FISCAL + QR CODE STUDIO */}
+            {/* QR CODE STUDIO */}
             <div className="max-w-7xl mx-auto px-6 mt-6 grid grid-cols-1 xl:grid-cols-2 gap-6">
               
-              {/* CARD 1: CALCULATOR FISCAL */}
-              <div className="bg-[#12181D] rounded-2xl border border-slate-800/80 shadow-xl p-6 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center gap-3 mb-6 border-b border-slate-800/80 pb-4">
-                    <span className="text-3xl"></span>
-                    <div>
-                      <h4 className="text-[#8ba888] font-bold text-sm">CALCULATOR FISCAL 2026</h4>
-                      <p className="text-[11px] text-slate-400">Plafoane CASS & Impozit</p>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-6">
-                    <div>
-                      <div className="flex justify-between items-center mb-1">
-                        <label htmlFor="venitLunar" className="text-slate-400 text-[10px] font-bold uppercase">Valoare Factură / Venit</label>
-                        <span className="text-[#8ba888] font-mono text-[11px] font-bold">{fiscal.venitLunar} RON</span>
-                      </div>
-                        <input 
-                          id="venitLunar"
-                          name="venitLunar"
-                          type="range" 
-                          min="0" 
-                          max="50000" 
-                          step="1" 
-                          value={fiscal.venitLunar} 
-                          onChange={e => setFiscal({...fiscal, venitLunar: Number(e.target.value)})} 
-                          className="w-full h-1.5 bg-slate-800 rounded appearance-none cursor-pointer accent-[#8ba888]" 
-                        />
-                        
-                        {/* Câmpul nou pentru introducere manuală din tastatură */}
-                        <div className="mt-3 flex items-center gap-2">
-                          <input 
-                            type="number" 
-                            min="0" 
-                            max="50000" 
-                            value={fiscal.venitLunar} 
-                            onChange={e => setFiscal({...fiscal, venitLunar: Number(e.target.value)})} 
-                            className="w-full p-2 bg-slate-800 text-white rounded border border-slate-700 focus:outline-none focus:border-[#8ba888]"
-                            placeholder="Introdu suma dorită..."
-                          />
-                          <span className="text-gray-400 font-medium">RON</span>
-                        </div>
-                      </div>
-                    
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label htmlFor="formaJuridica" className="text-slate-400 text-[10px] font-bold uppercase mb-1 block">Formă Juridică</label>
-                        <select id="formaJuridica" name="formaJuridica" value={fiscal.formaJuridica} onChange={e => setFiscal({...fiscal, formaJuridica: e.target.value})} className="w-full bg-[#0B0F12] border border-slate-700 rounded-lg py-2.5 px-3 text-white outline-none text-xs appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.2em_1.2em] bg-[right_0.6rem_center] bg-no-repeat pr-8">
-                          <option value="SRL">SRL (Microîntreprindere)</option>
-                          <option value="PFA_SISTEM_REAL">PFA (Sistem Real)</option>
-                        </select>
-                      </div>
-                      
-                      {fiscal.formaJuridica !== 'PFA_SISTEM_REAL' && (
-                        <div className="flex gap-2 items-end">
-                          <label className="flex-1 flex items-center justify-center bg-[#0B0F12] h-[36px] rounded-lg border border-slate-800 cursor-pointer text-[10px] text-white hover:bg-slate-900 transition">
-                            <input type="checkbox" checked={fiscal.areAngajati} onChange={e => setFiscal({...fiscal, areAngajati: e.target.checked})} className="mr-1.5 accent-[#8ba888]" /> Angajați
-                          </label>
-                          <label className="flex-1 flex items-center justify-center bg-[#0B0F12] h-[36px] rounded-lg border border-slate-800/60 cursor-pointer text-[10px] text-white hover:bg-slate-900 transition">
-                            <input type="checkbox" checked={fiscal.platitorTva} onChange={e => setFiscal({...fiscal, platitorTva: e.target.checked})} className="mr-1.5 accent-[#8ba888]" /> TVA
-                          </label>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-6 pt-4 border-t border-slate-800/50">
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4 font-mono text-[11px]">
-                    <div className="bg-[#0B0F12] p-3 rounded-lg border border-slate-800/40 flex flex-col justify-center">
-                      <span className="text-slate-500 text-[10px] block mb-1">Impozit micro:</span>
-                      <span className="text-slate-200 font-bold">{rezultateFiscale.defalcare.impozit} RON</span>
-                    </div>
-                    <div className="bg-[#0B0F12] p-3 rounded-lg border border-slate-800/40 flex flex-col justify-center">
-                      <span className="text-slate-500 text-[10px] block mb-1">CAS/CASS:</span>
-                      <span className="text-slate-200 font-bold">{rezultateFiscale.defalcare.sociale} RON</span>
-                    </div>
-                    {fiscal.formaJuridica === 'SRL' && (
-                      <div className="bg-[#0B0F12] p-3 rounded-lg border border-slate-800/40 flex flex-col justify-center">
-                        <span className="text-slate-500 text-[10px] block mb-1">Dividende(10%):</span>
-                        <span className="text-slate-200 font-bold">{rezultateFiscale.defalcare.dividende} RON</span>
-                      </div>
-                    )}
-                    {fiscal.platitorTva && (
-                      <div className="bg-[#0B0F12] p-3 rounded-lg border border-slate-800/40 flex flex-col justify-center">
-                        <span className="text-slate-500 text-[10px] block mb-1">TVA (21%):</span>
-                        <span className="text-slate-200 font-bold">{rezultateFiscale.tvaLunar} RON</span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="bg-[#16221A] border border-[#8ba888]/30 p-4 rounded-xl flex justify-between items-center">
-                    <div>
-                      <span className="text-slate-400 block text-[10px] uppercase font-bold mb-0.5">Dări Stat (Total Lunar)</span>
-                      <strong className="text-red-400 font-mono text-sm">{rezultateFiscale.taxeLunare} RON</strong>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-[#8ba888] block text-[10px] uppercase font-bold mb-0.5">Profit Curat Net / Lună</span>
-                      <strong className="text-white text-xl font-mono tracking-tight">{rezultateFiscale.netLunar} RON</strong>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
               <div className="bg-[#12181D] rounded-2xl border border-slate-800/80 shadow-xl flex flex-col">
                 {/* Header & Tabs */}
                 <div className="p-6 border-b border-slate-800/80 bg-[#0B0F12]/30 rounded-t-2xl">
@@ -2140,7 +2018,7 @@ export default function Home() {
                       </div>
                     )}
 
-                    {/* QR PAY OPTION - NOU */}
+                    {/* QR PAY OPTION */}
                     <div className="pt-4 border-t border-slate-800 space-y-3">
                       <span className="text-xs font-bold text-[#8ba888] uppercase block">Opțiuni Încasare & QR Pay</span>
                       <label className="flex items-center p-3 bg-[#0B0F12] border border-slate-800 rounded cursor-pointer transition hover:border-slate-700">
@@ -2279,6 +2157,18 @@ export default function Home() {
                   {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
                     <Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} />
                   )}
+
+                  <div className="pt-2 pb-4">
+                    <label className="flex items-start cursor-pointer group">
+                      <div className="relative flex items-center justify-center mt-0.5 shrink-0">
+                        <input type="checkbox" checked={acordGdpr} onChange={e => setAcordGdpr(e.target.checked)} className="peer appearance-none w-4 h-4 border border-slate-600 rounded bg-[#0B0F12] checked:bg-[#8ba888] checked:border-[#8ba888] transition-all cursor-pointer" />
+                        <svg className="absolute w-3 h-3 text-[#0B0F12] opacity-0 peer-checked:opacity-100 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+                      </div>
+                      <span className="ml-3 text-[11px] text-slate-400 leading-tight select-none">
+                        Sunt de acord cu <Link href="/termeni-si-conditii" target="_blank" className="text-[#8ba888] hover:underline">Termenii și Condițiile</Link> și înțeleg că documentele încărcate sunt procesate volatil pentru OCR. Datele <strong>NU</strong> sunt stocate permanent, conform <Link href="/politica-si-confidentialitate" target="_blank" className="text-[#8ba888] hover:underline">Politicii de Confidențialitate (GDPR)</Link>.
+                      </span>
+                    </label>
+                  </div>
 
                   <div className="flex justify-between items-center pt-6 border-t border-slate-800">
                     <button type="button" onClick={handleInapoiPrincipal} className="text-xs text-slate-400 underline">Înapoi</button>
@@ -2532,6 +2422,18 @@ export default function Home() {
                       {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
                         <Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} />
                       )}
+
+                      <div className="pt-2 pb-4">
+                        <label className="flex items-start cursor-pointer group">
+                          <div className="relative flex items-center justify-center mt-0.5 shrink-0">
+                            <input type="checkbox" checked={acordGdpr} onChange={e => setAcordGdpr(e.target.checked)} className="peer appearance-none w-4 h-4 border border-slate-600 rounded bg-[#0B0F12] checked:bg-[#8ba888] checked:border-[#8ba888] transition-all cursor-pointer" />
+                            <svg className="absolute w-3 h-3 text-[#0B0F12] opacity-0 peer-checked:opacity-100 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+                          </div>
+                          <span className="ml-3 text-[11px] text-slate-400 leading-tight select-none">
+                            Sunt de acord cu <Link href="/termeni-si-conditii" target="_blank" className="text-[#8ba888] hover:underline">Termenii și Condițiile</Link> și înțeleg că documentele încărcate sunt procesate volatil pentru OCR. Datele <strong>NU</strong> sunt stocate permanent, conform <Link href="/politica-si-confidentialitate" target="_blank" className="text-[#8ba888] hover:underline">Politicii de Confidențialitate (GDPR)</Link>.
+                          </span>
+                        </label>
+                      </div>
                       
                       <div className="flex justify-between items-center pt-2">
                         <button type="button" onClick={handleInapoiPrincipal} className="text-xs text-slate-400 underline">Înapoi la panou</button>
@@ -2559,6 +2461,120 @@ export default function Home() {
                 </form>
               )}
             </div>
+
+            {/* WIDGET-URI INTEGRATE ÎN STEP 2 (ANAF + Calculator) */}
+            <div className="max-w-6xl mx-auto mt-12 mb-8 pt-8 border-t border-slate-800 px-4">
+              <div className="text-center mb-10">
+                <h3 className="text-xl font-bold text-white uppercase tracking-wider">Instrumente Utile pentru Contractul Tău</h3>
+                <p className="text-sm text-slate-400 mt-1">Verifică partenerul la ANAF sau calculează taxele aplicabile contractului.</p>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+                
+                {/* WIDGET ANAF */}
+                <div className="w-full">
+                  <div className="bg-[#12181D] rounded-2xl border border-slate-800/80 shadow-xl p-6 md:p-8 flex flex-col items-center relative overflow-hidden h-full">
+                    <div className="absolute -right-20 -top-20 w-64 h-64 bg-[#8ba888]/5 rounded-full blur-3xl pointer-events-none"></div>
+                    
+                    <div className="w-full relative z-10 mb-6 border-b border-slate-800/80 pb-6 text-center">
+                      <h3 className="text-sm font-bold text-[#8ba888] uppercase tracking-wider block mb-2">Verificare Firmă ANAF</h3>
+                      <p className="text-[11px] text-slate-400 leading-relaxed">Interoghează rapid orice companie din România și descarcă raportul financiar.</p>
+                    </div>
+                    
+                    <div className="w-full relative z-10 flex flex-col justify-center flex-1">
+                      <form onSubmit={handleCautareCuiWidget} className="flex gap-2 w-full mb-6">
+                        <input type="text" placeholder="Introdu CUI (ex: 123456)" value={cuiSearch} onChange={e => setCuiSearch(e.target.value)} className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-3 text-sm text-white font-mono outline-none focus:border-[#8ba888] transition text-center" required />
+                        <button type="submit" disabled={isSearchingCui} className="bg-[#8ba888] text-[#0B0F12] font-black px-6 rounded-lg text-xs transition hover:opacity-90">
+                          {isSearchingCui ? '...' : 'Caută'}
+                        </button>
+                      </form>
+
+                      {!cuiDataResult ? (
+                        <div className="w-full py-6 flex flex-col items-center justify-center border-2 border-dashed border-slate-800/60 rounded-xl bg-[#0B0F12]/30 text-slate-500">
+                          <svg className="w-6 h-6 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                          <span className="text-[10px] font-bold uppercase tracking-wider">Așteaptă Căutarea</span>
+                        </div>
+                      ) : (
+                        <div className="w-full bg-[#0B0F12] border border-slate-700 rounded-xl p-5 animate-fadeIn">
+                          <div className="flex justify-between items-start mb-3">
+                            <div>
+                              <h4 className="text-sm font-bold text-white uppercase">{cuiDataResult.denumire}</h4>
+                              <span className="text-[10px] text-slate-400 font-mono">CUI: {cuiDataResult.cui}</span>
+                            </div>
+                            <span className={`px-2 py-1 rounded text-[9px] font-black uppercase ${cuiDataResult.stare?.toLowerCase().includes('inactiv') || cuiDataResult.stare?.toLowerCase().includes('radiat') ? 'bg-red-900/40 text-red-400 border border-red-900' : 'bg-emerald-900/40 text-emerald-400 border border-emerald-900'}`}>
+                              {cuiDataResult.stare || 'Necunoscut'}
+                            </span>
+                          </div>
+                          <button onClick={(e) => { e.preventDefault(); handleReportAction(); }} className="w-full mt-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold py-2.5 rounded-lg text-xs transition">
+                            {buttonText}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* CALCULATOR FISCAL */}
+                <div className="w-full">
+                  <div className="bg-[#12181D] rounded-2xl border border-slate-800/80 shadow-xl p-6 flex flex-col justify-between h-full">
+                    <div>
+                      <div className="flex items-center gap-3 mb-6 border-b border-slate-800/80 pb-4">
+                        <div>
+                          <h4 className="text-[#8ba888] font-bold text-sm">CALCULATOR FISCAL 2026</h4>
+                          <p className="text-[11px] text-slate-400">Plafoane CASS & Impozit</p>
+                        </div>
+                      </div>
+                      <div className="space-y-6">
+                        <div>
+                          <div className="flex justify-between items-center mb-1">
+                            <label className="text-slate-400 text-[10px] font-bold uppercase">Valoare Factură / Venit</label>
+                            <span className="text-[#8ba888] font-mono text-[11px] font-bold">{fiscal.venitLunar} RON</span>
+                          </div>
+                          <input type="range" min="0" max="50000" step="1" value={fiscal.venitLunar} onChange={e => setFiscal({...fiscal, venitLunar: Number(e.target.value)})} className="w-full h-1.5 bg-slate-800 rounded appearance-none cursor-pointer accent-[#8ba888]" />
+                          <div className="mt-3 flex items-center gap-2">
+                            <input type="number" min="0" max="50000" value={fiscal.venitLunar} onChange={e => setFiscal({...fiscal, venitLunar: Number(e.target.value)})} className="w-full p-2 bg-[#0B0F12] text-white rounded border border-slate-700 focus:outline-none focus:border-[#8ba888] text-xs" />
+                            <span className="text-gray-400 font-medium text-xs">RON</span>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-slate-400 text-[10px] font-bold uppercase mb-1 block">Formă Juridică</label>
+                            <select value={fiscal.formaJuridica} onChange={e => setFiscal({...fiscal, formaJuridica: e.target.value})} className="w-full bg-[#0B0F12] border border-slate-700 rounded-lg py-2 px-3 text-white outline-none text-xs">
+                              <option value="SRL">SRL (Micro)</option>
+                              <option value="PFA_SISTEM_REAL">PFA (Real)</option>
+                            </select>
+                          </div>
+                          {fiscal.formaJuridica !== 'PFA_SISTEM_REAL' && (
+                            <div className="flex gap-2 items-end">
+                              <label className="flex-1 flex items-center justify-center bg-[#0B0F12] h-[34px] rounded-lg border border-slate-800 cursor-pointer text-[10px] text-white hover:bg-slate-900 transition">
+                                <input type="checkbox" checked={fiscal.areAngajati} onChange={e => setFiscal({...fiscal, areAngajati: e.target.checked})} className="mr-1.5 accent-[#8ba888]" /> Angajați
+                              </label>
+                              <label className="flex-1 flex items-center justify-center bg-[#0B0F12] h-[34px] rounded-lg border border-slate-800/60 cursor-pointer text-[10px] text-white hover:bg-slate-900 transition">
+                                <input type="checkbox" checked={fiscal.platitorTva} onChange={e => setFiscal({...fiscal, platitorTva: e.target.checked})} className="mr-1.5 accent-[#8ba888]" /> TVA
+                              </label>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-6 pt-4 border-t border-slate-800/50">
+                      <div className="bg-[#16221A] border border-[#8ba888]/30 p-4 rounded-xl flex justify-between items-center">
+                        <div>
+                          <span className="text-slate-400 block text-[10px] uppercase font-bold mb-0.5">Dări Stat (Lunar)</span>
+                          <strong className="text-red-400 font-mono text-sm">{rezultateFiscale.taxeLunare} RON</strong>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-[#8ba888] block text-[10px] uppercase font-bold mb-0.5">Profit Net / Lună</span>
+                          <strong className="text-white text-xl font-mono tracking-tight">{rezultateFiscale.netLunar} RON</strong>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+              </div>
+            </div>
+
           </div>
         )}
 
@@ -2571,66 +2587,6 @@ export default function Home() {
               <QRCodeSVG value={qrGeneratedUrl} size={150} />
             </div>
             <p className="text-xs text-slate-500 mt-3 font-mono">URL Securizat: <a href={qrGeneratedUrl} target="_blank" rel="noreferrer" className="underline text-[#8ba888]">{qrGeneratedUrl}</a></p>
-          </div>
-        )}
-
-        {/* WIDGET INTEROGARE CUI ANAF */}
-        {step === 1 && (
-          <div className="max-w-7xl mx-auto px-6 mt-6">
-            <div className="bg-[#12181D] rounded-2xl border border-slate-800/80 shadow-xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
-              <div className="absolute -right-20 -top-20 w-64 h-64 bg-[#8ba888]/5 rounded-full blur-3xl pointer-events-none"></div>
-              <div className="flex-1 w-full relative z-10">
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="text-2xl"></span>
-                  <h3 className="text-sm font-bold text-[#8ba888] uppercase tracking-wider block">Verificare Firmă ANAF</h3>
-                </div>
-                <p className="text-xs text-slate-400 mb-6 max-w-md leading-relaxed">Interoghează rapid orice companie din România. Sistem hibrid de auto-completare cu descărcare rapoarte fiscale (datorii, bilanț, litigii) în format PDF.</p>
-                
-                <form onSubmit={handleCautareCuiWidget} className="flex flex-col sm:flex-row gap-2 w-full max-w-md">
-                  <input type="text" placeholder="Introdu CUI (ex: 123456)" value={cuiSearch} onChange={e => setCuiSearch(e.target.value)} className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-3 text-sm text-white font-mono outline-none focus:border-[#8ba888] transition" required />
-                  <button type="submit" disabled={isSearchingCui} className="bg-[#8ba888] text-[#0B0F12] font-black px-6 py-3 rounded-lg text-xs transition hover:opacity-90 whitespace-nowrap">
-                    {isSearchingCui ? 'Se caută...' : 'Caută'}
-                  </button>
-                </form>
-              </div>
-
-              <div className="flex-1 w-full relative z-10">
-                {!cuiDataResult ? (
-                  <div className="h-full min-h-[140px] flex flex-col items-center justify-center border-2 border-dashed border-slate-800/60 rounded-xl bg-[#0B0F12]/30 text-slate-500">
-                    <svg className="w-8 h-8 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    <span className="text-xs font-bold uppercase tracking-wider">Așteaptă Căutarea</span>
-                  </div>
-                ) : (
-                  <div className="bg-[#0B0F12] border border-slate-700 rounded-xl p-5 animate-fadeIn">
-                    <div className="flex justify-between items-start mb-3">
-                      <div>
-                        <h4 className="text-sm font-bold text-white uppercase">{cuiDataResult.denumire}</h4>
-                        <span className="text-[10px] text-slate-400 font-mono">CUI: {cuiDataResult.cui} | REG: {cuiDataResult.regCom}</span>
-                      </div>
-                      <span className={`px-2 py-1 rounded text-[9px] font-black uppercase ${cuiDataResult.stare?.toLowerCase().includes('inactiv') || cuiDataResult.stare?.toLowerCase().includes('radiat') ? 'bg-red-900/40 text-red-400 border border-red-900' : 'bg-emerald-900/40 text-emerald-400 border border-emerald-900'}`}>
-                        {cuiDataResult.stare || 'Necunoscut'}
-                      </span>
-                    </div>
-                    <p className="text-[10px] text-slate-500 mb-4 pb-4 border-b border-slate-800">{cuiDataResult.adresa}</p>
-                    <button 
-                      onClick={handleReportAction} 
-                      className="w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold py-2.5 rounded-lg text-xs transition flex justify-center items-center gap-2"
-                    >
-                      {isLocked ? (
-                        <svg className="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8V7a4 4 0 00-8 0v4h8z"></path>
-                        </svg>
-                      ) : (
-                        <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
-                        </svg>
-                      )}
-                      {buttonText}
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
         )}
 

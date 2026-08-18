@@ -72,10 +72,28 @@ export async function POST(req) {
     const jsonMatch = textBrut.match(/\{[\s\S]*\}/);
     const extractedData = jsonMatch ? JSON.parse(jsonMatch[0].trim()) : {};
 
+    // --- 4. SCRIPTUL DE CURĂȚENIE SUPREMĂ (AUTO-DELETE SUPABASE) ---
+    // Ștergem fișierul din Supabase fix în secunda în care am extras textul!
+    if (fileName && !isLocal) {
+      await supabase.storage.from('auto-documents').remove([fileName]);
+      console.log(`[GDPR CLEANUP] Poza ${fileName} a fost ștearsă definitiv.`);
+    }
+
     return NextResponse.json({ success: true, fileUrl: publicUrl, extractedData });
 
   } catch (err) {
-    console.error("Eroare server:", err);
-    return NextResponse.json({ success: false, error: err.message });
+    // --- 5. DATA MASKING (CENZURARE LOG-URI) ---
+    let errorMessage = err.message || String(err);
+    
+    // Cenzurare CNP (lasă primele 3 cifre, ascunde restul de 10)
+    errorMessage = errorMessage.replace(/\b([1-9]\d{2})\d{10}\b/g, '$1**********');
+    
+    // Cenzurare Serie Șasiu (lasă primele 3, ascunde restul de 14)
+    errorMessage = errorMessage.replace(/\b([A-HJ-NPR-Z0-9]{3})[A-HJ-NPR-Z0-9]{14}\b/gi, '$1**************');
+    
+    console.error("[Eroare Mascată GDPR]:", errorMessage);
+    
+    // Nu trimitem detalii tehnice în frontend, dăm o eroare generică:
+    return NextResponse.json({ success: false, error: "Eroare de procesare. Datele au fost protejate." });
   }
 }
