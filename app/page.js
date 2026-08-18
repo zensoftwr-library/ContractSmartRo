@@ -2461,14 +2461,14 @@ export default function Home() {
               )}
             </div>
 
-            {/* WIDGET-URI INTEGRATE ÎN STEP 2 (ANAF + Calculator) */}
-            <div className="max-w-6xl mx-auto mt-12 mb-8 pt-8 border-t border-slate-800 px-4">
-              <div className="text-center mb-10">
-                <h3 className="text-xl font-bold text-white uppercase tracking-wider">Instrumente Utile pentru Contractul Tău</h3>
-                <p className="text-sm text-slate-400 mt-1">Verifică partenerul la ANAF sau calculează taxele aplicabile contractului.</p>
+            {/* WIDGET-URI INTEGRATE ÎN STEP 2 (ANAF + Calculator) - Full Width */}
+              <div className="w-full max-w-6xl mx-auto mt-16 mb-12 px-4">
+              <div className="text-center mb-12">
+                <h3 className="text-2xl font-black text-white uppercase tracking-wider">Instrumente Utile pentru Contractul Tău</h3>
+                <p className="text-sm text-slate-400 mt-2">Verifică partenerul la ANAF sau calculează taxele aplicabile contractului.</p>
               </div>
 
-              <div className="w-full py-6 px-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-stretch">
                 
                 {/* WIDGET ANAF */}
                 <div className="w-full">
@@ -2515,105 +2515,85 @@ export default function Home() {
 
                 {/* CALCULATOR FISCAL */}
                 <div className="w-full">
-                <div className="bg-[#12181D] rounded-2xl border border-slate-800/80 shadow-xl p-6 flex flex-col justify-between h-full">
-                  <div>
-                    <div className="flex items-center gap-3 mb-6 border-b border-slate-800/80 pb-4">
-                      <span className="text-3xl"></span>
-                      <div>
-                        <h4 className="text-[#8ba888] font-bold text-sm">CALCULATOR FISCAL 2026</h4>
-                        <p className="text-[11px] text-slate-400">Plafoane CASS & Impozit</p>
+                  <div className="bg-[#12181D] rounded-2xl border border-slate-800/80 shadow-xl p-6 flex flex-col justify-between h-full">
+                    <div>
+                      <div className="flex items-center gap-3 mb-6 border-b border-slate-800/80 pb-4">
+                        <span className="text-3xl"></span>
+                        <div>
+                          <h4 className="text-[#8ba888] font-bold text-sm">CALCULATOR FISCAL 2026</h4>
+                          <p className="text-[11px] text-slate-400">Plafoane CASS & Impozit</p>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-6">
+                        <div>
+                          <div className="flex justify-between items-center mb-1">
+                            <label className="text-slate-400 text-[10px] font-bold uppercase">Valoare Factură / Venit</label>
+                            <span className="text-[#8ba888] font-mono text-[11px] font-bold">{fiscal.venitLunar} RON</span>
+                          </div>
+                          <input type="range" min="0" max="50000" step="1" value={fiscal.venitLunar} onChange={e => setFiscal({...fiscal, venitLunar: Number(e.target.value)})} className="w-full h-1.5 bg-slate-800 rounded appearance-none cursor-pointer accent-[#8ba888]" />
+                          <div className="mt-3 flex items-center gap-2">
+                            <input type="number" min="0" max="50000" value={fiscal.venitLunar} onChange={e => setFiscal({...fiscal, venitLunar: Number(e.target.value)})} className="w-full p-2 bg-[#0B0F12] text-white rounded border border-slate-700 focus:outline-none focus:border-[#8ba888] text-xs" placeholder="Introdu suma..." />
+                            <span className="text-gray-400 font-medium text-xs">RON</span>
+                          </div>
+                        </div>
+                      
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-slate-400 text-[10px] font-bold uppercase mb-1 block">Formă Juridică</label>
+                            <select value={fiscal.formaJuridica} onChange={e => setFiscal({...fiscal, formaJuridica: e.target.value})} className="w-full bg-[#0B0F12] border border-slate-700 rounded-lg py-2.5 px-3 text-white outline-none text-xs">
+                              <option value="SRL">SRL (Microîntreprindere)</option>
+                              <option value="PFA_SISTEM_REAL">PFA (Sistem Real)</option>
+                            </select>
+                          </div>
+                          {fiscal.formaJuridica !== 'PFA_SISTEM_REAL' && (
+                            <div className="flex gap-2 items-end">
+                              <label className="flex-1 flex items-center justify-center bg-[#0B0F12] h-[36px] rounded-lg border border-slate-800 cursor-pointer text-[10px] text-white hover:bg-slate-900 transition">
+                                <input type="checkbox" checked={fiscal.areAngajati} onChange={e => setFiscal({...fiscal, areAngajati: e.target.checked})} className="mr-1.5 accent-[#8ba888]" /> Angajați
+                              </label>
+                              <label className="flex-1 flex items-center justify-center bg-[#0B0F12] h-[36px] rounded-lg border border-slate-800/60 cursor-pointer text-[10px] text-white hover:bg-slate-900 transition">
+                                <input type="checkbox" checked={fiscal.platitorTva} onChange={e => setFiscal({...fiscal, platitorTva: e.target.checked})} className="mr-1.5 accent-[#8ba888]" /> TVA
+                              </label>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
-                    
-                    <div className="space-y-6">
-                      <div>
-                        <div className="flex justify-between items-center mb-1">
-                          <label htmlFor="venitLunar" className="text-slate-400 text-[10px] font-bold uppercase">Valoare Factură / Venit</label>
-                          <span className="text-[#8ba888] font-mono text-[11px] font-bold">{fiscal.venitLunar} RON</span>
+
+                    <div className="mt-6 pt-4 border-t border-slate-800/50">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4 font-mono text-[11px]">
+                        <div className="bg-[#0B0F12] p-3 rounded-lg border border-slate-800/40 flex flex-col justify-center">
+                          <span className="text-slate-500 text-[10px] block mb-1">Impozit micro:</span>
+                          <span className="text-slate-200 font-bold">{rezultateFiscale.defalcare.impozit} RON</span>
                         </div>
-                        <input 
-                          id="venitLunar"
-                          name="venitLunar"
-                          type="range" 
-                          min="0" 
-                          max="50000" 
-                          step="1" 
-                          value={fiscal.venitLunar} 
-                          onChange={e => setFiscal({...fiscal, venitLunar: Number(e.target.value)})} 
-                          className="w-full h-1.5 bg-slate-800 rounded appearance-none cursor-pointer accent-[#8ba888]" 
-                        />
-                        
-                        <div className="mt-3 flex items-center gap-2">
-                          <input 
-                            type="number" 
-                            min="0" 
-                            max="50000" 
-                            value={fiscal.venitLunar} 
-                            onChange={e => setFiscal({...fiscal, venitLunar: Number(e.target.value)})} 
-                            className="w-full p-2 bg-slate-800 text-white rounded border border-slate-700 focus:outline-none focus:border-[#8ba888] text-xs"
-                            placeholder="Introdu suma dorită..."
-                          />
-                          <span className="text-gray-400 font-medium text-xs">RON</span>
+                        <div className="bg-[#0B0F12] p-3 rounded-lg border border-slate-800/40 flex flex-col justify-center">
+                          <span className="text-slate-500 text-[10px] block mb-1">CAS/CASS:</span>
+                          <span className="text-slate-200 font-bold">{rezultateFiscale.defalcare.sociale} RON</span>
                         </div>
-                      </div>
-                    
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                          <label htmlFor="formaJuridica" className="text-slate-400 text-[10px] font-bold uppercase mb-1 block">Formă Juridică</label>
-                          <select id="formaJuridica" name="formaJuridica" value={fiscal.formaJuridica} onChange={e => setFiscal({...fiscal, formaJuridica: e.target.value})} className="w-full bg-[#0B0F12] border border-slate-700 rounded-lg py-2.5 px-3 text-white outline-none text-xs appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.2em_1.2em] bg-[right_0.6rem_center] bg-no-repeat pr-8">
-                            <option value="SRL">SRL (Microîntreprindere)</option>
-                            <option value="PFA_SISTEM_REAL">PFA (Sistem Real)</option>
-                          </select>
-                        </div>
-                        
-                        {fiscal.formaJuridica !== 'PFA_SISTEM_REAL' && (
-                          <div className="flex gap-2 items-end">
-                            <label className="flex-1 flex items-center justify-center bg-[#0B0F12] h-[36px] rounded-lg border border-slate-800 cursor-pointer text-[10px] text-white hover:bg-slate-900 transition">
-                              <input type="checkbox" checked={fiscal.areAngajati} onChange={e => setFiscal({...fiscal, areAngajati: e.target.checked})} className="mr-1.5 accent-[#8ba888]" /> Angajați
-                            </label>
-                            <label className="flex-1 flex items-center justify-center bg-[#0B0F12] h-[36px] rounded-lg border border-slate-800/60 cursor-pointer text-[10px] text-white hover:bg-slate-900 transition">
-                              <input type="checkbox" checked={fiscal.platitorTva} onChange={e => setFiscal({...fiscal, platitorTva: e.target.checked})} className="mr-1.5 accent-[#8ba888]" /> TVA
-                            </label>
+                        {fiscal.formaJuridica === 'SRL' && (
+                          <div className="bg-[#0B0F12] p-3 rounded-lg border border-slate-800/40 flex flex-col justify-center">
+                            <span className="text-slate-500 text-[10px] block mb-1">Dividende(10%):</span>
+                            <span className="text-slate-200 font-bold">{rezultateFiscale.defalcare.dividende} RON</span>
+                          </div>
+                        )}
+                        {fiscal.platitorTva && (
+                          <div className="bg-[#0B0F12] p-3 rounded-lg border border-slate-800/40 flex flex-col justify-center">
+                            <span className="text-slate-500 text-[10px] block mb-1">TVA (21%):</span>
+                            <span className="text-slate-200 font-bold">{rezultateFiscale.tvaLunar} RON</span>
                           </div>
                         )}
                       </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 pt-4 border-t border-slate-800/50">
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4 font-mono text-[11px]">
-                      <div className="bg-[#0B0F12] p-3 rounded-lg border border-slate-800/40 flex flex-col justify-center">
-                        <span className="text-slate-500 text-[10px] block mb-1">Impozit micro:</span>
-                        <span className="text-slate-200 font-bold">{rezultateFiscale.defalcare.impozit} RON</span>
-                      </div>
-                      <div className="bg-[#0B0F12] p-3 rounded-lg border border-slate-800/40 flex flex-col justify-center">
-                        <span className="text-slate-500 text-[10px] block mb-1">CAS/CASS:</span>
-                        <span className="text-slate-200 font-bold">{rezultateFiscale.defalcare.sociale} RON</span>
-                      </div>
-                      {fiscal.formaJuridica === 'SRL' && (
-                        <div className="bg-[#0B0F12] p-3 rounded-lg border border-slate-800/40 flex flex-col justify-center">
-                          <span className="text-slate-500 text-[10px] block mb-1">Dividende(10%):</span>
-                          <span className="text-slate-200 font-bold">{rezultateFiscale.defalcare.dividende} RON</span>
+                      <div className="bg-[#16221A] border border-[#8ba888]/30 p-4 rounded-xl flex justify-between items-center">
+                        <div>
+                          <span className="text-slate-400 block text-[10px] uppercase font-bold mb-0.5">Dări Stat (Total Lunar)</span>
+                          <strong className="text-red-400 font-mono text-sm">{rezultateFiscale.taxeLunare} RON</strong>
                         </div>
-                      )}
-                      {fiscal.platitorTva && (
-                        <div className="bg-[#0B0F12] p-3 rounded-lg border border-slate-800/40 flex flex-col justify-center">
-                          <span className="text-slate-500 text-[10px] block mb-1">TVA (21%):</span>
-                          <span className="text-slate-200 font-bold">{rezultateFiscale.tvaLunar} RON</span>
+                        <div className="text-right">
+                          <span className="text-[#8ba888] block text-[10px] uppercase font-bold mb-0.5">Profit Curat Net / Lună</span>
+                          <strong className="text-white text-xl font-mono tracking-tight">{rezultateFiscale.netLunar} RON</strong>
                         </div>
-                      )}
-                    </div>
-                    <div className="bg-[#16221A] border border-[#8ba888]/30 p-4 rounded-xl flex justify-between items-center">
-                      <div>
-                        <span className="text-slate-400 block text-[10px] uppercase font-bold mb-0.5">Dări Stat (Total Lunar)</span>
-                        <strong className="text-red-400 font-mono text-sm">{rezultateFiscale.taxeLunare} RON</strong>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-[#8ba888] block text-[10px] uppercase font-bold mb-0.5">Profit Curat Net / Lună</span>
-                        <strong className="text-white text-xl font-mono tracking-tight">{rezultateFiscale.netLunar} RON</strong>
                       </div>
                     </div>
-                  </div>
                   </div>
                 </div>
                 
