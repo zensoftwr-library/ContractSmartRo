@@ -1308,17 +1308,18 @@ export default function Home() {
       {/* NAVBAR */}
       <nav className="sticky top-0 z-40 backdrop-blur-md bg-[#0B0F12]/90 border-b border-slate-800 py-4 px-6 shadow-md transition-all">
         <div className="flex justify-between items-center w-full">
-          <div className="w-[180px] h-[30px] flex items-center cursor-pointer" onClick={handleInapoiPrincipal}>
-            <svg viewBox="0 0 240 40" className="w-full h-full">
-              <g transform="translate(0, 2)">
-                <path d="M24 6 C15 6, 8 13, 8 22 C8 31, 15 38, 24 38 C31 38, 37 33, 39 27" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round"/>
-                <path d="M16 21 L21 26 L32 12" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
-              </g>
-              <text x="48" y="26" fontFamily="system-ui, -apple-system, sans-serif" fontWeight="900" fontSize="20" fill="#FFFFFF" letterSpacing="-0.5">
-                Contract<tspan fill="#8ba888">Smart</tspan>
-              </text>
-            </svg>
-          </div>
+          {/* LOGO MARE DEASUPRA BUTOANELOR */}
+              <div className="w-[320px] h-[60px] mx-auto flex items-center justify-center mb-10">
+                <svg viewBox="0 0 320 50" className="w-full h-full">
+                  <g transform="translate(0, 2)">
+                    <path d="M24 6 C15 6, 8 13, 8 22 C8 31, 15 38, 24 38 C31 38, 37 33, 39 27" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round"/>
+                    <path d="M16 21 L21 26 L32 12" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+                  </g>
+                  <text x="50" y="35" fontFamily="system-ui, -apple-system, sans-serif" fontWeight="900" fontSize="30" fill="#FFFFFF" letterSpacing="-0.5">
+                    Contract<tspan fill="#8ba888">Smart</tspan>
+                  </text>
+                </svg>
+              </div>
           
           <button 
             className="md:hidden text-[#8ba888] text-2xl focus:outline-none"
@@ -1566,7 +1567,7 @@ export default function Home() {
                   </text>
                 </svg>
               </div>
-              
+
               <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto px-4">
                 <button type="button" onClick={() => { setFormData(prev => ({ ...prev, tipContract: 'prestari' })); setStep(2); }} className="bg-[#8ba888] text-[#0B0F12] font-black px-6 py-6 rounded-xl shadow-[0_0_20px_rgba(139,168,136,0.15)] transition-all hover:scale-105 text-sm uppercase tracking-wide flex items-center justify-center gap-2">
                     Generator Contracte B2B / Servicii
@@ -2481,7 +2482,7 @@ export default function Home() {
                 <p className="text-sm text-slate-400 mt-2">Verifică partenerul la ANAF sau calculează taxele aplicabile contractului.</p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+              <div className="grid grid-cols-1 gap-8 items-stretch">
                 
                 {/* WIDGET ANAF */}
                 <div className="w-full">
