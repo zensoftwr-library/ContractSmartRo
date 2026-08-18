@@ -1643,7 +1643,8 @@ export default function Home() {
 
         {/* STEP 2: MULTI-FORMULAR SECREȚIONAT STRUCTURAL */}
         {step === 2 && (
-          <div className="max-w-3xl mx-auto py-6 px-4">
+          <div className="w-full">
+            <div className="max-w-3xl mx-auto py-6 px-4">
             <div className="mb-4 flex items-center justify-between bg-[#12181D] border border-slate-800/80 px-5 py-3 rounded shadow-md">
               <button type="button" onClick={handleInapoiPrincipal} className="text-xs font-bold text-[#8ba888] hover:text-white flex items-center gap-1.5 transition">
                 &larr; Înapoi la Panoul Principal
