@@ -1308,7 +1308,7 @@ export default function Home() {
       {/* NAVBAR */}
       <nav className="sticky top-0 z-40 backdrop-blur-md bg-[#0B0F12]/90 border-b border-slate-800 py-4 px-6 shadow-md transition-all">
         <div className="flex justify-between items-center w-full">
-          <div className="w-[180px] h-[30px] flex items-center cursor-pointer" onClick={handleInapoiPrincipal}>
+          <a href="/" onClick={(e) => { e.preventDefault(); handleInapoiPrincipal(); }} className="w-[180px] h-[30px] flex items-center cursor-pointer">
             <svg viewBox="0 0 240 40" className="w-full h-full">
               <g transform="translate(0, 2)">
                 <path d="M24 6 C15 6, 8 13, 8 22 C8 31, 15 38, 24 38 C31 38, 37 33, 39 27" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round"/>
@@ -1318,7 +1318,7 @@ export default function Home() {
                 Contract<tspan fill="#8ba888">Smart</tspan>
               </text>
             </svg>
-          </div>
+          </a>
           
           <button 
             className="md:hidden text-[#8ba888] text-2xl focus:outline-none"
@@ -1553,19 +1553,16 @@ export default function Home() {
         {/* STEP 1: DASHBOARD / HOME */}
         {step === 1 && (
           <div className="w-full">
-            <div className="max-w-3xl mx-auto py-16 px-4 text-center">
+            <div className="max-w-3xl mx-auto py-12 px-4 text-center">
               
-              {/* LOGO MARE CENTRAT PERFECT */}
-              <div className="w-[280px] sm:w-[320px] h-[50px] sm:h-[60px] mx-auto flex items-center justify-center mb-10">
-                <svg viewBox="0 0 370 50" className="w-full h-full">
-                  <g transform="translate(0, 2)">
-                    <path d="M24 6 C15 6, 8 13, 8 22 C8 31, 15 38, 24 38 C31 38, 37 33, 39 27" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round"/>
-                    <path d="M16 21 L21 26 L32 12" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
-                  </g>
-                  <text x="50" y="35" fontFamily="system-ui, -apple-system, sans-serif" fontWeight="900" fontSize="26" fill="#FFFFFF" letterSpacing="-0.5">
-                    Contract<tspan fill="#8ba888">Smart</tspan>
-                  </text>
-                </svg>
+              {/* TEXT ELEGANT ÎN DOUĂ CULORI */}
+              <div className="mb-10 text-center">
+                <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight uppercase">
+                  Contracte Inteligente
+                </h1>
+                <p className="text-2xl sm:text-4xl font-black text-[#8ba888] tracking-tight uppercase mt-1">
+                  Prin Management de Clauze
+                </p>
               </div>
 
               <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto px-4">
