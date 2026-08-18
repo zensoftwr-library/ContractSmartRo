@@ -1923,7 +1923,7 @@ export default function Home() {
             </div>
 
             {/* PREȚURI SECUNDARE: Șabloane & QR Individual (Apar doar pe prima pagină) */}
-            <div className="max-w-7xl mx-auto px-6 mb-12">
+            <div className="max-w-7xl mx-auto px-6 mb-12 mt-12">
               <div className="border-t border-slate-800 pt-8 pb-4 mb-4 text-center">
                 <h3 className="text-2xl font-black text-white tracking-tight">Șabloane & Extensii QR (Plată Unică)</h3>
               </div>
@@ -2004,7 +2004,7 @@ export default function Home() {
             ========================================================================= */}
         {step === 2 && (
           <div className="w-full animate-fadeIn">
-            <div className="max-w-3xl mx-auto py-6 px-4">
+            <div className="max-w-5xl mx-auto py-6 px-4">
               <div className="mb-4 flex items-center justify-between bg-[#12181D] border border-slate-800/80 px-5 py-3 rounded shadow-md">
                 <button type="button" onClick={handleInapoiPrincipal} className="text-xs font-bold text-[#8ba888] hover:text-white flex items-center gap-1.5 transition">
                   &larr; Înapoi la Panoul Principal
