@@ -2239,8 +2239,8 @@ export default function Home() {
 
                     {/* SISTEM AVANSAT DE SEMNĂTURI */}
                     <div className="bg-[#0B0F12] p-5 rounded-lg border border-slate-800 space-y-4">
-                      <div className="flex justify-between items-center border-b border-slate-800 pb-2">
-                        <span className="text-xs font-bold text-slate-400 uppercase block tracking-wider">Aprobare și Semnare Document</span>
+                      <div className="flex flex-col sm:flex-row justify-between items-center border-b border-slate-800 pb-3 gap-3 sm:gap-0">
+                        <span className="text-xs font-bold text-slate-400 uppercase block tracking-wider text-center sm:text-left">Aprobare și Semnare Document</span>
                         <div className="flex gap-2 bg-[#12181D] p-1 rounded border border-slate-700">
                           <button type="button" onClick={() => { setSignatureTab('draw'); curataCanvas(); }} className={`px-3 py-1 rounded text-[10px] font-bold transition-colors ${signatureTab === 'draw' ? 'bg-[#8ba888] text-black' : 'text-slate-400 hover:text-white'}`}>Desenează</button>
                           <button type="button" onClick={() => { setSignatureTab('upload'); curataCanvas(); }} className={`px-3 py-1 rounded text-[10px] font-bold transition-colors ${signatureTab === 'upload' ? 'bg-[#8ba888] text-black' : 'text-slate-400 hover:text-white'}`}>Încarcă (PNG/JPG)</button>
@@ -2504,8 +2504,8 @@ export default function Home() {
 
                         {/* SECȚIUNE SEMNĂTURĂ PENTRU AUTO */}
                         <div className="bg-[#0B0F12] p-5 rounded-lg border border-slate-800 space-y-4 mt-6">
-                          <div className="flex justify-between items-center border-b border-slate-800 pb-2">
-                            <span className="text-xs font-bold text-slate-400 uppercase block tracking-wider">Aprobare și Semnare Dosar Auto</span>
+                          <div className="flex flex-col sm:flex-row justify-between items-center border-b border-slate-800 pb-3 gap-3 sm:gap-0">
+                            <span className="text-xs font-bold text-slate-400 uppercase block tracking-wider text-center sm:text-left">Aprobare și Semnare Dosar Auto</span>
                             <div className="flex gap-2 bg-[#12181D] p-1 rounded border border-slate-700">
                               <button type="button" onClick={() => { setAutoSignatureTab('draw'); curataCanvasAuto(); }} className={`px-3 py-1 rounded text-[10px] font-bold transition-colors ${autoSignatureTab === 'draw' ? 'bg-[#8ba888] text-black' : 'text-slate-400 hover:text-white'}`}>Desenează</button>
                               <button type="button" onClick={() => { setAutoSignatureTab('upload'); curataCanvasAuto(); }} className={`px-3 py-1 rounded text-[10px] font-bold transition-colors ${autoSignatureTab === 'upload' ? 'bg-[#8ba888] text-black' : 'text-slate-400 hover:text-white'}`}>Încarcă (PNG/JPG)</button>
@@ -2586,9 +2586,12 @@ export default function Home() {
                         </div>
                         
                         <div className="flex justify-between items-center pt-2">
-                          <button type="button" onClick={handleInapoiPrincipal} className="text-xs text-slate-400 underline">Înapoi la panou</button>
                           <button type="submit" disabled={isUploading || !!loadingText} className="bg-[#8ba888] text-black font-black px-6 py-2.5 rounded text-xs tracking-tight transition hover:opacity-90">
-                            {loadingText ? 'Se procesează...' : `Generează Pachet Auto .ZIP (${autoData.autoMoneda === 'EUR' ? `${Math.round(99 / cursBnr.eur)} EUR` : '19.99 €'})`}
+                            {loadingText ? 'Se procesează...' : 
+                              user?.status === 'founder' 
+                                ? 'Generează Pachet Auto .ZIP' 
+                                : `Generează Pachet Auto .ZIP (${autoData.autoMoneda === 'EUR' ? `${Math.round(99 / cursBnr.eur)} EUR` : '19.99 €'})`
+                            }
                           </button>
                         </div>
                       </div>
