@@ -551,22 +551,18 @@ export default function Home() {
 
   // --- AUTOFILL ANAF PENTRU VÂNZĂTOR AUTO ---
   useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      if (autoData?.vanzatorTip === 'PJ' && autoData?.vanzatorCui?.replace(/[^0-9]/g, '').length >= 5) {
-        handleAutofillCui(autoData.vanzatorCui, 'vanzator_auto');
-      }
-    }, 800);
-    return () => clearTimeout(delayDebounceFn);
+    const delay = setTimeout(() => {
+      if (autoData?.vanzatorTip === 'PJ' && autoData?.vanzatorCui?.replace(/[^0-9]/g, '').length >= 5) handleAutofillCui(autoData.vanzatorCui, 'vanzator_auto');
+      else if (!autoData?.vanzatorCui) setAutoData(p => ({ ...p, vanzatorNume: '', vanzatorSediu: '', vanzatorRegCom: '' }));
+    }, 800); return () => clearTimeout(delay);
   }, [autoData?.vanzatorCui, autoData?.vanzatorTip]);
 
   // --- AUTOFILL ANAF PENTRU CUMPĂRĂTOR AUTO ---
   useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      if (autoData?.cumparatorTip === 'PJ' && autoData?.cumparatorCui?.replace(/[^0-9]/g, '').length >= 5) {
-        handleAutofillCui(autoData.cumparatorCui, 'cumparator_auto');
-      }
-    }, 800);
-    return () => clearTimeout(delayDebounceFn);
+    const delay = setTimeout(() => {
+      if (autoData?.cumparatorTip === 'PJ' && autoData?.cumparatorCui?.replace(/[^0-9]/g, '').length >= 5) handleAutofillCui(autoData.cumparatorCui, 'cumparator_auto');
+      else if (!autoData?.cumparatorCui) setAutoData(p => ({ ...p, cumparatorNume: '', cumparatorSediu: '', cumparatorRegCom: '' }));
+    }, 800); return () => clearTimeout(delay);
   }, [autoData?.cumparatorCui, autoData?.cumparatorTip]);
 
   const startCamera = async (type) => {

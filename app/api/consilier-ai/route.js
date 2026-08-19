@@ -90,13 +90,7 @@ export async function POST(request) {
     
     ${contextText}`;
 
-    // 3. Inițializăm modelul tău preferat (gemini-3.5-flash) și îi dăm instrucțiunile
-    const chatModel = genAI.getGenerativeModel({ 
-      model: "gemini-3.7-flash",
-      systemInstruction: { parts: [{ text: systemInstruction }] }
-    });
-
-    // 4. Formatarea istoricului pentru Gemini
+    // 3. Formatarea istoricului pentru Gemini
     const contents = [];
     if (history && history.length > 0) {
       history.forEach(msg => {
@@ -106,16 +100,28 @@ export async function POST(request) {
         });
       });
     }
-    
-    contents.push({
-      role: 'user',
-      parts: [{ text: message }]
-    });
+    contents.push({ role: 'user', parts: [{ text: message }] });
 
-    // 5. Generarea răspunsului final
-    const result = await chatModel.generateContent({
-      contents: contents
-    });
+    // 4. Generarea răspunsului cu SISTEM CASCADĂ (Fallback)
+    let result;
+    try {
+      // Încercăm prima dată cu noul model 3.7
+      const primaryModel = genAI.getGenerativeModel({ 
+        model: "gemini-3.7-flash",
+        systemInstruction: { parts: [{ text: systemInstruction }] }
+      });
+      result = await primaryModel.generateContent({ contents: contents });
+      
+    } catch (primaryError) {
+      console.warn("[Cascadă AI] Modelul 3.7 e suprasolicitat. Trecem automat pe 3.6. Motiv:", primaryError.message);
+      
+      // Dacă 3.7 crapă (Eroare 503 etc.), activăm instant modelul 3.6
+      const fallbackModel = genAI.getGenerativeModel({ 
+        model: "gemini-3.6-flash",
+        systemInstruction: { parts: [{ text: systemInstruction }] }
+      });
+      result = await fallbackModel.generateContent({ contents: contents });
+    }
 
     let raspunsAI = result.response.text();
     raspunsAI += `\n\n---\n⚠️ DISCLAIMER: Informații cu caracter orientativ bazate pe legislația din România. Nu reprezintă consultanță juridică formală.`;
