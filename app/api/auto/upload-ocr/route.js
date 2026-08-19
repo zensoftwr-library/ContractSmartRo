@@ -1,9 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseKey);
+import { GoogleGenAI } from 'google-genai';
 
 export async function POST(req) {
   try {
@@ -13,66 +9,48 @@ export async function POST(req) {
 
     if (!file) return NextResponse.json({ success: false, error: 'Lipsă fișier' });
 
-    const apiKey = process.env.OCR_SPACE_API_KEY;
-    if (!apiKey) return NextResponse.json({ success: false, error: 'Lipsește cheia OCR_SPACE_API_KEY în .env' });
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) return NextResponse.json({ success: false, error: 'Lipsește GEMINI_API_KEY în .env' });
 
-    // Convertim fișierul în Base64
+    // Inițializăm SDK-ul oficial cu cheia ta AQ.
+    const ai = new GoogleGenAI({ apiKey });
+
     const buffer = Buffer.from(await file.arrayBuffer());
-    const base64Image = `data:${file.type || 'image/jpeg'};base64,${buffer.toString('base64')}`;
+    const base64Image = buffer.toString('base64');
 
-    const ocrFormData = new URLSearchParams();
-    ocrFormData.append('apikey', apiKey);
-    ocrFormData.append('base64Image', base64Image);
+    const promptText = tipDocument === 'civ' 
+      ? "Extrage din acest CIV auto și returnează DOAR un JSON valid cu formatul: {\"autoVin\": \"seria de 17 caractere\", \"autoMarcaModel\": \"marca și modelul\", \"autoNumarInmatriculare\": \"numărul sau gol\"}" 
+      : "Extrage din acest buletin românesc și returnează DOAR un JSON valid cu formatul: {\"autoNumeVanzator\": \"Numele și Prenumele complet\", \"autoCnpVanzator\": \"cnp-ul de 13 cifre\", \"autoAdresaVanzator\": \"\"}";
 
-    const ocrResponse = await fetch('https://api.ocr.space/parse/image', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: ocrFormData
+    const response = await ai.models.generateContent({
+      model: 'gemini-1.5-flash',
+      contents: [
+        {
+          parts: [
+            { text: promptText },
+            {
+              inlineData: {
+                mimeType: file.type || 'image/jpeg',
+                data: base64Image
+              }
+            }
+          ]
+        }
+      ]
     });
 
-    const ocrResult = await ocrResponse.json();
-    
-    if (ocrResult.IsErroredOnProcessing) {
-      const errMsg = Array.isArray(ocrResult.ErrorMessage) ? ocrResult.ErrorMessage.join(', ') : (ocrResult.ErrorMessage || "Eroare OCR");
-      throw new Error(errMsg);
-    }
-
-    const text = ocrResult.ParsedResults?.[0]?.ParsedText || '';
-    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+    const rawText = response.text || '';
 
     let extractedData = {};
-    if (tipDocument === 'civ') {
-      const vinMatch = text.match(/\b([A-HJ-NPR-Z0-9]{17})\b/i);
-      extractedData = {
-        autoVin: vinMatch ? vinMatch[1].toUpperCase() : "",
-        autoMarcaModel: "Verifică document",
-        autoNumarInmatriculare: ""
-      };
-    } else {
-      const cnpMatch = text.match(/\b([1-8]\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])\d{6})\b/);
-      
-      // Căutare automată nume
-      const ignoredWords = /ROMANIA|RO|CARTE|IDENTITATE|IDENTITY|CARD|SEX|CETATENIE|VALABILITATE|CNP|DATA|EMIS|DIRECTIA|DIRECTOR|SURNAME|SUMANE|NOM|GIVEN|GIVEO|NAMES|PRENUME|EXPIRY|BIRTH|ONTIT|CARE/i;
-      
-      const nameLine = lines.find(l => 
-        l.length > 5 && 
-        !/\d/.test(l) && 
-        l.includes(' ') && 
-        !l.includes('/') && // Etichetele au mereu "/" (ex: Prenume / Given names)
-        !ignoredWords.test(l)
-      ) || "";
-
-      extractedData = {
-        autoNumeVanzator: nameLine,
-        autoCnpVanzator: cnpMatch ? cnpMatch[1] : "",
-        autoAdresaVanzator: "" // Nu există pe buletinele noi
-      };
+    const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      extractedData = JSON.parse(jsonMatch[0]);
     }
 
     return NextResponse.json({ success: true, extractedData });
 
   } catch (err) {
-    console.error("[Eroare OCR.space]:", err.message);
+    console.error("[Eroare GoogleGenAI]:", err.message);
     return NextResponse.json({ success: false, error: err.message });
   }
 }
