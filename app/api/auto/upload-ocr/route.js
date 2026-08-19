@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { GoogleGenAI } from 'google-genai';
+import { GoogleGenAI } from '@google/genai';
 
 export async function POST(req) {
   try {
