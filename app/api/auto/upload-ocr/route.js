@@ -13,65 +13,50 @@ export async function POST(req) {
 
     if (!file) return NextResponse.json({ success: false, error: 'Lipsă fișier' });
 
-    const fileBuffer = Buffer.from(await file.arrayBuffer());
-    const base64Image = fileBuffer.toString('base64');
-    
-    const apiKey = process.env.GEMINI_API_KEY || '';
-    
-    // Configurăm cererea în funcție de tipul cheii (AQ folosește Bearer, AIza folosește ?key=)
-    let url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent`;
-    const headers = { "Content-Type": "application/json" };
+    // 1. Pregătim FormData pentru OCR.space
+    const ocrFormData = new FormData();
+    ocrFormData.append('apikey', process.env.OCR_SPACE_API_KEY);
+    ocrFormData.append('language', 'ron'); // Setăm limba română
+    ocrFormData.append('file', file);
+    ocrFormData.append('isOverlayRequired', 'false');
 
-    if (apiKey.startsWith('AIza')) {
-      url += `?key=${apiKey}`;
-    } else {
-      headers["Authorization"] = `Bearer ${apiKey}`;
-    }
-
-    const geminiResponse = await fetch(url, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        contents: [{
-          parts: [
-            { 
-              text: tipDocument === 'civ' 
-                ? "Analizează această imagine de CIV auto. Extrage datele și returnează DOAR un obiect JSON valid cu formatul exact: {\"autoVin\": \"seria de șasiu de 17 caractere\", \"autoMarcaModel\": \"marca și modelul mașinii\", \"autoNumarInmatriculare\": \"numărul sau gol\"}" 
-                : "Analizează această imagine de buletin / carte de identitate românească. Extrage datele și returnează DOAR un obiect JSON valid cu formatul exact: {\"autoNumeVanzator\": \"numele complet\", \"autoCnpVanzator\": \"cnp-ul de 13 cifre\", \"autoAdresaVanzator\": \"adresa completă\"}" 
-            },
-            { 
-              inline_data: { 
-                mime_type: file.type || "image/jpeg", 
-                data: base64Image 
-              } 
-            }
-          ]
-        }]
-      })
+    // 2. Apelăm API-ul OCR.space
+    const ocrResponse = await fetch('https://api.ocr.space/parse/image', {
+      method: 'POST',
+      body: ocrFormData
     });
 
-    if (!geminiResponse.ok) {
-      const errText = await geminiResponse.text();
-      throw new Error(`Gemini API Error: ${errText}`);
+    const ocrResult = await ocrResponse.json();
+    
+    if (ocrResult.IsErroredOnProcessing) {
+      throw new Error(ocrResult.ErrorMessage || "Eroare OCR.space");
     }
 
-    const geminiResult = await geminiResponse.json();
-    const rawText = geminiResult.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    // 3. Extragem textul unit
+    const text = ocrResult.ParsedResults?.[0]?.ParsedText || '';
 
+    // 4. Extragere date cu logica ta
     let extractedData = {};
-    try {
-      const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        extractedData = JSON.parse(jsonMatch[0]);
-      }
-    } catch (e) {
-      extractedData = {};
+    if (tipDocument === 'civ') {
+      const vinMatch = text.match(/\b([A-HJ-NPR-Z0-9]{17})\b/i);
+      extractedData = {
+        autoVin: vinMatch ? vinMatch[1].toUpperCase() : "",
+        autoMarcaModel: "Verifică document",
+        autoNumarInmatriculare: ""
+      };
+    } else {
+      const cnpMatch = text.match(/\b([1-8]\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])\d{6})\b/);
+      extractedData = {
+        autoNumeVanzator: "Verifică document",
+        autoCnpVanzator: cnpMatch ? cnpMatch[1] : "",
+        autoAdresaVanzator: "Verifică document"
+      };
     }
 
     return NextResponse.json({ success: true, extractedData });
 
   } catch (err) {
-    console.error("[Eroare OCR Gemini]:", err.message);
+    console.error("[Eroare OCR.space]:", err.message);
     return NextResponse.json({ success: false, error: err.message });
   }
 }
