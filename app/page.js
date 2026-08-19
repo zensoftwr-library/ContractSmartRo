@@ -1412,8 +1412,7 @@ export default function Home() {
           <div className="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn">
             <div className="bg-[#12181D] border border-slate-800 p-8 rounded-xl max-w-sm w-full shadow-lg relative">
               <button type="button" onClick={() => { setShowAuthModal(false); setIsSignUp(false); setAuthPassword(''); setAuthConfirmPassword(''); }} className="absolute top-4 right-4 text-slate-500 hover:text-white text-md font-bold transition">✕</button>
-              <h3 className="text-xl font-black text-white mb-1">{isSignUp ? 'Creează un Cont Nou' : 'Autentificare Portabilitate'}</h3>
-              <p className="text-xs text-slate-500 mb-6">Securizează documentele în serverele Supabase.</p>
+              <h3 className="text-xl font-black text-white mb-1">{isSignUp ? 'Creează un Cont Nou' : 'AUTENTIFICARE'}</h3>
 
              <form onSubmit={handleAuthSubmit} className="space-y-4">
   <div>
