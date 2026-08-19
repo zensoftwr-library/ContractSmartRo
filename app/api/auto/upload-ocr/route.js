@@ -1,10 +1,8 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-// Folosește cheile dedicate de server sau le ia automat pe cele publice ca fallback
 const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function POST(req) {
@@ -15,75 +13,56 @@ export async function POST(req) {
 
     if (!file) return NextResponse.json({ success: false, error: 'Lipsă fișier' });
 
-    // 1. Salvare în Supabase Storage (opțională pentru backup, ignorată dacă crapă bucket-ul)
-    const fileName = `${Date.now()}-${file.name}`;
-    let publicUrl = '';
-    try {
-      const { error } = await supabase.storage.from('auto-documents').upload(fileName, file);
-      if (!error) {
-        const urlObj = supabase.storage.from('auto-documents').getPublicUrl(fileName);
-        publicUrl = urlObj.data?.publicUrl || '';
-      }
-    } catch (e) {
-      console.log("Supabase storage skip");
-    }
-
-    // 2. GOOGLE CLOUD VISION API
+    // Pregătim imaginea în base64 pentru Gemini Vision
     const fileBuffer = Buffer.from(await file.arrayBuffer());
     const base64Image = fileBuffer.toString('base64');
     
-    const visionResponse = await fetch(`https://vision.googleapis.com/v1/images:annotate?key=${process.env.GOOGLE_VISION_API_KEY}`, {
+    // Apelăm Gemini 1.5 Flash (Motor multimodal ultrarapid și gratuit)
+    const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        requests: [
-          {
-            image: { content: base64Image },
-            features: [{ type: "DOCUMENT_TEXT_DETECTION" }]
-          }
-        ]
+        contents: [{
+          parts: [
+            { 
+              text: tipDocument === 'civ' 
+                ? "Analizează această imagine de CIV auto. Extrage datele și returnează DOAR un obiect JSON valid cu formatul exact: {\"autoVin\": \"seria de șasiu de 17 caractere\", \"autoMarcaModel\": \"marca și modelul mașinii\", \"autoNumarInmatriculare\": \"numărul sau gol\"}" 
+                : "Analizează această imagine de buletin / carte de identitate românească. Extrage datele și returnează DOAR un obiect JSON valid cu formatul exact: {\"autoNumeVanzator\": \"numele complet\", \"autoCnpVanzator\": \"cnp-ul de 13 cifre\", \"autoAdresaVanzator\": \"adresa completă\"}" 
+            },
+            { 
+              inline_data: { 
+                mime_type: file.type || "image/jpeg", 
+                data: base64Image 
+              } 
+            }
+          ]
+        }]
       })
     });
 
-    if (!visionResponse.ok) {
-      const errText = await visionResponse.text();
-      throw new Error(`Google Vision API Error ${visionResponse.status}: ${errText}`);
+    if (!geminiResponse.ok) {
+      const errText = await geminiResponse.text();
+      throw new Error(`Gemini API Error: ${errText}`);
     }
 
-    const visionResult = await visionResponse.json();
-    const textExtras = visionResult.responses?.[0]?.fullTextAnnotation?.text || '';
+    const geminiResult = await geminiResponse.json();
+    const rawText = geminiResult.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
-    // 3. EXTRAGERE DATE (Regex)
+    // Extragem JSON-ul curat din răspunsul dat de model
     let extractedData = {};
-    
-    if (tipDocument === 'civ') {
-      const vinMatch = textExtras.match(/\b([A-HJ-NPR-Z0-9]{17})\b/i);
-      extractedData = {
-        autoVin: vinMatch ? vinMatch[1].toUpperCase() : "",
-        autoMarcaModel: "Verifică document",
-        autoNumarInmatriculare: ""
-      };
-    } else {
-      // Regex îmbunătățit pentru CNP românesc (13 cifre)
-      const cnpMatch = textExtras.match(/\b([1-8]\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])\d{6})\b/);
-      extractedData = {
-        autoNumeVanzator: "Verifică document",
-        autoCnpVanzator: cnpMatch ? cnpMatch[1] : "",
-        autoAdresaVanzator: "Verifică document"
-      };
+    try {
+      const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        extractedData = JSON.parse(jsonMatch[0]);
+      }
+    } catch (e) {
+      extractedData = {};
     }
 
-    // 4. GDPR CLEANUP (Ștergere fișier din Supabase)
-    if (fileName) {
-      try {
-        await supabase.storage.from('auto-documents').remove([fileName]);
-      } catch(e) {}
-    }
-
-    return NextResponse.json({ success: true, fileUrl: publicUrl, extractedData });
+    return NextResponse.json({ success: true, extractedData });
 
   } catch (err) {
-    console.error("[Eroare Detaliată OCR Backend]:", err.message);
-    return NextResponse.json({ success: false, error: err.message || "Eroare de procesare." });
+    console.error("[Eroare OCR Gemini]:", err.message);
+    return NextResponse.json({ success: false, error: err.message });
   }
 }
