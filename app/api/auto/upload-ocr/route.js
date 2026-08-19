@@ -55,7 +55,7 @@ export async function POST(req) {
       const nameLine = lines.find(l => 
         l.length > 5 && l === l.toUpperCase() && !/\d/.test(l) && 
         /[A-Z].*\s+[A-Z]/.test(l) && 
-        !/ROMANIA|RO|CARTE|IDENTITATE|SEX|CETATENIE|VALABILITATE|CNP|DATA|EMIS/i.test(l) &&
+        !/ROMANIA|RO|CARTE|IDENTITATE|IDENTITY|CARD|SEX|CETATENIE|VALABILITATE|CNP|DATA|EMIS|DIRECTIA|DIRECTOR/i.test(l) &&
         !/[•\-:®©]/i.test(l)
       ) || "";
 
