@@ -3,9 +3,8 @@ import './globals.css';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { QRCodeSVG, QRCodeCanvas } from 'qrcode.react';
-import { createClient } from '@supabase/supabase-js';
-import { Turnstile } from '@marsidev/react-turnstile';
 import { supabase } from '../lib/supabase';
+import { Turnstile } from '@marsidev/react-turnstile';
 
 // NOMENCLATOR COMPLET CU TOATE CLAUZELE (VECHI INTEGRALE + NOI)
 const nomenclatorClauze = {
