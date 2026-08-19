@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { QRCodeSVG, QRCodeCanvas } from 'qrcode.react';
 import { createClient } from '@supabase/supabase-js';
 import { Turnstile } from '@marsidev/react-turnstile';
-import { supabase } from '@/lib/supabase'; // (sau calea corectă către fișierul creat la Pasul 1)
+import { supabase } from '../lib/supabase';
 
 // NOMENCLATOR COMPLET CU TOATE CLAUZELE (VECHI INTEGRALE + NOI)
 const nomenclatorClauze = {
