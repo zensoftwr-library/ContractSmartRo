@@ -5,7 +5,6 @@ export async function POST(req) {
   try {
     const formData = await req.formData();
     const file = formData.get('file');
-    const tipDocument = formData.get('tipDocument');
 
     if (!file) return NextResponse.json({ success: false, error: 'Lipsă fișier' });
 
@@ -18,11 +17,19 @@ export async function POST(req) {
     const buffer = Buffer.from(await file.arrayBuffer());
     const base64Image = buffer.toString('base64');
 
-    const promptText = tipDocument === 'civ' 
-      ? "Extrage din acest CIV auto și returnează DOAR un JSON valid cu formatul: {\"autoVin\": \"seria de 17 caractere\", \"autoMarcaModel\": \"marca și modelul\", \"autoNumarInmatriculare\": \"numărul sau gol\"}" 
-      : "Extrage din acest buletin românesc și returnează DOAR un JSON valid cu formatul: {\"autoNumeVanzator\": \"Numele și Prenumele complet\", \"autoCnpVanzator\": \"cnp-ul de 13 cifre\", \"autoAdresaVanzator\": \"\"}";
+    // Prompt universal strict pentru Pachetul Auto
+    const promptText = `Analizează acest document (poate fi Buletin, CIV, Talon auto).
+    Returnează STRICT un obiect JSON cu următoarele chei (dacă o informație nu există, lasă valoarea goală ""):
+    {
+      "autoVin": "seria de șasiu de 17 caractere",
+      "autoMarcaModel": "marca și modelul mașinii",
+      "autoNumarInmatriculare": "numărul de înmatriculare",
+      "numePersoana": "Numele și prenumele persoanei (fără etichete)",
+      "cnpPersoana": "CNP-ul exact de 13 cifre",
+      "adresaPersoana": "Adresa completă"
+    }`;
 
-    // Folosim modelul indicat de tine
+    // Folosim modelul indicat de tine cu configurarea pentru JSON
     const response = await ai.models.generateContent({
       model: 'gemini-3.6-flash', 
       contents: [
@@ -37,16 +44,26 @@ export async function POST(req) {
             }
           ]
         }
-      ]
+      ],
+      // MAGIA PENTRU VITEZĂ (Răspuns nativ JSON)
+      config: { 
+        responseMimeType: "application/json" 
+      }
     });
 
-    const rawText = response.text || '';
-
+    const rawText = response.text || '{}';
+    
     let extractedData = {};
-    const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      extractedData = JSON.parse(jsonMatch[0]);
+    try {
+      extractedData = JSON.parse(rawText);
+    } catch (e) {
+      console.error("Eroare parsare JSON Gemini:", e);
     }
+
+    // Curățăm datele (transformăm null/undefined în string gol)
+    Object.keys(extractedData).forEach(key => {
+      if (!extractedData[key]) extractedData[key] = "";
+    });
 
     return NextResponse.json({ success: true, extractedData });
 

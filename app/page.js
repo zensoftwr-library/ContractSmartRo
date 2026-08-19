@@ -17,6 +17,39 @@ if (process.env.NODE_ENV !== 'production') {
   globalThis.supabaseClient = supabase;
 }
 
+// Funcție pentru comprimarea pozelor la dimensiunea ideală pentru AI
+const compressImage = (file) => {
+  return new Promise((resolve) => {
+    if (!file.type.startsWith('image/')) return resolve(file); // Dacă e PDF, nu facem compresie
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_DIMENSION = 1600;
+        let width = img.width;
+        let height = img.height;
+        if (width > height && width > MAX_DIMENSION) {
+          height *= MAX_DIMENSION / width;
+          width = MAX_DIMENSION;
+        } else if (height > MAX_DIMENSION) {
+          width *= MAX_DIMENSION / height;
+          height = MAX_DIMENSION;
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob((blob) => {
+          resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+        }, 'image/jpeg', 0.85); // 85% calitate = perfect OCR
+      };
+    };
+  });
+};
+
 // NOMENCLATOR COMPLET CU TOATE CLAUZELE (VECHI INTEGRALE + NOI)
 const nomenclatorClauze = {
   prestari: [
@@ -472,6 +505,8 @@ export default function Home() {
 
   const [autoDocs, setAutoDocs] = useState({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon: null });
   const [isUploading, setIsUploading] = useState(false);
+
+  const [isScanning, setIsScanning] = useState(null);
 
   const [scrollPercent, setScrollPercent] = useState(0);
 
@@ -1031,54 +1066,62 @@ export default function Home() {
   };
 
   const handleAutoFileUpload = async (e, tipDoc) => {
-    const file = e.target.files[0];
+    const file = e?.target?.files?.[0];
     if (!file) return;
-    setIsUploading(true);
-
-    const localFormData = new FormData();
-    localFormData.append('file', file);
-    localFormData.append('tipDocument', tipDoc);
+    
+    setIsScanning(tipDoc); // Pornește rotița fix pe actul încărcat
 
     try {
+      // 1. Comprimare instantă (sau ignoră dacă e PDF)
+      const compressedFile = await compressImage(file);
+
+      // 2. Pregătim pachetul pentru AI
+      const localFormData = new FormData();
+      localFormData.append('file', compressedFile);
+      localFormData.append('tipDocument', tipDoc);
+      localFormData.append('context', 'auto'); // Îi spunem AI-ului din route.js că e auto
+
       const res = await fetch('/api/auto/upload-ocr', { method: 'POST', body: localFormData });
       const data = await res.json();
 
-      if (data.success) {
-        setAutoDocs(prev => ({ ...prev, [tipDoc]: data.fileUrl }));
+      if (data.success && data.extractedData) {
+        // Punem bifă verde pe documentul scanat în UI
+        setAutoDocs(prev => ({ ...prev, [tipDoc]: true }));
 
-        let dateFinale = data.extractedData || null;
+        let dateFinale = data.extractedData;
 
-        if (dateFinale) {
-          setAutoData(prev => {
-            let updated = { ...prev };
-            if (tipDoc === 'civ' || tipDoc === 'talon') {
-              updated.autoVin = dateFinale.autoVin || prev.autoVin;
-              updated.autoMarcaModel = dateFinale.autoMarcaModel || prev.autoMarcaModel;
-              updated.autoNumarInmatriculare = dateFinale.autoNumarInmatriculare || prev.autoNumarInmatriculare;
-            } 
-            else if (tipDoc === 'buletin_cumparator') {
-              updated.cumparatorNume = dateFinale.autoNumeVanzator || prev.cumparatorNume;
-              updated.cumparatorCnp = dateFinale.autoCnpVanzator || prev.cumparatorCnp;
-              updated.autoAdresaCumparator = dateFinale.autoAdresaVanzator || prev.autoAdresaCumparator;
-            } 
-            else {
-              updated.vanzatorNume = dateFinale.autoNumeVanzator || prev.vanzatorNume;
-              updated.vanzatorCnp = dateFinale.autoCnpVanzator || prev.vanzatorCnp;
-              updated.autoAdresaVanzator = dateFinale.autoAdresaVanzator || prev.autoAdresaVanzator;
-            }
-            return updated;
-          });
-          alert(`Documentul ${tipDoc.toUpperCase()} a fost citit cu succes!`);
-        } else {
-          alert('Modelul AI nu a putut extrage datele complet. Reîncearcă.');
-        }
+        // 3. MACAZUL: Turnăm datele exact unde trebuie
+        setAutoData(prev => {
+          let updated = { ...prev };
+          
+          // A. Datele mașinii se completează oricând găsește ceva despre ele (pe talon sau civ)
+          updated.autoVin = dateFinale.autoVin || prev.autoVin;
+          updated.autoMarcaModel = dateFinale.autoMarcaModel || prev.autoMarcaModel;
+          updated.autoNumarInmatriculare = dateFinale.autoNumarInmatriculare || prev.autoNumarInmatriculare;
+
+          // B. Macaz Buletin CUMPĂRĂTOR
+          if (tipDoc === 'buletin_cumparator') {
+            updated.cumparatorNume = dateFinale.numePersoana || prev.cumparatorNume;
+            updated.cumparatorCnp = dateFinale.cnpPersoana || prev.cumparatorCnp;
+            updated.autoAdresaCumparator = dateFinale.adresaPersoana || prev.autoAdresaCumparator;
+          } 
+          // C. Macaz Buletin VÂNZĂTOR
+          else if (tipDoc === 'buletin_vanzator') {
+            updated.vanzatorNume = dateFinale.numePersoana || prev.vanzatorNume;
+            updated.vanzatorCnp = dateFinale.cnpPersoana || prev.vanzatorCnp;
+            updated.autoAdresaVanzator = dateFinale.adresaPersoana || prev.autoAdresaVanzator;
+          }
+
+          return updated;
+        });
       } else {
-        alert('Eroare la încărcarea fișierului pe server.');
+        alert('Datele nu au putut fi extrase. Încearcă o poză mai clară.');
       }
     } catch (err) {
-      alert('Eroare tehnică la procesarea optică.');
+      alert('Eroare tehnică la citirea documentului.');
     } finally {
-      setIsUploading(false);
+      setIsScanning(null); // Oprește rotița
+      if (e.target) e.target.value = ''; // Resetează input-ul
     }
   };
 
@@ -2336,7 +2379,11 @@ export default function Home() {
                               <label className="text-xs text-slate-300 block mb-2 font-bold">Carte Identitate Vehicul (CIV)</label>
                               {!autoDocs.civ ? (
                                 <div className="flex flex-col gap-2">
-                                  <input type="file" id="file-input-civ" accept="image/*,application/pdf" disabled={isUploading} onChange={(e) => handleAutoFileUpload(e, 'civ')} className="text-[10px] block w-full text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-[#16221A] file:text-[#8ba888]" />
+                                  {isScanning === 'civ' ? (
+                                      <div className="flex justify-center py-1.5"><svg className="animate-spin h-5 w-5 text-[#8ba888]" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>
+                                    ) : (
+                                      <input type="file" id="file-input-civ" accept="image/*,application/pdf" disabled={!!isScanning} onChange={(e) => handleAutoFileUpload(e, 'civ')} className="text-[10px] block w-full text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-[#16221A] file:text-[#8ba888] cursor-pointer" />
+                                    )}
                                   <button type="button" onClick={() => startCamera('civ')} className="bg-slate-800 hover:bg-slate-700 text-xs text-white font-bold py-1.5 rounded transition">📷 Folosește Camera</button>
                                 </div>
                               ) : (
@@ -2351,7 +2398,11 @@ export default function Home() {
                               <label className="text-xs text-slate-300 block mb-2 font-bold">Certificat Înmatriculare (Talon)</label>
                               {!autoDocs.talon ? (
                                 <div className="flex flex-col gap-2">
-                                  <input type="file" id="file-input-talon" accept="image/*,application/pdf" disabled={isUploading} onChange={(e) => handleAutoFileUpload(e, 'talon')} className="text-[10px] block w-full text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-[#16221A] file:text-[#8ba888]" />
+                                  {isScanning === 'talon' ? (
+                                    <div className="flex justify-center py-1.5"><svg className="animate-spin h-5 w-5 text-[#8ba888]" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>
+                                  ) : (
+                                    <input type="file" id="file-input-talon" accept="image/*,application/pdf" disabled={!!isScanning} onChange={(e) => handleAutoFileUpload(e, 'talon')} className="text-[10px] block w-full text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-[#16221A] file:text-[#8ba888] cursor-pointer" />
+                                  )}
                                   <button type="button" onClick={() => startCamera('talon')} className="bg-slate-800 hover:bg-slate-700 text-xs text-white font-bold py-1.5 rounded transition">📷 Folosește Camera</button>
                                 </div>
                               ) : (
@@ -2366,7 +2417,11 @@ export default function Home() {
                               <label className="text-xs text-slate-300 block mb-2 font-bold">Act Identitate Vânzător</label>
                               {!autoDocs.buletin_vanzator ? (
                                 <div className="flex flex-col gap-2">
-                                  <input type="file" id="file-input-buletin_vanzator" accept="image/*,application/pdf" disabled={isUploading} onChange={(e) => handleAutoFileUpload(e, 'buletin_vanzator')} className="text-[10px] block w-full text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-[#16221A] file:text-[#8ba888]" />
+                                  {isScanning === 'buletin_vanzator' ? (
+                                    <div className="flex justify-center py-1.5"><svg className="animate-spin h-5 w-5 text-[#8ba888]" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>
+                                  ) : (
+                                    <input type="file" id="file-input-buletin_vanzator" accept="image/*,application/pdf" disabled={!!isScanning} onChange={(e) => handleAutoFileUpload(e, 'buletin_vanzator')} className="text-[10px] block w-full text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-[#16221A] file:text-[#8ba888] cursor-pointer" />
+                                  )}
                                   <button type="button" onClick={() => startCamera('buletin_vanzator')} className="bg-slate-800 hover:bg-slate-700 text-xs text-white font-bold py-1.5 rounded transition">📷 Folosește Camera</button>
                                 </div>
                               ) : (
@@ -2381,7 +2436,11 @@ export default function Home() {
                               <label className="text-xs text-slate-300 block mb-2 font-bold">Act Identitate Cumpărător</label>
                               {!autoDocs.buletin_cumparator ? (
                                 <div className="flex flex-col gap-2">
-                                  <input type="file" id="file-input-buletin_cumparator" accept="image/*,application/pdf" disabled={isUploading} onChange={(e) => handleAutoFileUpload(e, 'buletin_cumparator')} className="text-[10px] block w-full text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-[#16221A] file:text-[#8ba888]" />
+                                  {isScanning === 'buletin_cumparator' ? (
+                                    <div className="flex justify-center py-1.5"><svg className="animate-spin h-5 w-5 text-[#8ba888]" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>
+                                  ) : (
+                                    <input type="file" id="file-input-buletin_cumparator" accept="image/*,application/pdf" disabled={!!isScanning} onChange={(e) => handleAutoFileUpload(e, 'buletin_cumparator')} className="text-[10px] block w-full text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-[#16221A] file:text-[#8ba888] cursor-pointer" />
+                                  )}
                                   <button type="button" onClick={() => startCamera('buletin_cumparator')} className="bg-slate-800 hover:bg-slate-700 text-xs text-white font-bold py-1.5 rounded transition">📷 Folosește Camera</button>
                                 </div>
                               ) : (
