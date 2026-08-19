@@ -52,11 +52,13 @@ export async function POST(req) {
       const cnpMatch = text.match(/\b([1-8]\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])\d{6})\b/);
       
       // Căutare automată nume
+      const ignoredWords = /ROMANIA|RO|CARTE|IDENTITATE|IDENTITY|CARD|SEX|CETATENIE|VALABILITATE|CNP|DATA|EMIS|DIRECTIA|DIRECTOR|SURNAME|GIVEN|EXPIRY|BIRTH/i;
+      
       const nameLine = lines.find(l => 
-        l.length > 5 && l === l.toUpperCase() && !/\d/.test(l) && 
-        /[A-Z].*\s+[A-Z]/.test(l) && 
-        !/ROMANIA|RO|CARTE|IDENTITATE|IDENTITY|CARD|SEX|CETATENIE|VALABILITATE|CNP|DATA|EMIS|DIRECTIA|DIRECTOR/i.test(l) &&
-        !/[•\-:®©]/i.test(l)
+        l.length > 5 && 
+        !/\d/.test(l) && 
+        l.includes(' ') && 
+        !ignoredWords.test(l)
       ) || "";
 
       extractedData = {
