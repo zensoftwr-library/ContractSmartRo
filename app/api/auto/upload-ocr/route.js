@@ -29,28 +29,41 @@ export async function POST(req) {
       "adresaPersoana": "Adresa completă"
     }`;
 
-    // Folosim modelul indicat de tine cu configurarea pentru JSON
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.7-flash', 
-      contents: [
-        {
-          parts: [
-            { text: promptText },
-            {
-              inlineData: {
-                mimeType: file.type || 'image/jpeg',
-                data: base64Image
-              }
-            }
-          ]
-        }
-      ],
-      // MAGIA PENTRU VITEZĂ (Răspuns nativ JSON + Fără timp de gândire)
-      config: { 
-        responseMimeType: "application/json",
-        thinkingConfig: { thinkingLevel: "low" }
+    // Pregătim datele comune pentru ambele modele
+    const reqContents = [
+      {
+        parts: [
+          { text: promptText },
+          {
+            inlineData: { mimeType: file.type || 'image/jpeg', data: base64Image }
+          }
+        ]
       }
-    });
+    ];
+
+    let response;
+    try {
+      // 1. Încercăm prima dată cu NOUL model 3.7 Flash + Viteză Maximă
+      response = await ai.models.generateContent({
+        model: 'gemini-3.7-flash', 
+        contents: reqContents,
+        config: { 
+          responseMimeType: "application/json",
+          thinkingConfig: { thinkingLevel: "low" } 
+        }
+      });
+    } catch (primaryError) {
+      console.warn("[OCR Cascadă] Modelul 3.7 e suprasolicitat (503). Trecem automat pe 3.6. Motiv:", primaryError.message);
+      
+      // 2. Fallback: Dacă pică, trecem pe 3.6 Flash (aici nu mai punem parametrul thinkingLevel, 3.6 nu-l cunoaște)
+      response = await ai.models.generateContent({
+        model: 'gemini-3.6-flash', 
+        contents: reqContents,
+        config: { 
+          responseMimeType: "application/json" 
+        }
+      });
+    }
 
     const rawText = response.text || '{}';
     
