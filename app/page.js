@@ -1217,6 +1217,24 @@ export default function Home() {
     }
   };
 
+  const handleResetareParola = async () => {
+    if (!authEmail) {
+      alert("Te rog să introduci adresa de email în câmpul de mai sus pentru a primi link-ul de resetare.");
+      return;
+    }
+    
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(authEmail, {
+        redirectTo: window.location.origin, 
+      });
+      
+      if (error) throw error;
+      alert("Dacă adresa de email există în sistem, vei primi un link. Verifică și folderul Spam!");
+    } catch (error) {
+      alert("Eroare la resetarea parolei: " + error.message);
+    }
+  };
+
   const handleAuthSubmit = async (e) => {
     e.preventDefault();
     if (isProcessingForm.current) return;
@@ -1397,25 +1415,40 @@ export default function Home() {
               <h3 className="text-xl font-black text-white mb-1">{isSignUp ? 'Creează un Cont Nou' : 'Autentificare Portabilitate'}</h3>
               <p className="text-xs text-slate-500 mb-6">Securizează documentele în serverele Supabase.</p>
 
-              <form onSubmit={handleAuthSubmit} className="space-y-4">
-                <div>
-                  <label htmlFor="authEmail" className="text-[10px] text-slate-400 uppercase font-bold block mb-1">Adresă de Email</label>
-                  <input id="authEmail" name="email" type="email" required placeholder="nume@companie.ro" value={authEmail} onChange={e => setAuthEmail(e.target.value)} className="w-full p-3 bg-[#0B0F12] border border-slate-700 rounded-md text-xs text-white outline-none focus:border-[#8ba888]" />
-                </div>
-                <div>
-                  <label htmlFor="authPassword" className="text-[10px] text-slate-400 uppercase font-bold block mb-1">Parolă Validă</label>
-                  <input id="authPassword" name="password" type="password" required placeholder="••••••••" value={authPassword} onChange={e => setAuthPassword(e.target.value)} className="w-full p-3 bg-[#0B0F12] border border-slate-700 rounded-md text-xs text-white outline-none focus:border-[#8ba888]" />
-                </div>
-                {isSignUp && (
-                  <div>
-                    <label htmlFor="authConfirmPassword" className="text-[10px] text-slate-400 uppercase font-bold block mb-1">Confirmă Parola</label>
-                    <input id="authConfirmPassword" name="confirmPassword" type="password" required placeholder="••••••••" value={authConfirmPassword} onChange={e => setAuthConfirmPassword(e.target.value)} className="w-full p-3 bg-[#0B0F12] border border-slate-700 rounded-md text-xs text-white outline-none focus:border-[#8ba888]" />
-                  </div>
-                )}
-                <button type="submit" disabled={!!loadingText} className="w-full bg-[#8ba888] text-[#0B0F12] font-black py-3 rounded-md text-xs tracking-tight transition hover:opacity-90 mt-2">
-                  {loadingText ? 'Se procesează...' : isSignUp ? 'Confirmă Înregistrarea' : 'Conectare Securizată'}
-                </button>
-              </form>
+             <form onSubmit={handleAuthSubmit} className="space-y-4">
+  <div>
+    <label htmlFor="authEmail" className="text-[10px] text-slate-400 uppercase font-bold block mb-1">Adresă de Email</label>
+    <input id="authEmail" name="email" type="email" required placeholder="nume@companie.ro" value={authEmail} onChange={e => setAuthEmail(e.target.value)} className="w-full p-3 bg-[#0B0F12] border border-slate-700 rounded-md text-xs text-white outline-none focus:border-[#8ba888]" />
+  </div>
+  
+  <div>
+    <label htmlFor="authPassword" className="text-[10px] text-slate-400 uppercase font-bold block mb-1">Parolă Validă</label>
+    <input id="authPassword" name="password" type="password" required placeholder="••••••••" value={authPassword} onChange={e => setAuthPassword(e.target.value)} className="w-full p-3 bg-[#0B0F12] border border-slate-700 rounded-md text-xs text-white outline-none focus:border-[#8ba888]" />
+  </div>
+
+  {!isSignUp && (
+    <div className="flex justify-end w-full mt-1 mb-2">
+      <button 
+        type="button" 
+        onClick={handleResetareParola} 
+        className="text-[10px] text-slate-400 hover:text-[#8ba888] hover:underline transition-colors font-bold uppercase tracking-wider"
+      >
+        Ai uitat parola?
+      </button>
+    </div>
+  )}
+
+  {isSignUp && (
+    <div>
+      <label htmlFor="authConfirmPassword" className="text-[10px] text-slate-400 uppercase font-bold block mb-1">Confirmă Parola</label>
+      <input id="authConfirmPassword" name="confirmPassword" type="password" required placeholder="••••••••" value={authConfirmPassword} onChange={e => setAuthConfirmPassword(e.target.value)} className="w-full p-3 bg-[#0B0F12] border border-slate-700 rounded-md text-xs text-white outline-none focus:border-[#8ba888]" />
+    </div>
+  )}
+  
+  <button type="submit" disabled={!!loadingText} className="w-full bg-[#8ba888] text-[#0B0F12] font-black py-3 rounded-md text-xs tracking-tight transition hover:opacity-90 mt-2">
+    {loadingText ? 'Se procesează...' : isSignUp ? 'Confirmă Înregistrarea' : 'Conectare Securizată'}
+  </button>
+</form>
               <div className="text-center mt-5 pt-4 border-t border-slate-800/80">
                 <button type="button" onClick={() => { setIsSignUp(!isSignUp); setAuthPassword(''); setAuthConfirmPassword(''); }} className="text-xs text-slate-400 hover:text-white underline">{isSignUp ? 'Ai deja cont? Conectează-te' : 'Nu ai cont? Creează unul acum'}</button>
               </div>

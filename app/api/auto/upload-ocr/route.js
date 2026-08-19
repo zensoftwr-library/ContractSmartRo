@@ -11,7 +11,7 @@ export async function POST(req) {
 
     if (!file) return NextResponse.json({ success: false, error: 'Lipsă fișier' });
 
-    // 1. Salvare în Supabase Storage (Funcționează peste tot)
+    // 1. Salvare în Supabase Storage (necesar pentru prelucrare/logare temporară)
     const fileName = `${Date.now()}-${file.name}`;
     let publicUrl = '';
     try {
@@ -21,31 +21,10 @@ export async function POST(req) {
         publicUrl = urlObj.data?.publicUrl || '';
       }
     } catch (e) {
-      console.log("Supabase storage skip pe local dacă nu e configurat");
+      console.log("Supabase storage skip - ignorat dacă apar probleme de rețea locală");
     }
 
-    // 2. VERIFICARE MEDIU: Dacă suntem local, trimitem datele tale REALE de test
-    const isLocal = process.env.NODE_ENV === 'development' || !process.env.VERCEL;
-    
-    if (isLocal) {
-      console.log(`[DEVELOPMENT] Validare locală pentru ${tipDocument}. Returnăm datele tale reale de test.`);
-      
-      const extractedData = tipDocument === 'civ'
-        ? { 
-            autoVin: "WBA1A110X0V123456", // SCHIMBĂ CU SERIA TA REALĂ DE CIV
-            autoMarcaModel: "BMW Seria 1",
-            autoNumarInmatriculare: "BV 99 ABC" 
-          }
-        : { 
-            autoNumeVanzator: "POPESCU IONUT", // SCHIMBĂ CU NUMELE TĂU REAL
-            autoCnpVanzator: "1850102123456",   // SCHIMBĂ CU CNP-UL TĂU REAL
-            autoAdresaVanzator: "Str. Principală Nr. 10, Brașov" // ADRESA TA REALĂ
-          };
-
-      return NextResponse.json({ success: true, fileUrl: publicUrl, extractedData });
-    }
-
-    // 3. CODUL DE PRODUCȚIE (Rulează DOAR pe Vercel) - GOOGLE CLOUD VISION
+    // 2. CODUL DE PRODUCȚIE - GOOGLE CLOUD VISION API (Rulează peste tot acum)
     const fileBuffer = Buffer.from(await file.arrayBuffer());
     // Google Vision cere base64 curat, fără prefixul 'data:image/jpeg;base64,'
     const base64Image = fileBuffer.toString('base64');
@@ -89,9 +68,9 @@ export async function POST(req) {
       };
     }
 
-    // --- 4. SCRIPTUL DE CURĂȚENIE SUPREMĂ (AUTO-DELETE SUPABASE) ---
+    // --- 3. SCRIPTUL DE CURĂȚENIE SUPREMĂ (AUTO-DELETE SUPABASE) ---
     // Ștergem fișierul din Supabase fix în secunda în care am extras textul!
-    if (fileName && !isLocal) {
+    if (fileName) {
       await supabase.storage.from('auto-documents').remove([fileName]);
       console.log(`[GDPR CLEANUP] Poza ${fileName} a fost ștearsă definitiv.`);
     }
@@ -99,7 +78,7 @@ export async function POST(req) {
     return NextResponse.json({ success: true, fileUrl: publicUrl, extractedData });
 
   } catch (err) {
-    // --- 5. DATA MASKING (CENZURARE LOG-URI) ---
+    // --- 4. DATA MASKING (CENZURARE LOG-URI) ---
     let errorMessage = err.message || String(err);
     
     // Cenzurare CNP (lasă primele 3 cifre, ascunde restul de 10)
