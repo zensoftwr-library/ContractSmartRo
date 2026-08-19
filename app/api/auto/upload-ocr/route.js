@@ -13,29 +13,33 @@ export async function POST(req) {
 
     if (!file) return NextResponse.json({ success: false, error: 'Lipsă fișier' });
 
-    // 1. Pregătim FormData pentru OCR.space
-    const ocrFormData = new FormData();
-    ocrFormData.append('apikey', process.env.OCR_SPACE_API_KEY);
-    ocrFormData.append('language', 'rum'); // Setăm limba română
-    ocrFormData.append('file', file);
-    ocrFormData.append('isOverlayRequired', 'false');
+    const apiKey = process.env.OCR_SPACE_API_KEY;
+    if (!apiKey) return NextResponse.json({ success: false, error: 'Lipsește cheia OCR_SPACE_API_KEY în .env' });
 
-    // 2. Apelăm API-ul OCR.space
+    // Convertim fișierul în Base64 pentru a evita erorile de transmisie pe server
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const base64Image = `data:${file.type || 'image/jpeg'};base64,${buffer.toString('base64')}`;
+
+    const ocrFormData = new URLSearchParams();
+    ocrFormData.append('apikey', apiKey);
+    ocrFormData.append('base64Image', base64Image);
+    // Am lăsat fără limbă setată manual pentru a lăsa motorul să recunoască automat caracterele
+
     const ocrResponse = await fetch('https://api.ocr.space/parse/image', {
       method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: ocrFormData
     });
 
     const ocrResult = await ocrResponse.json();
     
     if (ocrResult.IsErroredOnProcessing) {
-      throw new Error(ocrResult.ErrorMessage || "Eroare OCR.space");
+      const errMsg = Array.isArray(ocrResult.ErrorMessage) ? ocrResult.ErrorMessage.join(', ') : (ocrResult.ErrorMessage || "Eroare OCR");
+      throw new Error(errMsg);
     }
 
-    // 3. Extragem textul unit
     const text = ocrResult.ParsedResults?.[0]?.ParsedText || '';
 
-    // 4. Extragere date cu logica ta
     let extractedData = {};
     if (tipDocument === 'civ') {
       const vinMatch = text.match(/\b([A-HJ-NPR-Z0-9]{17})\b/i);
