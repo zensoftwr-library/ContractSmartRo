@@ -2633,6 +2633,7 @@ export default function Home() {
                   <div className="grid grid-cols-1 gap-8 items-stretch">
                     
                     {/* WIDGET ANAF */}
+                    <div className="w-full max-w-2xl mx-auto">
                     <div className="w-full">
                       <div className="bg-[#12181D] rounded-2xl border border-slate-800/80 shadow-xl p-6 md:p-8 flex flex-col items-center relative overflow-hidden h-full">
                         <div className="absolute -right-20 -top-20 w-64 h-64 bg-[#8ba888]/5 rounded-full blur-3xl pointer-events-none"></div>
@@ -2701,6 +2702,7 @@ export default function Home() {
                           )}
                         </div>
                       </div>
+                    </div>
                     </div>
 
                     {/* CALCULATOR FISCAL */}
