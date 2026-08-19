@@ -92,7 +92,7 @@ export async function POST(request) {
 
     // 3. Inițializăm modelul tău preferat (gemini-3.5-flash) și îi dăm instrucțiunile
     const chatModel = genAI.getGenerativeModel({ 
-      model: "gemini-3.6-flash",
+      model: "gemini-3.7-flash",
       systemInstruction: { parts: [{ text: systemInstruction }] }
     });
 
@@ -114,10 +114,7 @@ export async function POST(request) {
 
     // 5. Generarea răspunsului final
     const result = await chatModel.generateContent({
-      contents: contents,
-      generationConfig: {
-        temperature: 0.4,
-      }
+      contents: contents
     });
 
     let raspunsAI = result.response.text();

@@ -464,7 +464,7 @@ export default function Home() {
             prestatorReprezentant: data.data.administrator || '' 
           }));
           setPrestatorCuiStatus(data.data.stare);
-        } else {
+        } else if (rol === 'client') {
           setFormData(prev => ({ 
             ...prev, 
             clientNume: data.data.denumire || '',              
@@ -472,6 +472,20 @@ export default function Home() {
             clientReprezentant: data.data.administrator || ''        
           }));
           setClientCuiStatus(data.data.stare);
+        } else if (rol === 'vanzator_auto') {
+          setAutoData(prev => ({
+            ...prev,
+            vanzatorNume: data.data.denumire || prev.vanzatorNume,
+            vanzatorSediu: data.data.adresa || prev.vanzatorSediu,
+            vanzatorRegCom: data.data.nrRegCom || data.data.numar_reg_com || data.data.reg_com || prev.vanzatorRegCom
+          }));
+        } else if (rol === 'cumparator_auto') {
+          setAutoData(prev => ({
+            ...prev,
+            cumparatorNume: data.data.denumire || prev.cumparatorNume,
+            cumparatorSediu: data.data.adresa || prev.cumparatorSediu,
+            cumparatorRegCom: data.data.nrRegCom || data.data.numar_reg_com || data.data.reg_com || prev.cumparatorRegCom
+          }));
         }
       }
     } catch (e) {
@@ -502,6 +516,26 @@ export default function Home() {
     }, 800);
     return () => clearTimeout(delayDebounceFn);
   }, [formData.clientCui]);
+
+  // --- AUTOFILL ANAF PENTRU VÂNZĂTOR AUTO ---
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (autoData.vanzatorTip === 'PJ' && autoData.vanzatorCui?.replace(/[^0-9]/g, '').length >= 5) {
+        handleAutofillCui(autoData.vanzatorCui, 'vanzator_auto');
+      }
+    }, 800);
+    return () => clearTimeout(delayDebounceFn);
+  }, [autoData.vanzatorCui, autoData.vanzatorTip]);
+
+  // --- AUTOFILL ANAF PENTRU CUMPĂRĂTOR AUTO ---
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (autoData.cumparatorTip === 'PJ' && autoData.cumparatorCui?.replace(/[^0-9]/g, '').length >= 5) {
+        handleAutofillCui(autoData.cumparatorCui, 'cumparator_auto');
+      }
+    }, 800);
+    return () => clearTimeout(delayDebounceFn);
+  }, [autoData.cumparatorCui, autoData.cumparatorTip]);
 
   const [autoDocs, setAutoDocs] = useState({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon: null });
   const [isUploading, setIsUploading] = useState(false);
@@ -2363,6 +2397,8 @@ export default function Home() {
                             <div className="grid grid-cols-2 gap-2">
                               <input type="text" placeholder="Denumire Companie / PFA Cumpărător" autoComplete="new-password" value={autoData.cumparatorNume} onChange={e => setAutoData({...autoData, cumparatorNume: e.target.value})} className="bg-[#12181D] border border-slate-700 p-2 rounded text-xs text-white outline-none" />
                               <input type="text" placeholder="CUI / CIF Fiscal" autoComplete="new-password" value={autoData.cumparatorCui} onChange={e => setAutoData({...autoData, cumparatorCui: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded text-xs text-white font-mono outline-none" />
+                              <input type="text" placeholder="Nr. Înmatriculare Reg. Com." autoComplete="new-password" value={autoData.cumparatorRegCom} onChange={e => setAutoData({...autoData, cumparatorRegCom: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none" />
+                              <input type="text" placeholder="Sediu Social Companie" autoComplete="new-password" value={autoData.cumparatorSediu} onChange={e => setAutoData({...autoData, cumparatorSediu: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none" />
                             </div>
                           )}
                         </div>

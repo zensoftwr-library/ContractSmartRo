@@ -31,7 +31,7 @@ export async function POST(req) {
 
     // Folosim modelul indicat de tine cu configurarea pentru JSON
     const response = await ai.models.generateContent({
-      model: 'gemini-3.6-flash', 
+      model: 'gemini-3.7-flash', 
       contents: [
         {
           parts: [
@@ -45,9 +45,10 @@ export async function POST(req) {
           ]
         }
       ],
-      // MAGIA PENTRU VITEZĂ (Răspuns nativ JSON)
+      // MAGIA PENTRU VITEZĂ (Răspuns nativ JSON + Fără timp de gândire)
       config: { 
-        responseMimeType: "application/json" 
+        responseMimeType: "application/json",
+        thinkingConfig: { thinkingLevel: "low" }
       }
     });
 
