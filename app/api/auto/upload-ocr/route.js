@@ -53,10 +53,10 @@ export async function POST(req) {
       
       // Căutare automată nume
       const nameLine = lines.find(l => 
-        l.length > 3 && 
-        l === l.toUpperCase() && 
-        !/\d/.test(l) && 
-        !/ROMANIA|CARTE|IDENTITATE|SEX|CETATENIE|VALABILITATE|CNP|DATA|EMIS/i.test(l)
+        l.length > 5 && l === l.toUpperCase() && !/\d/.test(l) && 
+        /[A-Z].*\s+[A-Z]/.test(l) && 
+        !/ROMANIA|RO|CARTE|IDENTITATE|SEX|CETATENIE|VALABILITATE|CNP|DATA|EMIS/i.test(l) &&
+        !/[•\-:®©]/i.test(l)
       ) || "";
 
       extractedData = {
