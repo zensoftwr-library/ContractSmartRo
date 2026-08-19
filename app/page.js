@@ -5,16 +5,7 @@ import Link from 'next/link';
 import { QRCodeSVG, QRCodeCanvas } from 'qrcode.react';
 import { createClient } from '@supabase/supabase-js';
 import { Turnstile } from '@marsidev/react-turnstile';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-
-// Singleton pattern: refolosim instanța dacă există, ca să evităm warning-ul de Multiple GoTrueClient
-const supabase = globalThis.supabaseClient ?? createClient(supabaseUrl, supabaseAnonKey);
-
-if (process.env.NODE_ENV !== 'production') {
-  globalThis.supabaseClient = supabase;
-}
+import { supabase } from '@/lib/supabase'; // (sau calea corectă către fișierul creat la Pasul 1)
 
 // NOMENCLATOR COMPLET CU TOATE CLAUZELE (VECHI INTEGRALE + NOI)
 const nomenclatorClauze = {
@@ -1984,7 +1975,7 @@ export default function Home() {
             </div>
 
             {/* ȘTIRI LIVE - GLOBALE CU THUMBNAILS UI/UX */}
-            <div className="max-w-7xl mx-auto px-6 mt-12 mb-12">
+            <div className="max-w-7xl mx-auto px-6 mt-16 pt-12 mb-12 border-t border-slate-800">
               <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-4">Flux Monitorizare Mediativă Legală Real-Time</span>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {stiriLive.slice(0, 6).map((stire, i) => (
