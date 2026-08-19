@@ -16,14 +16,13 @@ export async function POST(req) {
     const apiKey = process.env.OCR_SPACE_API_KEY;
     if (!apiKey) return NextResponse.json({ success: false, error: 'Lipsește cheia OCR_SPACE_API_KEY în .env' });
 
-    // Convertim fișierul în Base64 pentru a evita erorile de transmisie pe server
+    // Convertim fișierul în Base64
     const buffer = Buffer.from(await file.arrayBuffer());
     const base64Image = `data:${file.type || 'image/jpeg'};base64,${buffer.toString('base64')}`;
 
     const ocrFormData = new URLSearchParams();
     ocrFormData.append('apikey', apiKey);
     ocrFormData.append('base64Image', base64Image);
-    // Am lăsat fără limbă setată manual pentru a lăsa motorul să recunoască automat caracterele
 
     const ocrResponse = await fetch('https://api.ocr.space/parse/image', {
       method: 'POST',
@@ -39,6 +38,7 @@ export async function POST(req) {
     }
 
     const text = ocrResult.ParsedResults?.[0]?.ParsedText || '';
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
 
     let extractedData = {};
     if (tipDocument === 'civ') {
@@ -50,10 +50,19 @@ export async function POST(req) {
       };
     } else {
       const cnpMatch = text.match(/\b([1-8]\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])\d{6})\b/);
+      
+      // Căutare automată nume
+      const nameLine = lines.find(l => 
+        l.length > 3 && 
+        l === l.toUpperCase() && 
+        !/\d/.test(l) && 
+        !/ROMANIA|CARTE|IDENTITATE|SEX|CETATENIE|VALABILITATE|CNP|DATA|EMIS/i.test(l)
+      ) || "";
+
       extractedData = {
-        autoNumeVanzator: "Verifică document",
+        autoNumeVanzator: nameLine,
         autoCnpVanzator: cnpMatch ? cnpMatch[1] : "",
-        autoAdresaVanzator: "Verifică document"
+        autoAdresaVanzator: "" // Nu există pe buletinele noi
       };
     }
 
