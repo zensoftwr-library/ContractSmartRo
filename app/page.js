@@ -517,26 +517,6 @@ export default function Home() {
     return () => clearTimeout(delayDebounceFn);
   }, [formData.clientCui]);
 
-  // --- AUTOFILL ANAF PENTRU VÂNZĂTOR AUTO ---
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      if (autoData.vanzatorTip === 'PJ' && autoData.vanzatorCui?.replace(/[^0-9]/g, '').length >= 5) {
-        handleAutofillCui(autoData.vanzatorCui, 'vanzator_auto');
-      }
-    }, 800);
-    return () => clearTimeout(delayDebounceFn);
-  }, [autoData.vanzatorCui, autoData.vanzatorTip]);
-
-  // --- AUTOFILL ANAF PENTRU CUMPĂRĂTOR AUTO ---
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      if (autoData.cumparatorTip === 'PJ' && autoData.cumparatorCui?.replace(/[^0-9]/g, '').length >= 5) {
-        handleAutofillCui(autoData.cumparatorCui, 'cumparator_auto');
-      }
-    }, 800);
-    return () => clearTimeout(delayDebounceFn);
-  }, [autoData.cumparatorCui, autoData.cumparatorTip]);
-
   const [autoDocs, setAutoDocs] = useState({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon: null });
   const [isUploading, setIsUploading] = useState(false);
 
@@ -568,6 +548,26 @@ export default function Home() {
     autoAdresaVanzator: '', autoAdresaCumparator: '', pretIncludeTVA: false, autoMoneda: 'RON',
     semnaturaBase64: null
   });
+
+  // --- AUTOFILL ANAF PENTRU VÂNZĂTOR AUTO ---
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (autoData?.vanzatorTip === 'PJ' && autoData?.vanzatorCui?.replace(/[^0-9]/g, '').length >= 5) {
+        handleAutofillCui(autoData.vanzatorCui, 'vanzator_auto');
+      }
+    }, 800);
+    return () => clearTimeout(delayDebounceFn);
+  }, [autoData?.vanzatorCui, autoData?.vanzatorTip]);
+
+  // --- AUTOFILL ANAF PENTRU CUMPĂRĂTOR AUTO ---
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (autoData?.cumparatorTip === 'PJ' && autoData?.cumparatorCui?.replace(/[^0-9]/g, '').length >= 5) {
+        handleAutofillCui(autoData.cumparatorCui, 'cumparator_auto');
+      }
+    }, 800);
+    return () => clearTimeout(delayDebounceFn);
+  }, [autoData?.cumparatorCui, autoData?.cumparatorTip]);
 
   const startCamera = async (type) => {
     setTargetDocType(type);
