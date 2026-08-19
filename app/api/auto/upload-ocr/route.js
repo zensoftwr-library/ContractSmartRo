@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(process.env.SUPABASE_URL || '', process.env.SUPABASE_SERVICE_ROLE_KEY || '');
+// Folosește cheile dedicate de server sau le ia automat pe cele publice ca fallback
+const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function POST(req) {
   try {
@@ -11,7 +15,7 @@ export async function POST(req) {
 
     if (!file) return NextResponse.json({ success: false, error: 'Lipsă fișier' });
 
-    // 1. Salvare în Supabase Storage (necesar pentru prelucrare/logare temporară)
+    // 1. Salvare în Supabase Storage (opțională pentru backup, ignorată dacă crapă bucket-ul)
     const fileName = `${Date.now()}-${file.name}`;
     let publicUrl = '';
     try {
@@ -21,12 +25,11 @@ export async function POST(req) {
         publicUrl = urlObj.data?.publicUrl || '';
       }
     } catch (e) {
-      console.log("Supabase storage skip - ignorat dacă apar probleme de rețea locală");
+      console.log("Supabase storage skip");
     }
 
-    // 2. CODUL DE PRODUCȚIE - GOOGLE CLOUD VISION API (Rulează peste tot acum)
+    // 2. GOOGLE CLOUD VISION API
     const fileBuffer = Buffer.from(await file.arrayBuffer());
-    // Google Vision cere base64 curat, fără prefixul 'data:image/jpeg;base64,'
     const base64Image = fileBuffer.toString('base64');
     
     const visionResponse = await fetch(`https://vision.googleapis.com/v1/images:annotate?key=${process.env.GOOGLE_VISION_API_KEY}`, {
@@ -36,31 +39,33 @@ export async function POST(req) {
         requests: [
           {
             image: { content: base64Image },
-            features: [{ type: "DOCUMENT_TEXT_DETECTION" }] // Extrage absolut tot textul + tabele + diacritice
+            features: [{ type: "DOCUMENT_TEXT_DETECTION" }]
           }
         ]
       })
     });
 
-    if (!visionResponse.ok) throw new Error(`Google Vision API Error: ${visionResponse.status}`);
+    if (!visionResponse.ok) {
+      const errText = await visionResponse.text();
+      throw new Error(`Google Vision API Error ${visionResponse.status}: ${errText}`);
+    }
 
     const visionResult = await visionResponse.json();
     const textExtras = visionResult.responses?.[0]?.fullTextAnnotation?.text || '';
 
-    // Parsăm inteligent datele esențiale din textul brut returnat de Google
+    // 3. EXTRAGERE DATE (Regex)
     let extractedData = {};
     
     if (tipDocument === 'civ') {
-      // Regex pentru seria de șasiu (17 caractere alfanumerice)
       const vinMatch = textExtras.match(/\b([A-HJ-NPR-Z0-9]{17})\b/i);
       extractedData = {
         autoVin: vinMatch ? vinMatch[1].toUpperCase() : "",
-        autoMarcaModel: "Verifică document", // Va lăsa utilizatorul să valideze marca pe frontend
+        autoMarcaModel: "Verifică document",
         autoNumarInmatriculare: ""
       };
     } else {
-      // Regex exact pentru CNP românesc (13 cifre)
-      const cnpMatch = textExtras.match(/\b([1-9]\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])\d{6})\b/);
+      // Regex îmbunătățit pentru CNP românesc (13 cifre)
+      const cnpMatch = textExtras.match(/\b([1-8]\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])\d{6})\b/);
       extractedData = {
         autoNumeVanzator: "Verifică document",
         autoCnpVanzator: cnpMatch ? cnpMatch[1] : "",
@@ -68,28 +73,17 @@ export async function POST(req) {
       };
     }
 
-    // --- 3. SCRIPTUL DE CURĂȚENIE SUPREMĂ (AUTO-DELETE SUPABASE) ---
-    // Ștergem fișierul din Supabase fix în secunda în care am extras textul!
+    // 4. GDPR CLEANUP (Ștergere fișier din Supabase)
     if (fileName) {
-      await supabase.storage.from('auto-documents').remove([fileName]);
-      console.log(`[GDPR CLEANUP] Poza ${fileName} a fost ștearsă definitiv.`);
+      try {
+        await supabase.storage.from('auto-documents').remove([fileName]);
+      } catch(e) {}
     }
 
     return NextResponse.json({ success: true, fileUrl: publicUrl, extractedData });
 
   } catch (err) {
-    // --- 4. DATA MASKING (CENZURARE LOG-URI) ---
-    let errorMessage = err.message || String(err);
-    
-    // Cenzurare CNP (lasă primele 3 cifre, ascunde restul de 10)
-    errorMessage = errorMessage.replace(/\b([1-9]\d{2})\d{10}\b/g, '$1**********');
-    
-    // Cenzurare Serie Șasiu (lasă primele 3, ascunde restul de 14)
-    errorMessage = errorMessage.replace(/\b([A-HJ-NPR-Z0-9]{3})[A-HJ-NPR-Z0-9]{14}\b/gi, '$1**************');
-    
-    console.error("[Eroare Mascată GDPR]:", errorMessage);
-    
-    // Nu trimitem detalii tehnice în frontend, dăm o eroare generică:
-    return NextResponse.json({ success: false, error: "Eroare de procesare. Datele au fost protejate." });
+    console.error("[Eroare Detaliată OCR Backend]:", err.message);
+    return NextResponse.json({ success: false, error: err.message || "Eroare de procesare." });
   }
 }
