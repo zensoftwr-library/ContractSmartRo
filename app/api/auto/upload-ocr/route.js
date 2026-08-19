@@ -13,14 +13,24 @@ export async function POST(req) {
 
     if (!file) return NextResponse.json({ success: false, error: 'Lipsă fișier' });
 
-    // Pregătim imaginea în base64 pentru Gemini Vision
     const fileBuffer = Buffer.from(await file.arrayBuffer());
     const base64Image = fileBuffer.toString('base64');
     
-    // Apelăm Gemini 1.5 Flash (Motor multimodal ultrarapid și gratuit)
-    const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+    const apiKey = process.env.GEMINI_API_KEY || '';
+    
+    // Configurăm cererea în funcție de tipul cheii (AQ folosește Bearer, AIza folosește ?key=)
+    let url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent`;
+    const headers = { "Content-Type": "application/json" };
+
+    if (apiKey.startsWith('AIza')) {
+      url += `?key=${apiKey}`;
+    } else {
+      headers["Authorization"] = `Bearer ${apiKey}`;
+    }
+
+    const geminiResponse = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify({
         contents: [{
           parts: [
@@ -48,7 +58,6 @@ export async function POST(req) {
     const geminiResult = await geminiResponse.json();
     const rawText = geminiResult.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
-    // Extragem JSON-ul curat din răspunsul dat de model
     let extractedData = {};
     try {
       const jsonMatch = rawText.match(/\{[\s\S]*\}/);
