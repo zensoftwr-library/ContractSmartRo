@@ -3,8 +3,18 @@ import './globals.css';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { QRCodeSVG, QRCodeCanvas } from 'qrcode.react';
-import { supabase } from '../lib/supabase';
+import { createClient } from '@supabase/supabase-js';
 import { Turnstile } from '@marsidev/react-turnstile';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+
+// Singleton pattern: refolosim instanța dacă există, ca să evităm warning-ul de Multiple GoTrueClient
+const supabase = globalThis.supabaseClient ?? createClient(supabaseUrl, supabaseAnonKey);
+
+if (process.env.NODE_ENV !== 'production') {
+  globalThis.supabaseClient = supabase;
+}
 
 // NOMENCLATOR COMPLET CU TOATE CLAUZELE (VECHI INTEGRALE + NOI)
 const nomenclatorClauze = {
