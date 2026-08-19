@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { QRCodeSVG, QRCodeCanvas } from 'qrcode.react';
 import { createClient } from '@supabase/supabase-js';
 import { Turnstile } from '@marsidev/react-turnstile';
+import Navbar from '../components/Navbar';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
@@ -133,7 +134,6 @@ export default function Home() {
   const [autoStep, setAutoStep] = useState('upload');
   const [acordGdpr, setAcordGdpr] = useState(false);
   const [hydrated, setHydrated] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const [captchaToken, setCaptchaToken] = useState(null); 
   const isProcessingForm = useRef(false);
@@ -392,7 +392,7 @@ export default function Home() {
   }
 
   const [fiscal, setFiscal] = useState({
-    venitLunar: 45000,
+    venitLunar: 0,
     formaJuridica: 'SRL', 
     platitorTva: false,
     areAngajati: true,
@@ -1346,112 +1346,15 @@ export default function Home() {
       }}
     >
 
-      {/* NAVBAR */}
-      <nav className="sticky top-0 z-40 backdrop-blur-md bg-[#0B0F12]/90 border-b border-slate-800 py-4 px-6 shadow-md transition-all">
-        <div className="flex justify-between items-center w-full">
-          <a href="/" onClick={(e) => { e.preventDefault(); handleInapoiPrincipal(); }} className="w-[180px] h-[30px] flex items-center cursor-pointer">
-            <svg viewBox="0 0 240 52" className="w-full h-full">
-              <g transform="translate(0, 6)">
-                <path d="M24 6 C15 6, 8 13, 8 22 C8 31, 15 38, 24 38 C31 38, 37 33, 39 27" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round"/>
-                <path d="M16 21 L21 26 L32 12" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
-              </g>
-              <text x="48" y="34" fontFamily="system-ui, -apple-system, sans-serif" fontWeight="900" fontSize="22" fill="#FFFFFF" letterSpacing="-0.5">
-                Contract<tspan fill="#8ba888">Smart</tspan>
-              </text>
-            </svg>
-          </a>
-          
-          <button 
-            className="md:hidden text-[#8ba888] text-2xl focus:outline-none"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? '✕' : '☰'}
-          </button>
-
-          <div className="hidden md:flex items-center space-x-5">
-            <Link href="/modele-contracte" className="text-xs text-slate-400 hover:text-white transition">Modele Contracte Standard</Link>
-            <span className="text-slate-800">|</span>
-            <Link href="/baza-legala" className="text-xs text-slate-400 hover:text-white transition">Articole Validitate Juridică</Link>
-            <span className="text-slate-800">|</span>
-            <Link href="/termeni-si-conditii" className="text-xs text-slate-400 hover:text-white transition">Termeni și Condiții</Link>
-            <span className="text-slate-800">|</span>
-            <Link href="/politica-si-confidentialitate" className="text-xs text-slate-400 hover:text-white transition">Politica și Confidențialitate</Link>
-            <span className="text-slate-800">|</span>
-            <Link href="/contact" className="text-xs text-slate-400 hover:text-white transition">Contact</Link>
-            <span className="text-slate-800">|</span>
-            <Link href="/despre-noi" className="text-xs text-slate-400 hover:text-white transition">Despre Noi</Link>
-            <span className="text-slate-800">|</span>
-            
-            {!user ? (
-              <button type="button" onClick={() => { setIsSignUp(false); setShowAuthModal(true); }} className="text-xs font-bold text-slate-300 hover:text-[#8ba888] transition">Autentificare / Cont Nou</button>
-            ) : (
-              <div className="flex items-center space-x-3 text-xs">
-                <span className="text-slate-400 flex items-center gap-2">
-                  <span>Cont: <strong className="text-white font-mono font-normal">{user.email}</strong></span>
-                  <span className="text-[10px] uppercase font-bold bg-[#16221A] text-[#8ba888] px-2 py-0.5 rounded border border-emerald-900/40">
-                    {user.status}
-                  </span>
-                  {user.status === 'pro' && (
-                    <span className="text-[10px] uppercase font-bold bg-blue-900/20 text-blue-400 px-2 py-0.5 rounded border border-blue-900/50 shadow-sm">
-                      {3 - (user?.proReportsUsed || 0)}/3 RAPOARTE
-                    </span>
-                  )}
-                  {!isPremium && (
-                    <span className="text-[10px] uppercase font-bold bg-amber-900/20 text-amber-500 px-2 py-0.5 rounded border border-amber-900/50">
-                      {user.credits} CREDITE
-                    </span>
-                  )}
-                </span>
-                <button type="button" onClick={handleLogout} className="text-slate-300 hover:text-white font-bold hover:underline">Ieșire</button>
-                <span className="text-slate-800">|</span>
-                <button type="button" onClick={stergeCont} className="text-red-500 font-bold hover:underline">Șterge Cont</button>
-              </div>
-            )}
-            <button onClick={() => { const el = document.getElementById('sectiune-preturi'); el?.scrollIntoView({ behavior: 'smooth' }); }} className="bg-[#8ba888] hover:opacity-90 text-[#0B0F12] font-black text-xs px-4 py-2 rounded-md transition shadow-md shadow-[#8ba888]/10">Vezi Oferte</button>
-          </div>
-        </div>
-
-        {isMobileMenuOpen && (
-          <div className="md:hidden flex flex-col space-y-4 pt-4 mt-4 border-t border-slate-800 animate-fadeIn">
-            <Link href="/modele-contracte" className="text-sm text-slate-300 hover:text-white">Modele Contracte Standard</Link>
-            <Link href="/baza-legala" className="text-sm text-slate-300 hover:text-white">Articole Validitate Juridică</Link>
-            <Link href="/termeni-si-conditii" className="text-sm text-slate-300 hover:text-white">Termeni și Condiții</Link>
-            <Link href="/politica-si-confidentialitate" className="text-sm text-slate-300 hover:text-white">Politică de Confidențialitate</Link>
-            <Link href="/contact" className="text-sm text-slate-300 hover:text-white">Contact</Link>
-            <Link href="/despre-noi" className="text-sm text-slate-300 hover:text-white">Despre Noi</Link>
-
-            {!user ? (
-              <button type="button" onClick={() => { setIsMobileMenuOpen(false); setIsSignUp(false); setShowAuthModal(true); }} className="text-sm font-bold text-[#8ba888] text-left">Autentificare / Cont Nou</button>
-            ) : (
-              <div className="flex flex-col space-y-2 border-t border-slate-800/50 pt-2">
-                <div className="flex flex-col space-y-1.5 mb-2">
-                  <span className="text-xs text-slate-400">Logat ca: <strong className="text-white">{user.email}</strong></span>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[10px] uppercase font-bold bg-[#16221A] text-[#8ba888] px-2 py-0.5 rounded border border-emerald-900/40">
-                      {user.status}
-                    </span>
-                    {user.status === 'pro' && (
-                      <span className="text-[10px] uppercase font-bold bg-blue-900/20 text-blue-400 px-2 py-0.5 rounded border border-blue-900/50 shadow-sm">
-                        {3 - (user?.proReportsUsed || 0)}/3 RAPOARTE
-                      </span>
-                    )}
-                    {!isPremium && (
-                      <span className="text-[10px] uppercase font-bold bg-amber-900/20 text-amber-500 px-2 py-0.5 rounded border border-amber-900/50">
-                        {user.credits} CREDITE
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <div className="flex space-x-4 pt-1">
-                  <button type="button" onClick={handleLogout} className="text-slate-300 text-sm font-bold text-left hover:text-white">Ieșire</button>
-                  <button type="button" onClick={stergeCont} className="text-red-500 text-sm font-bold text-left hover:underline">Șterge Cont</button>
-                </div>
-              </div>
-            )}
-            <button onClick={() => { setIsMobileMenuOpen(false); const el = document.getElementById('sectiune-preturi'); el?.scrollIntoView({ behavior: 'smooth' }); }} className="bg-[#8ba888] text-[#0B0F12] font-black text-sm px-4 py-3 rounded-md text-center">Vezi Oferte</button>
-          </div>
-        )}
-      </nav>
+      <Navbar 
+  user={user} 
+  isPremium={isPremium} 
+  handleLogout={handleLogout} 
+  stergeCont={stergeCont} 
+  setShowAuthModal={setShowAuthModal} 
+  setIsSignUp={setIsSignUp}
+  handleInapoiPrincipal={handleInapoiPrincipal}
+/>
 
       {/* PREMIUM CINEMATIC LIGHT LEAKS (FROSTED AURORA) - SAFARI OPTIMIZED */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
@@ -1638,38 +1541,45 @@ export default function Home() {
             {renderCarduriPreturi()}
 
             {/* QR CODE STUDIO */}
-            <div className="max-w-5xl mx-auto px-6 mt-6">              
-              <div className="bg-[#12181D] rounded-2xl border border-slate-800/80 shadow-xl flex flex-col">
-                {/* Header & Tabs */}
-                <div className="p-6 border-b border-slate-800/80 bg-[#0B0F12]/30 rounded-t-2xl">
-                  <div className="flex items-center gap-3 mb-4">
-                    <span className="text-2xl"></span>
-                    <div>
-                      <h3 className="text-sm font-bold text-[#8ba888] uppercase tracking-wider block">ContractSmart QR ProStudio</h3>
-                      <p className="text-[11px] text-slate-400 mt-0.5">Generator multifuncțional avansat.</p>
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    <button onClick={() => setQrType('url')} className={`px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'url' ? 'bg-[#8ba888] text-[#0B0F12]' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>URL</button>
-                    <button onClick={() => setQrType('wifi')} className={`px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'wifi' ? 'bg-[#8ba888] text-[#0B0F12]' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>Wi-Fi</button>
-                    <button onClick={() => setQrType('crypto')} className={`px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'crypto' ? 'bg-[#8ba888] text-[#0B0F12]' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>₿ Crypto</button>
-                    <button onClick={() => { if(!isPremium && !profil?.has_qr_vcard) handleCheckout('qr_vcard'); else setQrType('vcard'); }} className={`relative px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'vcard' ? 'bg-[#8ba888] text-[#0B0F12]' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>
-                      vCard {(!isPremium && !profil?.has_qr_vcard) && <span className="absolute -top-1 -right-1 text-[8px] bg-amber-500 text-black px-1.5 rounded-full shadow-md">69 RON</span>}
-                    </button>
-                    <button onClick={() => { if(!isPremium && !profil?.has_qr_pdf) handleCheckout('qr_dynamic'); else setQrType('dynamic'); }} className={`relative px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'dynamic' ? 'bg-purple-600 text-white' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>
-                      Dinamic {(!isPremium && !profil?.has_qr_pdf) && <span className="absolute -top-1 -right-1 text-[8px] bg-purple-500 text-white px-1.5 rounded-full shadow-md">39 RON</span>}
-                    </button>
-                    <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('smart'); }} className={`relative px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'smart' ? 'bg-blue-600 text-white' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>
-                      Smart OS {(!isPremium) && <span className="absolute -top-1 -right-1 text-[8px] bg-blue-500 text-white px-1.5 rounded-full shadow-md">PRO</span>}
-                    </button>
-                    <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('geo'); }} className={`relative px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'geo' ? 'bg-blue-600 text-white' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>
-                      Geo-Target {(!isPremium) && <span className="absolute -top-1 -right-1 text-[8px] bg-blue-500 text-white px-1.5 rounded-full shadow-md">PRO</span>}
-                    </button>
-                    <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('landing'); }} className={`relative px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'landing' ? 'bg-blue-600 text-white' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>
-                      Landing Page {(!isPremium) && <span className="absolute -top-1 -right-1 text-[8px] bg-blue-500 text-white px-1.5 rounded-full shadow-md">PRO</span>}
-                    </button>
+          <div className="max-w-7xl mx-auto px-6 mt-16 pt-12 mb-8 text-center border-t border-slate-800">
+            <span className="text-[#8ba888] text-xs font-black uppercase tracking-widest block mb-1">Ecosistem Digital Dinamic</span>
+            <h2 className="text-3xl font-black text-white tracking-tight">ContractSmart QR ProStudio</h2>
+            <p className="text-xs text-slate-400 mt-2">Generator multifuncțional avansat.</p>
+          </div>
+
+          <div className="max-w-5xl mx-auto px-6 mt-6">              
+            <div className="bg-[#12181D] rounded-2xl border border-slate-800/80 shadow-xl flex flex-col">
+              {/* Header & Tabs */}
+              <div className="p-6 border-b border-slate-800/80 bg-[#0B0F12]/30 rounded-t-2xl text-center sm:text-left">
+                <div className="flex flex-col sm:flex-row items-center gap-3 mb-4">
+                  <span className="text-2xl"></span>
+                  <div className="text-center sm:text-left">
+                    <h3 className="text-sm font-bold text-[#8ba888] uppercase tracking-wider block">ContractSmart QR ProStudio</h3>
+                    <p className="text-[11px] text-slate-400 mt-0.5">Generator multifuncțional avansat.</p>
                   </div>
                 </div>
+                {/* Butoanele de tip (URL, Wi-Fi, etc.) centrate pe mobile */}
+                <div className="flex flex-wrap justify-center sm:justify-start gap-2">
+                  <button onClick={() => setQrType('url')} className={`px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'url' ? 'bg-[#8ba888] text-[#0B0F12]' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>URL</button>
+                  <button onClick={() => setQrType('wifi')} className={`px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'wifi' ? 'bg-[#8ba888] text-[#0B0F12]' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>Wi-Fi</button>
+                  <button onClick={() => setQrType('crypto')} className={`px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'crypto' ? 'bg-[#8ba888] text-[#0B0F12]' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>Crypto</button>
+                  <button onClick={() => { if(!isPremium && !profil?.has_qr_vcard) handleCheckout('qr_vcard'); else setQrType('vcard'); }} className={`relative px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'vcard' ? 'bg-[#8ba888] text-[#0B0F12]' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>
+                    vCard {(!isPremium && !profil?.has_qr_vcard) && <span className="absolute -top-1 -right-1 text-[8px] bg-amber-500 text-black px-1.5 rounded-full shadow-md">69 RON</span>}
+                  </button>
+                  <button onClick={() => { if(!isPremium && !profil?.has_qr_pdf) handleCheckout('qr_dynamic'); else setQrType('dynamic'); }} className={`relative px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'dynamic' ? 'bg-purple-600 text-white' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>
+                    Dinamic {(!isPremium && !profil?.has_qr_pdf) && <span className="absolute -top-1 -right-1 text-[8px] bg-purple-500 text-white px-1.5 rounded-full shadow-md">39 RON</span>}
+                  </button>
+                  <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('smart'); }} className={`relative px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'smart' ? 'bg-blue-600 text-white' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>
+                    Smart OS {(!isPremium) && <span className="absolute -top-1 -right-1 text-[8px] bg-blue-500 text-white px-1.5 rounded-full shadow-md">PRO</span>}
+                  </button>
+                  <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('geo'); }} className={`relative px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'geo' ? 'bg-blue-600 text-white' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>
+                    Geo-Target {(!isPremium) && <span className="absolute -top-1 -right-1 text-[8px] bg-blue-500 text-white px-1.5 rounded-full shadow-md">PRO</span>}
+                  </button>
+                  <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('landing'); }} className={`relative px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${qrType === 'landing' ? 'bg-blue-600 text-white' : 'bg-[#16221A] text-slate-400 hover:text-white'}`}>
+                    Landing Page {(!isPremium) && <span className="absolute -top-1 -right-1 text-[8px] bg-blue-500 text-white px-1.5 rounded-full shadow-md">PRO</span>}
+                  </button>
+                </div>
+              </div>
 
                 {/* Main Content Area */}
                 <div className="p-6 flex flex-col sm:flex-row gap-6 h-auto lg:h-full">
@@ -1839,9 +1749,9 @@ export default function Home() {
                       )}
                     </div>
                     
-                    {/* Branding Bar sub form */}
-                    <div className="flex items-center gap-3 pt-4 border-t border-slate-800/50 mt-4">
-                      <div className="flex items-center gap-3 w-full">
+                    {/* Branding Bar sub form - centrat pe mobile */}
+                    <div className="flex items-center justify-center sm:justify-start gap-3 pt-4 border-t border-slate-800/50 mt-4 flex-wrap">
+                      <div className="flex items-center justify-center sm:justify-start gap-3 w-full flex-wrap">
                         <label className="text-[10px] text-slate-400 font-bold uppercase shrink-0">Culoare</label>
                         <input type="color" value={qrColor} onChange={(e) => setQrColor(e.target.value)} className="w-7 h-7 rounded cursor-pointer shrink-0 bg-transparent border-0 p-0" />
                         

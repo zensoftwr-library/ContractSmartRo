@@ -24,7 +24,7 @@ export async function POST(req) {
       console.log("Supabase storage skip pe local dacă nu e configurat");
     }
 
-    // 2. VERIFICARE MEDIU: Dacă suntem local, trimitem datele tale REALE de test pe care le configurezi mai jos
+    // 2. VERIFICARE MEDIU: Dacă suntem local, trimitem datele tale REALE de test
     const isLocal = process.env.NODE_ENV === 'development' || !process.env.VERCEL;
     
     if (isLocal) {
@@ -32,45 +32,62 @@ export async function POST(req) {
       
       const extractedData = tipDocument === 'civ'
         ? { 
-            autoVin: "WBA1A110X0V123456", // SCHIMBĂ CU SERIA TA REALĂ DE CIV PENTRU TESTE
+            autoVin: "WBA1A110X0V123456", // SCHIMBĂ CU SERIA TA REALĂ DE CIV
             autoMarcaModel: "BMW Seria 1",
             autoNumarInmatriculare: "BV 99 ABC" 
           }
         : { 
-            autoNumeVanzator: "POPESCU IONUT", // SCHIMBĂ CU NUMELE TĂU REAL PENTRU TESTE
-            autoCnpVanzator: "1850102123456",   // SCHIMBĂ CU CNP-UL TĂU REAL PENTRU TESTE
+            autoNumeVanzator: "POPESCU IONUT", // SCHIMBĂ CU NUMELE TĂU REAL
+            autoCnpVanzator: "1850102123456",   // SCHIMBĂ CU CNP-UL TĂU REAL
             autoAdresaVanzator: "Str. Principală Nr. 10, Brașov" // ADRESA TA REALĂ
           };
 
       return NextResponse.json({ success: true, fileUrl: publicUrl, extractedData });
     }
 
-    // 3. CODUL DE PRODUCȚIE (Rulează DOAR pe Vercel, unde internetul și DNS-ul sunt curate)
+    // 3. CODUL DE PRODUCȚIE (Rulează DOAR pe Vercel) - GOOGLE CLOUD VISION
     const fileBuffer = Buffer.from(await file.arrayBuffer());
-    const base64Image = `data:${file.type};base64,${fileBuffer.toString('base64')}`;
+    // Google Vision cere base64 curat, fără prefixul 'data:image/jpeg;base64,'
+    const base64Image = fileBuffer.toString('base64');
     
-    let promptSpecific = tipDocument === 'civ'
-      ? `Return STRICTLY a JSON object: {"autoVin": "17 chars VIN", "autoMarcaModel": "brand model", "autoNumarInmatriculare": "plate"}`
-      : `Return STRICTLY a JSON object: {"autoNumeVanzator": "FULL NAME", "autoCnpVanzator": "13 DIGITS CNP", "autoAdresaVanzator": "ADDRESS"}`;
-
-    const response = await fetch("https://api-inference.huggingface.co/models/Qwen/Qwen2.5-VL-7B-Instruct", {
-      headers: { 
-        "Authorization": `Bearer ${process.env.HUGGINGFACE_API_KEY}`, 
-        "Content-Type": "application/json" 
-      },
+    const visionResponse = await fetch(`https://vision.googleapis.com/v1/images:annotate?key=${process.env.GOOGLE_VISION_API_KEY}`, {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        messages: [{ role: "user", content: [{ type: "text", text: promptSpecific }, { type: "image_url", image_url: { url: base64Image } }] }],
-        max_tokens: 300
+        requests: [
+          {
+            image: { content: base64Image },
+            features: [{ type: "DOCUMENT_TEXT_DETECTION" }] // Extrage absolut tot textul + tabele + diacritice
+          }
+        ]
       })
     });
 
-    if (!response.ok) throw new Error(`HF Cloud Error: ${response.status}`);
+    if (!visionResponse.ok) throw new Error(`Google Vision API Error: ${visionResponse.status}`);
 
-    const result = await response.json();
-    const textBrut = result.choices?.[0]?.message?.content || '{}';
-    const jsonMatch = textBrut.match(/\{[\s\S]*\}/);
-    const extractedData = jsonMatch ? JSON.parse(jsonMatch[0].trim()) : {};
+    const visionResult = await visionResponse.json();
+    const textExtras = visionResult.responses?.[0]?.fullTextAnnotation?.text || '';
+
+    // Parsăm inteligent datele esențiale din textul brut returnat de Google
+    let extractedData = {};
+    
+    if (tipDocument === 'civ') {
+      // Regex pentru seria de șasiu (17 caractere alfanumerice)
+      const vinMatch = textExtras.match(/\b([A-HJ-NPR-Z0-9]{17})\b/i);
+      extractedData = {
+        autoVin: vinMatch ? vinMatch[1].toUpperCase() : "",
+        autoMarcaModel: "Verifică document", // Va lăsa utilizatorul să valideze marca pe frontend
+        autoNumarInmatriculare: ""
+      };
+    } else {
+      // Regex exact pentru CNP românesc (13 cifre)
+      const cnpMatch = textExtras.match(/\b([1-9]\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])\d{6})\b/);
+      extractedData = {
+        autoNumeVanzator: "Verifică document",
+        autoCnpVanzator: cnpMatch ? cnpMatch[1] : "",
+        autoAdresaVanzator: "Verifică document"
+      };
+    }
 
     // --- 4. SCRIPTUL DE CURĂȚENIE SUPREMĂ (AUTO-DELETE SUPABASE) ---
     // Ștergem fișierul din Supabase fix în secunda în care am extras textul!
