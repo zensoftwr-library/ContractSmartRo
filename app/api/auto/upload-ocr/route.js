@@ -16,7 +16,7 @@ export async function POST(req) {
     // 1. Pregătim FormData pentru OCR.space
     const ocrFormData = new FormData();
     ocrFormData.append('apikey', process.env.OCR_SPACE_API_KEY);
-    ocrFormData.append('language', 'ron'); // Setăm limba română
+    ocrFormData.append('language', 'rum'); // Setăm limba română
     ocrFormData.append('file', file);
     ocrFormData.append('isOverlayRequired', 'false');
 
