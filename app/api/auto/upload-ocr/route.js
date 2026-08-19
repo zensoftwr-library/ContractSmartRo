@@ -12,7 +12,7 @@ export async function POST(req) {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) return NextResponse.json({ success: false, error: 'Lipsește GEMINI_API_KEY în .env' });
 
-    // Inițializăm SDK-ul oficial cu cheia ta AQ.
+    // Inițializăm SDK-ul oficial
     const ai = new GoogleGenAI({ apiKey });
 
     const buffer = Buffer.from(await file.arrayBuffer());
@@ -22,8 +22,9 @@ export async function POST(req) {
       ? "Extrage din acest CIV auto și returnează DOAR un JSON valid cu formatul: {\"autoVin\": \"seria de 17 caractere\", \"autoMarcaModel\": \"marca și modelul\", \"autoNumarInmatriculare\": \"numărul sau gol\"}" 
       : "Extrage din acest buletin românesc și returnează DOAR un JSON valid cu formatul: {\"autoNumeVanzator\": \"Numele și Prenumele complet\", \"autoCnpVanzator\": \"cnp-ul de 13 cifre\", \"autoAdresaVanzator\": \"\"}";
 
+    // Folosim modelul indicat de tine
     const response = await ai.models.generateContent({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-3.6-flash', 
       contents: [
         {
           parts: [
