@@ -16,6 +16,7 @@ export default function ModeleContracte() {
   const [user, setUser] = useState(null);
   const [userTier, setUserTier] = useState('free'); 
   const [achizitiiIndividuale, setAchizitiiIndividuale] = useState([]);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     async function getSesiuneSiProfil() {
@@ -221,78 +222,178 @@ export default function ModeleContracte() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B0F12] text-slate-200 py-12 px-6 font-sans">
-      <div className="max-w-5xl mx-auto">
+    <div className="min-h-screen bg-[#0B0F12] text-slate-200 font-sans selection:bg-[#8ba888]/30 selection:text-[#8ba888]">
+      
+      {/* NAVBAR */}
+      <nav className="sticky top-0 z-40 backdrop-blur-xl bg-[#0B0F12]/80 border-b border-slate-800/80 py-4 px-6 shadow-sm transition-all">
+        <div className="flex justify-between items-center w-full max-w-7xl mx-auto">
+          <Link href="/" className="w-[180px] h-[30px] flex items-center cursor-pointer hover:opacity-90 transition-opacity">
+            <svg viewBox="0 0 240 40" className="w-full h-full">
+              <g transform="translate(0, 2)">
+                <path d="M24 6 C15 6, 8 13, 8 22 C8 31, 15 38, 24 38 C31 38, 37 33, 39 27" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round"/>
+                <path d="M16 21 L21 26 L32 12" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+              </g>
+              <text x="48" y="26" fontFamily="system-ui, -apple-system, sans-serif" fontWeight="900" fontSize="20" fill="#FFFFFF" letterSpacing="-0.5">
+                Contract<tspan fill="#8ba888">Smart</tspan>
+              </text>
+            </svg>
+          </Link>
+          
+          <button className="md:hidden text-[#8ba888] text-2xl" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+            {isMobileMenuOpen ? '✕' : '☰'}
+          </button>
+
+          <div className="hidden md:flex items-center space-x-5">
+            <Link href="/" className="text-xs text-slate-400 hover:text-white transition">Acasă</Link>
+            <span className="text-slate-800">|</span>
+            <Link href="/modele-contracte" className="text-xs text-[#8ba888] font-bold transition drop-shadow-[0_0_8px_rgba(139,168,136,0.3)]">Modele Contracte</Link>
+            <span className="text-slate-800">|</span>
+            <Link href="/termeni-si-conditii" className="text-xs text-slate-400 hover:text-white transition">Termeni și Condiții</Link>
+            <span className="text-slate-800">|</span>
+            <Link href="/contact" className="text-xs text-slate-400 hover:text-white transition">Contact</Link>
+          </div>
+        </div>
         
-        {/* BUTON INAPOI */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden flex flex-col space-y-4 pt-4 mt-4 border-t border-slate-800/80 animate-fadeIn px-4 pb-2">
+            <Link href="/" className="text-sm text-slate-300 hover:text-white">Acasă</Link>
+            <Link href="/modele-contracte" className="text-sm text-[#8ba888] font-bold">Modele Contracte</Link>
+            <Link href="/termeni-si-conditii" className="text-sm text-slate-300 hover:text-white">Termeni și Condiții</Link>
+            <Link href="/contact" className="text-sm text-slate-300 hover:text-white">Contact</Link>
+          </div>
+        )}
+      </nav>
+
+      {/* BACKGROUND EFFECTS */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div className="absolute top-[5%] left-[50%] transform -translate-x-1/2 w-[90vw] h-[90vw] min-w-[800px] min-h-[800px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(139, 168, 136, 0.05) 0%, rgba(11, 15, 18, 0) 60%)' }} />
+      </div>
+
+      <div className="relative z-10 max-w-6xl mx-auto px-6 py-10 md:py-16">
+        
+        {/* BUTON INAPOI RAPID */}
         <div className="mb-8">
-          <Link 
-            href="/" 
-            className="inline-flex items-center gap-2 text-xs font-medium text-slate-500 hover:text-slate-300 transition-colors group"
-          >
-            <span className="transform group-hover:-translate-x-0.5 transition-transform">←</span> 
-            Înapoi la panou
+          <Link href="/" className="inline-flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-white transition-colors bg-[#12181D]/60 border border-slate-800/80 px-4 py-2 rounded-lg hover:border-[#8ba888]/50 shadow-sm backdrop-blur-sm">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Înapoi la aplicație
           </Link>
         </div>
         
         {/* HEADER */}
-        <div className="text-center mb-12">
-          <span className="bg-[#16221A] text-[#8ba888] border border-[#8ba888]/20 text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider">
+        <div className="text-center mb-16 border-b border-slate-800/80 pb-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#16221A] border border-[#8ba888]/20 text-[#8ba888] text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
+            <span className="relative flex h-1.5 w-1.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span></span>
             Librărie Documente Juridice 2026
-          </span>
-          <h1 className="text-4xl font-black text-white mt-4 tracking-tight">
-            Șabloane Tipizate <span className="text-[#8ba888]">Academice</span>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-black text-white leading-tight tracking-tighter mb-5">
+            Șabloane Tipizate <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8ba888] to-emerald-400">Academice</span>
           </h1>
-          <p className="text-sm text-slate-400 mt-2 max-w-xl mx-auto">
-            Descarcă modele oficiale în format protejat PDF, structurate rigid de avocați cu articole din Codul Civil, gata de completat de mână.
+          <p className="text-sm text-slate-400 max-w-2xl mx-auto leading-relaxed">
+            Descarcă modele oficiale în format protejat PDF, structurate rigid de experți juridici respectând prevederile Codului Civil, gata de imprimat și completat.
           </p>
         </div>
 
         {/* GRID ȘABLOANE */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
           {sabloane.map((sablon) => {
             const deblocat = areAccesLaSablon(sablon);
             return (
-              <div key={sablon.id} className="bg-[#12181D] border border-slate-800 rounded-lg p-6 flex flex-col justify-between hover:border-slate-700 transition shadow-lg">
-                <div>
-                  <div className="flex justify-between items-center mb-3">
-                    <span className={`text-[10px] font-bold uppercase px-2.5 py-0.5 rounded border ${
+              <div key={sablon.id} className="bg-[#12181D]/40 border border-slate-800/80 rounded-2xl p-6 md:p-8 flex flex-col justify-between hover:border-[#8ba888]/40 transition-colors shadow-lg relative overflow-hidden group">
+                {/* Accent Hover Blob */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-[#8ba888]/5 blur-2xl rounded-full group-hover:bg-[#8ba888]/10 transition-colors pointer-events-none"></div>
+                
+                <div className="relative z-10">
+                  <div className="flex justify-between items-center mb-5">
+                    <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-md border shadow-sm flex items-center gap-1.5 ${
                       !sablon.premium
-                        ? 'bg-[#16221A] text-[#8ba888] border-emerald-900/40'
+                        ? 'bg-emerald-900/20 text-emerald-400 border-emerald-500/30'
                         : deblocat
-                          ? 'bg-[#16221A] text-emerald-400 border-emerald-900/40'
-                          : 'bg-[#221F16] text-amber-400 border-amber-900/40'
+                          ? 'bg-blue-900/20 text-blue-400 border-blue-500/30'
+                          : 'bg-amber-900/20 text-amber-400 border-amber-500/30'
                     }`}>
-                      {deblocat && sablon.premium ? '📥 Model Deblocat (Membru)' : sablon.tip}
+                      {!sablon.premium && <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span>}
+                      {deblocat && sablon.premium && <span className="w-1.5 h-1.5 bg-blue-400 rounded-full"></span>}
+                      {!deblocat && sablon.premium && <span className="w-1.5 h-1.5 bg-amber-400 rounded-full"></span>}
+                      {deblocat && sablon.premium ? 'Model Deblocat (Membru)' : sablon.tip}
                     </span>
-                    <span className="text-slate-600 text-xs font-mono">Format .PDF (În Alb)</span>
+                    <span className="text-slate-500 text-[10px] font-mono border border-slate-700/50 bg-[#0B0F12] px-2 py-0.5 rounded">.PDF</span>
                   </div>
-                  <h3 className="text-base font-bold text-white mb-2 leading-snug">{sablon.nume}</h3>
+                  <h3 className="text-lg font-black text-white mb-3 leading-snug group-hover:text-[#8ba888] transition-colors">{sablon.nume}</h3>
                   <p className="text-xs text-slate-400 leading-relaxed">{sablon.descriere}</p>
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-slate-800/60">
+                <div className="mt-8 pt-5 border-t border-slate-800/60 relative z-10">
                   <button
                     type="button"
                     onClick={() => handleDescarcaSauCumpara(sablon)}
                     disabled={loadingTemplate !== null}
-                    className={`w-full font-bold text-xs py-3 rounded transition flex items-center justify-center gap-2 ${
+                    className={`w-full font-black text-xs py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm ${
                       deblocat
-                        ? 'bg-[#8ba888] text-[#0B0F12] font-black hover:opacity-90 shadow-md'
-                        : 'bg-gradient-to-r from-amber-500/20 to-amber-600/20 border border-amber-500/30 text-amber-300 hover:from-amber-500/30'
+                        ? 'bg-gradient-to-r from-[#8ba888] to-[#6d8a6a] text-[#0B0F12] hover:shadow-[0_0_20px_rgba(139,168,136,0.3)] hover:scale-[1.02] active:scale-[0.98]'
+                        : 'bg-gradient-to-r from-amber-500/10 to-amber-600/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20'
                     }`}
                   >
-                    {loadingTemplate === sablon.id 
-                      ? 'Se randează PDF...' 
-                      : deblocat ? '📥 Descarcă Model Tipizat (.PDF)' : '🔓 Cumpără Șablon Legal'}
+                    {loadingTemplate === sablon.id ? (
+                      <>
+                        <svg className={`animate-spin h-4 w-4 ${deblocat ? 'text-black' : 'text-amber-400'}`} viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        Se Randează PDF...
+                      </>
+                    ) : deblocat ? (
+                      <>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        Descarcă Model Tipizat (.PDF)
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        Deblochează Șablon Legal
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
             );
           })}
         </div>
-
       </div>
+
+      {/* FOOTER STANDARD PLATFORMA */}
+      <footer className="relative z-10 border-t border-slate-800/80 bg-[#0B0F12] pt-12 pb-8 mt-16 text-center">
+        <div className="max-w-5xl mx-auto px-6 space-y-6">
+          <div className="flex justify-center">
+            <Link href="/" className="w-[180px] h-[30px] cursor-pointer block hover:opacity-90 transition-opacity">
+              <svg viewBox="0 0 240 40" className="w-full h-full mx-auto">
+                <g transform="translate(0, 2)">
+                  <path d="M24 6 C15 6, 8 13, 8 22 C8 31, 15 38, 24 38 C31 38, 37 33, 39 27" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round"/>
+                  <path d="M16 21 L21 26 L32 12" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+                </g>
+                <text x="48" y="26" fontFamily="system-ui, -apple-system, sans-serif" fontWeight="900" fontSize="20" fill="#FFFFFF" letterSpacing="-0.5">
+                  Contract<tspan fill="#8ba888">Smart</tspan>
+                </text>
+              </svg>
+            </Link>
+          </div>
+          <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+            Infrastructură electronică avansată dedicată optimizării micro-sistemelor, înmatriculării rapide a entităților comerciale și auditului de clauze pe Codul Civil român.
+          </p>
+          <div className="flex justify-center space-x-6 text-xs text-slate-400 font-medium">
+            <Link href="/modele-contracte" className="hover:text-[#8ba888] transition text-white">Modele Standard</Link>
+            <span>•</span>
+            <Link href="/termeni-si-conditii" className="hover:text-[#8ba888] transition">Termeni și Condiții</Link>
+            <span>•</span>
+            <Link href="/politica-si-confidentialitate" className="hover:text-[#8ba888] transition">Confidențialitate</Link>
+            <span>•</span>
+            <Link href="/contact" className="hover:text-[#8ba888] transition">Contact</Link>
+          </div>
+          <div className="pt-6 border-t border-slate-800/40 flex flex-col items-center gap-4">
+            <p className="text-[10px] text-slate-500 font-mono max-w-3xl text-center leading-relaxed px-4">
+              <strong className="text-red-500/80">Disclaimer Legal!</strong> <strong className="text-[#8ba888]">ContractSmart</strong> este o platformă de software. <strong className="text-red-500/80">NU</strong> suntem o casă de avocatură și nu oferim consultanță juridică.
+            </p>
+            <p className="text-[11px] text-slate-500 font-mono tracking-wide">© 2026 <strong className="text-[#8ba888]">ContractSmart</strong>. Powered by <strong className="text-[#8ba888]">ZenSoftWare</strong>.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
