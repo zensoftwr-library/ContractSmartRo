@@ -228,7 +228,7 @@ export default function Home() {
   const [qrGeneratedUrl, setQrGeneratedUrl] = useState('');
 
   const [cursBnr, setCursBnr] = useState({ eur: '4.9752', usd: '4.5820' });
-  const [qrColor, setQrColor] = useState('#000000');
+  const [qrColor, setQrColor] = useState('#8ba888');
   const [qrLogo, setQrLogo] = useState(null);
   const [qrLogoRatio, setQrLogoRatio] = useState(1);
 
