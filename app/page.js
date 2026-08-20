@@ -3170,12 +3170,30 @@ export default function Home() {
                             <div className="bg-[#0B0F12] p-5 rounded-2xl border border-slate-700/60 shadow-inner">
                               <div className="flex justify-between items-center mb-3">
                                 <label className="text-slate-400 text-[10px] font-black uppercase tracking-widest">Valoare Factură / Venit</label>
-                                <span className="bg-[#16221A] text-[#8ba888] border border-emerald-900/40 px-2 py-0.5 rounded font-mono text-xs font-bold">{fiscal.venitLunar} RON</span>
+                                <span className="bg-[#16221A] text-[#8ba888] border border-emerald-900/40 px-2 py-0.5 rounded font-mono text-xs font-bold">
+                                  {fiscal.venitLunar} {fiscal.moneda || 'RON'}
+                                </span>
                               </div>
                               <input type="range" min="0" max="50000" step="1" value={fiscal.venitLunar} onChange={e => setFiscal({...fiscal, venitLunar: Number(e.target.value)})} className="w-full h-1.5 bg-slate-800 rounded-full appearance-none cursor-pointer accent-[#8ba888]" />
+                              
                               <div className="mt-4 flex items-center gap-3">
-                                <input type="number" min="0" max="50000" value={fiscal.venitLunar} onChange={e => setFiscal({...fiscal, venitLunar: Number(e.target.value)})} className="w-full p-3 bg-[#12181D] text-white rounded-xl border border-slate-700/80 outline-none focus:ring-1 focus:ring-[#8ba888]/50 focus:border-[#8ba888] text-sm font-mono transition-all" placeholder="Introdu suma exactă..." />
-                                <span className="text-slate-500 font-black text-xs uppercase bg-slate-800/50 px-3 py-3 rounded-xl border border-slate-700/50">RON</span>
+                                <input 
+                                  type="number" 
+                                  min="0" 
+                                  max="50000" 
+                                  value={fiscal.venitLunar} 
+                                  onChange={e => setFiscal({...fiscal, venitLunar: Number(e.target.value)})} 
+                                  className="w-full p-3 bg-[#12181D] text-white rounded-xl border border-slate-700/80 outline-none focus:ring-1 focus:ring-[#8ba888]/50 focus:border-[#8ba888] text-sm font-mono transition-all" 
+                                  placeholder="Introdu suma exactă..." 
+                                />
+                                <select 
+                                  value={fiscal.moneda || 'RON'} 
+                                  onChange={e => setFiscal({...fiscal, moneda: e.target.value})} 
+                                  className="w-24 bg-[#12181D] border border-slate-700/80 rounded-xl p-3 text-xs text-white outline-none appearance-none cursor-pointer focus:border-[#8ba888] focus:ring-1 focus:ring-[#8ba888]/50 font-bold uppercase tracking-wide transition-all shadow-inner bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.2em_1.2em] bg-[right_0.5rem_center] bg-no-repeat pr-7"
+                                >
+                                  <option value="RON">RON</option>
+                                  <option value="EUR">EUR</option>
+                                </select>
                               </div>
                             </div>
                           
