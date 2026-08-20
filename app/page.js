@@ -1367,56 +1367,50 @@ export default function Home() {
 
   // FUNCȚIE REUTILIZABILĂ PENTRU PREȚURI (Redesign Compact - 4 Coloane)
   const renderCarduriPreturi = () => (
-    <div id="sectiune-preturi" className="max-w-6xl mx-auto px-4 mt-12 mb-12 scroll-mt-20">
+    <div id="sectiune-preturi" className="max-w-6xl mx-auto px-4 mt-20 mb-20 scroll-mt-20">
       
-      {/* Antet Compactat Orizontal */}
-      <div className="flex flex-col sm:flex-row justify-between items-end border-b border-slate-800/80 pb-4 mb-6">
-        <div>
-          <span className="text-[#8ba888] text-[10px] font-black uppercase tracking-widest block mb-1">Ecosistem ContractSmart</span>
-          <h2 className="text-2xl font-black text-white tracking-tight">Planuri & Tranzacții</h2>
-        </div>
-        <p className="text-xs text-slate-400 hidden sm:block max-w-xs text-right leading-tight">
-          Alege varianta care se potrivește cel mai bine nevoilor tale punctuale sau de durată.
-        </p>
+      {/* Antet Centrat */}
+      <div className="text-center border-b border-slate-800/80 pb-8 mb-10">
+        <span className="text-[#8ba888] text-[10px] font-black uppercase tracking-widest block mb-2">Ecosistem ContractSmart</span>
+        <h2 className="text-3xl font-black text-white tracking-tight">Planuri de Business & Tranzacții</h2>
       </div>
 
-      {/* Grid 4 coloane - Ocupă jumătate din spațiul vertical vechi pe desktop */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Grid Centrat */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-center">
         
         {/* Onetime Contract B2B */}
         <div className="bg-[#12181D]/60 border border-slate-800/80 hover:border-slate-600 rounded-xl p-4 flex flex-col justify-between transition-colors">
           <div>
-            <div className="flex justify-between items-center mb-3">
+            <div className="flex justify-center items-center mb-3">
               <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider bg-slate-800/50 px-2 py-0.5 rounded">Plată Unică</span>
             </div>
             <h4 className="text-sm font-bold text-white">1x Contract B2B</h4>
             <div className="text-xl font-black text-[#8ba888] mt-1 mb-2">19 RON <span className="text-[9px] text-slate-500 font-normal">(~3.99 €)</span></div>
             <p className="text-[10px] text-slate-400 leading-relaxed mb-4">Plătești strict pentru documentul generat. Ideal pentru nevoi punctuale.</p>
           </div>
-          <button type="button" onClick={() => handleCumparaPremium('one_time_contract')} className="w-full bg-[#0B0F12] border border-slate-700 hover:bg-slate-800 text-white font-bold py-2 rounded-lg text-xs transition-colors">Cumpără 3.99 €</button>
+          <button type="button" onClick={() => handleCumparaPremium('one_time_contract')} className="w-full bg-[#0B0F12] border border-slate-700 hover:bg-slate-800 text-white font-bold py-2 rounded-lg text-xs transition-colors shadow-sm">Cumpără 3.99 €</button>
         </div>
 
         {/* Onetime Auto */}
         <div className="bg-[#12181D]/60 border border-slate-800/80 hover:border-blue-500/50 rounded-xl p-4 flex flex-col justify-between transition-colors relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-20 h-20 bg-blue-500/5 rounded-bl-full -z-10 group-hover:scale-110 transition-transform"></div>
           <div>
-            <div className="flex justify-between items-center mb-3">
+            <div className="flex justify-center items-center mb-3">
               <span className="text-[9px] font-bold text-blue-400 uppercase tracking-wider bg-blue-900/20 border border-blue-500/20 px-2 py-0.5 rounded">Pachet Auto</span>
             </div>
             <h4 className="text-sm font-bold text-white">Vânzare Auto</h4>
             <div className="text-xl font-black text-white mt-1 mb-2">99 RON <span className="text-[9px] text-slate-500 font-normal">(~19.99 €)</span></div>
             <p className="text-[10px] text-slate-400 leading-relaxed mb-4">5 exemplare DITL, PV + ghid complet automatizat post-vânzare.</p>
           </div>
-          <button type="button" onClick={() => handleCumparaPremium('contract_auto')} className="w-full bg-blue-600/10 border border-blue-500/30 hover:bg-blue-600 hover:text-white text-blue-400 font-bold py-2 rounded-lg text-xs transition-colors">Cumpără 19.99 €</button>
+          <button type="button" onClick={() => handleCumparaPremium('contract_auto')} className="w-full bg-blue-600/10 border border-blue-500/30 hover:bg-blue-600 hover:text-white text-blue-400 font-bold py-2 rounded-lg text-xs transition-colors shadow-sm">Cumpără 19.99 €</button>
         </div>
 
         {/* PRO */}
         <div className="bg-[#12181D] border border-[#8ba888]/40 hover:border-[#8ba888] rounded-xl p-4 flex flex-col justify-between transition-colors relative shadow-[0_0_15px_rgba(139,168,136,0.05)]">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-[1px] bg-gradient-to-r from-transparent via-[#8ba888] to-transparent"></div>
           <div>
-            <div className="flex justify-between items-center mb-3">
+            <div className="flex justify-center items-center mb-3">
               <span className="text-[9px] font-bold text-[#0B0F12] uppercase tracking-wider bg-[#8ba888] px-2 py-0.5 rounded">Popular</span>
-              <span className="text-[9px] font-bold text-slate-400 uppercase">Abonament</span>
             </div>
             <h4 className="text-sm font-bold text-white">Abonament PRO</h4>
             <div className="text-xl font-black text-white mt-1 mb-2">99 RON <span className="text-[9px] text-slate-500 font-normal">/lună (~19.99 €)</span></div>
@@ -1429,7 +1423,7 @@ export default function Home() {
         <div className="bg-gradient-to-b from-[#16221A] to-[#0B0F12] border border-amber-500/30 hover:border-amber-500/60 rounded-xl p-4 flex flex-col justify-between transition-colors relative overflow-hidden group shadow-lg">
           <div className="absolute -right-8 -top-8 w-24 h-24 bg-amber-500/10 blur-2xl rounded-full group-hover:bg-amber-500/20 transition-colors"></div>
           <div className="relative z-10">
-            <div className="flex justify-between items-center mb-3">
+            <div className="flex justify-center items-center mb-3">
               <span className="text-[9px] font-black text-amber-900 uppercase tracking-wider bg-gradient-to-r from-amber-200 to-yellow-500 px-2 py-0.5 rounded shadow-sm">VIP Lifetime</span>
             </div>
             <h4 className="text-sm font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-500">Membru Fondator</h4>
@@ -1971,19 +1965,18 @@ export default function Home() {
               </div>
             </div>
 
-            {/* PREȚURI SECUNDARE: Șabloane & QR Individual (Apar doar pe prima pagină) */}
+            {/* PREȚURI SECUNDARE: Șabloane & QR Individual */}
             <div className="max-w-6xl mx-auto px-4 mb-20 mt-4">
-              <div className="border-t border-slate-800/80 pt-8 pb-4 mb-6">
-                <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest block mb-1">Module Opționale Adiacente</span>
+              <div className="border-t border-slate-800/80 pt-8 pb-4 mb-6 text-center">
                 <h3 className="text-xl font-black text-white tracking-tight">Șabloane & Extensii QR <span className="text-[#8ba888] font-bold">(Plată Unică)</span></h3>
               </div>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 
                 {/* Sablon */}
-                <div className="bg-[#12181D]/60 border border-slate-800/80 hover:border-slate-600 rounded-xl p-4 flex flex-col justify-between transition-colors">
+                <div className="bg-[#12181D]/60 border border-slate-800/80 hover:border-slate-600 rounded-xl p-4 flex flex-col justify-between transition-colors text-center">
                   <div>
-                    <div className="flex justify-between items-center mb-3">
+                    <div className="flex justify-center items-center mb-3">
                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider bg-slate-800/50 px-2 py-0.5 rounded">Document Legal</span>
                     </div>
                     <h4 className="text-sm font-bold text-white">Șablon Tipizat</h4>
@@ -1994,9 +1987,9 @@ export default function Home() {
                 </div>
 
                 {/* QR Branding */}
-                <div className="bg-[#12181D]/60 border border-slate-800/80 hover:border-slate-600 rounded-xl p-4 flex flex-col justify-between transition-colors">
+                <div className="bg-[#12181D]/60 border border-slate-800/80 hover:border-slate-600 rounded-xl p-4 flex flex-col justify-between transition-colors text-center">
                   <div>
-                    <div className="flex justify-between items-center mb-3">
+                    <div className="flex justify-center items-center mb-3">
                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider bg-slate-800/50 px-2 py-0.5 rounded">Design QR</span>
                     </div>
                     <h4 className="text-sm font-bold text-white">Pachet Branding</h4>
@@ -2007,9 +2000,9 @@ export default function Home() {
                 </div>
 
                 {/* QR Dynamic */}
-                <div className="bg-[#12181D]/60 border border-slate-800/80 hover:border-[#8ba888]/50 rounded-xl p-4 flex flex-col justify-between transition-colors group">
+                <div className="bg-[#12181D]/60 border border-slate-800/80 hover:border-[#8ba888]/50 rounded-xl p-4 flex flex-col justify-between transition-colors group text-center">
                   <div>
-                    <div className="flex justify-between items-center mb-3">
+                    <div className="flex justify-center items-center mb-3">
                       <span className="text-[9px] font-bold text-[#8ba888] uppercase tracking-wider bg-[#8ba888]/10 px-2 py-0.5 rounded border border-[#8ba888]/20 transition-colors group-hover:bg-[#8ba888] group-hover:text-black">Sistem QR</span>
                     </div>
                     <h4 className="text-sm font-bold text-white">QR Dinamic + PDF</h4>
@@ -2020,9 +2013,9 @@ export default function Home() {
                 </div>
 
                 {/* QR vCard */}
-                <div className="bg-[#12181D]/60 border border-slate-800/80 hover:border-blue-500/50 rounded-xl p-4 flex flex-col justify-between transition-colors group">
+                <div className="bg-[#12181D]/60 border border-slate-800/80 hover:border-blue-500/50 rounded-xl p-4 flex flex-col justify-between transition-colors group text-center">
                   <div>
-                    <div className="flex justify-between items-center mb-3">
+                    <div className="flex justify-center items-center mb-3">
                       <span className="text-[9px] font-bold text-blue-400 uppercase tracking-wider bg-blue-900/20 px-2 py-0.5 rounded border border-blue-500/20 transition-colors group-hover:bg-blue-500 group-hover:text-white">Premium QR</span>
                     </div>
                     <h4 className="text-sm font-bold text-white">vCard Pro</h4>
@@ -2368,7 +2361,7 @@ export default function Home() {
                            <span className="text-xs font-bold text-white uppercase tracking-wider block">Aprobare și Semnare Document</span>
                         </div>
                         <div className="flex bg-[#0B0F12] p-1 rounded-lg border border-slate-700/60 shadow-inner">
-                          <button type="button" onClick={() => { setSignatureTab('draw'); curataCanvas(); }} className={`px-4 py-1.5 rounded-md text-[10px] font-bold transition-all duration-200 ${signatureTab === 'draw' ? 'bg-[#8ba888] text-black shadow-sm' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}>🖌️ Desenează</button>
+                          <button type="button" onClick={() => { setSignatureTab('draw'); curataCanvas(); }} className={`px-4 py-1.5 rounded-md text-[10px] font-bold transition-all duration-200 ${signatureTab === 'draw' ? 'bg-[#8ba888] text-black shadow-sm' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}>Desenează</button>
                           <button type="button" onClick={() => { setSignatureTab('upload'); curataCanvas(); }} className={`px-4 py-1.5 rounded-md text-[10px] font-bold transition-all duration-200 ${signatureTab === 'upload' ? 'bg-[#8ba888] text-black shadow-sm' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}>📁 Încarcă PNG/JPG</button>
                         </div>
                       </div>
@@ -2801,9 +2794,20 @@ export default function Home() {
                             </div>
                             <div className="sm:col-span-1">
                               <label className="text-[9px] text-slate-500 font-bold uppercase tracking-wide block mb-1.5">Preț Tranzacție</label>
-                              <div className="flex gap-2">
-                                <input type="number" placeholder="Sumă" autoComplete="new-password" value={autoData.autoPret} onChange={e => setAutoData({...autoData, autoPret: e.target.value})} className="flex-1 p-3 bg-[#0B0F12] border border-slate-700/60 rounded-lg text-xs text-white outline-none focus:border-[#8ba888] transition-colors" />
-                                <select value={autoData.autoMoneda} onChange={e => setAutoData({...autoData, autoMoneda: e.target.value})} className="w-20 bg-[#0B0F12] border border-slate-700/60 rounded-lg p-3 text-xs text-white outline-none appearance-none cursor-pointer focus:border-[#8ba888] bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1.2em_1.2em] bg-[right_0.4rem_center] bg-no-repeat pr-6">
+                              <div className="flex gap-1.5 min-w-0">
+                                <input 
+                                  type="number" 
+                                  placeholder="Sumă" 
+                                  autoComplete="new-password" 
+                                  value={autoData.autoPret} 
+                                  onChange={e => setAutoData({...autoData, autoPret: e.target.value})} 
+                                  className="min-w-0 flex-1 p-3 bg-[#0B0F12] border border-slate-700/60 rounded-lg text-xs text-white outline-none focus:border-[#8ba888] transition-colors" 
+                                />
+                                <select 
+                                  value={autoData.autoMoneda} 
+                                  onChange={e => setAutoData({...autoData, autoMoneda: e.target.value})} 
+                                  className="w-16 bg-[#0B0F12] border border-slate-700/60 rounded-lg p-3 text-xs text-white outline-none appearance-none cursor-pointer focus:border-[#8ba888] bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:1em_1.0em] bg-[right_0.2rem_center] bg-no-repeat pr-5"
+                                >
                                   <option value="RON">RON</option>
                                   <option value="EUR">EUR</option>
                                 </select>
