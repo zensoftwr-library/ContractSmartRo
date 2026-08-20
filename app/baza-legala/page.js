@@ -80,23 +80,23 @@ export default function BazaLegalaIndex() {
         </div>
 
         {/* HEADER */}
-        <div className="mb-12 border-b border-slate-800/80 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#16221A] border border-[#8ba888]/20 text-[#8ba888] text-[10px] font-black uppercase tracking-widest mb-4 shadow-sm">
-              <span className="relative flex h-1.5 w-1.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span></span>
-              Actualizat Live din Monitorul Oficial
-            </div>
-            <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight leading-tight mb-4">
-              Validitate Juridică & <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8ba888] to-emerald-400">Bază Legală</span>
-            </h1>
-            <p className="text-sm text-slate-400 max-w-2xl leading-relaxed">
-              Selecție dinamică a normelor juridice oficiale care fundamentează infrastructura platformei ContractSmart, actualizate în timp real.
-            </p>
+        <div className="mb-12 border-b border-slate-800/80 pb-10 flex flex-col items-center text-center gap-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#16221A] border border-[#8ba888]/20 text-[#8ba888] text-[10px] font-black uppercase tracking-widest shadow-sm">
+            <span className="relative flex h-1.5 w-1.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span></span>
+            Actualizat Live din Monitorul Oficial
           </div>
+          
+          <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight leading-tight">
+            Validitate Juridică & <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8ba888] to-emerald-400">Bază Legală</span>
+          </h1>
+          
+          <p className="text-sm text-slate-400 max-w-2xl mx-auto leading-relaxed mb-2">
+            Selecție dinamică a normelor juridice oficiale care fundamentează infrastructura platformei ContractSmart, actualizate în timp real.
+          </p>
           
           <button 
             onClick={() => setArticoleAfisate([...bibliotecaLegala].sort(() => 0.5 - Math.random()).slice(0, 16))}
-            className="flex items-center gap-2 bg-[#12181D] hover:bg-slate-800 border border-slate-700 text-white px-4 py-2.5 rounded-lg text-xs font-bold transition-colors shadow-sm h-fit group"
+            className="mt-2 flex items-center justify-center gap-2 bg-[#12181D] hover:bg-slate-800 border border-slate-700 text-white px-6 py-3 rounded-xl text-xs font-bold transition-all shadow-sm group hover:border-[#8ba888]/50"
           >
             <svg className="w-4 h-4 text-[#8ba888] group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
             Reîncarcă Articole

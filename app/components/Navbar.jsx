@@ -25,8 +25,9 @@ export default function Navbar({
   };
 
   return (
-    <nav className="sticky top-0 z-40 backdrop-blur-md bg-[#0B0F12]/90 border-b border-slate-800 py-4 px-6 shadow-md transition-all">
-      <div className="flex justify-between items-center w-full">
+    <nav className="sticky top-0 z-40 backdrop-blur-xl bg-[#0B0F12]/85 border-b border-slate-800/80 py-4 px-6 shadow-sm transition-all">
+      <div className="flex justify-between items-center w-full max-w-7xl mx-auto">
+        
         {/* LOGO */}
         <Link 
           href="/" 
@@ -36,7 +37,7 @@ export default function Navbar({
               handleInapoiPrincipal(); 
             }
           }} 
-          className="w-[180px] h-[30px] flex items-center cursor-pointer"
+          className="w-[180px] h-[30px] flex items-center cursor-pointer hover:opacity-90 transition-opacity"
         >
           <svg viewBox="0 0 240 52" className="w-full h-full">
             <g transform="translate(0, 6)">
@@ -51,95 +52,107 @@ export default function Navbar({
         
         {/* HAMBURGER MOBILE */}
         <button 
-          className="md:hidden text-[#8ba888] text-2xl focus:outline-none"
+          className="lg:hidden text-[#8ba888] text-2xl focus:outline-none hover:scale-110 transition-transform"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           {isMobileMenuOpen ? '✕' : '☰'}
         </button>
 
         {/* MENIU DESKTOP */}
-        <div className="hidden md:flex items-center space-x-5">
-          <Link href="/modele-contracte" className="text-xs text-slate-400 hover:text-white transition">Modele Contracte Standard</Link>
+        <div className="hidden lg:flex items-center space-x-6">
+          <Link href="/modele-contracte" className="text-[11px] font-bold text-slate-400 hover:text-white uppercase tracking-wider transition-colors">Modele Tipizate</Link>
           <span className="text-slate-800">|</span>
-          <Link href="/baza-legala" className="text-xs text-slate-400 hover:text-white transition">Articole Validitate Juridică</Link>
+          <Link href="/baza-legala" className="text-[11px] font-bold text-slate-400 hover:text-white uppercase tracking-wider transition-colors">Baza Legală</Link>
           <span className="text-slate-800">|</span>
-          <Link href="/termeni-si-conditii" className="text-xs text-slate-400 hover:text-white transition">Termeni și Condiții</Link>
-          <span className="text-slate-800">|</span>
-          <Link href="/politica-si-confidentialitate" className="text-xs text-slate-400 hover:text-white transition">Politica și Confidențialitate</Link>
-          <span className="text-slate-800">|</span>
-          <Link href="/contact" className="text-xs text-slate-400 hover:text-white transition">Contact</Link>
-          <span className="text-slate-800">|</span>
-          <Link href="/despre-noi" className="text-xs text-slate-400 hover:text-white transition">Despre Noi</Link>
+          
+          {/* Dropdown Simplu pentru Pagini Info */}
+          <div className="relative group">
+            <button className="text-[11px] font-bold text-slate-400 hover:text-white uppercase tracking-wider transition-colors flex items-center gap-1">
+              Despre Noi <span className="text-[8px]">▼</span>
+            </button>
+            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-48 bg-[#12181D] border border-slate-700 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all flex flex-col overflow-hidden">
+              <Link href="/despre-noi" className="px-4 py-3 text-xs text-slate-300 hover:bg-slate-800 hover:text-white border-b border-slate-700/50">Misiune Platformă</Link>
+              <Link href="/termeni-si-conditii" className="px-4 py-3 text-xs text-slate-300 hover:bg-slate-800 hover:text-white border-b border-slate-700/50">Termeni și Condiții</Link>
+              <Link href="/politica-si-confidentialitate" className="px-4 py-3 text-xs text-slate-300 hover:bg-slate-800 hover:text-white border-b border-slate-700/50">Politica de Confidențialitate</Link>
+              <Link href="/contact" className="px-4 py-3 text-xs text-[#8ba888] font-bold hover:bg-slate-800">Suport / Contact</Link>
+            </div>
+          </div>
+          
           <span className="text-slate-800">|</span>
           
           {!user ? (
-            <button type="button" onClick={() => { setIsSignUp?.(false); setShowAuthModal?.(true); }} className="text-xs font-bold text-slate-300 hover:text-[#8ba888] transition">Autentificare / Cont Nou</button>
+            <button type="button" onClick={() => { setIsSignUp?.(false); setShowAuthModal?.(true); }} className="text-[11px] font-black text-slate-200 hover:text-[#8ba888] transition-colors uppercase tracking-widest bg-slate-800/50 px-4 py-2 rounded-lg border border-slate-700 hover:border-[#8ba888]/50 shadow-sm">Autentificare</button>
           ) : (
-            <div className="flex items-center space-x-3 text-xs">
-              <span className="text-slate-400 flex items-center gap-2">
-                <span>Cont: <strong className="text-white font-mono font-normal">{user.email}</strong></span>
-                <span className="text-[10px] uppercase font-bold bg-[#16221A] text-[#8ba888] px-2 py-0.5 rounded border border-emerald-900/40">
-                  {user.status}
-                </span>
-                {user.status === 'pro' && (
-                  <span className="text-[10px] uppercase font-bold bg-blue-900/20 text-blue-400 px-2 py-0.5 rounded border border-blue-900/50 shadow-sm">
-                    {3 - (user?.proReportsUsed || 0)}/3 RAPOARTE
+            <div className="flex items-center space-x-4">
+              <div className="flex flex-col items-end mr-2">
+                <span className="text-[10px] text-slate-500 font-mono leading-none mb-1.5">{user.email}</span>
+                <div className="flex items-center gap-1.5">
+                  <span className={`text-[9px] uppercase font-black px-2 py-0.5 rounded shadow-sm border ${isPremium ? 'bg-amber-900/20 text-amber-500 border-amber-900/50' : 'bg-[#16221A] text-[#8ba888] border-emerald-900/40'}`}>
+                    {user.status === 'pro' || isPremium ? 'PRO / LIFETIME' : 'Plan Gratuit'}
                   </span>
-                )}
-                {!isPremium && (
-                  <span className="text-[10px] uppercase font-bold bg-amber-900/20 text-amber-500 px-2 py-0.5 rounded border border-amber-900/50">
-                    {user.credits} CREDITE
-                  </span>
-                )}
-              </span>
-              <button type="button" onClick={handleLogout} className="text-slate-300 hover:text-white font-bold hover:underline">Ieșire</button>
-              <span className="text-slate-800">|</span>
-              <button type="button" onClick={stergeCont} className="text-red-500 font-bold hover:underline">Șterge Cont</button>
+                  {user.status === 'pro' && (
+                    <span className="text-[9px] uppercase font-bold bg-blue-900/20 text-blue-400 px-2 py-0.5 rounded border border-blue-900/50 shadow-sm">
+                      {3 - (user?.proReportsUsed || 0)}/3 Rapoarte
+                    </span>
+                  )}
+                  {!isPremium && (
+                    <span className="text-[9px] uppercase font-bold bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700 shadow-sm">
+                      {user.credits} Credite
+                    </span>
+                  )}
+                </div>
+              </div>
+              <button type="button" onClick={handleLogout} className="text-slate-400 hover:text-white text-[11px] font-bold uppercase tracking-wider transition-colors">Ieșire</button>
+              <button type="button" onClick={stergeCont} className="text-red-500 hover:text-red-400 text-[11px] font-bold uppercase tracking-wider transition-colors ml-2 bg-red-900/10 px-2 py-1 rounded">Șterge Cont</button>
             </div>
           )}
-          <button onClick={mergiLaPreturi} className="bg-[#8ba888] hover:opacity-90 text-[#0B0F12] font-black text-xs px-4 py-2 rounded-md transition shadow-md shadow-[#8ba888]/10">Vezi Oferte</button>
+          
+          <button onClick={mergiLaPreturi} className="bg-gradient-to-r from-[#8ba888] to-[#6d8a6a] text-black font-black text-[11px] px-5 py-2.5 rounded-xl uppercase tracking-widest transition-all shadow-[0_0_15px_rgba(139,168,136,0.3)] hover:scale-[1.02] active:scale-[0.98]">Tarife</button>
         </div>
       </div>
 
       {/* MENIU MOBIL */}
       {isMobileMenuOpen && (
-        <div className="md:hidden flex flex-col space-y-4 pt-4 mt-4 border-t border-slate-800 animate-fadeIn">
-          <Link href="/modele-contracte" className="text-sm text-slate-300 hover:text-white" onClick={() => setIsMobileMenuOpen(false)}>Modele Contracte Standard</Link>
-          <Link href="/baza-legala" className="text-sm text-slate-300 hover:text-white" onClick={() => setIsMobileMenuOpen(false)}>Articole Validitate Juridică</Link>
-          <Link href="/termeni-si-conditii" className="text-sm text-slate-300 hover:text-white" onClick={() => setIsMobileMenuOpen(false)}>Termeni și Condiții</Link>
-          <Link href="/politica-si-confidentialitate" className="text-sm text-slate-300 hover:text-white" onClick={() => setIsMobileMenuOpen(false)}>Politică de Confidențialitate</Link>
-          <Link href="/contact" className="text-sm text-slate-300 hover:text-white" onClick={() => setIsMobileMenuOpen(false)}>Contact</Link>
-          <Link href="/despre-noi" className="text-sm text-slate-300 hover:text-white" onClick={() => setIsMobileMenuOpen(false)}>Despre Noi</Link>
+        <div className="lg:hidden flex flex-col space-y-3 pt-5 mt-4 border-t border-slate-800/80 animate-fadeIn">
+          <Link href="/modele-contracte" className="text-sm font-bold text-slate-300 hover:text-white uppercase tracking-wider" onClick={() => setIsMobileMenuOpen(false)}>Modele Tipizate</Link>
+          <Link href="/baza-legala" className="text-sm font-bold text-slate-300 hover:text-white uppercase tracking-wider" onClick={() => setIsMobileMenuOpen(false)}>Baza Legală</Link>
+          <div className="h-[1px] w-full bg-slate-800/50 my-1"></div>
+          <Link href="/termeni-si-conditii" className="text-xs text-slate-400 hover:text-white" onClick={() => setIsMobileMenuOpen(false)}>Termeni și Condiții</Link>
+          <Link href="/politica-si-confidentialitate" className="text-xs text-slate-400 hover:text-white" onClick={() => setIsMobileMenuOpen(false)}>Politică de Confidențialitate</Link>
+          <Link href="/contact" className="text-xs text-slate-400 hover:text-white" onClick={() => setIsMobileMenuOpen(false)}>Contact</Link>
+          <Link href="/despre-noi" className="text-xs text-slate-400 hover:text-white" onClick={() => setIsMobileMenuOpen(false)}>Despre Noi</Link>
+
+          <div className="h-[1px] w-full bg-slate-800/50 my-2"></div>
 
           {!user ? (
-            <button type="button" onClick={() => { setIsMobileMenuOpen(false); setIsSignUp?.(false); setShowAuthModal?.(true); }} className="text-sm font-bold text-[#8ba888] text-left">Autentificare / Cont Nou</button>
+            <button type="button" onClick={() => { setIsMobileMenuOpen(false); setIsSignUp?.(false); setShowAuthModal?.(true); }} className="text-sm font-black text-[#8ba888] text-left uppercase tracking-wider">Autentificare / Cont Nou</button>
           ) : (
-            <div className="flex flex-col space-y-2 border-t border-slate-800/50 pt-2">
-              <div className="flex flex-col space-y-1.5 mb-2">
-                <span className="text-xs text-slate-400">Logat ca: <strong className="text-white">{user.email}</strong></span>
+            <div className="flex flex-col space-y-3 bg-[#12181D] p-4 rounded-xl border border-slate-800">
+              <div className="flex flex-col space-y-2 mb-2">
+                <span className="text-xs text-slate-400">Logat ca: <strong className="text-white font-mono break-all">{user.email}</strong></span>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-[10px] uppercase font-bold bg-[#16221A] text-[#8ba888] px-2 py-0.5 rounded border border-emerald-900/40">
-                    {user.status}
+                  <span className={`text-[10px] uppercase font-black px-2.5 py-1 rounded shadow-sm border ${isPremium ? 'bg-amber-900/20 text-amber-500 border-amber-900/50' : 'bg-[#16221A] text-[#8ba888] border-emerald-900/40'}`}>
+                    {user.status === 'pro' || isPremium ? 'PRO / LIFETIME' : 'Plan Gratuit'}
                   </span>
                   {user.status === 'pro' && (
-                    <span className="text-[10px] uppercase font-bold bg-blue-900/20 text-blue-400 px-2 py-0.5 rounded border border-blue-900/50 shadow-sm">
-                      {3 - (user?.proReportsUsed || 0)}/3 RAPOARTE
+                    <span className="text-[10px] uppercase font-bold bg-blue-900/20 text-blue-400 px-2.5 py-1 rounded border border-blue-900/50 shadow-sm">
+                      {3 - (user?.proReportsUsed || 0)}/3 Rapoarte
                     </span>
                   )}
                   {!isPremium && (
-                    <span className="text-[10px] uppercase font-bold bg-amber-900/20 text-amber-500 px-2 py-0.5 rounded border border-amber-900/50">
-                      {user.credits} CREDITE
+                    <span className="text-[10px] uppercase font-bold bg-slate-800 text-slate-300 px-2.5 py-1 rounded border border-slate-700 shadow-sm">
+                      {user.credits} Credite
                     </span>
                   )}
                 </div>
               </div>
-              <div className="flex space-x-4 pt-1">
-                <button type="button" onClick={handleLogout} className="text-slate-300 text-sm font-bold text-left hover:text-white">Ieșire</button>
-                <button type="button" onClick={stergeCont} className="text-red-500 text-sm font-bold text-left hover:underline">Șterge Cont</button>
+              <div className="flex justify-between pt-3 border-t border-slate-700/50">
+                <button type="button" onClick={handleLogout} className="text-slate-300 text-xs font-bold uppercase tracking-wider hover:text-white">Ieșire Cont</button>
+                <button type="button" onClick={stergeCont} className="text-red-500 text-xs font-bold uppercase tracking-wider hover:text-red-400">Șterge Cont</button>
               </div>
             </div>
           )}
-          <button onClick={mergiLaPreturi} className="bg-[#8ba888] text-[#0B0F12] font-black text-sm px-4 py-3 rounded-md text-center">Vezi Oferte</button>
+          <button onClick={mergiLaPreturi} className="bg-gradient-to-r from-[#8ba888] to-[#6d8a6a] text-black font-black text-sm px-4 py-3.5 rounded-xl text-center uppercase tracking-widest shadow-lg mt-2">Vezi Oferte & Tarife</button>
         </div>
       )}
     </nav>
