@@ -87,19 +87,32 @@ export default function Navbar({
               <div className="flex flex-col items-end mr-2">
                 <span className="text-[10px] text-slate-500 font-mono leading-none mb-1.5">{user.email}</span>
                 <div className="flex items-center gap-1.5">
-                  <span className={`text-[9px] uppercase font-black px-2 py-0.5 rounded shadow-sm border ${isPremium ? 'bg-amber-900/20 text-amber-500 border-amber-900/50' : 'bg-[#16221A] text-[#8ba888] border-emerald-900/40'}`}>
-                    {user.status === 'pro' || isPremium ? 'PRO / LIFETIME' : 'Plan Gratuit'}
-                  </span>
-                  {user.status === 'pro' && (
-                    <span className="text-[9px] uppercase font-bold bg-blue-900/20 text-blue-400 px-2 py-0.5 rounded border border-blue-900/50 shadow-sm">
-                      {3 - (user?.proReportsUsed || 0)}/3 Rapoarte
+                  
+                  {/* LOGICA DE AFIȘARE A STATUSURILOR - DESKTOP */}
+                  {user.status === 'founder' ? (
+                    <span className="text-[9px] uppercase font-black bg-gradient-to-r from-amber-400 to-amber-600 text-black px-2 py-0.5 rounded shadow-sm border border-amber-300 tracking-widest">
+                      FONDATOR
                     </span>
+                  ) : user.status === 'pro' ? (
+                    <>
+                      <span className="text-[9px] uppercase font-black bg-blue-900/20 text-blue-400 px-2 py-0.5 rounded shadow-sm border border-blue-900/50">
+                        PRO
+                      </span>
+                      <span className="text-[9px] uppercase font-bold bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700 shadow-sm">
+                        {3 - (user?.proReportsUsed || 0)}/3 Rapoarte
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-[9px] uppercase font-black bg-[#16221A] text-[#8ba888] px-2 py-0.5 rounded shadow-sm border border-emerald-900/40">
+                        Plan Gratuit
+                      </span>
+                      <span className="text-[9px] uppercase font-bold bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700 shadow-sm">
+                        {user.credits} Credite
+                      </span>
+                    </>
                   )}
-                  {!isPremium && (
-                    <span className="text-[9px] uppercase font-bold bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700 shadow-sm">
-                      {user.credits} Credite
-                    </span>
-                  )}
+
                 </div>
               </div>
               <button type="button" onClick={handleLogout} className="text-slate-400 hover:text-white text-[11px] font-bold uppercase tracking-wider transition-colors">Ieșire</button>
@@ -131,19 +144,32 @@ export default function Navbar({
               <div className="flex flex-col space-y-2 mb-2">
                 <span className="text-xs text-slate-400">Logat ca: <strong className="text-white font-mono break-all">{user.email}</strong></span>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className={`text-[10px] uppercase font-black px-2.5 py-1 rounded shadow-sm border ${isPremium ? 'bg-amber-900/20 text-amber-500 border-amber-900/50' : 'bg-[#16221A] text-[#8ba888] border-emerald-900/40'}`}>
-                    {user.status === 'pro' || isPremium ? 'PRO / LIFETIME' : 'Plan Gratuit'}
-                  </span>
-                  {user.status === 'pro' && (
-                    <span className="text-[10px] uppercase font-bold bg-blue-900/20 text-blue-400 px-2.5 py-1 rounded border border-blue-900/50 shadow-sm">
-                      {3 - (user?.proReportsUsed || 0)}/3 Rapoarte
+                  
+                  {/* LOGICA DE AFIȘARE A STATUSURILOR - MOBILE */}
+                  {user.status === 'founder' ? (
+                    <span className="text-[10px] uppercase font-black bg-gradient-to-r from-amber-400 to-amber-600 text-black px-2.5 py-1 rounded shadow-sm border border-amber-300 tracking-widest">
+                      FONDATOR
                     </span>
+                  ) : user.status === 'pro' ? (
+                    <>
+                      <span className="text-[10px] uppercase font-black bg-blue-900/20 text-blue-400 px-2.5 py-1 rounded shadow-sm border border-blue-900/50">
+                        PRO
+                      </span>
+                      <span className="text-[10px] uppercase font-bold bg-slate-800 text-slate-300 px-2.5 py-1 rounded border border-slate-700 shadow-sm">
+                        {3 - (user?.proReportsUsed || 0)}/3 Rapoarte
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-[10px] uppercase font-black bg-[#16221A] text-[#8ba888] px-2.5 py-1 rounded shadow-sm border border-emerald-900/40">
+                        Plan Gratuit
+                      </span>
+                      <span className="text-[10px] uppercase font-bold bg-slate-800 text-slate-300 px-2.5 py-1 rounded border border-slate-700 shadow-sm">
+                        {user.credits} Credite
+                      </span>
+                    </>
                   )}
-                  {!isPremium && (
-                    <span className="text-[10px] uppercase font-bold bg-slate-800 text-slate-300 px-2.5 py-1 rounded border border-slate-700 shadow-sm">
-                      {user.credits} Credite
-                    </span>
-                  )}
+
                 </div>
               </div>
               <div className="flex justify-between pt-3 border-t border-slate-700/50">
