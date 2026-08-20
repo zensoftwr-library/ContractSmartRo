@@ -1,6 +1,7 @@
 import './globals.css';
 import CookieConsent from './components/CookieConsent';
 import GlobalAIAssistant from './components/GlobalAIAssistant';
+import Script from 'next/script'; // Importăm componenta optimizată Next.js
 
 export const metadata = {
   title: 'ContractSmart | Infrastructură Legală & Contracte B2B',
@@ -38,6 +39,27 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className="bg-[#0B0F12] text-slate-200 antialiased relative min-h-screen selection:bg-[#8ba888]/30 selection:text-[#8ba888]" suppressHydrationWarning>
+        
+        {/* GOOGLE ANALYTICS 4 - Incarcare Asincrona Optimizata */}
+        <Script
+          strategy="afterInteractive"
+          src={`https://www.googletagmanager.com/gtag/js?id=G-96RCSSYK3W`}
+        />
+        <Script
+          id="google-analytics"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-96RCSSYK3W', {
+                page_path: window.location.pathname,
+              });
+            `,
+          }}
+        />
+
         {children}
         
         <CookieConsent />
