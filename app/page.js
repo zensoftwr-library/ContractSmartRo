@@ -1622,11 +1622,11 @@ export default function Home() {
               
               {/* TEXT ELEGANT ÎN DOUĂ CULORI */}
               <div className="mb-10 text-center">
-                <p className="text-2xl sm:text-4xl font-black text-[#8ba888] tracking-tight uppercase mt-1">
-                  Contracte Inteligente
-                </p>
-                <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight uppercase">
-                  Prin Management de Clauze
+                <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight tracking-tighter mb-5">
+                  Contracte <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8ba888] to-emerald-400">Inteligente</span>
+                </h1>
+                <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight tracking-tighter mb-5">
+                  Prin Management <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8ba888] to-emerald-400">De Clauze</span>
                 </h1>
               </div>
 
@@ -3183,8 +3183,6 @@ export default function Home() {
               Infrastructură electronică avansată dedicată optimizării micro-sistemelor, înmatriculării rapide a entităților comerciale și auditului de clauze pe Codul Civil român.
               </p>
               <div className="flex justify-center space-x-6 text-xs text-slate-400 font-medium">
-              <Link href="/modele-contracte" className="hover:text-[#8ba888] transition text-white">Modele Standard</Link>
-              <span>•</span>
               <Link href="/termeni-si-conditii" className="hover:text-[#8ba888] transition">Termeni și Condiții</Link>
               <span>•</span>
               <Link href="/politica-si-confidentialitate" className="hover:text-[#8ba888] transition">Confidențialitate</Link>

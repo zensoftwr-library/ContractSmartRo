@@ -164,11 +164,11 @@ export default function PoliticaConfidentialitate() {
             Infrastructură electronică avansată dedicată optimizării micro-sistemelor, înmatriculării rapide a entităților comerciale și auditului de clauze pe Codul Civil român.
           </p>
           <div className="flex justify-center space-x-6 text-xs text-slate-400 font-medium">
-            <Link href="/modele-contracte" className="hover:text-[#8ba888] transition">Modele Standard</Link>
-            <span>•</span>
             <Link href="/termeni-si-conditii" className="hover:text-[#8ba888] transition">Termeni și Condiții</Link>
             <span>•</span>
             <Link href="/politica-si-confidentialitate" className="hover:text-[#8ba888] transition text-white">Confidențialitate</Link>
+            <span>•</span>
+            <Link href="/contact" className="hover:text-[#8ba888] transition">Contact</Link>
           </div>
           <div className="pt-6 border-t border-slate-800/40 flex flex-col items-center gap-4">
             <p className="text-[10px] text-slate-500 font-mono max-w-3xl text-center leading-relaxed px-4">

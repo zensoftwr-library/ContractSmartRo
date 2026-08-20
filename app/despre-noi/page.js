@@ -157,8 +157,6 @@ export default function DespreNoi() {
             Infrastructură electronică avansată dedicată optimizării micro-sistemelor, înmatriculării rapide a entităților comerciale și auditului de clauze pe Codul Civil român.
           </p>
           <div className="flex justify-center space-x-6 text-xs text-slate-400 font-medium">
-            <Link href="/modele-contracte" className="hover:text-[#8ba888] transition">Modele Standard</Link>
-            <span>•</span>
             <Link href="/termeni-si-conditii" className="hover:text-[#8ba888] transition">Termeni și Condiții</Link>
             <span>•</span>
             <Link href="/politica-si-confidentialitate" className="hover:text-[#8ba888] transition">Confidențialitate</Link>

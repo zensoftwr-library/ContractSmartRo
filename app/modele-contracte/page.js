@@ -358,6 +358,11 @@ export default function ModeleContracte() {
         </div>
       </div>
 
+      {/* Tabelul de prețuri apare mereu la finalul Step 2 (și la B2B și la Auto) */}
+              <div className="mt-8">
+                {renderCarduriPreturi()}
+              </div>
+
       {/* FOOTER STANDARD PLATFORMA */}
       <footer className="relative z-10 border-t border-slate-800/80 bg-[#0B0F12] pt-12 pb-8 mt-16 text-center">
         <div className="max-w-5xl mx-auto px-6 space-y-6">
