@@ -358,11 +358,6 @@ export default function ModeleContracte() {
         </div>
       </div>
 
-      {/* Tabelul de prețuri apare mereu la finalul Step 2 (și la B2B și la Auto) */}
-              <div className="mt-8">
-                {renderCarduriPreturi()}
-              </div>
-
       {/* FOOTER STANDARD PLATFORMA */}
       <footer className="relative z-10 border-t border-slate-800/80 bg-[#0B0F12] pt-12 pb-8 mt-16 text-center">
         <div className="max-w-5xl mx-auto px-6 space-y-6">
@@ -383,8 +378,6 @@ export default function ModeleContracte() {
             Infrastructură electronică avansată dedicată optimizării micro-sistemelor, înmatriculării rapide a entităților comerciale și auditului de clauze pe Codul Civil român.
           </p>
           <div className="flex justify-center space-x-6 text-xs text-slate-400 font-medium">
-            <Link href="/modele-contracte" className="hover:text-[#8ba888] transition text-white">Modele Standard</Link>
-            <span>•</span>
             <Link href="/termeni-si-conditii" className="hover:text-[#8ba888] transition">Termeni și Condiții</Link>
             <span>•</span>
             <Link href="/politica-si-confidentialitate" className="hover:text-[#8ba888] transition">Confidențialitate</Link>
