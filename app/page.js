@@ -1646,9 +1646,9 @@ export default function Home() {
                 <span className="w-2 h-2 rounded-full bg-[#8ba888] animate-pulse"></span>
                 <span className="text-[10px] uppercase font-black text-[#8ba888] tracking-widest">Protecție Completă</span>
               </div>
-              <h2 className="text-xl sm:text-2xl font-black text-white mb-3 tracking-tight">
-                Generezi ocazional sau vrei <span className="text-[#8ba888]">siguranță pe termen lung?</span>
-              </h2>
+                <h2 className="text-xl md:text-2xl font-black text-white leading-tight tracking-tighter mb-5">
+                  Generezi ocazional sau vrei <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8ba888] to-emerald-400">siguranță pe termen lung?</span>
+                </h2>
               <p className="text-sm text-slate-400 leading-relaxed max-w-2xl mx-auto">
                 Testează platforma gratuit pentru nevoi urgente, dar nu lăsa birocrația viitoare la voia întâmplării. 
                 Treci la un plan Premium și deblochează contracte nelimitate, verificări ANAF și ecosistemul complet de încasări rapide prin QR Studio.

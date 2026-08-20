@@ -358,6 +358,8 @@ export default function ModeleContracte() {
         </div>
       </div>
 
+      {renderCarduriPreturi()}
+
       {/* FOOTER STANDARD PLATFORMA */}
       <footer className="relative z-10 border-t border-slate-800/80 bg-[#0B0F12] pt-12 pb-8 mt-16 text-center">
         <div className="max-w-5xl mx-auto px-6 space-y-6">
