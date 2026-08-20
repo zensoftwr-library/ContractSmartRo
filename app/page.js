@@ -1688,10 +1688,10 @@ export default function Home() {
               
               {/* TEXT ELEGANT ÎN DOUĂ CULORI */}
               <div className="mb-10 text-center">
-                <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight tracking-tighter mb-5">
+                <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight tracking-tighter mb-2 md:mb-4">
                   Contracte <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8ba888] to-emerald-400">Inteligente</span>
                 </h1>
-                <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight tracking-tighter mb-5">
+                <h1 className="text-2xl md:text-4xl font-bold text-white leading-tight tracking-tighter mb-5">
                   Prin Management <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8ba888] to-emerald-400">De Clauze</span>
                 </h1>
               </div>
@@ -2136,16 +2136,17 @@ export default function Home() {
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#8ba888]/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
                     
                     {stire.imagine ? (
-                      <div className="w-full h-44 overflow-hidden relative border-b border-slate-800/60 bg-[#12181D]">
+                      <div className="w-full h-44 overflow-hidden relative border-b border-slate-800/60 bg-gradient-to-br from-[#12181D] to-[#16221A]">
                         <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors z-10"></div>
                         <img 
                           src={stire.imagine} 
                           alt="News thumbnail" 
                           onError={(e) => {
-                            e.target.onerror = null; 
-                            e.target.src = "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=600&q=80"; // Imagine Fallback Premium Business/Legal
+                            // Dacă imaginea dă eroare (404, CORS, AdBlock), o ascundem complet. 
+                            // Se va vedea doar gradientul elegant de pe fundalul div-ului părinte.
+                            e.currentTarget.style.display = 'none'; 
                           }}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" 
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out absolute inset-0 z-0" 
                         />
                         <div className="absolute bottom-3 left-3 z-20">
                           <span className="text-[9px] font-black text-black bg-[#8ba888] px-2.5 py-1 rounded-md shadow-lg uppercase tracking-wider">{stire.sursa || "Presă Economică"}</span>
@@ -2164,11 +2165,11 @@ export default function Home() {
                       </div>
                       <div className="mt-6 pt-4 border-t border-slate-800/60 flex justify-between items-center">
                         <span className="text-[10px] text-slate-500 flex items-center gap-1.5">
-                          <svg className="w-3.5 h-3.5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                          <span className="block w-1.5 h-1.5 rounded-full bg-[#8ba888]"></span>
                           Astăzi
                         </span>
                         <span className="text-[10px] font-bold text-[#8ba888] group-hover:translate-x-1 transition-transform flex items-center gap-1">
-                          Citește Articol <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                          Citește Articol <span className="text-lg leading-none mb-0.5">›</span>
                         </span>
                       </div>
                     </div>
