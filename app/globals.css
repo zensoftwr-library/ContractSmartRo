@@ -2,10 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background-color: #0B0F12;
   color: #E2E8F0;
-  overflow-x: hidden; 
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ✨ SELECȚIE TEXT PREMIUM ✨ */
+::selection {
+  background-color: rgba(139, 168, 136, 0.25);
+  color: #8ba888;
 }
 
 /* 📈 ANIMAȚIE CONTINUĂ PENTRU MARQUEE SENSE PRO */
@@ -51,7 +62,7 @@ body {
   will-change: transform, opacity;
 }
 
-/* Stiluri utilitare opționale pentru scrollbar fin */
+/* 📜 SCROLLBAR ELEGANT ȘI VIZIBIL */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -60,7 +71,7 @@ body {
   background: #0B0F12;
 }
 ::-webkit-scrollbar-thumb {
-  background: #12181D;
+  background: #1e293b; /* Puțin mai deschis pentru vizibilitate pe fundalul negru */
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
