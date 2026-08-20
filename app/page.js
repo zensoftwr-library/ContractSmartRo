@@ -2136,9 +2136,17 @@ export default function Home() {
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#8ba888]/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
                     
                     {stire.imagine ? (
-                      <div className="w-full h-44 overflow-hidden relative border-b border-slate-800/60">
+                      <div className="w-full h-44 overflow-hidden relative border-b border-slate-800/60 bg-[#12181D]">
                         <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors z-10"></div>
-                        <img src={stire.imagine} alt="News thumbnail" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" />
+                        <img 
+                          src={stire.imagine} 
+                          alt="News thumbnail" 
+                          onError={(e) => {
+                            e.target.onerror = null; 
+                            e.target.src = "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=600&q=80"; // Imagine Fallback Premium Business/Legal
+                          }}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" 
+                        />
                         <div className="absolute bottom-3 left-3 z-20">
                           <span className="text-[9px] font-black text-black bg-[#8ba888] px-2.5 py-1 rounded-md shadow-lg uppercase tracking-wider">{stire.sursa || "Presă Economică"}</span>
                         </div>
