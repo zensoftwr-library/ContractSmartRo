@@ -296,6 +296,11 @@ export default function Home() {
   const [cuiDataResult, setCuiDataResult] = useState(null);
   useEffect(() => { setCuiDataResult(null); setCuiSearch(''); }, []);
   const [isSearchingCui, setIsSearchingCui] = useState(false);
+  useEffect(() => {
+    if (!cuiSearch || cuiSearch.trim() === '') {
+      setCuiDataResult(null);
+    }
+  }, [cuiSearch]);
   const [prestatorCuiStatus, setPrestatorCuiStatus] = useState(null);
   const [clientCuiStatus, setClientCuiStatus] = useState(null);
 
@@ -477,14 +482,14 @@ export default function Home() {
             ...prev,
             vanzatorNume: data.data.denumire || prev.vanzatorNume,
             vanzatorSediu: data.data.adresa || prev.vanzatorSediu,
-            vanzatorRegCom: data.data.nrRegCom || data.data.numar_reg_com || data.data.reg_com || prev.vanzatorRegCom
+            vanzatorRegCom: data.data.regCom || prev.vanzatorRegCom
           }));
         } else if (rol === 'cumparator_auto') {
           setAutoData(prev => ({
             ...prev,
             cumparatorNume: data.data.denumire || prev.cumparatorNume,
             cumparatorSediu: data.data.adresa || prev.cumparatorSediu,
-            cumparatorRegCom: data.data.nrRegCom || data.data.numar_reg_com || data.data.reg_com || prev.cumparatorRegCom
+            cumparatorRegCom: data.data.regCom || prev.cumparatorRegCom
           }));
         }
       }
@@ -2097,7 +2102,7 @@ export default function Home() {
                         <div className="flex flex-col space-y-1">
                           <label className="text-[10px] text-slate-500 font-bold uppercase">Denumire Furnizor / Nume</label>
                           <input type="text" placeholder="Denumire Firma / Nume Complet" autoComplete="new-password" value={formData.prestatorNume} onChange={e => setFormData({...formData, prestatorNume: e.target.value})} className="p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none" />
-                          <input type="text" placeholder="Nume Administrator / Reprezentant Prestator" autoComplete="new-password" value={formData.prestatorReprezentant} onChange={e => setFormData({...formData, prestatorReprezentant: e.target.value})} className="mt-2 p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none w-full" />
+                          <textarea rows="2" placeholder="Reprezentant Legal / Administratori" value={formData.prestatorReprezentant} onChange={e => setFormData({...formData, prestatorReprezentant: e.target.value})} className="bg-[#12181D] border border-slate-700 p-2 rounded text-xs text-white outline-none w-full resize-y"></textarea>
                           <input type="text" placeholder="Adresă Sediu Social Prestator" autoComplete="new-password" value={formData.prestatorAdresa || ''} onChange={e => setFormData({...formData, prestatorAdresa: e.target.value})} className="mt-2 p-2.5 bg-[#12181D] border border-slate-700 rounded text-xs text-white outline-none w-full" />
                         </div>
                       </div>
@@ -2118,7 +2123,7 @@ export default function Home() {
                         <div className="flex flex-col space-y-1">
                           <label className="text-[10px] text-slate-500 font-bold uppercase">Companie Client / Nume</label>
                           <input type="text" placeholder="Companie Client / Nume" autoComplete="new-password" value={formData.clientNume} onChange={e => setFormData({...formData, clientNume: e.target.value})} className="p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white outline-none" />
-                          <input type="text" placeholder="Nume Administrator / Reprezentant Client" autoComplete="new-password" value={formData.clientReprezentant} onChange={e => setFormData({...formData, clientReprezentant: e.target.value})} className="mt-2 p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white outline-none w-full" />
+                          <textarea rows="2" placeholder="Reprezentant Legal / Administratori" value={formData.clientReprezentant} onChange={e => setFormData({...formData, clientReprezentant: e.target.value})} className="bg-[#12181D] border border-slate-700 p-2 rounded text-xs text-white outline-none w-full resize-y"></textarea>
                           <input type="text" placeholder="Adresă Sediu Social Client" autoComplete="new-password" value={formData.clientAdresa || ''} onChange={e => setFormData({...formData, clientAdresa: e.target.value})} className="mt-2 p-2.5 bg-[#0B0F12] border border-slate-700 rounded text-xs text-white outline-none w-full" />
                         </div>
                       </div>
