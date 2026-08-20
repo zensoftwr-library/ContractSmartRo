@@ -2837,7 +2837,7 @@ export default function Home() {
                                <span className="text-xs font-bold text-white uppercase tracking-wider block">Aprobare și Semnare Dosar Auto</span>
                             </div>
                             <div className="flex bg-[#0B0F12] p-1 rounded-lg border border-slate-700/60 shadow-inner">
-                              <button type="button" onClick={() => { setAutoSignatureTab('draw'); curataCanvasAuto(); }} className={`px-4 py-1.5 rounded-md text-[10px] font-bold transition-all duration-200 ${autoSignatureTab === 'draw' ? 'bg-[#8ba888] text-black shadow-sm' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}>🖌️ Desenează</button>
+                              <button type="button" onClick={() => { setAutoSignatureTab('draw'); curataCanvasAuto(); }} className={`px-4 py-1.5 rounded-md text-[10px] font-bold transition-all duration-200 ${autoSignatureTab === 'draw' ? 'bg-[#8ba888] text-black shadow-sm' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}> Desenează</button>
                               <button type="button" onClick={() => { setAutoSignatureTab('upload'); curataCanvasAuto(); }} className={`px-4 py-1.5 rounded-md text-[10px] font-bold transition-all duration-200 ${autoSignatureTab === 'upload' ? 'bg-[#8ba888] text-black shadow-sm' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}>📁 Încarcă PNG/JPG</button>
                             </div>
                           </div>
