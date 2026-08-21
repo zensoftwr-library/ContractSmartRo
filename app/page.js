@@ -1622,7 +1622,8 @@ export default function Home() {
             </div>
 
             {/* QR CODE STUDIO */}
-          <div className="max-w-7xl mx-auto px-6 mt-16 pt-12 mb-6 relative z-10 text-center border-t border-slate-800/80">
+          <div className="max-w-6xl mx-auto border-t border-slate-800/80 pt-12 mt-8"></div>
+            <div className="max-w-7xl mx-auto px-6 mb-6 relative z-10 text-center">
             <span className="text-[#8ba888] text-[10px] font-black uppercase tracking-widest block mb-1">Ecosistem Digital Dinamic</span>
             <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">ContractSmart QR ProStudio</h2>
             <p className="text-xs text-slate-400 mt-1 max-w-lg mx-auto leading-relaxed">Generator multifuncțional avansat pentru extinderea capacităților digitale.</p>
