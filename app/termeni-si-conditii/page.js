@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import Navbar from '@/app/components/Navbar';
+import Navbar from '../components/Navbar';
 
 export default function TermeniSiConditii() {
   const [scrollPercent, setScrollPercent] = useState(0);
