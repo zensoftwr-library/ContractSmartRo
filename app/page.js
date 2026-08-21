@@ -13,6 +13,7 @@ import PricingAddons from './components/PricingAddons';
 import LiveNewsSection from './components/LiveNewsSection';
 import AnafWidget from './components/AnafWidget';
 import FiscalCalculator from './components/FiscalCalculator';
+import AiAuditWidget from './components/AiAuditWidget';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
@@ -1603,6 +1604,7 @@ export default function Home() {
             <HeroSection 
               onStartB2B={() => { setFormData(prev => ({ ...prev, tipContract: 'prestari' })); setStep(2); }} 
               onStartAuto={() => { setFormData(prev => ({ ...prev, tipContract: 'auto' })); setStep(2); }} 
+              onStartAudit={() => { setStep(3); }} 
             />
 
             {/* ADAUGAM PREȚURILE AICI ÎN PASUL 1 */}
@@ -2893,6 +2895,17 @@ export default function Home() {
               </a>
             </div>
           </div>
+        )}
+
+        {/* =========================================================================
+                                    STEP 3: AI AUDIT JURO-STYLE
+            ========================================================================= */}
+        {step === 3 && (
+          <AiAuditWidget 
+            handleInapoiPrincipal={() => setStep(1)} 
+            user={user} 
+            isPremium={isPremium} 
+          />
         )}
 
         <Footer handleInapoiPrincipal={handleInapoiPrincipal} />
