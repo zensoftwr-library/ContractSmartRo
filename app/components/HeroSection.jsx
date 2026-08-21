@@ -25,7 +25,7 @@ export default function HeroSection({ onStartB2B, onStartAuto, onStartAudit }) {
         </button>
       </div>
 
-      <div className="max-w-3xl mx-auto px-6 mt-12 mb-8 text-center animate-fadeIn">
+      <div className="max-w-3xl mx-auto px-6 mt-12 mb-0 text-center animate-fadeIn">
         <div className="inline-flex items-center justify-center gap-2 bg-[#8ba888]/10 border border-[#8ba888]/20 px-4 py-1.5 rounded-full mb-5">
           <span className="w-2 h-2 rounded-full bg-[#8ba888] animate-pulse"></span>
           <span className="text-[10px] uppercase font-black text-[#8ba888] tracking-widest">Protecție Completă</span>
