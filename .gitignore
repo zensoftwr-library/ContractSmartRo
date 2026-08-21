@@ -9,3 +9,5 @@ node_modules
 /playwright/.cache/
 /playwright/.auth/
 .env.local
+# Sentry Config File
+.env.sentry-build-plugin

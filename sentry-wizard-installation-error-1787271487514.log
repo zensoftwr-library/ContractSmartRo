@@ -1,0 +1,18 @@
+npm warn deprecated puppeteer@22.15.0: < 24.15.0 is no longer supported
+npm error code 1
+npm error path C:\Users\blana\Desktop\contracte-smart\node_modules\puppeteer
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c node install.mjs
+npm error Error: ERROR: Failed to set up Chrome v127.0.6533.88! Set "PUPPETEER_SKIP_DOWNLOAD" env variable to skip download.
+npm error     at file:///C:/Users/blana/Desktop/contracte-smart/node_modules/puppeteer/lib/esm/puppeteer/node/install.js:58:23
+npm error     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+npm error     at async Promise.all (index 0)
+npm error     at async downloadBrowser (file:///C:/Users/blana/Desktop/contracte-smart/node_modules/puppeteer/lib/esm/puppeteer/node/install.js:90:9) {
+npm error   [cause]: Error: The browser folder (C:\Users\blana\.cache\puppeteer\chrome\win64-127.0.6533.88) exists but the executable (C:\Users\blana\.cache\puppeteer\chrome\win64-127.0.6533.88\chrome-win64\chrome.exe) is missing
+npm error       at installUrl (file:///C:/Users/blana/Desktop/contracte-smart/node_modules/@puppeteer/browsers/lib/esm/install.js:114:23)
+npm error       at install (file:///C:/Users/blana/Desktop/contracte-smart/node_modules/@puppeteer/browsers/lib/esm/install.js:77:34)
+npm error       at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+npm error       at async Promise.all (index 0)
+npm error       at async downloadBrowser (file:///C:/Users/blana/Desktop/contracte-smart/node_modules/puppeteer/lib/esm/puppeteer/node/install.js:90:9)
+npm error }
+npm error A complete log of this run can be found in: C:\Users\blana\AppData\Local\npm-cache\_logs\2026-08-21T00_17_41_217Z-debug-0.log
