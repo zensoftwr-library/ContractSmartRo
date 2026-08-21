@@ -39,6 +39,24 @@ export async function POST(request) {
       }
     }
 
+    // --- VERIFICARE ANAF PRE-SEMNARE ---
+    
+    if (clientCui) {
+      const cleanCui = clientCui.replace(/[^0-9]/g, '');
+      if (cleanCui.length >= 5) {
+        const anafRes = await fetch(`https://api.contractsmart.ro/api/anaf?cui=${cleanCui}`);
+        const anafData = await anafRes.json();
+        
+        if (anafData.success && anafData.data?.stare && (anafData.data.stare.toUpperCase().includes('INACTIV') || anafData.data.stare.toUpperCase().includes('RADIAT'))) {
+          return NextResponse.json({ 
+            success: false, 
+            message: `Atenție! Firma ${anafData.data.denumire} are starea fiscală: ${anafData.data.stare}. Nu recomandăm semnarea contractului.` 
+          }, { status: 403 });
+        }
+      }
+    }
+    // ------------------------------------
+
     if (!userId) {
       return NextResponse.json({ success: false, message: 'Utilizator neautentificat.' }, { status: 401 });
     }

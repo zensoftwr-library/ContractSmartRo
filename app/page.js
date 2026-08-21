@@ -14,6 +14,7 @@ import LiveNewsSection from './components/LiveNewsSection';
 import AnafWidget from './components/AnafWidget';
 import FiscalCalculator from './components/FiscalCalculator';
 import AiAuditWidget from './components/AiAuditWidget';
+import ContractsDashboard from './components/ContractsDashboard';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
@@ -1938,6 +1939,13 @@ export default function Home() {
             </div>
 
             <PricingAddons handleCumparaPremium={handleCumparaPremium} />
+
+            {/* DASHBOARD-UL CRM PENTRU UTILIZATORII AUTENTIFICATI */}
+          {user && (
+            <div className="max-w-6xl mx-auto px-6 mb-12">
+              <ContractsDashboard userId={user.id} />
+            </div>
+          )}            
 
             <LiveNewsSection stiriLive={stiriLive} />
 
