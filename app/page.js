@@ -2924,6 +2924,37 @@ export default function Home() {
           />
         )}
 
+        {/* TRUST BADGES ENTERPRISE */}
+        <div className="max-w-6xl mx-auto px-6 my-16">
+          <div className="bg-[#12181D]/40 border border-slate-800/80 backdrop-blur-xl p-6 rounded-2xl flex flex-col md:flex-row items-center justify-around gap-6 text-center shadow-lg">
+            
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold border border-emerald-500/20">✓</div>
+              <div className="text-left">
+                <h4 className="text-xs font-bold text-white uppercase tracking-wider">Validare Fiscală ANAF</h4>
+                <p className="text-[10px] text-slate-400">Interogare directă în registre</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-[#8ba888]/10 text-[#8ba888] flex items-center justify-center font-bold border border-[#8ba888]/20">🛡️</div>
+              <div className="text-left">
+                <h4 className="text-xs font-bold text-white uppercase tracking-wider">Criptografie SHA-256</h4>
+                <p className="text-[10px] text-slate-400">Amprentă imuabilă în Smart Vault</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center font-bold border border-blue-500/20">⚖️</div>
+              <div className="text-left">
+                <h4 className="text-xs font-bold text-white uppercase tracking-wider">Codul Civil Român</h4>
+                <p className="text-[10px] text-slate-400">Conformitate Art. 1522 & 1538</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
         <Footer handleInapoiPrincipal={handleInapoiPrincipal} />
 
       </div>

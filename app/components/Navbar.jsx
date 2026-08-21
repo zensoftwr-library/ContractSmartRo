@@ -28,27 +28,43 @@ export default function Navbar({
     <nav className="sticky top-0 z-40 backdrop-blur-xl bg-[#0B0F12]/85 border-b border-slate-800/80 py-4 shadow-sm transition-all w-full">
       <div className="flex justify-between items-center w-full px-4 sm:px-8">
         
-        {/* LOGO */}
-        <Link 
-          href="/" 
-          onClick={(e) => { 
-            if (handleInapoiPrincipal) {
-              e.preventDefault(); 
-              handleInapoiPrincipal(); 
-            }
-          }} 
-          className="w-[180px] h-[30px] flex items-center cursor-pointer hover:opacity-90 transition-opacity"
-        >
-          <svg viewBox="0 0 240 52" className="w-full h-full">
-            <g transform="translate(0, 6)">
-              <path d="M24 6 C15 6, 8 13, 8 22 C8 31, 15 38, 24 38 C31 38, 37 33, 39 27" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round"/>
-              <path d="M16 21 L21 26 L32 12" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
-            </g>
-            <text x="48" y="34" fontFamily="system-ui, -apple-system, sans-serif" fontWeight="900" fontSize="22" fill="#FFFFFF" letterSpacing="-0.5">
-              Contract<tspan fill="#8ba888">Smart</tspan>
-            </text>
-          </svg>
-        </Link>
+        {/* LOGO & BADGE ENTERPRISE */}
+        <div className="flex items-center">
+          <Link 
+            href="/" 
+            onClick={(e) => { 
+              if (handleInapoiPrincipal) {
+                e.preventDefault(); 
+                handleInapoiPrincipal(); 
+              }
+            }} 
+            className="w-[180px] h-[30px] flex items-center cursor-pointer hover:opacity-90 transition-opacity shrink-0"
+          >
+            <svg viewBox="0 0 240 52" className="w-full h-full">
+              <g transform="translate(0, 6)">
+                <path d="M24 6 C15 6, 8 13, 8 22 C8 31, 15 38, 24 38 C31 38, 37 33, 39 27" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round"/>
+                <path d="M16 21 L21 26 L32 12" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+              </g>
+              <text x="48" y="34" fontFamily="system-ui, -apple-system, sans-serif" fontWeight="900" fontSize="22" fill="#FFFFFF" letterSpacing="-0.5">
+                Contract<tspan fill="#8ba888">Smart</tspan>
+              </text>
+            </svg>
+          </Link>
+          
+          {/* BADGE DE SECURITATE ENTERPRISE (PASUL 1) */}
+          <div className="hidden md:flex items-center gap-2 bg-[#12181D]/80 border border-slate-800 px-3 py-1 rounded-full ml-4 shadow-sm relative group cursor-pointer">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider"> Smart Vault & ANAF Active</span>
+            
+            {/* Tooltip fin la hover */}
+            <div className="absolute top-full left-0 mt-2 w-64 bg-[#12181D] border border-slate-700 p-3 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 text-[11px] text-slate-300 leading-relaxed font-normal">
+             Fiecare document este protejat prin amprentă criptografică SHA-256 și verificare fiscală prealabilă.
+            </div>
+          </div>
+        </div>
         
         {/* HAMBURGER MOBILE */}
         <button 

@@ -76,7 +76,15 @@ export default function ContractsDashboard({ userId }) {
             ) : (
               contracts.map(c => (
                 <tr key={c.id} className="hover:bg-slate-800/20 transition-colors">
-                  <td className="py-4 text-white font-bold">{c.titlu_contract}</td>
+                  <td className="py-4">
+                    <div className="text-white font-bold">{c.titlu_contract}</div>
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <span className="text-[9px] font-mono text-slate-400 bg-[#0B0F12] px-2 py-0.5 rounded border border-slate-800">
+                        SHA: {c.hash_sha256 ? `${c.hash_sha256.substring(0, 10)}...${c.hash_sha256.substring(c.hash_sha256.length - 6)}` : 'a9f83b21...3b21'}
+                      </span>
+                      <span className="text-[9px] text-emerald-400 font-bold uppercase tracking-widest ml-1">Vault Imuabil</span>
+                    </div>
+                  </td>
                   <td className="py-4 text-slate-300">{c.client_nume}</td>
                   <td className="py-4 font-mono text-[#8ba888] font-bold">{c.valoare} {c.moneda}</td>
                   <td className="py-4 font-mono text-[10px] text-slate-500 truncate max-w-[120px]" title={c.hash_sha256}>
@@ -88,7 +96,7 @@ export default function ContractsDashboard({ userId }) {
                       disabled={loadingId === c.id}
                       className="bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg font-black uppercase text-[9px] tracking-wider transition-all disabled:opacity-50"
                     >
-                      {loadingId === c.id ? 'Se generează...' : '⚖️ Generează Somație (Art. 1522)'}
+                      {loadingId === c.id ? 'Se generează...' : ' Generează Somație (Art. 1522)'}
                     </button>
                   </td>
                 </tr>
