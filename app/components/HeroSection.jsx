@@ -2,7 +2,7 @@
 
 export default function HeroSection({ onStartB2B, onStartAuto, onStartAudit }) {
   return (
-    <div className="max-w-4xl mx-auto py-12 px-4 text-center">
+    <div className="max-w-4xl mx-auto pt-12 pb-0 px-4 text-center">
       <div className="mb-10 text-center">
         <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight tracking-tighter mb-2 md:mb-4">
           Contracte <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8ba888] to-emerald-400">Inteligente</span>
