@@ -25,7 +25,7 @@ export default function Navbar({
   };
 
   return (
-    <nav className="sticky top-0 z-40 backdrop-blur-xl bg-[#0B0F12]/85 border-b border-slate-800/80 py-4 px-6 shadow-sm transition-all">
+    <nav className="sticky top-0 z-40 backdrop-blur-xl bg-[#0B0F12]/85 border-b border-slate-800/80 py-4 shadow-sm transition-all w-full">
       <div className="flex justify-between items-center w-full px-4 sm:px-8">
         
         {/* LOGO */}
@@ -126,7 +126,7 @@ export default function Navbar({
 
       {/* MENIU MOBIL */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden flex flex-col space-y-3 pt-5 mt-4 border-t border-slate-800/80 animate-fadeIn">
+        <div className="lg:hidden flex flex-col space-y-3 pt-5 mt-4 border-t border-slate-800/80 px-4 sm:px-8 animate-fadeIn">
           <Link href="/modele-contracte" className="text-sm font-bold text-slate-300 hover:text-white uppercase tracking-wider" onClick={() => setIsMobileMenuOpen(false)}>Modele Tipizate</Link>
           <Link href="/baza-legala" className="text-sm font-bold text-slate-300 hover:text-white uppercase tracking-wider" onClick={() => setIsMobileMenuOpen(false)}>Baza Legală</Link>
           <div className="h-[1px] w-full bg-slate-800/50 my-1"></div>
