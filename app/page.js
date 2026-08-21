@@ -1617,7 +1617,7 @@ export default function Home() {
             />
 
             {/* ADAUGAM PREȚURILE AICI ÎN PASUL 1 */}
-            <div className="-mt-4 mb-4 relative z-20">
+            <div className="-mt-16 relative z-20">
               <PricingPlans handleCumparaPremium={handleCumparaPremium} />
             </div>
 
@@ -1948,7 +1948,10 @@ export default function Home() {
               </div>
             </div>
 
-            <PricingAddons handleCumparaPremium={handleCumparaPremium} />
+            {/* SEPARATOR BORDER - EXTENSII QR */}
+            <div className="max-w-6xl mx-auto border-t border-slate-800/80 pt-16 mt-8">
+              <PricingAddons handleCumparaPremium={handleCumparaPremium} />
+            </div>
 
             {/* DASHBOARD-UL CRM PENTRU UTILIZATORII AUTENTIFICATI */}
           {user && (
