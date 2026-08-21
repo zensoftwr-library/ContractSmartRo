@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { bibliotecaLegala } from './bazaLegalaData';
+import Navbar from '@/app/components/Navbar';
 
 export default function BazaLegalaIndex() {
   const [articoleAfisate, setArticoleAfisate] = useState([]);
@@ -21,49 +22,7 @@ export default function BazaLegalaIndex() {
   return (
     <div className="min-h-screen bg-[#0B0F12] text-slate-300 font-sans selection:bg-[#8ba888]/30 selection:text-[#8ba888]">
       
-      {/* NAVBAR */}
-      <nav className="sticky top-0 z-40 backdrop-blur-xl bg-[#0B0F12]/80 border-b border-slate-800/80 py-4 px-6 shadow-sm transition-all">
-        <div className="flex justify-between items-center w-full max-w-7xl mx-auto">
-          <Link href="/" className="w-[180px] h-[30px] flex items-center cursor-pointer hover:opacity-90 transition-opacity">
-            <svg viewBox="0 0 240 40" className="w-full h-full">
-              <g transform="translate(0, 2)">
-                <path d="M24 6 C15 6, 8 13, 8 22 C8 31, 15 38, 24 38 C31 38, 37 33, 39 27" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round"/>
-                <path d="M16 21 L21 26 L32 12" fill="none" stroke="#8ba888" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
-              </g>
-              <text x="48" y="26" fontFamily="system-ui, -apple-system, sans-serif" fontWeight="900" fontSize="20" fill="#FFFFFF" letterSpacing="-0.5">
-                Contract<tspan fill="#8ba888">Smart</tspan>
-              </text>
-            </svg>
-          </Link>
-          
-          <button className="md:hidden text-[#8ba888] text-2xl" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-            {isMobileMenuOpen ? '✕' : '☰'}
-          </button>
-
-          <div className="hidden md:flex items-center space-x-5">
-            <Link href="/" className="text-xs text-slate-400 hover:text-white transition">Acasă</Link>
-            <span className="text-slate-800">|</span>
-            <Link href="/modele-contracte" className="text-xs text-slate-400 hover:text-white transition">Modele Contracte</Link>
-            <span className="text-slate-800">|</span>
-            <Link href="/baza-legala" className="text-xs text-[#8ba888] font-bold transition drop-shadow-[0_0_8px_rgba(139,168,136,0.3)]">Validitate Juridică</Link>
-            <span className="text-slate-800">|</span>
-            <Link href="/termeni-si-conditii" className="text-xs text-slate-400 hover:text-white transition">Termeni și Condiții</Link>
-            <span className="text-slate-800">|</span>
-            <Link href="/contact" className="text-xs text-slate-400 hover:text-white transition">Contact</Link>
-          </div>
-        </div>
-        {isMobileMenuOpen && (
-          <div className="md:hidden flex flex-col space-y-4 pt-4 mt-4 border-t border-slate-800/80 animate-fadeIn px-4 pb-2">
-            <Link href="/" className="text-sm text-slate-300 hover:text-white">Acasă</Link>
-            <Link href="/modele-contracte" className="text-sm text-slate-300 hover:text-white">Modele Contracte</Link>
-            <Link href="/baza-legala" className="text-sm text-[#8ba888] font-bold">Validitate Juridică</Link>
-            <Link href="/termeni-si-conditii" className="text-sm text-slate-300 hover:text-white">Termeni și Condiții</Link>
-            <Link href="/contact" className="text-sm text-slate-300 hover:text-white">Contact</Link>
-          </div>
-        )}
-      </nav>
-
-      {/* BACKGROUND EFFECTS */}
+            {/* BACKGROUND EFFECTS */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         <div className="absolute top-[5%] left-[50%] transform -translate-x-1/2 w-[90vw] h-[90vw] min-w-[800px] min-h-[800px] rounded-full"
           style={{ background: 'radial-gradient(circle, rgba(139, 168, 136, 0.04) 0%, rgba(11, 15, 18, 0) 60%)' }} />
