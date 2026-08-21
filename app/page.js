@@ -824,18 +824,25 @@ export default function Home() {
   useEffect(() => {
     const fetchUserProfile = async (userId, email) => {
       try {
-        const { data: profile } = await supabase.from('profiles').select('subscription_tier, credits_remaining, has_qr_branding, has_qr_vcard, has_qr_dynamic, has_qr_pdf, is_pro, is_enterprise, pro_reports_used').eq('id', userId).single();
+        // 1. Am adăugat 'ai_audits_used' în .select()
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('subscription_tier, credits_remaining, has_qr_branding, has_qr_vcard, has_qr_dynamic, has_qr_pdf, is_pro, is_enterprise, pro_reports_used, ai_audits_used')
+          .eq('id', userId)
+          .single();
+
         setUser({ 
           id: userId, 
           email: email, 
           status: profile?.subscription_tier || 'free', 
           credits: profile?.credits_remaining ?? 0,
-          proReportsUsed: profile?.pro_reports_used || 0
+          proReportsUsed: profile?.pro_reports_used || 0,
+          aiAuditsUsed: profile?.ai_audits_used || 0 // <-- 2. Am adăugat această linie
         });
         setProfil(profile);
         setUserTier(profile?.subscription_tier || 'free');
       } catch (err) {
-        setUser({ id: userId, email: email, status: 'free', credits: 0 });
+        setUser({ id: userId, email: email, status: 'free', credits: 0, aiAuditsUsed: 0 });
         setProfil({ subscription_tier: 'free', has_qr_branding: false, has_qr_vcard: false, has_qr_dynamic: false, has_qr_pdf: false, is_pro: false});
         setUserTier('free');
       }

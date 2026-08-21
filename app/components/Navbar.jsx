@@ -101,6 +101,9 @@ export default function Navbar({
                       <span className="text-[9px] uppercase font-bold bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700 shadow-sm">
                         {3 - (user?.proReportsUsed || 0)}/3 Rapoarte
                       </span>
+                      <span className="text-[9px] uppercase font-bold bg-purple-950/40 text-purple-300 px-2 py-0.5 rounded border border-purple-800/50 shadow-sm">
+                        {10 - (user?.aiAuditsUsed || 0)}/10 Audituri AI
+                      </span>
                     </>
                   ) : (
                     <>
@@ -157,6 +160,9 @@ export default function Navbar({
                       </span>
                       <span className="text-[10px] uppercase font-bold bg-slate-800 text-slate-300 px-2.5 py-1 rounded border border-slate-700 shadow-sm">
                         {3 - (user?.proReportsUsed || 0)}/3 Rapoarte
+                      </span>
+                      <span className="text-[10px] uppercase font-bold bg-purple-950/40 text-purple-300 px-2.5 py-1 rounded border border-purple-800/50 shadow-sm">
+                        {10 - (user?.aiAuditsUsed || 0)}/10 Audituri AI
                       </span>
                     </>
                   ) : (
