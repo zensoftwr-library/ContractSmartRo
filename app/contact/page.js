@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useState } from 'react';
-import Navbar from '@/app/components/Navbar';
+import Navbar from '../components/Navbar';
 
 export default function Contact() {
   const [formData, setFormData] = useState({ nume: '', email: '', subiect: '', mesaj: '' });

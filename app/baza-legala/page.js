@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { bibliotecaLegala } from './bazaLegalaData';
-import Navbar from '@/app/components/Navbar';
+import Navbar from '../components/Navbar';
 
 export default function BazaLegalaIndex() {
   const [articoleAfisate, setArticoleAfisate] = useState([]);

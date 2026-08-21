@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import '../globals.css';
-import Navbar from '@/app/components/Navbar';
+import Navbar from '../components/Navbar';
 
 export default function DespreNoi() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
