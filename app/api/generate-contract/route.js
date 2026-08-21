@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import crypto from 'crypto';
 import puppeteer from 'puppeteer';
 
 export const dynamic = 'force-dynamic';
@@ -500,6 +501,30 @@ export async function POST(request) {
     if (!isPremium && availableCredits > 0) {
       await supabase.from('profiles').update({ credits_remaining: availableCredits - 1 }).eq('id', userId);
     }
+
+    // --- SMART VAULT: Generare Amprentă Criptografică SHA-256 ---
+    const hashSha256 = crypto
+      .createHash('sha256')
+      .update(pdfBuffer)
+      .digest('hex');
+
+    // Salvăm contractul și amprenta în baza de date pentru Valoare Probatorie
+    const { error: dbError } = await supabase.from('user_contracts').insert({
+      user_id: userId,
+      titlu_contract: `Contract ${tipContract || 'prestari'}`,
+      tip_contract: tipContract || 'prestari',
+      client_nume: clientNume || 'N/A',
+      client_cui: clientCui || null,
+      valoare: valoare ? Number(valoare) : 0,
+      moneda: moneda || 'RON',
+      hash_sha256: hashSha256,
+      stare_plata: 'generat'
+    });
+
+    if (dbError) {
+      console.error("❌ Eroare salvare Smart Vault în DB:", dbError.message);
+    }
+    // -------------------------------------------------------------
 
     return new NextResponse(pdfBuffer, { 
       status: 200, 
