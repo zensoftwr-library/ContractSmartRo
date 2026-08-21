@@ -114,12 +114,12 @@ export default function TermeniSiConditii() {
             </h2>
             <div className="relative z-10 space-y-4">
               <p>
-                <strong className="text-red-400 font-bold">ATENȚIE: Platforma ContractSmart NU este o casă de avocatură, un birou notarial sau o firmă de consultanță juridică/fiscală.</strong> Platforma operează ca o soluție de tip <span className="italic">Software-as-a-Service (SaaS)</span> care pune la dispoziția utilizatorilor șabloane dinamice cu un grad înalt de automatizare.
+                <strong className="text-red-400 font-bold">ATENȚIE: Platforma ContractSmart NU este o casă de avocatură, un birou notarial sau o firmă de consultanță juridică/fiscală.</strong> Platforma operează ca o soluție de tip <span className="italic">Software-as-a-Service (SaaS)</span> care pune la dispoziția utilizatorilor șabloane dinamice și instrumente automate de audit.
               </p>
               <ul className="list-disc pl-5 space-y-3 text-slate-400">
-                <li>Documentele generate reprezintă puncte de plecare (draft-uri) bazate pe legislația generală, însă <strong className="text-white">nu garantează</strong> acoperirea tuturor spețelor individuale sau modificărilor legislative de ultimă oră.</li>
-                <li>Orice document generat <strong className="text-white">trebuie revizuit obligatoriu de către un avocat sau consilier juridic</strong> înainte de semnare.</li>
-                <li>Compania ZenSoftWare nu răspunde pentru daune financiare, litigii, amenzi, anularea tranzacțiilor, recalificări fiscale (ANAF) sau alte prejudicii rezultate din utilizarea documentelor sau rapoartelor financiare generate pe această platformă.</li>
+                <li>Rapoartele de risc generate de modulul <strong className="text-white">AI Contract Review</strong> au caracter pur informativ și tehnic, bazat pe inteligență artificială, neconstituind consultanță juridică oficială.</li>
+                <li>Documentele generate sau auditate <strong className="text-white">trebuie revizuite obligatoriu de către un avocat sau consilier juridic</strong> înainte de orice decizie comercială sau semnare.</li>
+                <li>Compania ZenSoftWare nu răspunde pentru daune financiare, litigii, amenzi, anularea tranzacțiilor, recalificări fiscale (ANAF) sau alte prejudicii rezultate din utilizarea documentelor, rapoartelor AI sau validărilor fiscale de pe platformă.</li>
               </ul>
             </div>
           </section>
@@ -140,23 +140,23 @@ export default function TermeniSiConditii() {
               </div>
 
               <div className="bg-[#0B0F12] p-5 rounded-xl border border-slate-800/60 transition-colors hover:border-[#8ba888]/20">
-                <h3 className="text-[#8ba888] font-bold text-xs uppercase tracking-wider mb-2">2.2. Rapoarte ANAF</h3>
+                <h3 className="text-[#8ba888] font-bold text-xs uppercase tracking-wider mb-2">2.2. Rapoarte & Validare ANAF</h3>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Rapoartele financiare sunt extrase prin interogarea unor surse publice (inclusiv API-uri). Nu garantăm acuratețea 100% în timp real a stării fiscale. Aceste rapoarte au strict un caracter informativ.
+                  Interogările stării fiscale se fac prin surse publice. Alertele de pre-semnare au rol de prevenție. Nu garantăm acuratețea 100% în timp real a stării fiscale afișate de bazele de date administrative.
                 </p>
               </div>
 
               <div className="bg-[#0B0F12] p-5 rounded-xl border border-slate-800/60 transition-colors hover:border-[#8ba888]/20">
-                <h3 className="text-[#8ba888] font-bold text-xs uppercase tracking-wider mb-2">2.3. Funcția OCR (AI)</h3>
+                <h3 className="text-[#8ba888] font-bold text-xs uppercase tracking-wider mb-2">2.3. AI Contract Review (Audit)</h3>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Scanarea documentelor folosește algoritmi AI de extragere a textului. Ne rezervăm dreptul la o marjă de eroare tehnică. <strong className="text-white">Este obligația dumneavoastră să verificați datele extrase</strong> înainte de generarea PDF-urilor.
+                  Scanarea și evaluarea clauzelor externe folosesc modele generative avansate. Algoritmul poate prezenta erori de interpretare contextuală. Utilizatorul are obligația de a verifica manual toate clauzele semnalate ca toxice.
                 </p>
               </div>
 
               <div className="bg-[#0B0F12] p-5 rounded-xl border border-slate-800/60 transition-colors hover:border-[#8ba888]/20">
-                <h3 className="text-[#8ba888] font-bold text-xs uppercase tracking-wider mb-2">2.4. QR ProStudio</h3>
+                <h3 className="text-[#8ba888] font-bold text-xs uppercase tracking-wider mb-2">2.4. Smart Vault (SHA-256)</h3>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Abonamentele permit generarea de QR-uri dinamice și găzduire PDF. Ne rezervăm dreptul de a dezactiva codurile QR care redirecționează către conținut ilegal, malițios sau care încalcă legislația.
+                  Sistemul generează amprente criptografice unice (hash SHA-256) pentru documentele generate. Portalul public de verificare confirmă exclusiv identitatea matematică a amprentei stocate în baza noastră de date.
                 </p>
               </div>
             </div>

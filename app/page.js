@@ -167,7 +167,8 @@ const gumroadLinks = {
   qr_dynamic: 'https://zensoftware.gumroad.com/l/qr-dinamic',
   sablon_tipizat: 'https://zensoftware.gumroad.com/l/sablon-tipizat-legal',
   one_time_contract: 'https://zensoftware.gumroad.com/l/contract-b2b',
-  raport_detaliat: 'https://zensoftware.gumroad.com/l/raport-companie'
+  raport_detaliat: 'https://zensoftware.gumroad.com/l/raport-companie',
+  ai_audit_pack: 'https://zensoftware.gumroad.com/l/wuwjp'
 };
 
 export default function Home() {

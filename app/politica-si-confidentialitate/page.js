@@ -64,7 +64,7 @@ export default function PoliticaConfidentialitate() {
         <div className="text-center mb-16 border-b border-slate-800/80 pb-10">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#16221A] border border-[#8ba888]/20 text-[#8ba888] text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
             <span className="relative flex h-1.5 w-1.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span></span>
-            Sistem Prelucrare Tranzitorie (RAM)
+            Sistem Prelucrare Tranzitorie (RAM) & Criptografie Vault
           </div>
           <h1 className="text-4xl md:text-5xl font-black text-white leading-tight tracking-tighter mb-5">
             Politica de <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8ba888] to-emerald-400">Confidențialitate</span>
@@ -91,25 +91,25 @@ export default function PoliticaConfidentialitate() {
           <section className="bg-[#12181D]/40 border border-slate-800/80 p-6 md:p-8 rounded-2xl shadow-lg hover:border-[#8ba888]/30 transition-colors">
             <h2 className="text-lg font-black text-white mb-5 flex items-center gap-3">
               <span className="w-8 h-8 rounded-lg bg-[#8ba888]/20 flex items-center justify-center text-[#8ba888] font-black text-sm border border-[#8ba888]/30">2</span>
-              Prelucrare Tranzitorie (Fără Stocare)
+              Prelucrare Tranzitorie și Stocarea Metadatelor (Smart Vault)
             </h2>
             <p className="text-sm leading-relaxed text-slate-300 mb-4">
-              Pentru a asigura confidențialitatea absolută (în special la modulul OCR), aplicăm următoarele reguli tehnice:
+              Pentru a asigura confidențialitatea absolută, aplicăm următoarele reguli tehnice:
             </p>
             <ul className="space-y-3 text-sm text-slate-400">
               <li className="flex gap-3"><span className="text-[#8ba888]">▹</span> <strong>Procesare Exclusiv în RAM:</strong> Documentele încărcate sunt procesate strict în memoria volatilă pe durata a câteva secunde.</li>
-              <li className="flex gap-3"><span className="text-[#8ba888]">▹</span> <strong>Ștergere Automată:</strong> Imediat după generarea documentului, orice fișier sursă sau fotografie cu act de identitate este distrus automat și ireversibil.</li>
-              <li className="flex gap-3"><span className="text-[#8ba888]">▹</span> <strong>Fără Baze de Date:</strong> Nu salvăm profiluri ascunse, nu reținem serii de șasiu, CNP-uri sau detalii de tranzacții pe hard disk-urile noastre.</li>
+              <li className="flex gap-3"><span className="text-[#8ba888]">▹</span> <strong>Audit AI Extern:</strong> Fișierele trimise către modulul de audit AI sunt procesate prin intermediul algoritmilor securizați (Google Gemini), fără a fi stocate permanent pe serverele terțe ale furnizorului de inteligență artificială.</li>
+              <li className="flex gap-3"><span className="text-[#8ba888]">▹</span> <strong>Smart Vault & CRM:</strong> În vederea funcționării istoricfului din CRM și a verificării criptografice (hash SHA-256), platforma stochează în baza de date Supabase strict metadatele esențiale (titlu contract, nume client, CUI, valoare, dată și amprenta unică).</li>
             </ul>
           </section>
 
           <section className="bg-[#12181D]/40 border border-slate-800/80 p-6 md:p-8 rounded-2xl shadow-lg hover:border-[#8ba888]/30 transition-colors">
             <h2 className="text-lg font-black text-white mb-4 flex items-center gap-3">
               <span className="w-8 h-8 rounded-lg bg-[#8ba888]/20 flex items-center justify-center text-[#8ba888] font-black text-sm border border-[#8ba888]/30">3</span>
-              Scopul Colectării
+              Scopul Colectării și Interogări ANAF
             </h2>
             <p className="text-sm leading-relaxed text-slate-300">
-              Datele sunt prelucrate strict pentru un singur scop: <strong>facilitarea și automatizarea generării contractelor</strong> solicitate în mod direct de către utilizator. Nu realizăm profilări și nu vindem datele către terți.
+              Datele sunt prelucrate strict pentru facilitarea generării documentelor, verificarea fiscală preventivă prin interogarea registrelor publice (ANAF) și menținerea istoricului în contul utilizatorului. Nu realizăm profilări comerciale și nu vindem datele către terți.
             </p>
           </section>
 
@@ -129,7 +129,7 @@ export default function PoliticaConfidentialitate() {
               Drepturile Dumneavoastră și ANSPDCP
             </h2>
             <p className="text-sm leading-relaxed text-slate-300 mb-5">
-              Conform GDPR, beneficiați de dreptul la informare, acces, rectificare și ștergere. Având în vedere că datele introduse în formulare nu sunt stocate permanent, ștergerea are loc automat la finalizarea sesiunii de utilizare a platformei.
+              Conform GDPR, beneficiați de dreptul la informare, acces, rectificare și ștergere a datelor asociate contului dumneavoastră din platformă, putând solicita oricând eliminarea istoriccului din baza de date.
             </p>
             <p className="text-sm leading-relaxed text-slate-300">
               Dacă considerați că drepturile privind protecția datelor v-au fost încălcate, aveți dreptul de a depune o plângere la Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal (ANSPDCP):
