@@ -26,6 +26,9 @@ export default function TermeniSiConditii() {
         '--scroll-y': `${scrollPercent * 100}%`,
       }}
     >
+
+      <Navbar />
+
             {/* PREMIUM CINEMATIC LIGHT LEAKS (BACKGROUND) */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         <div className="absolute top-[5%] left-[50%] transform -translate-x-1/2 w-[90vw] h-[90vw] min-w-[800px] min-h-[800px] rounded-full"

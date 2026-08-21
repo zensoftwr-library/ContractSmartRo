@@ -321,6 +321,8 @@ export default function ModeleContracte() {
   return (
     <div className="min-h-screen bg-[#0B0F12] text-slate-200 font-sans selection:bg-[#8ba888]/30 selection:text-[#8ba888]">
       
+<Navbar />
+
             {/* BACKGROUND EFFECTS */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         <div className="absolute top-[5%] left-[50%] transform -translate-x-1/2 w-[90vw] h-[90vw] min-w-[800px] min-h-[800px] rounded-full"
