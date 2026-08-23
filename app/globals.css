@@ -102,7 +102,7 @@ html.matcha-light-theme svg text tspan {
   fill: #8ba888 !important;
 }
 
-/* 2. Forțăm vizibilitatea absolută a imaginilor și elementelor media (inclusiv stiri) */
+/* 2. Forțăm vizibilitatea absolută a imaginilor (inclusiv stiri) */
 html.matcha-light-theme img,
 html.matcha-light-theme picture,
 html.matcha-light-theme figure {
@@ -110,13 +110,6 @@ html.matcha-light-theme figure {
   opacity: 1 !important;
   visibility: visible !important;
   filter: none !important;
-}
-
-html.matcha-light-theme .aspect-video,
-html.matcha-light-theme [class*="h-48"],
-html.matcha-light-theme [class*="h-40"] {
-  background-color: #f1f5f9 !important;
-  border-color: #cbd5e1 !important;
 }
 
 /* 3. Forțăm orice container, card, meniu fix, modal sau secțiune întunecată */
@@ -151,15 +144,10 @@ html.matcha-light-theme [class*="bg-[#0B0F12]"] {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
 }
 
-html.matcha-light-theme .bg-black *,
-html.matcha-light-theme [class*="bg-black"] *,
-html.matcha-light-theme [class*="from-black"] *,
-html.matcha-light-theme div.bg-gradient-to-b *,
-html.matcha-light-theme div[class*="from-[#16221A]"] *,
-html.matcha-light-theme span[class*="bg-black"] *,
-html.matcha-light-theme div[class*="bg-black"] *,
-html.matcha-light-theme [class*="bg-slate-900"] *,
-html.matcha-light-theme [class*="bg-[#0B0F12]"] * {
+/* Elementele generice din interiorul blocului închis devin închise, dar protejăm culorile din footer */
+html.matcha-light-theme .bg-black *:not([class*="text-red-"]):not([class*="text-emerald-"]):not([class*="text-amber-"]):not([class*="text-[#8ba888]"]),
+html.matcha-light-theme [class*="bg-black"] *:not([class*="text-red-"]):not([class*="text-emerald-"]):not([class*="text-amber-"]):not([class*="text-[#8ba888]"]),
+html.matcha-light-theme [class*="bg-[#0B0F12]"] *:not([class*="text-red-"]):not([class*="text-emerald-"]):not([class*="text-amber-"]):not([class*="text-[#8ba888]"]) {
   color: #1f2937 !important;
 }
 
@@ -186,15 +174,16 @@ html.matcha-light-theme hr {
   border-color: var(--border-color) !important;
 }
 
-/* 7. Transformarea tuturor textelor albe/deschise în text închis lizibil de zi */
-html.matcha-light-theme .text-white,
+/* 7. Transformarea textelor generice în text închis lizibil de zi (Păstrând culorile din Footer/Disclaimer) */
 html.matcha-light-theme h1,
 html.matcha-light-theme h2,
 html.matcha-light-theme h3,
-html.matcha-light-theme h4,
-html.matcha-light-theme strong,
-html.matcha-light-theme span,
-html.matcha-light-theme p {
+html.matcha-light-theme h4 {
+  color: var(--text-main) !important;
+}
+
+html.matcha-light-theme p:not(:has(strong[class*="text-"])),
+html.matcha-light-theme span:not([class*="text-"]):not(:has(strong)) {
   color: var(--text-main) !important;
 }
 
@@ -218,7 +207,6 @@ html.matcha-light-theme select {
 /* FIXURI Punctuale (Cameră Live Auto & Casetă Total Fiscal)  */
 /* ========================================================== */
 
-/* Butoanele de cameră live din secțiunea Acte Auto */
 html.matcha-light-theme button.bg-\[\#1e293b\],
 html.matcha-light-theme button[class*="bg-[#1e293b]"] {
   background-color: #f1f5f9 !important;
@@ -228,22 +216,4 @@ html.matcha-light-theme button[class*="bg-[#1e293b]"] {
 html.matcha-light-theme button.bg-\[\#1e293b\] svg,
 html.matcha-light-theme button[class*="bg-[#1e293b]"] svg {
   color: #334155 !important;
-}
-
-/* Caseta de total / profit curat net din Calculatorul Fiscal și badge-urile mici de valoare */
-html.matcha-light-theme div[class*="bg-[#0B0F12]"],
-html.matcha-light-theme div[class*="bg-black"],
-html.matcha-light-theme span[class*="bg-black"],
-html.matcha-light-theme div[class*="bg-[#12181D]"] {
-  background-color: #f1f5f9 !important;
-  border: 1px solid #cbd5e1 !important;
-}
-html.matcha-light-theme div[class*="bg-[#0B0F12]"] span,
-html.matcha-light-theme div[class*="bg-[#0B0F12]"] p,
-html.matcha-light-theme div[class*="bg-[#0B0F12]"] div,
-html.matcha-light-theme div[class*="bg-black"] span,
-html.matcha-light-theme div[class*="bg-black"] p,
-html.matcha-light-theme div[class*="bg-black"] div,
-html.matcha-light-theme span[class*="bg-black"] {
-  color: #1f2937 !important;
 }
