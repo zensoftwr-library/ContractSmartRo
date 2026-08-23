@@ -94,7 +94,15 @@ html.matcha-light-theme body {
   color: var(--text-main) !important;
 }
 
-/* 1. Forțăm orice container, card, meniu fix, modal sau secțiune întunecată să devină alb curat */
+/* 1. Fix Logo SVG în Modul Zi (Cuvântul Contract devine negru vizibil) */
+html.matcha-light-theme svg text {
+  fill: #1f2937 !important;
+}
+html.matcha-light-theme svg text tspan {
+  fill: #8ba888 !important;
+}
+
+/* 2. Forțăm orice container, card, meniu fix, modal sau secțiune întunecată */
 html.matcha-light-theme [class*="bg-[#0B0F12]"],
 html.matcha-light-theme [class*="bg-[#12181D]"],
 html.matcha-light-theme [class*="bg-[#0c1014]"],
@@ -109,12 +117,15 @@ html.matcha-light-theme nav {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
 }
 
-/* 2. Cardul VIP Fondator și orice card/container cu fundal negru/gradient închis */
+/* 3. Cardul VIP Fondator și orice card/container cu fundal negru/gradient închis */
+html.matcha-light-theme img {
+  display: block !important;
+  opacity: 1 !important;
+}
+
 html.matcha-light-theme .bg-black,
 html.matcha-light-theme [class*="bg-black"],
-html.matcha-light-theme [class*="from-black"],
-html.matcha-light-theme div[class*="rounded-2xl"]:has(.text-amber-400),
-html.matcha-light-theme div[class*="rounded-xl"]:has(.text-amber-400) {
+html.matcha-light-theme [class*="from-black"] {
   background: #ffffff !important;
   background-image: none !important;
   border: 1px solid #cbd5e1 !important;
@@ -122,9 +133,11 @@ html.matcha-light-theme div[class*="rounded-xl"]:has(.text-amber-400) {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
 }
 
-/* 3. Toate badge-urile, pill-urile mici și tag-urile întunecate de pe pagini */
+/* 4. Toate badge-urile, pill-urile mici și tag-urile întunecate (Live Preview, Actualizat Live etc.) */
 html.matcha-light-theme div[class*="rounded-full"],
 html.matcha-light-theme span[class*="rounded-full"],
+html.matcha-light-theme div[class*="rounded-md"],
+html.matcha-light-theme span[class*="rounded-md"],
 html.matcha-light-theme div[class*="bg-slate-"],
 html.matcha-light-theme span[class*="bg-slate-"],
 html.matcha-light-theme div[class*="bg-emerald-"],
@@ -135,14 +148,14 @@ html.matcha-light-theme div[class*="bg-[#16221A]"] {
   border: 1px solid #cbd5e1 !important;
 }
 
-/* 4. Borduri deschise */
+/* 5. Borduri deschise */
 html.matcha-light-theme [class*="border-slate-"],
 html.matcha-light-theme [class*="border-gray-"],
 html.matcha-light-theme [class*="border-zinc-"] {
   border-color: var(--border-color) !important;
 }
 
-/* 5. Transformarea tuturor textelor albe/deschise în text închis lizibil de zi */
+/* 6. Transformarea tuturor textelor albe/deschise în text închis lizibil de zi */
 html.matcha-light-theme .text-white,
 html.matcha-light-theme h1,
 html.matcha-light-theme h2,
@@ -161,7 +174,7 @@ html.matcha-light-theme .text-gray-400 {
   color: var(--text-muted) !important;
 }
 
-/* 6. Câmpuri de formular */
+/* 7. Câmpuri de formular */
 html.matcha-light-theme input, 
 html.matcha-light-theme textarea, 
 html.matcha-light-theme select {
@@ -186,9 +199,11 @@ html.matcha-light-theme button[class*="bg-[#1e293b]"] svg {
   color: #334155 !important;
 }
 
-/* Casetă total / profit curat net din Calculatorul Fiscal */
+/* Caseta de total / profit curat net din Calculatorul Fiscal și badge-urile mici de valoare */
 html.matcha-light-theme div[class*="bg-[#0B0F12]"],
-html.matcha-light-theme div[class*="bg-black"] {
+html.matcha-light-theme div[class*="bg-black"],
+html.matcha-light-theme span[class*="bg-black"],
+html.matcha-light-theme div[class*="bg-[#12181D]"] {
   background-color: #f1f5f9 !important;
   border: 1px solid #cbd5e1 !important;
 }
@@ -197,6 +212,7 @@ html.matcha-light-theme div[class*="bg-[#0B0F12]"] p,
 html.matcha-light-theme div[class*="bg-[#0B0F12]"] div,
 html.matcha-light-theme div[class*="bg-black"] span,
 html.matcha-light-theme div[class*="bg-black"] p,
-html.matcha-light-theme div[class*="bg-black"] div {
+html.matcha-light-theme div[class*="bg-black"] div,
+html.matcha-light-theme span[class*="bg-black"] {
   color: #1f2937 !important;
 }

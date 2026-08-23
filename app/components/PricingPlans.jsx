@@ -2,12 +2,14 @@
 
 export default function PricingPlans({ handleCumparaPremium }) {
   return (
+    
     <div id="sectiune-preturi" className="max-w-6xl mx-auto px-4 mt-20 mb-20 scroll-mt-20">
-      {/* Antet Centrat */}
-      <div className="text-center border-b border-slate-800/80 pb-8 mb-10">
-        <span className="text-[#8ba888] text-[10px] font-black uppercase tracking-widest block mb-2">Ecosistem ContractSmart</span>
-        <h2 className="text-3xl font-black text-white tracking-tight">Planuri de Business & Tranzacții</h2>
-      </div>
+      <div className="max-w-6xl mx-auto border-t border-slate-800/80 pt-12 mt-8"></div>
+        {/* Antet Centrat */}
+        <div className="text-center border-b border-slate-800/80 pb-8 mb-10">
+          <span className="text-[#8ba888] text-[10px] font-black uppercase tracking-widest block mb-2">Ecosistem ContractSmart</span>
+          <h2 className="text-3xl font-black text-white tracking-tight">Planuri de Business & Tranzacții</h2>
+        </div>
 
       {/* Grid Principal - 3 Coloane pentru B2B, Auto, PRO */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center mb-6">
