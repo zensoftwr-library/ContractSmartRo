@@ -1702,11 +1702,9 @@ const reseteazaSemnaturiB2B = () => {
             />
 
             {/* ADAUGAM PREȚURILE AICI ÎN PASUL 1 */}
-            {user?.status !== 'founder' && (
-              <div className="-mt-16 relative z-20">
-                <PricingPlans handleCumparaPremium={handleCumparaPremium} />
-              </div>
-            )}
+            <div className="-mt-16 relative z-20">
+              <PricingPlans handleCumparaPremium={handleCumparaPremium} user={user} />
+            </div>
 
             {/* QR CODE STUDIO */}
           <div className="max-w-6xl mx-auto border-t border-slate-800/80 pt-12 mt-8"></div>
@@ -2040,8 +2038,7 @@ const reseteazaSemnaturiB2B = () => {
             {/* SEPARATOR BORDER - EXTENSII QR */}
             {user?.status !== 'founder' && (
               <div className="max-w-6xl mx-auto border-t border-slate-800/80 pt-16 mt-8 w-full px-4">
-                <PricingAddons handleCumparaPremium={handleCumparaPremium} />
-              </div>
+                <PricingAddons handleCumparaPremium={handleCumparaPremium} user={user} />              </div>
             )}
 
                       </div>

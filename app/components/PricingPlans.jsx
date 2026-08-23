@@ -1,8 +1,9 @@
 'use client';
 
-export default function PricingPlans({ handleCumparaPremium }) {
+export default function PricingPlans({ handleCumparaPremium, user }) {
+  const isFounder = user?.status === 'founder';
+
   return (
-    
     <div id="sectiune-preturi" className="max-w-6xl mx-auto px-4 mt-20 mb-20 scroll-mt-20">
       <div className="max-w-6xl mx-auto border-t border-slate-800/80 pt-12 mt-8"></div>
         {/* Antet Centrat */}
@@ -24,7 +25,13 @@ export default function PricingPlans({ handleCumparaPremium }) {
             <div className="text-xl font-black text-[#8ba888] mt-1 mb-2">19 RON <span className="text-[9px] text-slate-500 font-normal">(~3.99 €)</span></div>
             <p className="text-[10px] text-slate-400 leading-relaxed mb-4">Plătești strict pentru documentul generat. Ideal pentru nevoi punctuale.</p>
           </div>
-          <button type="button" onClick={() => handleCumparaPremium('one_time_contract')} className="w-full bg-[#0B0F12] border border-slate-700 hover:bg-slate-800 text-white font-bold py-2.5 rounded-lg text-xs transition-colors shadow-sm">Cumpără 3.99 €</button>
+          {isFounder ? (
+            <div className="w-full text-center py-2 text-emerald-400 font-black text-[10px] uppercase tracking-wider bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+              Inclus în contul tău VIP
+            </div>
+          ) : (
+            <button type="button" onClick={() => handleCumparaPremium('one_time_contract')} className="w-full bg-[#0B0F12] border border-slate-700 hover:bg-slate-800 text-white font-bold py-2.5 rounded-lg text-xs transition-colors shadow-sm">Cumpără 3.99 €</button>
+          )}
         </div>
 
         {/* Onetime Auto */}
@@ -38,7 +45,13 @@ export default function PricingPlans({ handleCumparaPremium }) {
             <div className="text-xl font-black text-white mt-1 mb-2">99 RON <span className="text-[9px] text-slate-500 font-normal">(~19.99 €)</span></div>
             <p className="text-[10px] text-slate-400 leading-relaxed mb-4">5 exemplare DITL, PV + ghid complet automatizat post-vânzare.</p>
           </div>
-          <button type="button" onClick={() => handleCumparaPremium('contract_auto')} className="w-full bg-blue-600/10 border border-blue-500/30 hover:bg-blue-600 hover:text-white text-blue-400 font-bold py-2.5 rounded-lg text-xs transition-colors shadow-sm">Cumpără 19.99 €</button>
+          {isFounder ? (
+            <div className="w-full text-center py-2 text-emerald-400 font-black text-[10px] uppercase tracking-wider bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+              Inclus în contul tău VIP
+            </div>
+          ) : (
+            <button type="button" onClick={() => handleCumparaPremium('contract_auto')} className="w-full bg-blue-600/10 border border-blue-500/30 hover:bg-blue-600 hover:text-white text-blue-400 font-bold py-2.5 rounded-lg text-xs transition-colors shadow-sm">Cumpără 19.99 €</button>
+          )}
         </div>
 
         {/* PRO */}
@@ -52,7 +65,13 @@ export default function PricingPlans({ handleCumparaPremium }) {
             <div className="text-xl font-black text-white mt-1 mb-2">99 RON <span className="text-[9px] text-slate-500 font-normal">/lună (~19.99 €)</span></div>
             <p className="text-[10px] text-slate-400 leading-relaxed mb-4">Contracte B2B nelimitate + Mega-QR Studio (Smart, Geo, Landing).</p>
           </div>
-          <button type="button" onClick={() => handleCumparaPremium('pro')} className="w-full bg-[#8ba888] text-[#0B0F12] hover:opacity-90 font-black py-2.5 rounded-lg text-xs transition-opacity shadow-sm">Abonează-te</button>
+          {isFounder ? (
+            <div className="w-full text-center py-2 text-emerald-400 font-black text-[10px] uppercase tracking-wider bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+              Inclus în contul tău VIP
+            </div>
+          ) : (
+            <button type="button" onClick={() => handleCumparaPremium('pro')} className="w-full bg-[#8ba888] text-[#0B0F12] hover:opacity-90 font-black py-2.5 rounded-lg text-xs transition-opacity shadow-sm">Abonează-te</button>
+          )}
         </div>
 
       </div>
@@ -81,13 +100,19 @@ export default function PricingPlans({ handleCumparaPremium }) {
             <span className="text-2xl font-black text-white block">999 RON</span>
             <span className="text-[9px] text-amber-400 uppercase font-bold tracking-wider block">Unică / Pe Viață</span>
           </div>
-          <button 
-            type="button" 
-            onClick={() => handleCumparaPremium('founder')} 
-            className="bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-500 text-black hover:opacity-95 font-black px-6 py-3.5 rounded-xl text-xs uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(245,158,11,0.3)] shrink-0 active:scale-95"
-          >
-            Devino Fondator VIP
-          </button>
+          {isFounder ? (
+            <div className="text-center py-2 px-4 text-emerald-400 font-black text-[10px] uppercase tracking-wider bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
+              Activ în contul tău
+            </div>
+          ) : (
+            <button 
+              type="button" 
+              onClick={() => handleCumparaPremium('founder')} 
+              className="bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-500 text-black hover:opacity-95 font-black px-6 py-3.5 rounded-xl text-xs uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(245,158,11,0.3)] shrink-0 active:scale-95"
+            >
+              Devino Fondator VIP
+            </button>
+          )}
         </div>
       </div>
 

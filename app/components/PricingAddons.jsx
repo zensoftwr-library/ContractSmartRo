@@ -1,6 +1,8 @@
 'use client';
 
-export default function PricingAddons({ handleCumparaPremium }) {
+export default function PricingAddons({ handleCumparaPremium, user }) {
+  const isFounder = user?.status === 'founder';
+
   return (
     <div className="max-w-6xl mx-auto px-4 mb-20 mt-4">
       <div className="pb-4 mb-6 text-center">
@@ -20,7 +22,13 @@ export default function PricingAddons({ handleCumparaPremium }) {
             <div className="text-xl font-black text-white mt-1 mb-2">49 RON <span className="text-[9px] text-slate-500 font-normal">(~9.99 €)</span></div>
             <p className="text-[10px] text-slate-400 leading-relaxed mb-4">Contracte PDF standard, gata redactate și verificate juridic.</p>
           </div>
-          <button type="button" onClick={() => handleCumparaPremium('sablon_tipizat')} className="w-full bg-[#0B0F12] border border-slate-700 hover:bg-slate-800 text-white font-bold py-2 rounded-lg text-xs transition-colors shadow-sm">Cumpără 9.99 €</button>
+          {isFounder ? (
+            <div className="w-full text-center py-2 text-emerald-400 font-black text-[9px] uppercase tracking-wider bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+              Inclus VIP
+            </div>
+          ) : (
+            <button type="button" onClick={() => handleCumparaPremium('sablon_tipizat')} className="w-full bg-[#0B0F12] border border-slate-700 hover:bg-slate-800 text-white font-bold py-2 rounded-lg text-xs transition-colors shadow-sm">Cumpără 9.99 €</button>
+          )}
         </div>
 
         {/* QR Branding */}
@@ -33,7 +41,13 @@ export default function PricingAddons({ handleCumparaPremium }) {
             <div className="text-xl font-black text-white mt-1 mb-2">49 RON <span className="text-[9px] text-slate-500 font-normal">(~9.99 €)</span></div>
             <p className="text-[10px] text-slate-400 leading-relaxed mb-4">Adaugă logo-ul companiei tale în centrul codului QR generat.</p>
           </div>
-          <button type="button" onClick={() => handleCumparaPremium('qr_branding')} className="w-full bg-[#0B0F12] border border-slate-700 hover:bg-slate-800 text-white font-bold py-2 rounded-lg text-xs transition-colors shadow-sm">Cumpără 9.99 €</button>
+          {isFounder ? (
+            <div className="w-full text-center py-2 text-emerald-400 font-black text-[9px] uppercase tracking-wider bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+              Inclus VIP
+            </div>
+          ) : (
+            <button type="button" onClick={() => handleCumparaPremium('qr_branding')} className="w-full bg-[#0B0F12] border border-slate-700 hover:bg-slate-800 text-white font-bold py-2 rounded-lg text-xs transition-colors shadow-sm">Cumpără 9.99 €</button>
+          )}
         </div>
 
         {/* QR Dynamic */}
@@ -46,7 +60,13 @@ export default function PricingAddons({ handleCumparaPremium }) {
             <div className="text-xl font-black text-[#8ba888] mt-1 mb-2">39 RON <span className="text-[9px] text-slate-500 font-normal">(~7.99 €)</span></div>
             <p className="text-[10px] text-slate-400 leading-relaxed mb-4">Schimbă destinația link-ului oricând + Găzduire PDF inclusă.</p>
           </div>
-          <button type="button" onClick={() => handleCumparaPremium('qr_dynamic')} className="w-full bg-[#0B0F12] border border-slate-700 hover:bg-slate-800 text-white font-bold py-2 rounded-lg text-xs transition-colors shadow-sm">Cumpără 7.99 €</button>
+          {isFounder ? (
+            <div className="w-full text-center py-2 text-emerald-400 font-black text-[9px] uppercase tracking-wider bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+              Inclus VIP
+            </div>
+          ) : (
+            <button type="button" onClick={() => handleCumparaPremium('qr_dynamic')} className="w-full bg-[#0B0F12] border border-slate-700 hover:bg-slate-800 text-white font-bold py-2 rounded-lg text-xs transition-colors shadow-sm">Cumpără 7.99 €</button>
+          )}
         </div>
 
         {/* QR vCard */}
@@ -59,7 +79,13 @@ export default function PricingAddons({ handleCumparaPremium }) {
             <div className="text-xl font-black text-white mt-1 mb-2">69 RON <span className="text-[9px] text-slate-500 font-normal">(~13.99 €)</span></div>
             <p className="text-[10px] text-slate-400 leading-relaxed mb-4">Carte de vizită digitală inteligentă cu salvare directă în agendă.</p>
           </div>
-          <button type="button" onClick={() => handleCumparaPremium('qr_vcard')} className="w-full bg-[#0B0F12] border border-slate-700 hover:bg-slate-800 text-white font-bold py-2 rounded-lg text-xs transition-colors shadow-sm">Cumpără 13.99 €</button>
+          {isFounder ? (
+            <div className="w-full text-center py-2 text-emerald-400 font-black text-[9px] uppercase tracking-wider bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+              Inclus VIP
+            </div>
+          ) : (
+            <button type="button" onClick={() => handleCumparaPremium('qr_vcard')} className="w-full bg-[#0B0F12] border border-slate-700 hover:bg-slate-800 text-white font-bold py-2 rounded-lg text-xs transition-colors shadow-sm">Cumpără 13.99 €</button>
+          )}
         </div>
 
       </div>
@@ -86,12 +112,18 @@ export default function PricingAddons({ handleCumparaPremium }) {
             <span className="text-lg font-black text-white block">49 RON</span>
             <span className="text-[9px] text-slate-500 uppercase block">Plată unică</span>
           </div>
-          <button 
-            onClick={() => handleCumparaPremium('ai_audit_pack')}
-            className="bg-purple-600 hover:bg-purple-500 text-white font-black px-5 py-3 rounded-xl text-xs uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(147,51,234,0.3)] shrink-0"
-          >
-            Cumpără Pachetul AI
-          </button>
+          {isFounder ? (
+            <div className="text-center py-2 px-4 text-emerald-400 font-black text-[10px] uppercase tracking-wider bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
+              Inclus în contul VIP
+            </div>
+          ) : (
+            <button 
+              onClick={() => handleCumparaPremium('ai_audit_pack')}
+              className="bg-purple-600 hover:bg-purple-500 text-white font-black px-5 py-3 rounded-xl text-xs uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(147,51,234,0.3)] shrink-0"
+            >
+              Cumpără Pachetul AI
+            </button>
+          )}
         </div>
       </div>
 

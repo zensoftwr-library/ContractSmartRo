@@ -270,3 +270,23 @@ html.matcha-light-theme button[class*="bg-[#16221A]"]:hover {
   background-color: #cbd5e1 !important;
   color: #0f172a !important;
 }
+
+html.matcha-light-theme label span { color: #1f2937 !important; }
+
+/* Fix pentru textele radio-urilor ("Sunt PRESTATOR / Sunt BENEFICIAR") pe Light Theme */
+html.matcha-light-theme label span:not([class*="text-"]) {
+    color: #1f2937 !important;
+}
+
+/* Fix pentru butoanele cu fundal alb de la Hero Section ("PACHET ACTE AUTO") */
+html.matcha-light-theme a.bg-white,
+html.matcha-light-theme button.bg-white,
+html.matcha-light-theme .bg-white.text-white {
+    color: #1f2937 !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05) !important;
+}
+html.matcha-light-theme a.bg-white:hover,
+html.matcha-light-theme button.bg-white:hover {
+    background-color: #f1f5f9 !important;
+}
