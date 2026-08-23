@@ -349,8 +349,10 @@ export default function ModeleContracte() {
         </div>
       </div>
 
-      {/* FOLOSIM COMPONENTA CENTRALĂ DE PREȚURI */}
-      <PricingPlans handleCumparaPremium={handleCumparaPremium} />
+      {/* ADAUGAM PREȚURILE AICI ÎN PASUL 1 */}
+                  <div className="-mt-16 relative z-20">
+                    <PricingPlans handleCumparaPremium={handleCumparaPremium} />
+                  </div>
 
       {/* TRUST BADGES ENTERPRISE */}
       <div className="max-w-6xl mx-auto px-6 my-16">

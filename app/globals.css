@@ -118,14 +118,11 @@ html.matcha-light-theme nav {
 }
 
 /* 3. Cardul VIP Fondator și orice card/container cu fundal negru/gradient închis */
-html.matcha-light-theme img {
-  display: block !important;
-  opacity: 1 !important;
-}
-
 html.matcha-light-theme .bg-black,
 html.matcha-light-theme [class*="bg-black"],
-html.matcha-light-theme [class*="from-black"] {
+html.matcha-light-theme [class*="from-black"],
+html.matcha-light-theme img { display: block !important; opacity: 1 !important; },
+html.matcha-light-theme div[class*="rounded-xl"]:has(h3) {
   background: #ffffff !important;
   background-image: none !important;
   border: 1px solid #cbd5e1 !important;
