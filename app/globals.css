@@ -105,17 +105,18 @@ html.matcha-light-theme svg text tspan {
 /* 2. Forțăm vizibilitatea absolută a imaginilor și elementelor media (inclusiv stiri) */
 html.matcha-light-theme img,
 html.matcha-light-theme picture,
-html.matcha-light-theme figure,
-html.matcha-light-theme [class*="image"],
-html.matcha-light-theme [class*="img"] {
+html.matcha-light-theme figure {
   display: block !important;
   opacity: 1 !important;
   visibility: visible !important;
   filter: none !important;
 }
 
-html.matcha-light-theme div[style*="background-image"] {
-  opacity: 1 !important;
+html.matcha-light-theme .aspect-video,
+html.matcha-light-theme [class*="h-48"],
+html.matcha-light-theme [class*="h-40"] {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
 }
 
 /* 3. Forțăm orice container, card, meniu fix, modal sau secțiune întunecată */
@@ -133,14 +134,16 @@ html.matcha-light-theme nav {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
 }
 
-/* 4. Cardul VIP Fondator și orice card/container/badge cu fundal negru/gradient închis (inclusiv Live Preview, 0 RON) */
+/* 4. Carduri, badge-uri mici, "Live Preview", "0 RON", etc. cu fundal închis */
 html.matcha-light-theme .bg-black,
 html.matcha-light-theme [class*="bg-black"],
 html.matcha-light-theme [class*="from-black"],
 html.matcha-light-theme div.bg-gradient-to-b,
 html.matcha-light-theme div[class*="from-[#16221A]"],
 html.matcha-light-theme span[class*="bg-black"],
-html.matcha-light-theme div[class*="bg-black"] {
+html.matcha-light-theme div[class*="bg-black"],
+html.matcha-light-theme [class*="bg-slate-900"],
+html.matcha-light-theme [class*="bg-[#0B0F12]"] {
   background: #f1f5f9 !important;
   background-image: none !important;
   border: 1px solid #cbd5e1 !important;
@@ -148,14 +151,19 @@ html.matcha-light-theme div[class*="bg-black"] {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
 }
 
+html.matcha-light-theme .bg-black *,
+html.matcha-light-theme [class*="bg-black"] *,
+html.matcha-light-theme [class*="from-black"] *,
 html.matcha-light-theme div.bg-gradient-to-b *,
 html.matcha-light-theme div[class*="from-[#16221A]"] *,
 html.matcha-light-theme span[class*="bg-black"] *,
-html.matcha-light-theme div[class*="bg-black"] * {
+html.matcha-light-theme div[class*="bg-black"] *,
+html.matcha-light-theme [class*="bg-slate-900"] *,
+html.matcha-light-theme [class*="bg-[#0B0F12]"] * {
   color: #1f2937 !important;
 }
 
-/* 5. Toate badge-urile, pill-urile mici și tag-urile întunecate (Live Preview, Actualizat Live etc.) */
+/* 5. Toate badge-urile, pill-urile mici și tag-urile întunecate */
 html.matcha-light-theme div[class*="rounded-full"],
 html.matcha-light-theme span[class*="rounded-full"],
 html.matcha-light-theme div[class*="rounded-md"],
