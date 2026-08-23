@@ -2034,9 +2034,7 @@ const reseteazaSemnaturiB2B = () => {
               <PricingAddons handleCumparaPremium={handleCumparaPremium} />
             </div>
 
-            <LiveNewsSection stiriLive={stiriLive} />
-
-          </div>
+                      </div>
         )}
 
         {/* =========================================================================
