@@ -78,12 +78,14 @@ body {
   background: #8ba888;
 }
 
-/* TEMATICA MATCHA LIGHT (MODUL ZI) */
+/* ========================================================== */
+/* TEMATICA MATCHA LIGHT (MODUL ZI - SUPRASCRIERE COMPLETĂ)      */
+/* ========================================================== */
 html.matcha-light-theme {
   --bg-dark: #f8fbf8; 
   --text-main: #1f2937; 
   --text-muted: #4b5563; 
-  --border-color: #e2e8f0; 
+  --border-color: #cbd5e1; 
   --card-bg: #ffffff; 
 }
 
@@ -92,28 +94,40 @@ html.matcha-light-theme body {
   color: var(--text-main) !important;
 }
 
-html.matcha-light-theme .bg-\[\#0B0F12\] {
-  background-color: var(--bg-dark) !important;
-}
-
-html.matcha-light-theme .bg-\[\#12181D\] {
+/* Acoperă toate fundalurile întunecate și cardurile mari din aplicație */
+html.matcha-light-theme .bg-\[\#0B0F12\],
+html.matcha-light-theme .bg-\[\#12181D\],
+html.matcha-light-theme div[class*="bg-slate-900"],
+html.matcha-light-theme div[class*="bg-slate-950"],
+html.matcha-light-theme div[class*="bg-slate-800"] {
   background-color: var(--card-bg) !important;
+  color: var(--text-main) !important;
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05) !important;
 }
 
-html.matcha-light-theme .border-slate-800,
-html.matcha-light-theme .border-slate-700 {
+/* Setează bordurile deschise */
+html.matcha-light-theme [class*="border-slate-"],
+html.matcha-light-theme [class*="border-gray-"] {
   border-color: var(--border-color) !important;
 }
 
-html.matcha-light-theme .text-white {
+/* Transformă textele albe/deschise din interiorul cardurilor în text citibil de zi */
+html.matcha-light-theme .text-white,
+html.matcha-light-theme h1,
+html.matcha-light-theme h2,
+html.matcha-light-theme h3,
+html.matcha-light-theme h4,
+html.matcha-light-theme strong {
   color: var(--text-main) !important;
 }
 
-html.matcha-light-theme .text-slate-400 {
+html.matcha-light-theme .text-slate-400,
+html.matcha-light-theme .text-slate-300,
+html.matcha-light-theme .text-slate-200 {
   color: var(--text-muted) !important;
 }
 
+/* Câmpurile de formular */
 html.matcha-light-theme input, 
 html.matcha-light-theme textarea, 
 html.matcha-light-theme select {

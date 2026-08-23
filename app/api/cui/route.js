@@ -1,98 +1,112 @@
 import { NextResponse } from 'next/server';
 
-function formateazaStare(stareOriginala, regCom, dataCompleta) {
-  let stare = stareOriginala || 'ÎNREGISTRAT';
-  if (stare.toUpperCase().includes('ACTIV') || stare.toUpperCase().includes('INREGISTRAT') || !stare.toUpperCase().includes('INACTIV')) {
-    if (dataCompleta) return `ACTIV FISCAL (din ${dataCompleta})`;
-    const anMatch = regCom ? regCom.match(/(19|20)\d{2}/) : null;
-    if (anMatch) return `ACTIV FISCAL (din ${anMatch[0]})`;
-    return `ACTIV FISCAL`;
-  }
-  return stare;
+function formateazaAdresa(addr) {
+  if (!addr) return '';
+  if (typeof addr === 'string') return addr;
+  const parti = [
+    addr.street ? `Str. ${addr.street}` : '',
+    addr.number ? `nr. ${addr.number}` : '',
+    addr.block ? `bl. ${addr.block}` : '',
+    addr.scara ? `sc. ${addr.scara}` : '',
+    addr.floor ? `et. ${addr.floor}` : '',
+    addr.apartment ? `ap. ${addr.apartment}` : '',
+    addr.city || '',
+    addr.county || ''
+  ];
+  return parti.filter(Boolean).join(', ');
 }
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const cui = searchParams.get('cui');
 
-  if (!cui) return NextResponse.json({ success: false, message: 'CUI lipsă' }, { status: 400 });
+  if (!cui) {
+    return NextResponse.json({ success: false, message: 'CUI lipsă sau invalid' }, { status: 400 });
+  }
+
+  const cleanCui = cui.replace(/[^0-9]/g, '');
 
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3500);
+    let denumire = '';
+    let regCom = '';
+    let adresa = '';
+    let stare = 'ACTIV FISCAL';
+    let administrator = '';
 
-    // 🚀 PASUL 1: Microserviciul Local (Doar date rapide)
+    // 🚀 PASUL 1: Luăm datele de bază și administratorii de la lista-firme.info (Gratuit)
     try {
-      const resPrimary = await fetch(`http://localhost:3001/api/v1/firma/${cui}`, { signal: controller.signal });
-      if (resPrimary.ok) {
-        clearTimeout(timeoutId);
-        const result = await resPrimary.json();
-        const data = result.data || {};
-        return NextResponse.json({
-          success: true, source: 'local-microservice',
-          data: {
-            denumire: data.denumire || data.nume || '', cui: cui, regCom: data.regCom || data.nr_reg_com || '',
-            adresa: data.adresa || '', stare: formateazaStare(data.stare, data.regCom || data.nr_reg_com, data.data_inregistrare), 
-            administrator: data.administrator || data.reprezentant || ''
-          }
-        });
-      }
-    } catch (err) {}
-    clearTimeout(timeoutId);
-
-    // 🚀 PASUL 2: Fallback pe Lista-Firme.info (Open-Source, Gratuit, cu Reprezentanți!)
-    try {
-      const resFreeApi = await fetch(`https://lista-firme.info/api/v1/info?cui=${cui}`);
+      const resFreeApi = await fetch(`https://lista-firme.info/api/v1/info?cui=${cleanCui}`, {
+        signal: AbortSignal.timeout(3500)
+      });
       if (resFreeApi.ok) {
         const dataFree = await resFreeApi.json();
-        let administratorFree = '';
-        
-        // Extragem reprezentanții din structura lor (baza data.gov.ro)
-        if (dataFree.reprezentanti_legali && dataFree.reprezentanti_legali.length > 0) {
-          administratorFree = dataFree.reprezentanti_legali.map(r => r.nume).join(', ');
-        } else if (dataFree.reprezentanti && dataFree.reprezentanti.length > 0) {
-          administratorFree = dataFree.reprezentanti.map(r => r.nume).join(', ');
-        }
-
-        return NextResponse.json({
-          success: true, source: 'lista-firme-gratis',
-          data: {
-            denumire: dataFree.nume || dataFree.denumire || '',
-            cui: cui,
-            regCom: dataFree.numar_reg_com || dataFree.nr_reg_com || '',
-            adresa: dataFree.adresa || '',
-            stare: formateazaStare(dataFree.stare || 'ACTIV', dataFree.numar_reg_com, null),
-            administrator: administratorFree
+        if (dataFree && dataFree.cui) {
+          denumire = dataFree.name || dataFree.denumire || '';
+          regCom = dataFree.reg_com || dataFree.numar_reg_com || '';
+          adresa = formateazaAdresa(dataFree.address);
+          
+          const reps = [...(dataFree.legal_representatives || []), ...(dataFree.natural_person_representatives || [])];
+          if (reps.length > 0) {
+            administrator = reps.map(r => r.nume || r.name || '').filter(Boolean).join(', ');
           }
-        });
+        }
       }
     } catch (e) {
-      console.warn("[CUI API] Lista-Firme gratuit a picat. Trecem la Premium.");
+      console.warn("Eroare lista-firme.info:", e.message);
     }
 
-    // 🚀 PASUL 3: Fallback Premium pe OpenAPI
-    const openApiKey = process.env.OPENAPI_API_KEY;
-    if (openApiKey) {
+    // 🚀 PASUL 2: Interogăm FirmeAPI pentru a obține STAREA FISCALĂ REALĂ (Inactiv/Radiat) și Bilanțuri
+    const apiKey = process.env.FIRMEAPI_KEY; 
+    if (apiKey) {
       try {
-        const resOpenApi = await fetch(`https://api.openapi.ro/api/companies/${cui}`, { headers: { 'x-api-key': openApiKey } });
-        if (resOpenApi.ok) {
-          const data = await resOpenApi.json();
-          let administrator = '';
-          if (data.reprezentanti && data.reprezentanti.length > 0) administrator = data.reprezentanti.map(r => r.nume).join(', ');
+        const resFirme = await fetch(`https://www.firmeapi.ro/api/v1/firma/${cleanCui}`, {
+          headers: { 'Authorization': `Bearer ${apiKey}`, 'Accept': 'application/json' },
+          signal: AbortSignal.timeout(3500)
+        });
+
+        if (resFirme.ok) {
+          const raw = await resFirme.json();
+          const data = raw.data || {};
           
-          return NextResponse.json({
-            success: true, source: 'openapi-premium',
-            data: {
-              denumire: data.denumire || '', cui: data.cif || cui, regCom: data.numar_reg_com || '',
-              adresa: data.adresa || '', stare: formateazaStare(data.stare, data.numar_reg_com, data.data_inregistrare),
-              administrator: administrator
+          if (!denumire) denumire = data.denumire || '';
+          if (!regCom) regCom = data.nr_reg_com || '';
+          if (!adresa) adresa = typeof data.adresa === 'string' ? data.adresa : '';
+
+          // Verificare critică pentru starea fiscală (Inactiv / Radiat)
+          if (data.status_inactiv && data.status_inactiv.inactiv) {
+            const dataInactivarii = data.status_inactiv.data_inactivare || '';
+            stare = dataInactivarii ? `INACTIV FISCAL (din ${dataInactivarii})` : `INACTIV FISCAL`;
+          } else if (data.stare) {
+            stare = data.stare.toUpperCase();
+            if (stare.includes('INREGISTRAT') || stare.includes('ACTIV')) {
+              const an = data.data_inregistrare ? data.data_inregistrare.substring(0, 4) : '';
+              stare = an ? `ACTIV FISCAL (din ${an})` : `ACTIV FISCAL`;
             }
-          });
+          }
         }
-      } catch (e) {}
+      } catch (e) {
+        console.warn("Eroare FirmeAPI stare:", e.message);
+      }
     }
 
-    return NextResponse.json({ success: false, message: 'Firma nu a fost găsită în nicio bază.' }, { status: 404 });
+    // Dacă nu am găsit denumirea în niciuna dintre surse
+    if (!denumire) {
+      return NextResponse.json({ success: false, message: 'Firma nu a fost găsită.' }, { status: 404 });
+    }
+
+    return NextResponse.json({
+      success: true,
+      source: 'combo-gratuit-firmeapi',
+      data: {
+        denumire,
+        cui: cleanCui,
+        regCom,
+        adresa,
+        stare,
+        administrator
+      }
+    });
+
   } catch (error) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
   }
