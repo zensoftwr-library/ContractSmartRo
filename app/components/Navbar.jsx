@@ -1,11 +1,16 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabase = globalThis.supabaseClient ?? createClient(supabaseUrl, supabaseAnonKey);
 
 export default function Navbar({ 
-  user, 
-  isPremium, 
-  handleLogout, 
+  user: propUser, 
+  isPremium: propIsPremium, 
+  handleLogout: propHandleLogout, 
   stergeCont, 
   setShowAuthModal, 
   setIsSignUp,
@@ -13,6 +18,55 @@ export default function Navbar({
 }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMatchaLight, setIsMatchaLight] = useState(false);
+  
+  // Stare locală independentă pentru utilizator pe orice pagină
+  const [localUser, setLocalUser] = useState(propUser || null);
+
+  // Sincronizăm cu prop-ul dacă vine din Home, dar verificăm și direct din Supabase pentru paginile secundare
+  useEffect(() => {
+    if (propUser) {
+      setLocalUser(propUser);
+      return;
+    }
+
+    const checkSession = async () => {
+      try {
+        if (!supabaseUrl || !supabaseAnonKey) return;
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('subscription_tier, credits_remaining, is_pro, pro_reports_used, ai_audits_used')
+            .eq('id', session.user.id)
+            .single();
+
+          setLocalUser({
+            id: session.user.id,
+            email: session.user.email,
+            status: profile?.subscription_tier || 'free',
+            credits: profile?.credits_remaining ?? 0,
+            proReportsUsed: profile?.pro_reports_used || 0,
+            aiAuditsUsed: profile?.ai_audits_used || 0
+          });
+        }
+      } catch (e) {}
+    };
+
+    checkSession();
+  }, [propUser]);
+
+  const user = localUser;
+
+  // Logout local securizat
+  const handleLogout = async () => {
+    if (propHandleLogout) {
+      propHandleLogout();
+    } else {
+      await supabase.auth.signOut();
+      setLocalUser(null);
+      window.location.href = '/';
+    }
+  };
 
   // Aplicăm clasa pe <html> pentru tema de culori
   useEffect(() => {
