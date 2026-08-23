@@ -2,27 +2,77 @@ import { NextResponse } from 'next/server';
 import puppeteer from 'puppeteer';
 
 async function generatePdfBuffer(cuiClean) {
-  if (!cuiClean) {
-    throw new Error('CUI invalid sau lipsă');
+  if (!cuiClean) throw new Error('CUI invalid sau lipsă');
+
+  let dataFirma = {};
+  
+  // 1. Preluăm Istoricul Financiar de la FirmeAPI
+  if (process.env.FIRMEAPI_KEY) {
+    try {
+      const resFirme = await fetch(`https://www.firmeapi.ro/api/v1/firma/${cuiClean}`, {
+        headers: { 'Authorization': `Bearer ${process.env.FIRMEAPI_KEY}`, 'Accept': 'application/json' }
+      });
+      if (resFirme.ok) {
+        const resultFirme = await resFirme.json();
+        if (resultFirme.data) {
+          dataFirma = {
+            ...resultFirme.data,
+            regCom: resultFirme.data.nr_reg_com,
+            istoric_financiar: resultFirme.data.bilant || [],
+            an_bilant: resultFirme.data.bilant?.[0]?.an || 'N/A',
+            cifra_afaceri: resultFirme.data.bilant?.[0]?.cifra_afaceri || 0,
+            profit_net: resultFirme.data.bilant?.[0]?.profit_net || 0,
+            pierdere_neta: resultFirme.data.bilant?.[0]?.pierdere_neta || 0,
+            datorii: resultFirme.data.bilant?.[0]?.datorii || 0,
+            angajati: resultFirme.data.bilant?.[0]?.angajati || 0,
+            active_imobilizate: resultFirme.data.bilant?.[0]?.active_imobilizate || 0,
+            active_circulante: resultFirme.data.bilant?.[0]?.active_circulante || 0,
+            stocuri: resultFirme.data.bilant?.[0]?.stocuri || 0,
+            creante: resultFirme.data.bilant?.[0]?.creante || 0,
+            cash: resultFirme.data.bilant?.[0]?.casa_si_conturi || 0,
+            capitaluri_proprii: resultFirme.data.bilant?.[0]?.capitaluri_proprii || 0
+          };
+        }
+      }
+    } catch(e) { console.warn("FirmeAPI bilant error:", e); }
   }
 
-  // Apelăm microserviciul nostru de pe portul 3002
-  const response = await fetch(`http://localhost:3002/api/v1/demoanaf/${cuiClean}`);
-  const result = await response.json();
-  
-  if (!result.success || !result.data) {
-    throw new Error(result.error || 'Date indisponibile pentru acest CUI');
+  // 2. Preluăm Datele Juridice + Administratorii de la OpenAPI (Suprascrie datele de bază)
+  if (process.env.OPENAPI_API_KEY) {
+    try {
+      const resOpen = await fetch(`https://api.openapi.ro/api/companies/${cuiClean}`, {
+        headers: { 'x-api-key': process.env.OPENAPI_API_KEY }
+      });
+      if (resOpen.ok) {
+        const resultOpen = await resOpen.json();
+        let admin = '';
+        if (resultOpen.reprezentanti && resultOpen.reprezentanti.length > 0) {
+          admin = resultOpen.reprezentanti.map(r => r.nume).join(', ');
+        }
+        
+        dataFirma.denumire = resultOpen.denumire || dataFirma.denumire;
+        dataFirma.cui = resultOpen.cif || cuiClean;
+        dataFirma.regCom = resultOpen.numar_reg_com || dataFirma.regCom;
+        dataFirma.stare = resultOpen.stare || dataFirma.stare || 'ACTIV';
+        dataFirma.stare_juridica = resultOpen.stare || 'Societate Comercială';
+        dataFirma.adresa = resultOpen.adresa || dataFirma.adresa;
+        dataFirma.caen = resultOpen.caen || dataFirma.caen;
+        dataFirma.administrator = admin;
+        dataFirma.tva = resultOpen.tva ? 'DA' : 'NU';
+      }
+    } catch(e) { console.warn("OpenAPI basic error:", e); }
   }
-  
-  const dataFirma = result.data;
+
+  if (!dataFirma.denumire) throw new Error('Date indisponibile pentru acest CUI în rețeaua oficială.');
+
   const formatMoney = (val) => Number(val || 0).toLocaleString('ro-RO') + ' RON';
   const formatNumber = (val) => Number(val || 0).toLocaleString('ro-RO');
-  // Construim dinamic tabelul cu istoricul pe 8 ani
+  
   let istoricHtml = '';
   if (dataFirma.istoric_financiar && dataFirma.istoric_financiar.length > 0) {
     const randuriTabel = dataFirma.istoric_financiar.map(an => `
       <tr>
-        <td style="text-align: center;"><strong>${an.an_bilant}</strong></td>
+        <td style="text-align: center;"><strong>${an.an_bilant || an.an}</strong></td>
         <td style="text-align: right;">${formatMoney(an.cifra_afaceri)}</td>
         <td style="text-align: right;" class="${an.profit_net > 0 ? 'text-green' : 'text-red'}">${formatMoney(an.profit_net)}</td>
         <td style="text-align: right;" class="text-red">${formatMoney(an.datorii)}</td>
@@ -50,7 +100,7 @@ async function generatePdfBuffer(cuiClean) {
       </div>
     `;
   }
-  // Șablonul HTML complet, cu logo-ul SVG inclus și toate datele extinse
+
   const htmlContent = `
     <!DOCTYPE html>
     <html>
@@ -72,7 +122,6 @@ async function generatePdfBuffer(cuiClean) {
       </head>
       <body>
         <div class="header">
-          <!-- Logo SVG Vectorial -->
           <div style="width: 160px; height: 28px; margin: 0 auto 10px auto; display: inline-block;">
             <svg viewBox="0 0 240 40" style="width: 100%; height: 100%;">
               <g transform="translate(0, 2)">
@@ -84,7 +133,6 @@ async function generatePdfBuffer(cuiClean) {
               </text>
             </svg>
           </div>
-          
           <h2 style="margin: 0; color: #111827; font-size: 16px;">RAPORT FINANCIAR & JURIDIC DETALIAT</h2>
           <p style="margin: 4px 0 0; color: #6b7280; font-size: 10px;">Generat digital la: ${new Date().toLocaleString('ro-RO')}</p>
         </div>
@@ -92,19 +140,19 @@ async function generatePdfBuffer(cuiClean) {
         <div class="section">
           <div class="section-title">1. DATE DE IDENTIFICARE & ACTIVITATE</div>
           <table>
-            <tr><th>Denumire Companie:</th><td><strong>${dataFirma.denumire}</strong></td></tr>
-            <tr><th>CUI / Reg. Com.:</th><td>${dataFirma.cui} / ${dataFirma.regCom || 'N/A'}</td></tr>
-            <tr><th>Stare Fiscală / ANAF:</th><td><span class="badge">${dataFirma.stare}</span></td></tr>
-            <tr><th>Stare Juridică / Activitate:</th><td><span class="text-red">${dataFirma.stare_juridica}</span></td></tr> <!-- Adaugă doar acest rând -->
+            <tr><th>Denumire Companie:</th><td><strong>${dataFirma.denumire || 'N/A'}</strong></td></tr>
+            <tr><th>CUI / Reg. Com.:</th><td>${dataFirma.cui || cuiClean} / ${dataFirma.regCom || 'N/A'}</td></tr>
+            <tr><th>Stare Fiscală / ANAF:</th><td><span class="badge">${dataFirma.stare || 'N/A'}</span></td></tr>
+            <tr><th>Stare Juridică / Activitate:</th><td><span class="text-red">${dataFirma.stare_juridica || 'N/A'}</span></td></tr>
             <tr><th>Administrator / Reprezentant:</th><td>${dataFirma.administrator || 'N/A'}</td></tr>
-            <tr><th>Adresă Sediu Social:</th><td>${dataFirma.adresa}</td></tr>
+            <tr><th>Adresă Sediu Social:</th><td>${typeof dataFirma.adresa === 'string' ? dataFirma.adresa : 'N/A'}</td></tr>
             <tr><th>Domeniu de Activitate (CAEN):</th><td>${dataFirma.caen || 'N/A'}</td></tr>
-            <tr><th>Plătitor de TVA:</th><td>${dataFirma.tva}</td></tr>
+            <tr><th>Plătitor de TVA:</th><td>${dataFirma.tva || 'N/A'}</td></tr>
           </table>
         </div>
 
         <div class="section">
-          <div class="section-title">2. SITUAȚIA FINANCIARĂ PRINCIPALĂ (ULTIMUL AN DISPONIBIL: ${dataFirma.an_bilant})</div>
+          <div class="section-title">2. SITUAȚIA FINANCIARĂ PRINCIPALĂ (ULTIMUL AN DISPONIBIL: ${dataFirma.an_bilant || 'N/A'})</div>
           <table>
             <tr><th>Cifră de Afaceri Netă:</th><td>${formatMoney(dataFirma.cifra_afaceri)}</td></tr>
             <tr><th>Venituri Totale:</th><td>${formatMoney(dataFirma.venituri_totale)}</td></tr>
@@ -116,7 +164,7 @@ async function generatePdfBuffer(cuiClean) {
         </div>
 
         <div class="section">
-          <div class="section-title">3. ACTIVE, DATORII ȘI PATRIMONIU (BILANȚ ${dataFirma.an_bilant})</div>
+          <div class="section-title">3. ACTIVE, DATORII ȘI PATRIMONIU (BILANȚ ${dataFirma.an_bilant || 'N/A'})</div>
           <table>
             <tr><th>Active Imobilizate:</th><td>${formatMoney(dataFirma.active_imobilizate)}</td></tr>
             <tr><th>Active Circulante (Total):</th><td>${formatMoney(dataFirma.active_circulante)}</td></tr>
@@ -127,7 +175,6 @@ async function generatePdfBuffer(cuiClean) {
             <tr><th>Capitaluri Proprii:</th><td>${formatMoney(dataFirma.capitaluri_proprii)}</td></tr>
           </table>
         </div>
-        <!-- Tabelul dinamic cu istoricul financiar pe 8 ani -->
         ${istoricHtml}
       </body>
     </html>

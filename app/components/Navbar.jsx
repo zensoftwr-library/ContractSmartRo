@@ -226,7 +226,12 @@ export default function Navbar({
               </div>
             </div>
           )}
-          <button onClick={mergiLaPreturi} className="bg-gradient-to-r from-[#8ba888] to-[#6d8a6a] text-black font-black text-sm px-4 py-3.5 rounded-xl text-center uppercase tracking-widest shadow-lg mt-2">Vezi Oferte & Tarife</button>
+          <div className="flex gap-3 mt-2">
+            <button onClick={mergiLaPreturi} className="flex-1 bg-gradient-to-r from-[#8ba888] to-[#6d8a6a] text-black font-black text-sm px-4 py-3.5 rounded-xl text-center uppercase tracking-widest shadow-lg">Vezi Oferte & Tarife</button>
+            <button onClick={toggleTheme} className="w-14 shrink-0 flex items-center justify-center rounded-xl bg-[#12181D] border border-slate-700 hover:border-[#8ba888] transition-all text-xl shadow-lg" title="Schimbă Tema">
+              {isMatchaLight ? '🌙' : '☀️'}
+            </button>
+          </div>
         </div>
       )}
     </nav>

@@ -116,12 +116,15 @@ export default function GlobalAIAssistant({ user }) {
             
             {/* INDICATOR DE TASTARE (Loading) */}
             {aiLoading && (
-              <div className="flex justify-start animate-fadeIn">
-                <div className="bg-[#16221A]/80 border border-[#8ba888]/20 px-4 py-3.5 rounded-2xl rounded-tl-sm flex gap-1.5 items-center shadow-sm">
+              <div className="flex flex-col items-start gap-2 animate-fadeIn">
+                <div className="bg-[#16221A]/80 border border-[#8ba888]/20 px-4 py-3.5 rounded-2xl rounded-tl-sm flex gap-1.5 items-center shadow-sm w-max">
                   <div className="w-1.5 h-1.5 bg-[#8ba888] rounded-full animate-bounce"></div>
                   <div className="w-1.5 h-1.5 bg-[#8ba888] rounded-full animate-bounce delay-75"></div>
                   <div className="w-1.5 h-1.5 bg-[#8ba888] rounded-full animate-bounce delay-150"></div>
                 </div>
+                <span className="text-[10px] text-[#8ba888] font-medium px-2 animate-pulse">
+                  ⏳ Se interoghează sursele oficiale, acest proces poate dura câteva secunde pentru acuratețe...
+                </span>
               </div>
             )}
             

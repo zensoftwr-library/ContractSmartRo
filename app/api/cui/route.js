@@ -1,25 +1,13 @@
 import { NextResponse } from 'next/server';
 
-// 🛠️ Funcție inteligentă care combină data completă (dacă există) cu anul din RegCom (ca fallback)
 function formateazaStare(stareOriginala, regCom, dataCompleta) {
   let stare = stareOriginala || 'ÎNREGISTRAT';
-  
-  if (stare.toUpperCase().includes('ACTIV') && !stare.toUpperCase().includes('INACTIV')) {
-    
-    // 1. Dacă serverul trimite data completă (ex: 15-05-2013), o afișăm pe toată!
-    if (dataCompleta) {
-      return `ACTIV FISCAL (din ${dataCompleta})`;
-    }
-    
-    // 2. Dacă nu trimite data completă, extragem măcar anul din J.../2013
+  if (stare.toUpperCase().includes('ACTIV') || stare.toUpperCase().includes('INREGISTRAT') || !stare.toUpperCase().includes('INACTIV')) {
+    if (dataCompleta) return `ACTIV FISCAL (din ${dataCompleta})`;
     const anMatch = regCom ? regCom.match(/(19|20)\d{2}/) : null;
-    if (anMatch) {
-      return `ACTIV FISCAL (din ${anMatch[0]})`;
-    }
-    
+    if (anMatch) return `ACTIV FISCAL (din ${anMatch[0]})`;
     return `ACTIV FISCAL`;
   }
-  
   return stare;
 }
 
@@ -27,96 +15,84 @@ export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const cui = searchParams.get('cui');
 
-  if (!cui) {
-    return NextResponse.json({ success: false, message: 'CUI lipsă sau invalid' }, { status: 400 });
-  }
+  if (!cui) return NextResponse.json({ success: false, message: 'CUI lipsă' }, { status: 400 });
 
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 3500);
 
-    // 🚀 PASUL 1: Microserviciul Local
+    // 🚀 PASUL 1: Microserviciul Local (Doar date rapide)
     try {
-      const resPrimary = await fetch(`http://localhost:3001/api/v1/firma/${cui}`, {
-        signal: controller.signal
-      });
-      
+      const resPrimary = await fetch(`http://localhost:3001/api/v1/firma/${cui}`, { signal: controller.signal });
       if (resPrimary.ok) {
         clearTimeout(timeoutId);
         const result = await resPrimary.json();
         const data = result.data || {};
-        
         return NextResponse.json({
-          success: true,
-          source: 'local-microservice',
+          success: true, source: 'local-microservice',
           data: {
-            denumire: data.denumire || data.nume || '',
-            cui: cui,
-            regCom: data.regCom || data.nr_reg_com || '',
-            adresa: data.adresa || '',
-            stare: formateazaStare(data.stare, data.regCom || data.nr_reg_com, data.data_inregistrare || data.data_infiintare), 
+            denumire: data.denumire || data.nume || '', cui: cui, regCom: data.regCom || data.nr_reg_com || '',
+            adresa: data.adresa || '', stare: formateazaStare(data.stare, data.regCom || data.nr_reg_com, data.data_inregistrare), 
             administrator: data.administrator || data.reprezentant || ''
           }
         });
       }
-    } catch (err) {
-      console.warn(`[CUI API] Nu s-a găsit în DB local CUI: ${cui}. Trecem la DemoANAF...`);
-    }
+    } catch (err) {}
     clearTimeout(timeoutId);
 
-    // 🚀 PASUL 2: Fallback pe DemoANAF
-    let numeAdmin = '';
-    let dateFirma = {};
+    // 🚀 PASUL 2: Fallback pe Lista-Firme.info (Open-Source, Gratuit, cu Reprezentanți!)
     try {
-      const resAdmin = await fetch(`http://localhost:3002/api/v1/demoanaf/${cui}`);
-      if (resAdmin.ok) {
-        const admData = await resAdmin.json();
-        dateFirma = admData.data || {};
-        if (dateFirma.administrator) numeAdmin = dateFirma.administrator;
+      const resFreeApi = await fetch(`https://lista-firme.info/api/v1/info?cui=${cui}`);
+      if (resFreeApi.ok) {
+        const dataFree = await resFreeApi.json();
+        let administratorFree = '';
         
+        // Extragem reprezentanții din structura lor (baza data.gov.ro)
+        if (dataFree.reprezentanti_legali && dataFree.reprezentanti_legali.length > 0) {
+          administratorFree = dataFree.reprezentanti_legali.map(r => r.nume).join(', ');
+        } else if (dataFree.reprezentanti && dataFree.reprezentanti.length > 0) {
+          administratorFree = dataFree.reprezentanti.map(r => r.nume).join(', ');
+        }
+
         return NextResponse.json({
-          success: true,
-          source: 'demoanaf-fallback',
+          success: true, source: 'lista-firme-gratis',
           data: {
-            denumire: dateFirma.denumire || '',
+            denumire: dataFree.nume || dataFree.denumire || '',
             cui: cui,
-            regCom: dateFirma.regCom || '',
-            adresa: dateFirma.adresa || '',
-            stare: formateazaStare(dateFirma.stare, dateFirma.regCom, dateFirma.data_inregistrare || dateFirma.data_infiintare),
-            administrator: numeAdmin
+            regCom: dataFree.numar_reg_com || dataFree.nr_reg_com || '',
+            adresa: dataFree.adresa || '',
+            stare: formateazaStare(dataFree.stare || 'ACTIV', dataFree.numar_reg_com, null),
+            administrator: administratorFree
           }
         });
       }
     } catch (e) {
-      console.warn(`[CUI API] DemoANAF a eșuat. Trecem la FirmeAPI...`);
+      console.warn("[CUI API] Lista-Firme gratuit a picat. Trecem la Premium.");
     }
 
-    // 🚀 PASUL 3: Fallback final pe FirmeAPI.ro
-    const apiKey = process.env.FIRMEAPI_KEY; 
-    if (apiKey) {
-      const resSecondary = await fetch(`https://www.firmeapi.ro/api/v1/firma/${cui}`, {
-        headers: { 'Authorization': `Bearer ${apiKey}`, 'Accept': 'application/json' }
-      });
-
-      if (resSecondary.ok) {
-        const raw = await resSecondary.json();
-        const data = raw.data || {};
-        return NextResponse.json({
-          success: true,
-          source: 'firmeapi-fallback',
-          data: {
-            denumire: data.denumire,
-            cui: data.cui,
-            regCom: data.nr_reg_com,
-            adresa: typeof data.adresa === 'string' ? data.adresa : (data.adresa ? `${data.adresa.judet || ''}, ${data.adresa.localitate || ''}` : ''),
-            stare: formateazaStare(data.stare, data.nr_reg_com, data.data_inregistrare || data.data_infiintare),
-            administrator: numeAdmin
-          }
-        });
-      }
+    // 🚀 PASUL 3: Fallback Premium pe OpenAPI
+    const openApiKey = process.env.OPENAPI_API_KEY;
+    if (openApiKey) {
+      try {
+        const resOpenApi = await fetch(`https://api.openapi.ro/api/companies/${cui}`, { headers: { 'x-api-key': openApiKey } });
+        if (resOpenApi.ok) {
+          const data = await resOpenApi.json();
+          let administrator = '';
+          if (data.reprezentanti && data.reprezentanti.length > 0) administrator = data.reprezentanti.map(r => r.nume).join(', ');
+          
+          return NextResponse.json({
+            success: true, source: 'openapi-premium',
+            data: {
+              denumire: data.denumire || '', cui: data.cif || cui, regCom: data.numar_reg_com || '',
+              adresa: data.adresa || '', stare: formateazaStare(data.stare, data.numar_reg_com, data.data_inregistrare),
+              administrator: administrator
+            }
+          });
+        }
+      } catch (e) {}
     }
 
-    return NextResponse.json({ success: false, message: 'Firma nu a fost găsită.' }, { status: 404 });
+    return NextResponse.json({ success: false, message: 'Firma nu a fost găsită în nicio bază.' }, { status: 404 });
   } catch (error) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
   }

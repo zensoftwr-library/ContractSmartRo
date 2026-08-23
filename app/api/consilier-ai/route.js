@@ -124,7 +124,8 @@ export async function POST(request) {
     }
 
     let raspunsAI = result.response.text();
-    raspunsAI += `\n\n---\n⚠️ DISCLAIMER: Informații cu caracter orientativ bazate pe legislația din România. Nu reprezintă consultanță juridică formală.`;
+    // AICI AM INTEGRAT DISCLAIMER-UL OFICIAL ȘI NOTIFICAREA DE ACURATEȚE (PUNCTUL 2)
+    raspunsAI += `\n\n---\n⚠️ **Notă:** *S-au interogat sursele oficiale pentru acuratețe. Informațiile au caracter de ghidaj administrativ. Platforma ContractSmart nu își asumă răspunderea pentru posibile modificări legislative de ultimă oră. Recomandăm validarea spețelor complexe cu un expert.*`;
 
     return NextResponse.json({ success: true, response: raspunsAI });
 

@@ -5,7 +5,6 @@ import puppeteer from 'puppeteer';
 
 export const dynamic = 'force-dynamic';
 
-// Unificarea variabilelor de mediu pentru a preveni erorile de tip 400 Bad Request
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
 const supabase = createClient(supabaseUrl, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
@@ -26,38 +25,60 @@ export async function POST(request) {
     } = body;
 
     // -------------------------------------------------------------------------
-    // VALIDARE ANTI-SPAM CLOUDFLARE TURNSTILE PE BACKEND
+    // 1. VALIDARE ANTI-SPAM CLOUDFLARE
     // -------------------------------------------------------------------------
     if (process.env.TURNSTILE_SECRET_KEY && captchaToken) {
-      const verifyRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `secret=${process.env.TURNSTILE_SECRET_KEY}&response=${captchaToken}`
-      });
-      const verifyData = await verifyRes.json();
-      if (!verifyData.success) {
-        return NextResponse.json({ success: false, message: 'Validare anti-spam (Cloudflare) eșuată. Reîncărcați pagina.' }, { status: 403 });
+      try {
+        const formData = new URLSearchParams();
+        formData.append('secret', process.env.TURNSTILE_SECRET_KEY);
+        formData.append('response', captchaToken);
+
+        const verifyRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+          method: 'POST',
+          body: formData
+        });
+        
+        if (!verifyRes.ok) throw new Error('Cloudflare network error');
+        const verifyData = await verifyRes.json();
+        
+        if (!verifyData.success) {
+          return NextResponse.json({ success: false, message: 'Validare anti-spam eșuată. Te rugăm să reîncarci pagina.' }, { status: 403 });
+        }
+      } catch (cfErr) {
+        console.error("Eroare verificare Cloudflare:", cfErr.message);
+        // Continuăm dacă pică serverul CF, ca să nu blocăm userul aiurea
       }
     }
 
-    // --- VERIFICARE ANAF PRE-SEMNARE ---
-    
-    if (clientCui) {
+    // -------------------------------------------------------------------------
+    // 2. VERIFICARE ANAF PRE-SEMNARE (VIA OPENAPI)
+    // -------------------------------------------------------------------------
+    if (clientCui && process.env.OPENAPI_API_KEY) {
       const cleanCui = clientCui.replace(/[^0-9]/g, '');
       if (cleanCui.length >= 5) {
-        const anafRes = await fetch(`https://api.contractsmart.ro/api/anaf?cui=${cleanCui}`);
-        const anafData = await anafRes.json();
-        
-        if (anafData.success && anafData.data?.stare && (anafData.data.stare.toUpperCase().includes('INACTIV') || anafData.data.stare.toUpperCase().includes('RADIAT'))) {
-          return NextResponse.json({ 
-            success: false, 
-            message: `Atenție! Firma ${anafData.data.denumire} are starea fiscală: ${anafData.data.stare}. Nu recomandăm semnarea contractului.` 
-          }, { status: 403 });
+        try {
+          const openApiRes = await fetch(`https://api.openapi.ro/api/companies/${cleanCui}`, {
+            headers: { 'x-api-key': process.env.OPENAPI_API_KEY }
+          });
+
+          if (openApiRes.ok) {
+            const companie = await openApiRes.json();
+            if (companie.stare && (companie.stare.toUpperCase().includes('INACTIV') || companie.stare.toUpperCase().includes('RADIAT'))) {
+              return NextResponse.json({ 
+                success: false, 
+                message: `Atenție! Firma client are starea fiscală: ${companie.stare}. Contractul nu poate fi generat securizat pentru entități inactive.` 
+              }, { status: 403 });
+            }
+          }
+        } catch (apiErr) {
+          console.error("Eroare validare pre-semnare OpenAPI:", apiErr.message);
         }
       }
     }
-    // ------------------------------------
 
+    // -------------------------------------------------------------------------
+    // 3. VERIFICARE CONT ȘI CREDITE SUPABASE
+    // -------------------------------------------------------------------------
     if (!userId) {
       return NextResponse.json({ success: false, message: 'Utilizator neautentificat.' }, { status: 401 });
     }
@@ -80,6 +101,9 @@ export async function POST(request) {
       }, { status: 403 });
     }
 
+    // -------------------------------------------------------------------------
+    // 4. HTML BUILDER (TEMEI JURIDIC & CLAUZE)
+    // -------------------------------------------------------------------------
     let temeiJuridicHtml = '';
     let titluContractOficial = '';
 
@@ -170,7 +194,6 @@ export async function POST(request) {
       }
     });
 
-    // --- MAGIA PENTRU CLAUZA CUSTOM ---
     if (clauzaCustom && clauzaCustom.trim() !== '') {
       const numarUrmator = nrClauzeBifate + 1;
       clauzeInjectateHtml += `<li><strong>ART. 4.${numarUrmator}. CLAUZĂ SPECIALĂ ADIȚIONALĂ:</strong> ${clauzaCustom.trim()}</li>`;
@@ -185,132 +208,35 @@ export async function POST(request) {
 
     const dataCurenta = new Date().toLocaleDateString('ro-RO');
 
-    // CONSTRUCȚIA HTML 
+    // -------------------------------------------------------------------------
+    // 5. REDACTARE HTML
+    // -------------------------------------------------------------------------
     let htmlContract = `
       <!DOCTYPE html>
       <html>
       <head>
         <meta charset="utf-8">
         <style>
-          body { 
-            font-family: 'Times New Roman', Times, serif; 
-            padding: 50px; 
-            color: #000000; 
-            line-height: 1.6; 
-            font-size: 14px; 
-          }
-          .brand-header { 
-            font-family: Arial, sans-serif; 
-            color: #64748b; 
-            font-size: 11px; 
-            text-transform: uppercase; 
-            border-bottom: 1px solid #cbd5e1; 
-            padding-bottom: 5px; 
-            margin-bottom: 35px; 
-            letter-spacing: 0.5px; 
-          }
-          .contract-title { 
-            text-align: center; 
-            font-size: 16px; 
-            font-weight: bold; 
-            margin-bottom: 5px; 
-            text-transform: uppercase; 
-          }
-          .contract-subtitle { 
-            text-align: center; 
-            font-size: 12px; 
-            font-weight: normal; 
-            margin-bottom: 35px; 
-            font-style: italic; 
-          }
-          .capitol-title { 
-            font-weight: bold; 
-            margin-top: 25px; 
-            margin-bottom: 10px; 
-            text-transform: uppercase; 
-            text-align: justify; 
-            font-size: 14px; 
-          }
-          .text-paragraph { 
-            text-align: justify; 
-            margin-bottom: 12px; 
-            text-indent: 30px; 
-          }
-          .clauze-list { 
-            list-style-type: none; 
-            padding: 0; 
-            margin: 0; 
-          }
-          .clauze-list li { 
-            text-align: justify; 
-            margin-bottom: 12px; 
-            padding-left: 0; 
-          }
-          .signature-layout { 
-            margin-top: 50px; 
-            display: flex; 
-            justify-content: space-between; 
-            page-break-inside: avoid; 
-          }
-          .signature-column { 
-            width: 45%; 
-            text-align: center; 
-            border-top: 1px solid #000000; 
-            padding-top: 8px; 
-            font-size: 13px; 
-            font-weight: bold; 
-          }
-          .signature-image { 
-            max-height: 80px; 
-            margin-bottom: 5px; 
-            display: block; 
-            margin-left: auto; 
-            margin-right: auto; 
-          }
-          .signature-placeholder { 
-            height: 60px; 
-            font-size: 11px; 
-            color: #94a3b8; 
-            font-weight: normal; 
-            font-style: italic; 
-            padding-top: 20px; 
-          }
-          .qr-pay-box {
-            margin: 25px auto; 
-            padding: 15px; 
-            border: 2px dashed #cbd5e1; 
-            background-color: #f8fafc; 
-            text-align: center; 
-            max-width: 320px; 
-            page-break-inside: avoid;
-            border-radius: 8px;
-          }
-          .legal-footer { 
-            margin-top: 70px; 
-            border-top: 1px solid #e2e8f0; 
-            padding-top: 10px; 
-            font-size: 10px; 
-            color: #64748b; 
-            text-align: center; 
-            font-family: Arial, sans-serif; 
-          }
-          .linia-dinamica { 
-            display: inline-block; 
-            border-bottom: 1px solid #000000; 
-            vertical-align: bottom; 
-            height: 18px; 
-          }
-          .valoare-importata { 
-            font-weight: bold; 
-            border-bottom: 1px transparent solid; 
-            display: inline; 
-            padding: 0 2px; 
-          }
+          body { font-family: 'Times New Roman', Times, serif; padding: 50px; color: #000000; line-height: 1.6; font-size: 14px; }
+          .brand-header { font-family: Arial, sans-serif; color: #64748b; font-size: 11px; text-transform: uppercase; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px; margin-bottom: 35px; letter-spacing: 0.5px; }
+          .contract-title { text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
+          .contract-subtitle { text-align: center; font-size: 12px; font-weight: normal; margin-bottom: 35px; font-style: italic; }
+          .capitol-title { font-weight: bold; margin-top: 25px; margin-bottom: 10px; text-transform: uppercase; text-align: justify; font-size: 14px; }
+          .text-paragraph { text-align: justify; margin-bottom: 12px; text-indent: 30px; }
+          .clauze-list { list-style-type: none; padding: 0; margin: 0; }
+          .clauze-list li { text-align: justify; margin-bottom: 12px; padding-left: 0; }
+          .signature-layout { margin-top: 50px; display: flex; justify-content: space-between; page-break-inside: avoid; }
+          .signature-column { width: 45%; text-align: center; border-top: 1px solid #000000; padding-top: 8px; font-size: 13px; font-weight: bold; }
+          .signature-image { max-height: 80px; margin-bottom: 5px; display: block; margin-left: auto; margin-right: auto; }
+          .signature-placeholder { height: 60px; font-size: 11px; color: #94a3b8; font-weight: normal; font-style: italic; padding-top: 20px; }
+          .qr-pay-box { margin: 25px auto; padding: 15px; border: 2px dashed #cbd5e1; background-color: #f8fafc; text-align: center; max-width: 320px; page-break-inside: avoid; border-radius: 8px; }
+          .legal-footer { margin-top: 70px; border-top: 1px solid #e2e8f0; padding-top: 10px; font-size: 10px; color: #64748b; text-align: center; font-family: Arial, sans-serif; }
+          .linia-dinamica { display: inline-block; border-bottom: 1px solid #000000; vertical-align: bottom; height: 18px; }
+          .valoare-importata { font-weight: bold; border-bottom: 1px transparent solid; display: inline; padding: 0 2px; }
         </style>
       </head>
       <body>
         <div class="brand-header">Sistem de Certificare și Audit Criptografic // ContractSmart 2026</div>
-        
         <div class="contract-title">${titluContractOficial}</div>
         <div class="contract-subtitle">Nr. Identificare Digitală: CS-${Math.floor(10000 + Math.random() * 90000)} / Data Generării: ${dataCurenta}</div>
         
@@ -324,42 +250,21 @@ export async function POST(request) {
         </div>
 
         <div class="capitol-title">CAPITOLUL II. OBIECTUL CONTRACTULUI ȘI TEMEIUL LEGAL</div>
-        <div class="text-paragraph">
-          <strong>ART. 2.1. TEMEIUL JURIDIC:</strong> ${temeiJuridicHtml}
-        </div>
-        <div class="text-paragraph">
-          <strong>ART. 2.2. SPECIFICAȚII TEHNICE:</strong> Obiectul contractului este stabilit în mod expres prin convenția părților și constă în: ${fieldHtml(obiect, "350px")}.
-        </div>
+        <div class="text-paragraph"><strong>ART. 2.1. TEMEIUL JURIDIC:</strong> ${temeiJuridicHtml}</div>
+        <div class="text-paragraph"><strong>ART. 2.2. SPECIFICAȚII TEHNICE:</strong> Obiectul contractului este stabilit în mod expres prin convenția părților și constă în: ${fieldHtml(obiect, "350px")}.</div>
 
         <div class="capitol-title">CAPITOLUL III. OBLIGAȚII FINANCIARE ȘI SCADENȚĂ</div>
-        <div class="text-paragraph">
-          <strong>ART. 3.1. ONORARIU NOMINAL:</strong> Prețul stabilit de către Părți este în cuantum total de: <strong>${fieldHtml(valoare, "80px")} ${fieldHtml(moneda, "50px")}</strong>.
-        </div>
-        <div class="text-paragraph">
-          <strong>ART. 3.2. DECONTARE:</strong> Stingerea obligațiilor de plată se va efectua prin virament bancar, termenele stipulate în facturi fiind esențiale și de decădere.
-        </div>
+        <div class="text-paragraph"><strong>ART. 3.1. ONORARIU NOMINAL:</strong> Prețul stabilit de către Părți este în cuantum total de: <strong>${fieldHtml(valoare, "80px")} ${fieldHtml(moneda, "50px")}</strong>.</div>
+        <div class="text-paragraph"><strong>ART. 3.2. DECONTARE:</strong> Stingerea obligațiilor de plată se va efectua prin virament bancar, termenele stipulate în facturi fiind esențiale și de decădere.</div>
 
         ${tipContract === 'constructii' ? `
         <div class="text-paragraph">
-          <strong>ART. 3.3. DEVIZ FINANCIAR DEFALCAT:</strong> Valoarea menționată la Art. 3.1 este fundamentată conform devizului atașat lucrării:
-          <br/><br/>
+          <strong>ART. 3.3. DEVIZ FINANCIAR DEFALCAT:</strong> Valoarea menționată la Art. 3.1 este fundamentată conform devizului atașat lucrării:<br/><br/>
           <table style="width:90%; margin: 0 auto; border-collapse: collapse; font-size: 13px; text-align: left;" border="1">
-            <tr>
-              <th style="padding: 6px; background-color: #f0f0f0;">Categorie Deviz</th>
-              <th style="padding: 6px; background-color: #f0f0f0;">Valoare (RON)</th>
-            </tr>
-            <tr>
-              <td style="padding: 6px;">Materiale de Construcție de Bază</td>
-              <td style="padding: 6px; font-weight: bold;">${constructiiMateriale || '0'}</td>
-            </tr>
-            <tr>
-              <td style="padding: 6px;">Manoperă Specializată & Echipă Tehnică</td>
-              <td style="padding: 6px; font-weight: bold;">${constructiiManopera || '0'}</td>
-            </tr>
-            <tr>
-              <td style="padding: 6px;">Suprafață Acoperită (${constructiiSuprafata || '0'} mp * ${constructiiPretMp || '0'} lei/mp)</td>
-              <td style="padding: 6px; font-weight: bold;">${(parseFloat(constructiiSuprafata || 0) * parseFloat(constructiiPretMp || 0)).toFixed(2)}</td>
-            </tr>
+            <tr><th style="padding: 6px; background-color: #f0f0f0;">Categorie Deviz</th><th style="padding: 6px; background-color: #f0f0f0;">Valoare (RON)</th></tr>
+            <tr><td style="padding: 6px;">Materiale de Construcție de Bază</td><td style="padding: 6px; font-weight: bold;">${constructiiMateriale || '0'}</td></tr>
+            <tr><td style="padding: 6px;">Manoperă Specializată & Echipă Tehnică</td><td style="padding: 6px; font-weight: bold;">${constructiiManopera || '0'}</td></tr>
+            <tr><td style="padding: 6px;">Suprafață Acoperită (${constructiiSuprafata || '0'} mp * ${constructiiPretMp || '0'} lei/mp)</td><td style="padding: 6px; font-weight: bold;">${(parseFloat(constructiiSuprafata || 0) * parseFloat(constructiiPretMp || 0)).toFixed(2)}</td></tr>
           </table>
         </div>
         ` : ''}
@@ -393,7 +298,7 @@ export async function POST(request) {
             ${initiatorRol === 'prestator' && semnăturaBase64 ? `
               <img src="${semnăturaBase64}" class="signature-image" alt="Semnatura Prestator" />
               <span style="font-size: 10px; font-weight: normal; color: #16a34a; display:block;">Semnat digital creator</span>
-            ` : `<div class="signature-placeholder">[Validat Electronic]</div>`}
+            ` : `<div class="signature-placeholder">[Așteaptă Validare Electronică]</div>`}
           </div>
           <div class="signature-column">
             PENTRU BENEFICIAR / CUMPĂRĂTOR<br><br>
@@ -409,7 +314,9 @@ export async function POST(request) {
         </div>
     `;
 
-    // ADAUGĂ PROCES VERBAL DACĂ E BIFAT
+    // -------------------------------------------------------------------------
+    // 6. ADĂUGARE PROCES VERBAL OPȚIONAL
+    // -------------------------------------------------------------------------
     if (adaugaProcesVerbal === true || adaugaProcesVerbal === "true") {
       htmlContract += `
         <div style="page-break-before: always; clear: both; padding-top: 40px;"></div>
@@ -417,98 +324,77 @@ export async function POST(request) {
         <div class="contract-title">ANEXA 1: PROCES-VERBAL DE PREDARE-PRIMIRE</div>
         <div class="contract-subtitle">Anexă la Contractul nr. CS-${Math.floor(10000 + Math.random() * 90000)} / ${dataCurenta}</div>
         
-        <div class="text-paragraph">
-          Încheiat astăzi, ${dataCurenta}, între:
-        </div>
-        <div class="text-paragraph">
-          1. <strong>${fieldHtml(prestatorNume, "220px")}</strong> (în calitate de Prestator / Vânzător)
-        </div>
-        <div class="text-paragraph">
-          2. <strong>${fieldHtml(clientNume, "220px")}</strong> (în calitate de Beneficiar / Cumpărător)
-        </div>
+        <div class="text-paragraph">Încheiat astăzi, ${dataCurenta}, între:</div>
+        <div class="text-paragraph">1. <strong>${fieldHtml(prestatorNume, "220px")}</strong> (în calitate de Prestator / Vânzător)</div>
+        <div class="text-paragraph">2. <strong>${fieldHtml(clientNume, "220px")}</strong> (în calitate de Beneficiar / Cumpărător)</div>
         
-        <div class="text-paragraph">
-          Obiectul predării a constat în recepționarea fizică și calitativă a următoarelor bunuri/lucrări/servicii: ${fieldHtml(obiect, "350px")}.
-        </div>
-        <div class="text-paragraph">
-          Prin semnarea prezentului proces-verbal, Beneficiarul declară în mod expres, ferm și neechivoc că a primit și recepționat bunurile/serviciile mai sus menționate. Beneficiarul confirmă că acestea sunt în stare perfectă de funcționare, cantitativ și calitativ conform standardelor agreate, și că <strong>nu are absolut nicio obiecțiune vizibilă sau ascunsă</strong> cu privire la acestea.
-        </div>
-        <div class="text-paragraph">
-          Odată cu semnarea acestui document, se naște obligația de plată (dacă nu a fost deja achitată) și orice răspundere de paza juridică trece în sarcina Beneficiarului.
-        </div>
+        <div class="text-paragraph">Obiectul predării a constat în recepționarea fizică și calitativă a următoarelor bunuri/lucrări/servicii: ${fieldHtml(obiect, "350px")}.</div>
+        <div class="text-paragraph">Prin semnarea prezentului proces-verbal, Beneficiarul declară în mod expres, ferm și neechivoc că a primit și recepționat bunurile/serviciile mai sus menționate. Beneficiarul confirmă că acestea sunt în stare perfectă de funcționare, cantitativ și calitativ conform standardelor agreate, și că <strong>nu are absolut nicio obiecțiune vizibilă sau ascunsă</strong> cu privire la acestea.</div>
+        <div class="text-paragraph">Odată cu semnarea acestui document, se naște obligația de plată (dacă nu a fost deja achitată) și orice răspundere de paza juridică trece în sarcina Beneficiarului.</div>
 
         <div class="signature-layout">
           <div class="signature-column">
-            PENTRU PRESTATOR / VÂNZĂTOR (PREDARE)<br><br>
-            ${initiatorRol === 'prestator' && semnăturaBase64 ? `
-              <img src="${semnăturaBase64}" class="signature-image" alt="Semnatura Prestator" />
-              <span style="font-size: 10px; font-weight: normal; color: #16a34a; display:block;">Semnat digital creator</span>
-            ` : `<div class="signature-placeholder">[Validat Electronic]</div>`}
+            PENTRU PRESTATOR (PREDARE)<br><br>
+            ${initiatorRol === 'prestator' && semnăturaBase64 ? `<img src="${semnăturaBase64}" class="signature-image" alt="Semnatura Prestator" /><span style="font-size: 10px; font-weight: normal; color: #16a34a; display:block;">Semnat digital creator</span>` : `<div class="signature-placeholder">[Validat Electronic]</div>`}
           </div>
           <div class="signature-column">
-            PENTRU BENEFICIAR / CUMPĂRĂTOR (PRIMIRE)<br><br>
-            ${initiatorRol === 'client' && semnăturaBase64 ? `
-              <img src="${semnăturaBase64}" class="signature-image" alt="Semnatura Beneficiar" />
-              <span style="font-size: 10px; font-weight: normal; color: #16a34a; display:block;">Semnat digital creator</span>
-            ` : `<div class="signature-placeholder" style="color: #ef4444;">Așteaptă semnare partener</div>`}
+            PENTRU BENEFICIAR (PRIMIRE)<br><br>
+            ${initiatorRol === 'client' && semnăturaBase64 ? `<img src="${semnăturaBase64}" class="signature-image" alt="Semnatura Beneficiar" /><span style="font-size: 10px; font-weight: normal; color: #16a34a; display:block;">Semnat digital creator</span>` : `<div class="signature-placeholder" style="color: #ef4444;">Așteaptă semnare partener</div>`}
           </div>
         </div>
       `;
     }
 
-    htmlContract += `
-      </body>
-      </html>
-    `;
-
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu', '--single-process']
-    });
-    
-    const page = await browser.newPage();
-    await page.setContent(htmlContract, { waitUntil: 'networkidle0' });
-    const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true, margin: { top: '40px', bottom: '40px', left: '40px', right: '40px' } });
-    await browser.close();
+    htmlContract += `</body></html>`;
 
     // -------------------------------------------------------------------------
-    // TRIMITE EMAIL VIA RESEND CU LOG-URI CLARE
+    // 7. GENERARE PDF CU PUPPETEER (PROTEJAT DE TRY/CATCH)
+    // -------------------------------------------------------------------------
+    let pdfBuffer;
+    try {
+      const browser = await puppeteer.launch({
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu', '--single-process']
+      });
+      
+      const page = await browser.newPage();
+      await page.setContent(htmlContract, { waitUntil: 'networkidle0' });
+      pdfBuffer = await page.pdf({ format: 'A4', printBackground: true, margin: { top: '40px', bottom: '40px', left: '40px', right: '40px' } });
+      await browser.close();
+    } catch (pdfError) {
+      console.error("Eroare severă la generarea PDF-ului:", pdfError.message);
+      return NextResponse.json({ success: false, message: 'A picat motorul de redare PDF intern. ' + pdfError.message }, { status: 500 });
+    }
+
+    // -------------------------------------------------------------------------
+    // 8. TRIMITERE EMAIL VIA RESEND
     // -------------------------------------------------------------------------
     if (process.env.RESEND_API_KEY && clientEmail) {
       try {
         const { Resend } = await import('resend');
         const resend = new Resend(process.env.RESEND_API_KEY);
 
-        const emailResponse = await resend.emails.send({
+        await resend.emails.send({
           from: 'ContractSmart <contact@contractsmart.ro>',
           to: clientEmail,
           subject: `Document Securizat - ${titluContractOficial}`,
           text: `Salutare!\n\nRegăsiți atașat contractul comercial generat securizat prin intermediul platformei ContractSmart.\n\nO zi excelentă!`,
-          attachments: [
-            {
-              filename: `contract_${tipContract}_securizat.pdf`,
-              content: Buffer.from(pdfBuffer),
-            },
-          ],
+          attachments: [{ filename: `contract_${tipContract}_securizat.pdf`, content: Buffer.from(pdfBuffer) }],
         });
-        console.log("E-mail procesat de Resend:", emailResponse);
       } catch (emailErr) {
-        console.error("❌ EROARE RESEND DETALIATĂ:", emailErr);
+        console.error("EROARE RESEND:", emailErr.message);
       }
     }
 
-    // SCĂDERE CREDITE DOAR DACA E FREE
+    // -------------------------------------------------------------------------
+    // 9. GESTIUNE CREDITE ȘI SMART VAULT
+    // -------------------------------------------------------------------------
     if (!isPremium && availableCredits > 0) {
       await supabase.from('profiles').update({ credits_remaining: availableCredits - 1 }).eq('id', userId);
     }
 
-    // --- SMART VAULT: Generare Amprentă Criptografică SHA-256 ---
-    const hashSha256 = crypto
-      .createHash('sha256')
-      .update(pdfBuffer)
-      .digest('hex');
+    const hashSha256 = crypto.createHash('sha256').update(pdfBuffer).digest('hex');
 
-    // Salvăm contractul și amprenta în baza de date pentru Valoare Probatorie
     const { error: dbError } = await supabase.from('user_contracts').insert({
       user_id: userId,
       titlu_contract: `Contract ${tipContract || 'prestari'}`,
@@ -522,9 +408,8 @@ export async function POST(request) {
     });
 
     if (dbError) {
-      console.error("❌ Eroare salvare Smart Vault în DB:", dbError.message);
+      console.error("Eroare salvare Smart Vault:", dbError.message);
     }
-    // -------------------------------------------------------------
 
     return new NextResponse(pdfBuffer, { 
       status: 200, 
@@ -535,6 +420,7 @@ export async function POST(request) {
       }
     });
   } catch (error) {
-    return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+    console.error("CATCH GLOBAL:", error.message);
+    return NextResponse.json({ success: false, message: 'A picat generarea din server: ' + error.message }, { status: 500 });
   }
 }
