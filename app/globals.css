@@ -261,3 +261,30 @@ html.matcha-light-theme select {
   color: #111827 !important;
   border-color: #cbd5e1 !important;
 }
+
+/* ========================================================== */
+/* FIXURI SUPLIMENTARE TEMATICA MATCHA LIGHT (MODUL ZI)       */
+/* ========================================================== */
+
+/* 1. Butoanele de cameră live din secțiunea Acte Auto (aa.jpg) */
+html.matcha-light-theme button.bg-\[\#1e293b\],
+html.matcha-light-theme button[class*="bg-[#1e293b]"] {
+  background-color: #f1f5f9 !important;
+  color: #1f2937 !important;
+  border: 1px solid #cbd5e1 !important;
+}
+html.matcha-light-theme button.bg-\[\#1e293b\] svg,
+html.matcha-light-theme button[class*="bg-[#1e293b]"] svg {
+  color: #334155 !important;
+}
+
+/* 2. Casetă total / profit curat net din Calculatorul Fiscal (aaa.jpg) */
+html.matcha-light-theme div[class*="bg-[#0B0F12]"] {
+  background-color: #f1f5f9 !important;
+  border: 1px solid #cbd5e1 !important;
+}
+html.matcha-light-theme div[class*="bg-[#0B0F12]"] span,
+html.matcha-light-theme div[class*="bg-[#0B0F12]"] p,
+html.matcha-light-theme div[class*="bg-[#0B0F12]"] div {
+  color: #1f2937 !important;
+}
