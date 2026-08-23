@@ -299,3 +299,38 @@ html.matcha-light-theme svg.animate-spin path {
   fill: #8ba888 !important; /* Indicatorul principal */
   opacity: 1 !important;
 }
+/* ========================================================== */
+/* FIX-URI CHIRURGICALE PENTRU HERO, QR ȘI SPINNERE */
+/* ========================================================== */
+
+/* 1. Fix butonul alb din Hero (Forțează textul să fie vizibil DOAR în butoanele albe) */
+html.matcha-light-theme .bg-white,
+html.matcha-light-theme .bg-white * {
+  color: #111827 !important;
+}
+
+/* 2. Fix butoanele inactive din terminalul QR (Țintim fix clasa de fundal întunecat) */
+html.matcha-light-theme button[class*="bg-[#16221A]"] {
+  background-color: #f1f5f9 !important;
+  color: #334155 !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+html.matcha-light-theme button[class*="bg-[#16221A]"]:hover {
+  background-color: #e2e8f0 !important;
+}
+
+/* 3. Fix pentru toate spinnerele de loading (Colorăm elementele interne din SVG) */
+html.matcha-light-theme svg.animate-spin {
+  color: #8ba888 !important;
+}
+
+html.matcha-light-theme svg.animate-spin circle {
+  stroke: #cbd5e1 !important;
+  opacity: 1 !important;
+}
+
+html.matcha-light-theme svg.animate-spin path {
+  fill: #8ba888 !important;
+  opacity: 1 !important;
+}
