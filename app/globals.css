@@ -112,6 +112,11 @@ html.matcha-light-theme figure {
   filter: none !important;
 }
 
+/* Protejăm overlay-urile semi-transparente (cum ar fi bg-black/20 de pe știri) să nu devină solid albe/gri */
+html.matcha-light-theme [class*="bg-black/"] {
+  background-color: rgba(0, 0, 0, 0.15) !important;
+}
+
 /* 3. Forțăm orice container, card, meniu fix, modal sau secțiune întunecată */
 html.matcha-light-theme [class*="bg-[#0B0F12]"],
 html.matcha-light-theme [class*="bg-[#12181D]"],
