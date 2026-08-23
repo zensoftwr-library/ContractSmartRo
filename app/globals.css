@@ -102,13 +102,16 @@ html.matcha-light-theme svg text tspan {
   fill: #8ba888 !important;
 }
 
-/* 2. Forțăm vizibilitatea imaginilor și a fundalurilor media (inclusiv la știri) */
+/* 2. Forțăm vizibilitatea absolută a imaginilor și elementelor media (inclusiv stiri) */
 html.matcha-light-theme img,
 html.matcha-light-theme picture,
-html.matcha-light-theme figure {
+html.matcha-light-theme figure,
+html.matcha-light-theme [class*="image"],
+html.matcha-light-theme [class*="img"] {
   display: block !important;
   opacity: 1 !important;
   visibility: visible !important;
+  filter: none !important;
 }
 
 html.matcha-light-theme div[style*="background-image"] {
@@ -130,13 +133,15 @@ html.matcha-light-theme nav {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
 }
 
-/* 4. Cardul VIP Fondator și orice card/container cu fundal negru/gradient închis */
+/* 4. Cardul VIP Fondator și orice card/container/badge cu fundal negru/gradient închis (inclusiv Live Preview, 0 RON) */
 html.matcha-light-theme .bg-black,
 html.matcha-light-theme [class*="bg-black"],
 html.matcha-light-theme [class*="from-black"],
 html.matcha-light-theme div.bg-gradient-to-b,
-html.matcha-light-theme div[class*="from-[#16221A]"] {
-  background: #ffffff !important;
+html.matcha-light-theme div[class*="from-[#16221A]"],
+html.matcha-light-theme span[class*="bg-black"],
+html.matcha-light-theme div[class*="bg-black"] {
+  background: #f1f5f9 !important;
   background-image: none !important;
   border: 1px solid #cbd5e1 !important;
   color: #1f2937 !important;
@@ -144,11 +149,13 @@ html.matcha-light-theme div[class*="from-[#16221A]"] {
 }
 
 html.matcha-light-theme div.bg-gradient-to-b *,
-html.matcha-light-theme div[class*="from-[#16221A]"] * {
+html.matcha-light-theme div[class*="from-[#16221A]"] *,
+html.matcha-light-theme span[class*="bg-black"] *,
+html.matcha-light-theme div[class*="bg-black"] * {
   color: #1f2937 !important;
 }
 
-/* 5. Toate badge-urile, pill-urile mici și tag-urile întunecate */
+/* 5. Toate badge-urile, pill-urile mici și tag-urile întunecate (Live Preview, Actualizat Live etc.) */
 html.matcha-light-theme div[class*="rounded-full"],
 html.matcha-light-theme span[class*="rounded-full"],
 html.matcha-light-theme div[class*="rounded-md"],

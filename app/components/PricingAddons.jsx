@@ -3,7 +3,7 @@
 export default function PricingAddons({ handleCumparaPremium }) {
   return (
     <div className="max-w-6xl mx-auto px-4 mb-20 mt-4">
-      <div className="border-t border-slate-800/80 pt-8 pb-4 mb-6 text-center">
+      <div className="pb-4 mb-6 text-center">
         <h3 className="text-xl font-black text-white tracking-tight">Șabloane & Extensii QR <span className="text-[#8ba888] font-bold">(Plată Unică)</span></h3>
       </div>
       
