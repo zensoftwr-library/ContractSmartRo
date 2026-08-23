@@ -121,7 +121,7 @@ html.matcha-light-theme nav {
 html.matcha-light-theme .bg-black,
 html.matcha-light-theme [class*="bg-black"],
 html.matcha-light-theme [class*="from-black"],
-html.matcha-light-theme img { display: block !important; opacity: 1 !important; },
+html.matcha-light-theme div[class*="rounded-2xl"]:has(h3),
 html.matcha-light-theme div[class*="rounded-xl"]:has(h3) {
   background: #ffffff !important;
   background-image: none !important;
