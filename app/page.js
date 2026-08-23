@@ -2036,12 +2036,11 @@ const reseteazaSemnaturiB2B = () => {
             </div>
 
             {/* SEPARATOR BORDER - EXTENSII QR */}
-            {user?.status !== 'founder' && (
-              <div className="max-w-6xl mx-auto border-t border-slate-800/80 pt-16 mt-8 w-full px-4">
-                <PricingAddons handleCumparaPremium={handleCumparaPremium} user={user} />              </div>
-            )}
+            <div className="max-w-6xl mx-auto border-t border-slate-800/80 pt-16 mt-8 w-full px-4">
+              <PricingAddons handleCumparaPremium={handleCumparaPremium} user={user} />
+            </div>
 
-                      </div>
+          </div>
         )}
 
         {/* =========================================================================
