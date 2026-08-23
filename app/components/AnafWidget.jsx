@@ -2,7 +2,7 @@
 
 export default function AnafWidget({ 
   cuiSearch, setCuiSearch, isSearchingCui, handleCautareCuiWidget, 
-  cuiDataResult, handleReportAction, buttonText 
+  cuiDataResult 
 }) {
   return (
     <div className="w-full">
@@ -64,15 +64,11 @@ export default function AnafWidget({
               </div>
               
               {cuiDataResult.adresa && (
-                <div className="mb-6 mt-5 text-[11px] text-slate-400 bg-[#12181D] p-3.5 rounded-xl border border-slate-800/80 leading-relaxed">
+                <div className="mt-5 text-[11px] text-slate-400 bg-[#12181D] p-3.5 rounded-xl border border-slate-800/80 leading-relaxed">
                   <strong className="text-slate-500 uppercase text-[9px] font-black tracking-widest block mb-1">Sediu Social Declarat:</strong>
                   {cuiDataResult.adresa}
                 </div>
               )}
-
-              <button onClick={(e) => { e.preventDefault(); handleReportAction(); }} className="w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-black uppercase tracking-wide py-3.5 rounded-xl text-[11px] transition-all shadow-md">
-                {buttonText}
-              </button>
             </div>
           )}
         </div>
