@@ -46,99 +46,99 @@ async function generatePdfBuffer(cuiClean) {
     capitaluri_proprii: 0
   };
 
-  // 🚀 PASUL 1: Preluăm tot ce este Gratuit din baza bazată pe CSV-uri (lista-firme.info)
-  try {
-    const resFree = await fetch(`https://lista-firme.info/api/v1/info?cui=${cuiClean}`, {
-      signal: AbortSignal.timeout(3500)
-    });
-    if (resFree.ok) {
-      const dFree = await resFree.json();
-      if (dFree && dFree.cui) {
-        dataFirma.denumire = dFree.name || dFree.denumire || '';
-        dataFirma.regCom = dFree.reg_com || dFree.numar_reg_com || '';
-        dataFirma.adresa = formateazaAdresa(dFree.address);
-        
-        // Extragem administratorii direct din CSV-uri (legal_representatives)
-        const reps = [...(dFree.legal_representatives || []), ...(dFree.natural_person_representatives || [])];
-        if (reps.length > 0) {
-          dataFirma.administrator = reps.map(r => r.nume || r.name || '').filter(Boolean).join(', ');
-        }
+  let esteInactivFizic = false;
 
-        if (dFree.status && dFree.status.details && dFree.status.details.description) {
-          dataFirma.stare = dFree.status.details.description.toUpperCase();
-          dataFirma.stare_juridica = dataFirma.stare;
-        }
-
-        if (dFree.caen && dFree.caen.length > 0) {
-          dataFirma.caen = String(dFree.caen[0].code || '');
-        }
-      }
-    }
-  } catch (e) {
-    console.warn("Eroare preluare date gratuite:", e.message);
-  }
-
-  // 🚀 PASUL 2: Apelăm FirmeAPI strict pentru Bilanțuri Financiare și Status Fiscal Avansat
-  const apiKey = process.env.FIRMEAPI_KEY;
-  if (apiKey) {
-    const headers = { 'Authorization': `Bearer ${apiKey}`, 'Accept': 'application/json' };
-
-    // Verificăm statusul fiscal detaliat (inactiv / TVA)
+  // 🚀 PASUL 1: FirmeAPI.ro (Prioritate pentru Stare Fiscală Inactivă/Radiată și Bilanțuri)
+  if (process.env.FIRMEAPI_KEY) {
+    const headersFirme = { 'Authorization': `Bearer ${process.env.FIRMEAPI_KEY}`, 'Accept': 'application/json' };
     try {
-      const resFirma = await fetch(`https://www.firmeapi.ro/api/v1/firma/${cuiClean}`, { headers, signal: AbortSignal.timeout(3000) });
+      const resFirma = await fetch(`https://www.firmeapi.ro/api/v1/firma/${cuiClean}`, { headers: headersFirme, signal: AbortSignal.timeout(3000) });
       if (resFirma.ok) {
         const json = await resFirma.json();
         const d = json.data || {};
-        if (!dataFirma.denumire) dataFirma.denumire = d.denumire || '';
-        if (!dataFirma.regCom) dataFirma.regCom = d.nr_reg_com || '';
-        if (!dataFirma.adresa) dataFirma.adresa = typeof d.adresa === 'string' ? d.adresa : formateazaAdresa(d.adresa_sediu_social);
-        if (d.cod_caen) dataFirma.caen = d.cod_caen;
+        dataFirma.denumire = d.denumire || '';
+        dataFirma.regCom = d.nr_reg_com || '';
+        dataFirma.adresa = typeof d.adresa === 'string' ? d.adresa : formateazaAdresa(d.adresa_sediu_social);
+        dataFirma.caen = d.cod_caen || '';
         if (d.tva && d.tva.platitor) dataFirma.tva = 'DA';
 
+        // Verificare critică inactivitate ANAF
         if (d.status_inactiv && d.status_inactiv.inactiv) {
-          dataFirma.stare = `INACTIV FISCAL (din ${d.status_inactiv.data_inactivare || ''})`;
+          esteInactivFizic = true;
+          const dataInactivarii = d.status_inactiv.data_inactivare || '';
+          dataFirma.stare = dataInactivarii ? `INACTIV FISCAL (din ${dataInactivarii})` : `INACTIV FISCAL`;
           dataFirma.stare_juridica = dataFirma.stare;
+        } else if (d.stare) {
+          dataFirma.stare = d.stare;
+          dataFirma.stare_juridica = d.stare;
         }
       }
     } catch (e) {}
 
-    // Dacă nu am găsit administratorul în CSV, îl luăm de la FirmeAPI
-    if (!dataFirma.administrator) {
-      try {
-        const resAdmin = await fetch(`https://www.firmeapi.ro/api/v1/administratori/${cuiClean}`, { headers, signal: AbortSignal.timeout(3000) });
-        if (resAdmin.ok) {
-          const jsonAdmin = await resAdmin.json();
-          const adminiList = jsonAdmin.data || jsonAdmin.administratori || jsonAdmin || [];
-          if (Array.isArray(adminiList) && adminiList.length > 0) {
-            dataFirma.administrator = adminiList.map(a => a.nume || a.nume_prenume || '').filter(Boolean).join(', ');
-          }
-        }
-      } catch (e) {}
-    }
-
-    // Preluăm Bilanțul Financiar de la /bilant/{cui}
+    // Administratori
     try {
-      const resBilant = await fetch(`https://www.firmeapi.ro/api/v1/bilant/${cuiClean}`, { headers, signal: AbortSignal.timeout(3000) });
+      const resAdmin = await fetch(`https://www.firmeapi.ro/api/v1/administratori/${cuiClean}`, { headers: headersFirme, signal: AbortSignal.timeout(3000) });
+      if (resAdmin.ok) {
+        const jsonAdmin = await resAdmin.json();
+        const adminiList = jsonAdmin.data || jsonAdmin.administratori || jsonAdmin || [];
+        if (Array.isArray(adminiList) && adminiList.length > 0) {
+          dataFirma.administrator = adminiList.map(a => a.nume || a.nume_prenume || '').filter(Boolean).join(', ');
+        }
+      }
+    } catch (e) {}
+
+    // Bilanț financiar
+    try {
+      const resBilant = await fetch(`https://www.firmeapi.ro/api/v1/bilant/${cuiClean}`, { headers: headersFirme, signal: AbortSignal.timeout(3000) });
       if (resBilant.ok) {
         const jsonBilant = await resBilant.json();
         const bilanturi = jsonBilant.data || jsonBilant.bilant || jsonBilant || [];
         if (Array.isArray(bilanturi) && bilanturi.length > 0) {
           dataFirma.istoric_financiar = bilanturi;
-          const ultimul = bilanturi[0];
-          dataFirma.an_bilant = ultimul.an_bilant || ultimul.an || 'N/A';
-          dataFirma.cifra_afaceri = ultimul.cifra_afaceri || ultimul.cifra_de_afaceri || 0;
-          dataFirma.venituri_totale = ultimul.venituri_totale || ultimul.venituri || 0;
-          dataFirma.cheltuieli_totale = ultimul.cheltuieli_totale || ultimul.cheltuieli || 0;
-          dataFirma.profit_net = ultimul.profit_net || ultimul.profit || 0;
-          dataFirma.pierdere_neta = ultimul.pierdere_neta || ultimul.pierdere || 0;
-          dataFirma.datorii = ultimul.datorii || ultimul.datorii_totale || 0;
-          dataFirma.angajati = ultimul.angajati || ultimul.numar_angajati || 0;
-          dataFirma.active_imobilizate = ultimul.active_imobilizate || 0;
-          dataFirma.active_circulante = ultimul.active_circulante || 0;
-          dataFirma.stocuri = ultimul.stocuri || 0;
-          dataFirma.creante = ultimul.creante || 0;
-          dataFirma.cash = ultimul.casa_si_conturi || ultimul.cash || 0;
-          dataFirma.capitaluri_proprii = ultimul.capitaluri_proprii || 0;
+          const u = bilanturi[0];
+          dataFirma.an_bilant = u.an_bilant || u.an || 'N/A';
+          dataFirma.cifra_afaceri = u.cifra_afaceri || u.cifra_de_afaceri || 0;
+          dataFirma.venituri_totale = u.venituri_totale || u.venituri || 0;
+          dataFirma.cheltuieli_totale = u.cheltuieli_totale || u.cheltuieli || 0;
+          dataFirma.profit_net = u.profit_net || u.profit || 0;
+          dataFirma.pierdere_neta = u.pierdere_neta || u.pierdere || 0;
+          dataFirma.datorii = u.datorii || u.datorii_totale || 0;
+          dataFirma.angajati = u.angajati || u.numar_angajati || 0;
+          dataFirma.active_imobilizate = u.active_imobilizate || 0;
+          dataFirma.active_circulante = u.active_circulante || 0;
+          dataFirma.stocuri = u.stocuri || 0;
+          dataFirma.creante = u.creante || 0;
+          dataFirma.cash = u.casa_si_conturi || u.cash || 0;
+          dataFirma.capitaluri_proprii = u.capitaluri_proprii || 0;
+        }
+      }
+    } catch (e) {}
+  }
+
+  // 🚀 PASUL 2: Cascada prin listafirme.ro / lista-firme.info (Dacă lipsesc date de bază)
+  if (!dataFirma.denumire || !dataFirma.administrator) {
+    try {
+      const resListafirme = await fetch(`https://lista-firme.info/api/v1/info?cui=${cuiClean}`, { signal: AbortSignal.timeout(3000) });
+      if (resListafirme.ok) {
+        const dLf = await resListafirme.json();
+        if (dLf && dLf.cui) {
+          if (!dataFirma.denumire) dataFirma.denumire = dLf.name || dLf.denumire || '';
+          if (!dataFirma.regCom) dataFirma.regCom = dLf.reg_com || dLf.numar_reg_com || '';
+          if (!dataFirma.adresa) dataFirma.adresa = formateazaAdresa(dLf.address);
+          
+          const reps = [...(dLf.legal_representatives || []), ...(dLf.natural_person_representatives || [])];
+          if (reps.length > 0 && !dataFirma.administrator) {
+            dataFirma.administrator = reps.map(r => r.nume || r.name || '').filter(Boolean).join(', ');
+          }
+
+          // Setăm starea doar dacă firma nu este deja marcată ca inactivă de ANAF
+          if (!esteInactivFizic && dLf.status && dLf.status.details && dLf.status.details.description) {
+            const desc = dLf.status.details.description.toUpperCase();
+            if (!desc.includes('FUNCȚIUNE') && !desc.includes('FUNCTIONEAZA')) {
+              dataFirma.stare = desc;
+              dataFirma.stare_juridica = desc;
+            }
+          }
         }
       }
     } catch (e) {}
@@ -196,7 +196,8 @@ async function generatePdfBuffer(cuiClean) {
           th, td { padding: 6px 8px; text-align: left; border-bottom: 1px solid #e5e7eb; }
           th { width: 45%; color: #4b5563; font-weight: 600; }
           td { color: #111827; }
-          .badge { display: inline-block; padding: 2px 8px; background: #dfeeeb; color: #065f46; font-weight: bold; border-radius: 4px; font-size: 10px; }
+          .badge { display: inline-block; padding: 2px 8px; background: #fee2e2; color: #dc2626; font-weight: bold; border-radius: 4px; font-size: 10px; }
+          .badge-activ { display: inline-block; padding: 2px 8px; background: #dfeeeb; color: #065f46; font-weight: bold; border-radius: 4px; font-size: 10px; }
           .text-green { color: #166534; font-weight: bold; }
           .text-red { color: #dc2626; font-weight: bold; }
         </style>
@@ -211,7 +212,7 @@ async function generatePdfBuffer(cuiClean) {
           <table>
             <tr><th>Denumire:</th><td><strong>${dataFirma.denumire}</strong></td></tr>
             <tr><th>CUI / Reg. Com.:</th><td>${dataFirma.cui} / ${dataFirma.regCom || 'N/A'}</td></tr>
-            <tr><th>Stare:</th><td><span class="badge">${dataFirma.stare}</span></td></tr>
+            <tr><th>Stare Fiscală:</th><td><span class="${esteInactivFizic ? 'badge' : 'badge-activ'}">${dataFirma.stare}</span></td></tr>
             <tr><th>Administrator:</th><td><strong>${dataFirma.administrator || 'N/A'}</strong></td></tr>
             <tr><th>Adresă:</th><td>${dataFirma.adresa}</td></tr>
             <tr><th>CAEN:</th><td>${dataFirma.caen || 'N/A'}</td></tr>
