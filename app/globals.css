@@ -102,7 +102,7 @@ html.matcha-light-theme svg text tspan {
   fill: #8ba888 !important;
 }
 
-/* 2. Forțăm vizibilitatea imaginilor și le dăm fundal clar pentru zonele de știri */
+/* 2. Forțăm vizibilitatea absolută a imaginilor și elementelor media (inclusiv știri) */
 html.matcha-light-theme img,
 html.matcha-light-theme picture,
 html.matcha-light-theme figure {
@@ -110,15 +110,6 @@ html.matcha-light-theme figure {
   opacity: 1 !important;
   visibility: visible !important;
   filter: none !important;
-}
-
-/* Zona de thumbnail / imagine de la știri primește un fundal gri-deschis clar și bordură */
-html.matcha-light-theme .aspect-video,
-html.matcha-light-theme [class*="h-48"],
-html.matcha-light-theme [class*="h-40"],
-html.matcha-light-theme div:has(> img) {
-  background-color: #f1f5f9 !important;
-  border-bottom: 1px solid #cbd5e1 !important;
 }
 
 /* 3. Forțăm orice container, card, meniu fix, modal sau secțiune întunecată */
@@ -136,27 +127,18 @@ html.matcha-light-theme nav {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
 }
 
-/* 4. Carduri, badge-uri mici, "Live Preview", "0 RON", etc. cu fundal închis */
-html.matcha-light-theme .bg-black,
-html.matcha-light-theme [class*="bg-black"],
-html.matcha-light-theme [class*="from-black"],
-html.matcha-light-theme div.bg-gradient-to-b,
-html.matcha-light-theme div[class*="from-[#16221A]"],
-html.matcha-light-theme span[class*="bg-black"],
-html.matcha-light-theme div[class*="bg-black"],
-html.matcha-light-theme [class*="bg-slate-900"],
-html.matcha-light-theme [class*="bg-[#0B0F12]"] {
-  background: #f1f5f9 !important;
+/* 4. Cardul VIP Fondator (Targetat specific pe baza chenarului de amber, lăsând știrile intacte) */
+html.matcha-light-theme div.border-amber-500\/40,
+html.matcha-light-theme div.border-amber-500\/30 {
+  background: #ffffff !important;
   background-image: none !important;
   border: 1px solid #cbd5e1 !important;
   color: #1f2937 !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
 }
 
-/* Protejăm culorile speciale din footer (roșu, verde, etc.) */
-html.matcha-light-theme .bg-black *:not([class*="text-red-"]):not([class*="text-emerald-"]):not([class*="text-amber-"]):not([class*="text-[#8ba888]"]),
-html.matcha-light-theme [class*="bg-black"] *:not([class*="text-red-"]):not([class*="text-emerald-"]):not([class*="text-amber-"]):not([class*="text-[#8ba888]"]),
-html.matcha-light-theme [class*="bg-[#0B0F12]"] *:not([class*="text-red-"]):not([class*="text-emerald-"]):not([class*="text-amber-"]):not([class*="text-[#8ba888]"]) {
+html.matcha-light-theme div.border-amber-500\/40 *,
+html.matcha-light-theme div.border-amber-500\/30 * {
   color: #1f2937 !important;
 }
 
