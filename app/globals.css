@@ -102,7 +102,20 @@ html.matcha-light-theme svg text tspan {
   fill: #8ba888 !important;
 }
 
-/* 2. Forțăm orice container, card, meniu fix, modal sau secțiune întunecată */
+/* 2. Forțăm vizibilitatea imaginilor și a fundalurilor media (inclusiv la știri) */
+html.matcha-light-theme img,
+html.matcha-light-theme picture,
+html.matcha-light-theme figure {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+html.matcha-light-theme div[style*="background-image"] {
+  opacity: 1 !important;
+}
+
+/* 3. Forțăm orice container, card, meniu fix, modal sau secțiune întunecată */
 html.matcha-light-theme [class*="bg-[#0B0F12]"],
 html.matcha-light-theme [class*="bg-[#12181D]"],
 html.matcha-light-theme [class*="bg-[#0c1014]"],
@@ -117,12 +130,12 @@ html.matcha-light-theme nav {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
 }
 
-/* 3. Cardul VIP Fondator și orice card/container cu fundal negru/gradient închis */
+/* 4. Cardul VIP Fondator și orice card/container cu fundal negru/gradient închis */
 html.matcha-light-theme .bg-black,
 html.matcha-light-theme [class*="bg-black"],
 html.matcha-light-theme [class*="from-black"],
-html.matcha-light-theme div[class*="rounded-2xl"]:has(h3),
-html.matcha-light-theme div[class*="rounded-xl"]:has(h3) {
+html.matcha-light-theme div.bg-gradient-to-b,
+html.matcha-light-theme div[class*="from-[#16221A]"] {
   background: #ffffff !important;
   background-image: none !important;
   border: 1px solid #cbd5e1 !important;
@@ -130,7 +143,12 @@ html.matcha-light-theme div[class*="rounded-xl"]:has(h3) {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
 }
 
-/* 4. Toate badge-urile, pill-urile mici și tag-urile întunecate (Live Preview, Actualizat Live etc.) */
+html.matcha-light-theme div.bg-gradient-to-b *,
+html.matcha-light-theme div[class*="from-[#16221A]"] * {
+  color: #1f2937 !important;
+}
+
+/* 5. Toate badge-urile, pill-urile mici și tag-urile întunecate */
 html.matcha-light-theme div[class*="rounded-full"],
 html.matcha-light-theme span[class*="rounded-full"],
 html.matcha-light-theme div[class*="rounded-md"],
@@ -145,14 +163,15 @@ html.matcha-light-theme div[class*="bg-[#16221A]"] {
   border: 1px solid #cbd5e1 !important;
 }
 
-/* 5. Borduri deschise */
+/* 6. Borduri și linii despărțitoare deschise */
 html.matcha-light-theme [class*="border-slate-"],
 html.matcha-light-theme [class*="border-gray-"],
-html.matcha-light-theme [class*="border-zinc-"] {
+html.matcha-light-theme [class*="border-zinc-"],
+html.matcha-light-theme hr {
   border-color: var(--border-color) !important;
 }
 
-/* 6. Transformarea tuturor textelor albe/deschise în text închis lizibil de zi */
+/* 7. Transformarea tuturor textelor albe/deschise în text închis lizibil de zi */
 html.matcha-light-theme .text-white,
 html.matcha-light-theme h1,
 html.matcha-light-theme h2,
@@ -171,7 +190,7 @@ html.matcha-light-theme .text-gray-400 {
   color: var(--text-muted) !important;
 }
 
-/* 7. Câmpuri de formular */
+/* 8. Câmpuri de formular */
 html.matcha-light-theme input, 
 html.matcha-light-theme textarea, 
 html.matcha-light-theme select {

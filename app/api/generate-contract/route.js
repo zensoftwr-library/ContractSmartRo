@@ -51,27 +51,31 @@ export async function POST(request) {
     }
 
     // -------------------------------------------------------------------------
-    // 2. VERIFICARE ANAF PRE-SEMNARE (VIA OPENAPI)
+    // 2. VERIFICARE ANAF PRE-SEMNARE (VIA FIRMEAPI.RO)
     // -------------------------------------------------------------------------
-    if (clientCui && process.env.OPENAPI_API_KEY) {
+    if (clientCui && process.env.FIRMEAPI_KEY) {
       const cleanCui = clientCui.replace(/[^0-9]/g, '');
       if (cleanCui.length >= 5) {
         try {
-          const openApiRes = await fetch(`https://api.openapi.ro/api/companies/${cleanCui}`, {
-            headers: { 'x-api-key': process.env.OPENAPI_API_KEY }
+          const resFirma = await fetch(`https://www.firmeapi.ro/api/v1/firma/${cleanCui}`, {
+            headers: { 'Authorization': `Bearer ${process.env.FIRMEAPI_KEY}`, 'Accept': 'application/json' },
+            signal: AbortSignal.timeout(3500)
           });
 
-          if (openApiRes.ok) {
-            const companie = await openApiRes.json();
-            if (companie.stare && (companie.stare.toUpperCase().includes('INACTIV') || companie.stare.toUpperCase().includes('RADIAT'))) {
+          if (resFirma.ok) {
+            const json = await resFirma.json();
+            const d = json.data || {};
+            
+            // Verificare critică inactivitate ANAF
+            if (d.status_inactiv && d.status_inactiv.inactiv) {
               return NextResponse.json({ 
                 success: false, 
-                message: `Atenție! Firma client are starea fiscală: ${companie.stare}. Contractul nu poate fi generat securizat pentru entități inactive.` 
+                message: `Atenție! Firma client este INACTIVĂ FISCAL. Contractul nu poate fi generat securizat pentru entități inactive.` 
               }, { status: 403 });
             }
           }
         } catch (apiErr) {
-          console.error("Eroare validare pre-semnare OpenAPI:", apiErr.message);
+          console.error("Eroare validare pre-semnare FirmeAPI:", apiErr.message);
         }
       }
     }
