@@ -334,3 +334,6 @@ html.matcha-light-theme svg.animate-spin path {
   fill: #8ba888 !important;
   opacity: 1 !important;
 }
+.matcha-light-theme .bg-white *{color:#000!important}
+.matcha-light-theme button[class*="slate-400"]{background:#eee!important;color:#000!important}
+.matcha-light-theme .animate-spin path{fill:#8ba888!important}
