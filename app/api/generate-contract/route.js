@@ -292,20 +292,35 @@ export async function POST(request) {
           <strong>ART. 6.1. JURISDICȚIE:</strong> În lipsa soluționării amiabile în 15 zile, litigiile vor fi deduse exclusiv instanțelor de la sediul Prestatorului sau Locatorului.
         </div>
 
-        <div class="signature-layout">
+        <div class="signature-layout" style="margin-top: 40px; border-top: 1px solid #cbd5e1; padding-top: 20px;">
           <div class="signature-column">
-            PENTRU PRESTATOR / VÂNZĂTOR<br><br>
+            <strong>PENTRU PRESTATOR (PREDARE)</strong><br>
+            <span style="font-size: 10px; color: #64748b;">(Pasul 1: Emitent)</span><br><br>
             ${initiatorRol === 'prestator' && semnăturaBase64 ? `
               <img src="${semnăturaBase64}" class="signature-image" alt="Semnatura Prestator" />
-              <span style="font-size: 10px; font-weight: normal; color: #16a34a; display:block;">Semnat digital creator</span>
-            ` : `<div class="signature-placeholder">[Așteaptă Validare Electronică]</div>`}
+              <div style="font-size: 10px; color: #16a34a; background: #f0fdf4; padding: 4px; border-radius: 4px; margin-top: 5px;">
+                ✓ Recepție &amp; Predare Validată
+              </div>
+            ` : `
+              <div class="signature-placeholder" style="border: 1px dashed #cbd5e1; padding: 10px; border-radius: 4px; color: #d97706;">
+               [Așteaptă Validarea]
+              </div>
+            `}
           </div>
+          
           <div class="signature-column">
-            PENTRU BENEFICIAR / CUMPĂRĂTOR<br><br>
+            <strong>PENTRU BENEFICIAR (PRIMIRE)</strong><br>
+            <span style="font-size: 10px; color: #64748b;">(Pasul 2: Receptor)</span><br><br>
             ${initiatorRol === 'client' && semnăturaBase64 ? `
               <img src="${semnăturaBase64}" class="signature-image" alt="Semnatura Beneficiar" />
-              <span style="font-size: 10px; font-weight: normal; color: #16a34a; display:block;">Semnat digital creator</span>
-            ` : `<div class="signature-placeholder" style="color: #ef4444;">Așteaptă semnare partener</div>`}
+              <div style="font-size: 10px; color: #16a34a; background: #f0fdf4; padding: 4px; border-radius: 4px; margin-top: 5px;">
+                ✓ Recepție &amp; Primire Validată
+              </div>
+            ` : `
+              <div class="signature-placeholder" style="border: 1px dashed #cbd5e1; padding: 10px; border-radius: 4px; color: #ef4444;">
+               În așteptarea semnăturii beneficiarului
+              </div>
+            `}
           </div>
         </div>
 

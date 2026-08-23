@@ -533,6 +533,35 @@ export default function Home() {
 
   const [scrollPercent, setScrollPercent] = useState(0);
 
+  // Stări pentru semnături duble B2B
+const [b2bSignStep, setB2bSignStep] = useState('prestator'); // 'prestator' -> 'client' -> 'done'
+const [b2bSigPrestator, setB2bSigPrestator] = useState(null);
+const [b2bSigClient, setB2bSigClient] = useState(null);
+
+const salveazaSemnaturaB2B = (rol) => {
+  let sig = null;
+  if (signatureTab === 'draw' && canvasRef.current) sig = canvasRef.current.toDataURL('image/png');
+  else if (signatureTab === 'upload' && uploadedSignature) sig = uploadedSignature;
+  
+  if (!sig || sig.length < 100) return alert('Te rugăm să adaugi o semnătură validă!');
+
+  if (rol === 'prestator') {
+    setB2bSigPrestator(sig);
+    curataCanvas();
+    setB2bSignStep('client');
+  } else {
+    setB2bSigClient(sig);
+    curataCanvas();
+    setB2bSignStep('done');
+  }
+};
+
+const reseteazaSemnaturiB2B = () => {
+  setB2bSigPrestator(null); 
+  setB2bSigClient(null); 
+  setB2bSignStep('prestator'); 
+  curataCanvas();
+};
   const [signatureTab, setSignatureTab] = useState('draw');
   const [isDrawing, setIsDrawing] = useState(false);
   const canvasRef = useRef(null);
@@ -1062,7 +1091,14 @@ export default function Home() {
       const res = await fetch('/api/generate-contract', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, prestatorEmail: user.email, semnăturaBase64: imagineSemnaturaText, userId: user.id, captchaToken })
+        body: JSON.stringify({ 
+        ...formData, 
+        prestatorEmail: user.email, 
+        semnaturaPrestatorBase64: b2bSigPrestator, 
+        semnaturaClientBase64: b2bSigClient, 
+        userId: user.id, 
+        captchaToken 
+      })
       });
 
       if (res.ok) {
@@ -2286,74 +2322,91 @@ export default function Home() {
                       )} {/* <-- AICI SE ÎNCHIDE BLOCUL EXTENSIBIL (isClausesOpen) */}
                     </div>
 
-                    {/* 05. SISTEM AVANSAT DE SEMNĂTURI */}
+                    {/* 05. SISTEM AVANSAT DE SEMNĂTURI B2B ÎN DOI PAȘI */}
                     <div className="p-4 sm:p-6 bg-[#12181D]/40 border border-slate-800/80 rounded-xl space-y-4 sm:space-y-5 relative overflow-hidden group hover:border-slate-700/60 transition-colors">
                       <div className="absolute top-0 left-0 w-1 h-full bg-slate-700 group-hover:bg-[#8ba888] transition-colors"></div>
                       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800/60 pb-3 gap-4 sm:gap-0">
-                        <span className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2"><span className="text-slate-500 font-mono">05.</span> Aprobare și Semnare Document</span>
-                        <div className="flex bg-[#0B0F12] p-1 rounded-lg border border-slate-700/60 shadow-inner w-full sm:w-auto">
-                          <button type="button" onClick={() => { setSignatureTab('draw'); curataCanvas(); }} className={`flex-1 sm:flex-none px-4 py-1.5 rounded-md text-[10px] font-bold transition-all duration-200 ${signatureTab === 'draw' ? 'bg-[#8ba888] text-black shadow-sm' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}>Desenează</button>
-                          <button type="button" onClick={() => { setSignatureTab('upload'); curataCanvas(); }} className={`flex-1 sm:flex-none px-4 py-1.5 rounded-md text-[10px] font-bold transition-all duration-200 ${signatureTab === 'upload' ? 'bg-[#8ba888] text-black shadow-sm' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}>📁 Încarcă PNG/JPG</button>
-                        </div>
+                        <span className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                          <span className="text-slate-500 font-mono">05.</span> Aprobare și Semnare în Doi Pași
+                        </span>
+                        {b2bSignStep !== 'done' && (
+                          <div className="flex bg-[#0B0F12] p-1 rounded-lg border border-slate-700/60 shadow-inner w-full sm:w-auto">
+                            <button type="button" onClick={() => { setSignatureTab('draw'); curataCanvas(); }} className={`flex-1 sm:flex-none px-4 py-1.5 rounded-md text-[10px] font-bold transition-all duration-200 ${signatureTab === 'draw' ? 'bg-[#8ba888] text-black shadow-sm' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}>Desenează</button>
+                            <button type="button" onClick={() => { setSignatureTab('upload'); curataCanvas(); }} className={`flex-1 sm:flex-none px-4 py-1.5 rounded-md text-[10px] font-bold transition-all duration-200 ${signatureTab === 'upload' ? 'bg-[#8ba888] text-black shadow-sm' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}>📁 Încarcă PNG/JPG</button>
+                          </div>
+                        )}
                       </div>
 
                       <div className="bg-[#0B0F12] p-4 rounded-xl border border-slate-700/60">
-                        {signatureTab === 'draw' && (
-                          <div className="space-y-3 relative">
-                            <div className="relative border-2 border-dashed border-slate-600 rounded-xl bg-white overflow-hidden shadow-inner">
-                              {!isDrawing && !canvasRef.current?.toDataURL().length > 100 && (
-                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
-                                  <span className="text-slate-800 text-3xl font-black italic tracking-tighter">Semnează aici</span>
-                                </div>
-                              )}
-                              {/* O grilă subtilă de fundal pentru aspect premium */}
-                              <div className="absolute inset-0 pointer-events-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9IiNlMmU4ZjAiLz48L3N2Zz4=')] opacity-50"></div>
-                              <canvas 
-                                ref={canvasRef} 
-                                width={600} 
-                                height={160} 
-                                onTouchStart={pornesteDesenul} 
-                                onTouchMove={deseneaza} 
-                                onTouchEnd={opresteDesenul} 
-                                onMouseDown={pornesteDesenul} 
-                                onMouseMove={deseneaza} 
-                                onMouseUp={opresteDesenul} 
-                                onMouseLeave={opresteDesenul} 
-                                className="w-full h-40 cursor-crosshair block touch-none relative z-10" 
-                              />
-                            </div>
-                            <div className="flex justify-center sm:justify-end">
-                              <button type="button" onClick={curataCanvas} className="text-[10px] font-bold text-red-400 hover:text-red-300 transition-colors uppercase tracking-widest flex items-center gap-1.5 bg-red-400/10 px-3 py-1.5 rounded-lg border border-red-400/20">
-                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                Curăță / Resemnează
-                              </button>
-                            </div>
+                        {b2bSignStep === 'done' ? (
+                          <div className="text-center py-6 animate-fadeIn">
+                            <div className="text-emerald-400 mb-2 font-bold text-xs uppercase tracking-wider">✔️ Ambele semnături au fost înregistrate (Prestator + Beneficiar).</div>
+                            <button type="button" onClick={reseteazaSemnaturiB2B} className="text-[10px] text-slate-400 hover:text-white underline mt-2 transition-colors uppercase font-bold">Resetează și resemnează</button>
                           </div>
-                        )}
-
-                        {signatureTab === 'upload' && (
-                          <div className="flex flex-col items-center justify-center py-10 border-2 border-dashed border-slate-600 rounded-xl bg-[#12181D]/50 transition-colors hover:border-[#8ba888]/50 hover:bg-[#12181D]">
-                            {!uploadedSignature ? (
-                              <>
-                                <div className="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center mb-4 text-[#8ba888] shadow-inner">
-                                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                                </div>
-                                <label className="cursor-pointer bg-[#8ba888] text-black px-6 py-2.5 rounded-lg text-xs font-bold hover:opacity-90 transition-opacity shadow-lg shadow-[#8ba888]/20">
-                                  Selectează Imaginea
-                                  <input type="file" accept="image/png, image/jpeg" onChange={handleIncarcareSemnatura} className="hidden" />
-                                </label>
-                                <span className="text-[10px] text-slate-500 mt-3 max-w-xs text-center leading-relaxed">Pentru un rezultat perfect, folosiți o imagine clară (PNG fără fundal este ideal). Sistemul o va încadra pe document.</span>
-                              </>
-                            ) : (
-                              <div className="flex flex-col items-center w-full px-4">
-                                <div className="bg-white p-4 rounded-xl mb-5 w-full max-w-sm flex justify-center border border-slate-300 shadow-inner relative overflow-hidden">
+                        ) : (
+                          <div className="animate-fadeIn">
+                            <div className="mb-4 text-center">
+                              <span className="text-[10px] font-black uppercase text-amber-500 tracking-widest bg-amber-900/20 px-3 py-1.5 rounded border border-amber-500/20 shadow-sm">
+                                PASUL {b2bSignStep === 'prestator' ? '1: Semnează Prestatorul' : '2: Semnează Beneficiarul'}
+                              </span>
+                            </div>
+                            
+                            {signatureTab === 'draw' && (
+                              <div className="space-y-3 relative">
+                                <div className="relative border-2 border-dashed border-slate-600 rounded-xl bg-white overflow-hidden shadow-inner">
+                                  {!isDrawing && !canvasRef.current?.toDataURL().length > 100 && (
+                                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+                                      <span className="text-slate-800 text-3xl font-black italic tracking-tighter">Semnează {b2bSignStep === 'prestator' ? 'Prestator' : 'Beneficiar'}</span>
+                                    </div>
+                                  )}
                                   <div className="absolute inset-0 pointer-events-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9IiNlMmU4ZjAiLz48L3N2Zz4=')] opacity-50"></div>
-                                  <img src={uploadedSignature} alt="Semnatura Incarcata" className="max-h-28 object-contain relative z-10 drop-shadow-sm" />
+                                  <canvas 
+                                    ref={canvasRef} 
+                                    width={600} 
+                                    height={160} 
+                                    onTouchStart={pornesteDesenul} 
+                                    onTouchMove={deseneaza} 
+                                    onTouchEnd={opresteDesenul} 
+                                    onMouseDown={pornesteDesenul} 
+                                    onMouseMove={deseneaza} 
+                                    onMouseUp={opresteDesenul} 
+                                    onMouseLeave={opresteDesenul} 
+                                    className="w-full h-40 cursor-crosshair block touch-none relative z-10" 
+                                  />
                                 </div>
-                                <button type="button" onClick={() => setUploadedSignature(null)} className="text-[10px] font-bold text-red-400 hover:text-red-300 transition-colors uppercase tracking-widest flex items-center gap-1.5 bg-red-400/10 px-4 py-2 rounded-lg border border-red-400/20">
-                                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                  Șterge & Reîncarcă
-                                </button>
+                                <div className="flex justify-between items-center">
+                                  <button type="button" onClick={curataCanvas} className="text-[10px] font-bold text-slate-400 hover:text-white transition-colors uppercase">Curăță</button>
+                                  <button type="button" onClick={() => salveazaSemnaturaB2B(b2bSignStep)} className="bg-[#8ba888] hover:scale-105 active:scale-95 transition-transform text-black px-5 py-2.5 rounded-lg text-xs font-black uppercase shadow-sm">
+                                    Confirmă {b2bSignStep === 'prestator' ? 'Prestator' : 'Beneficiar'} &rarr;
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+
+                            {signatureTab === 'upload' && (
+                              <div className="flex flex-col items-center justify-center py-10 border-2 border-dashed border-slate-600 rounded-xl bg-[#12181D]/50 transition-colors">
+                                {!uploadedSignature ? (
+                                  <>
+                                    <div className="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center mb-4 text-[#8ba888] shadow-inner">
+                                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                    </div>
+                                    <label className="cursor-pointer bg-[#8ba888] text-black px-6 py-2.5 rounded-lg text-xs font-bold hover:opacity-90 transition-opacity shadow-lg shadow-[#8ba888]/20">
+                                      Încarcă Semnătură {b2bSignStep === 'prestator' ? 'Prestator' : 'Beneficiar'}
+                                      <input type="file" accept="image/png, image/jpeg" onChange={handleIncarcareSemnatura} className="hidden" />
+                                    </label>
+                                  </>
+                                ) : (
+                                  <div className="flex flex-col items-center w-full px-4">
+                                    <div className="bg-white p-4 rounded-xl mb-5 w-full max-w-sm flex justify-center border border-slate-300 shadow-inner relative overflow-hidden">
+                                      <div className="absolute inset-0 pointer-events-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9IiNlMmU4ZjAiLz48L3N2Zz4=')] opacity-50"></div>
+                                      <img src={uploadedSignature} alt="Semnatura Incarcata" className="max-h-28 object-contain relative z-10 drop-shadow-sm" />
+                                    </div>
+                                    <div className="flex gap-4">
+                                      <button type="button" onClick={() => setUploadedSignature(null)} className="text-[10px] font-bold text-red-400 hover:text-red-300 transition-colors uppercase tracking-widest px-4 py-2 border border-slate-700 rounded-lg">Șterge</button>
+                                      <button type="button" onClick={() => salveazaSemnaturaB2B(b2bSignStep)} className="bg-[#8ba888] hover:scale-105 active:scale-95 transition-transform text-black px-5 py-2 rounded-lg text-xs font-black uppercase shadow-sm">Confirmă &rarr;</button>
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             )}
                           </div>
