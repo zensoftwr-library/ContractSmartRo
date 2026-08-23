@@ -1,66 +1,140 @@
 import { NextResponse } from 'next/server';
 import puppeteer from 'puppeteer';
 
+function formateazaAdresa(addr) {
+  if (!addr) return '';
+  if (typeof addr === 'string') return addr;
+  return [
+    addr.street ? `Str. ${addr.street}` : '',
+    addr.number ? `nr. ${addr.number}` : '',
+    addr.city || '',
+    addr.county || ''
+  ].filter(Boolean).join(', ');
+}
+
 async function generatePdfBuffer(cuiClean) {
   if (!cuiClean) throw new Error('CUI invalid sau lipsă');
 
-  let dataFirma = {};
-  
-  // 1. Preluăm Istoricul Financiar de la FirmeAPI
+  let dataFirma = {
+    cui: cuiClean,
+    denumire: '',
+    regCom: '',
+    adresa: '',
+    stare: 'ACTIV',
+    stare_juridica: 'Societate Comercială',
+    administrator: '',
+    caen: '',
+    tva: 'NU',
+    istoric_financiar: [],
+    an_bilant: 'N/A',
+    cifra_afaceri: 0,
+    profit_net: 0,
+    pierdere_neta: 0,
+    datorii: 0,
+    angajati: 0,
+    active_imobilizate: 0,
+    active_circulante: 0,
+    stocuri: 0,
+    creante: 0,
+    cash: 0,
+    capitaluri_proprii: 0
+  };
+
+  // 1. Preluăm datele juridice de bază (Gratuit) de la lista-firme.info
+  try {
+    const resFree = await fetch(`https://lista-firme.info/api/v1/info?cui=${cuiClean}`, {
+      signal: AbortSignal.timeout(3500)
+    });
+    if (resFree.ok) {
+      const dataFree = await resFree.json();
+      dataFirma.denumire = dataFree.name || dataFree.denumire || '';
+      dataFirma.regCom = dataFree.reg_com || dataFree.numar_reg_com || '';
+      dataFirma.adresa = formateazaAdresa(dataFree.address);
+      
+      const reps = [...(dataFree.legal_representatives || []), ...(dataFree.natural_person_representatives || [])];
+      if (reps.length > 0) {
+        dataFirma.administrator = reps.map(r => r.nume || r.name || '').filter(Boolean).join(', ');
+      }
+    }
+  } catch (e) {
+    console.warn("Eroare lista-firme.info în raport:", e.message);
+  }
+
+  // 2. Preluăm Bilanțurile Financiare și Starea Fiscală Reală de la FirmeAPI
   if (process.env.FIRMEAPI_KEY) {
     try {
       const resFirme = await fetch(`https://www.firmeapi.ro/api/v1/firma/${cuiClean}`, {
-        headers: { 'Authorization': `Bearer ${process.env.FIRMEAPI_KEY}`, 'Accept': 'application/json' }
+        headers: { 'Authorization': `Bearer ${process.env.FIRMEAPI_KEY}`, 'Accept': 'application/json' },
+        signal: AbortSignal.timeout(4000)
       });
+      
       if (resFirme.ok) {
         const resultFirme = await resFirme.json();
-        if (resultFirme.data) {
-          dataFirma = {
-            ...resultFirme.data,
-            regCom: resultFirme.data.nr_reg_com,
-            istoric_financiar: resultFirme.data.bilant || [],
-            an_bilant: resultFirme.data.bilant?.[0]?.an || 'N/A',
-            cifra_afaceri: resultFirme.data.bilant?.[0]?.cifra_afaceri || 0,
-            profit_net: resultFirme.data.bilant?.[0]?.profit_net || 0,
-            pierdere_neta: resultFirme.data.bilant?.[0]?.pierdere_neta || 0,
-            datorii: resultFirme.data.bilant?.[0]?.datorii || 0,
-            angajati: resultFirme.data.bilant?.[0]?.angajati || 0,
-            active_imobilizate: resultFirme.data.bilant?.[0]?.active_imobilizate || 0,
-            active_circulante: resultFirme.data.bilant?.[0]?.active_circulante || 0,
-            stocuri: resultFirme.data.bilant?.[0]?.stocuri || 0,
-            creante: resultFirme.data.bilant?.[0]?.creante || 0,
-            cash: resultFirme.data.bilant?.[0]?.casa_si_conturi || 0,
-            capitaluri_proprii: resultFirme.data.bilant?.[0]?.capitaluri_proprii || 0
-          };
+        const data = resultFirme.data || {};
+        
+        if (!dataFirma.denumire) dataFirma.denumire = data.denumire || '';
+        if (!dataFirma.regCom) dataFirma.regCom = data.nr_reg_com || '';
+        if (!dataFirma.adresa) dataFirma.adresa = typeof data.adresa === 'string' ? data.adresa : '';
+        if (data.cod_caen) dataFirma.caen = data.cod_caen;
+        if (data.tva && data.tva.platitor) dataFirma.tva = 'DA';
+
+        // Verificare stadiu inactiv / radiat
+        if (data.status_inactiv && data.status_inactiv.inactiv) {
+          const dataInactivarii = data.status_inactiv.data_inactivare || '';
+          dataFirma.stare = dataInactivarii ? `INACTIV FISCAL (din ${dataInactivarii})` : `INACTIV FISCAL`;
+          dataFirma.stare_juridica = dataFirma.stare;
+        } else if (data.stare) {
+          dataFirma.stare = data.stare;
+          dataFirma.stare_juridica = data.stare;
+        }
+
+        // Extragere istoric financiar / bilanțuri
+        const bilanturi = data.bilant || data.istoric_financiar || data.financiare || [];
+        if (bilanturi.length > 0) {
+          dataFirma.istoric_financiar = bilanturi;
+          const ultimulBilant = bilanturi[0]; // De obicei primul din listă este cel mai recent
+          
+          dataFirma.an_bilant = ultimulBilant.an_bilant || ultimulBilant.an || 'N/A';
+          dataFirma.cifra_afaceri = ultimulBilant.cifra_afaceri || 0;
+          dataFirma.profit_net = ultimulBilant.profit_net || 0;
+          dataFirma.pierdere_neta = ultimulBilant.pierdere_neta || 0;
+          dataFirma.datorii = ultimulBilant.datorii || 0;
+          dataFirma.angajati = ultimulBilant.angajati || 0;
+          dataFirma.active_imobilizate = ultimulBilant.active_imobilizate || 0;
+          dataFirma.active_circulante = ultimulBilant.active_circulante || 0;
+          dataFirma.stocuri = ultimulBilant.stocuri || 0;
+          dataFirma.creante = ultimulBilant.creante || 0;
+          dataFirma.cash = ultimulBilant.casa_si_conturi || ultimulBilant.cash || 0;
+          dataFirma.capitaluri_proprii = ultimulBilant.capitaluri_proprii || 0;
         }
       }
-    } catch(e) { console.warn("FirmeAPI bilant error:", e); }
+    } catch (e) {
+      console.warn("Eroare FirmeAPI în raport:", e.message);
+    }
   }
 
-  // 2. Preluăm Datele Juridice + Administratorii de la OpenAPI (Suprascrie datele de bază)
-  if (process.env.OPENAPI_API_KEY) {
+  // Fallback final la OpenAPI dacă nu avem denumire din primele două surse
+  if (!dataFirma.denumire && process.env.OPENAPI_API_KEY) {
     try {
       const resOpen = await fetch(`https://api.openapi.ro/api/companies/${cuiClean}`, {
         headers: { 'x-api-key': process.env.OPENAPI_API_KEY }
       });
       if (resOpen.ok) {
         const resultOpen = await resOpen.json();
-        let admin = '';
-        if (resultOpen.reprezentanti && resultOpen.reprezentanti.length > 0) {
-          admin = resultOpen.reprezentanti.map(r => r.nume).join(', ');
-        }
-        
-        dataFirma.denumire = resultOpen.denumire || dataFirma.denumire;
-        dataFirma.cui = resultOpen.cif || cuiClean;
-        dataFirma.regCom = resultOpen.numar_reg_com || dataFirma.regCom;
-        dataFirma.stare = resultOpen.stare || dataFirma.stare || 'ACTIV';
-        dataFirma.stare_juridica = resultOpen.stare || 'Societate Comercială';
-        dataFirma.adresa = resultOpen.adresa || dataFirma.adresa;
-        dataFirma.caen = resultOpen.caen || dataFirma.caen;
-        dataFirma.administrator = admin;
+        dataFirma.denumire = resultOpen.denumire;
+        dataFirma.regCom = resultOpen.numar_reg_com;
+        dataFirma.adresa = typeof resultOpen.adresa === 'string' ? resultOpen.adresa : '';
+        dataFirma.caen = resultOpen.caen;
         dataFirma.tva = resultOpen.tva ? 'DA' : 'NU';
+        dataFirma.stare = resultOpen.stare || 'ACTIV';
+        dataFirma.stare_juridica = resultOpen.stare || 'ACTIV';
+        if (resultOpen.reprezentanti && resultOpen.reprezentanti.length > 0) {
+          dataFirma.administrator = resultOpen.reprezentanti.map(r => r.nume).join(', ');
+        }
       }
-    } catch(e) { console.warn("OpenAPI basic error:", e); }
+    } catch (e) {
+      console.warn("Eroare OpenAPI în raport:", e.message);
+    }
   }
 
   if (!dataFirma.denumire) throw new Error('Date indisponibile pentru acest CUI în rețeaua oficială.');
@@ -72,9 +146,9 @@ async function generatePdfBuffer(cuiClean) {
   if (dataFirma.istoric_financiar && dataFirma.istoric_financiar.length > 0) {
     const randuriTabel = dataFirma.istoric_financiar.map(an => `
       <tr>
-        <td style="text-align: center;"><strong>${an.an_bilant || an.an}</strong></td>
+        <td style="text-align: center;"><strong>${an.an_bilant || an.an || 'N/A'}</strong></td>
         <td style="text-align: right;">${formatMoney(an.cifra_afaceri)}</td>
-        <td style="text-align: right;" class="${an.profit_net > 0 ? 'text-green' : 'text-red'}">${formatMoney(an.profit_net)}</td>
+        <td style="text-align: right;" class="${(an.profit_net || 0) > 0 ? 'text-green' : 'text-red'}">${formatMoney(an.profit_net)}</td>
         <td style="text-align: right;" class="text-red">${formatMoney(an.datorii)}</td>
         <td style="text-align: center;">${formatNumber(an.angajati)}</td>
       </tr>
@@ -141,11 +215,11 @@ async function generatePdfBuffer(cuiClean) {
           <div class="section-title">1. DATE DE IDENTIFICARE & ACTIVITATE</div>
           <table>
             <tr><th>Denumire Companie:</th><td><strong>${dataFirma.denumire || 'N/A'}</strong></td></tr>
-            <tr><th>CUI / Reg. Com.:</th><td>${dataFirma.cui || cuiClean} / ${dataFirma.regCom || 'N/A'}</td></tr>
+            <tr><th>CUI / Reg. Com.:</th><td>${dataFirma.cui} / ${dataFirma.regCom || 'N/A'}</td></tr>
             <tr><th>Stare Fiscală / ANAF:</th><td><span class="badge">${dataFirma.stare || 'N/A'}</span></td></tr>
             <tr><th>Stare Juridică / Activitate:</th><td><span class="text-red">${dataFirma.stare_juridica || 'N/A'}</span></td></tr>
             <tr><th>Administrator / Reprezentant:</th><td>${dataFirma.administrator || 'N/A'}</td></tr>
-            <tr><th>Adresă Sediu Social:</th><td>${typeof dataFirma.adresa === 'string' ? dataFirma.adresa : 'N/A'}</td></tr>
+            <tr><th>Adresă Sediu Social:</th><td>${dataFirma.adresa || 'N/A'}</td></tr>
             <tr><th>Domeniu de Activitate (CAEN):</th><td>${dataFirma.caen || 'N/A'}</td></tr>
             <tr><th>Plătitor de TVA:</th><td>${dataFirma.tva || 'N/A'}</td></tr>
           </table>
@@ -210,14 +284,12 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
-  let cui = null;
+  let jsonBody = {};
   try {
-    const body = await request.json();
-    cui = body.cui;
-  } catch (e) {
-    const { searchParams } = new URL(request.url);
-    cui = searchParams.get('cui');
-  }
+    jsonBody = await request.json();
+  } catch (e) {}
+
+  const cui = jsonBody.cui || new URL(request.url).searchParams.get('cui');
 
   try {
     const pdfBuffer = await generatePdfBuffer(cui);
