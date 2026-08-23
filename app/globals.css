@@ -125,11 +125,20 @@ html.matcha-light-theme [class*="bg-slate-9"],
 html.matcha-light-theme [class*="bg-slate-8"],
 html.matcha-light-theme [class*="bg-gray-9"],
 html.matcha-light-theme [class*="bg-zinc-9"],
-html.matcha-light-theme div[class*="fixed"], 
+html.matcha-light-theme .fixed.inset-0, 
 html.matcha-light-theme nav {
   background-color: var(--card-bg) !important;
   color: var(--text-main) !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Protejăm widget-urile externe de chat să nu aibă pătrat alb */
+html.matcha-light-theme iframe,
+html.matcha-light-theme [id*="chat"],
+html.matcha-light-theme [class*="chat"] {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 /* 4. Cardul VIP Fondator (Targetat specific pe baza chenarului de amber, lăsând știrile intacte) */
@@ -220,4 +229,44 @@ html.matcha-light-theme span[class*="bg-black"],
 html.matcha-light-theme div[class*="bg-[#12181D]"] {
   background-color: #f1f5f9 !important;
   border: 1px solid #cbd5e1 !important;
+}
+
+/* ======= FIX-URI PENTRU VIZIBILITATE ======= */
+
+/* Afișarea Corectă a Prețurilor, CUI-ului, meniului și PDF Upload pe Light Theme (Text Alb pe Alb) */
+html.matcha-light-theme span.text-white,
+html.matcha-light-theme div.text-white,
+html.matcha-light-theme p.text-white,
+html.matcha-light-theme h1.text-white,
+html.matcha-light-theme h2.text-white,
+html.matcha-light-theme h3.text-white,
+html.matcha-light-theme h4.text-white,
+html.matcha-light-theme strong.text-white {
+  color: #1f2937 !important;
+}
+
+/* Păstrăm textul alb DOAR pe butoanele colorate (Cumpără, Generare etc.) */
+html.matcha-light-theme button span.text-white,
+html.matcha-light-theme button .text-white,
+html.matcha-light-theme button.text-white,
+html.matcha-light-theme a[class*="bg-"] .text-white {
+  color: #ffffff !important;
+}
+
+/* Spinner Vizibil Global */
+html.matcha-light-theme .animate-spin {
+  border-color: #cbd5e1 !important;
+  border-top-color: #8ba888 !important;
+  border-left-color: #8ba888 !important;
+}
+
+/* Terminal QR - Contrast Butoane Gri */
+html.matcha-light-theme button[class*="bg-[#16221A]"] {
+  background-color: #e2e8f0 !important;
+  color: #334155 !important;
+  border: 1px solid #cbd5e1 !important;
+}
+html.matcha-light-theme button[class*="bg-[#16221A]"]:hover {
+  background-color: #cbd5e1 !important;
+  color: #0f172a !important;
 }

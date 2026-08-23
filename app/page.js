@@ -20,7 +20,13 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
 // Singleton pattern: refolosim instanța dacă există, ca să evităm warning-ul de Multiple GoTrueClient
-const supabase = globalThis.supabaseClient ?? createClient(supabaseUrl, supabaseAnonKey);
+const supabase = globalThis.supabaseClient ?? createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true
+  }
+});
 
 if (process.env.NODE_ENV !== 'production') {
   globalThis.supabaseClient = supabase;
@@ -1696,9 +1702,11 @@ const reseteazaSemnaturiB2B = () => {
             />
 
             {/* ADAUGAM PREȚURILE AICI ÎN PASUL 1 */}
-            <div className="-mt-16 relative z-20">
-              <PricingPlans handleCumparaPremium={handleCumparaPremium} />
-            </div>
+            {user?.status !== 'founder' && (
+              <div className="-mt-16 relative z-20">
+                <PricingPlans handleCumparaPremium={handleCumparaPremium} />
+              </div>
+            )}
 
             {/* QR CODE STUDIO */}
           <div className="max-w-6xl mx-auto border-t border-slate-800/80 pt-12 mt-8"></div>
@@ -1708,8 +1716,8 @@ const reseteazaSemnaturiB2B = () => {
             <p className="text-xs text-slate-400 mt-1 max-w-lg mx-auto leading-relaxed">Generator multifuncțional avansat pentru extinderea capacităților digitale.</p>
           </div>
 
-          <div className="max-w-6xl mx-auto px-6 mt-4 mb-12">              
-            <div className="bg-[#12181D]/60 backdrop-blur-xl rounded-2xl border border-slate-800/80 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden group hover:border-[#8ba888]/30 transition-colors relative">
+          <div className="max-w-6xl w-full mx-auto px-4 sm:px-6 mt-4 mb-12">              
+            <div className="bg-[#12181D]/60 backdrop-blur-xl rounded-2xl border border-slate-800/80 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden group hover:border-[#8ba888]/30 transition-colors relative w-full overflow-x-hidden">
               {/* Subtle ambient glow */}
               <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#8ba888]/5 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -2030,9 +2038,11 @@ const reseteazaSemnaturiB2B = () => {
             </div>
 
             {/* SEPARATOR BORDER - EXTENSII QR */}
-            <div className="max-w-6xl mx-auto border-t border-slate-800/80 pt-16 mt-8">
-              <PricingAddons handleCumparaPremium={handleCumparaPremium} />
-            </div>
+            {user?.status !== 'founder' && (
+              <div className="max-w-6xl mx-auto border-t border-slate-800/80 pt-16 mt-8 w-full px-4">
+                <PricingAddons handleCumparaPremium={handleCumparaPremium} />
+              </div>
+            )}
 
                       </div>
         )}
@@ -2986,9 +2996,11 @@ const reseteazaSemnaturiB2B = () => {
             </div>
 
             {/* Tabelul de prețuri apare mereu la finalul Step 2 (și la B2B și la Auto) */}
-            <div className="mt-8">
-              <PricingPlans handleCumparaPremium={handleCumparaPremium} />
-            </div>
+            {user?.status !== 'founder' && (
+              <div className="mt-8 w-full px-4">
+                <PricingPlans handleCumparaPremium={handleCumparaPremium} />
+              </div>
+            )}
 
           </div>
         )}

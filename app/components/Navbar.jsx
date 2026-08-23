@@ -5,7 +5,9 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-const supabase = globalThis.supabaseClient ?? createClient(supabaseUrl, supabaseAnonKey);
+const supabase = globalThis.supabaseClient ?? createClient(supabaseUrl, supabaseAnonKey, {
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+});
 
 export default function Navbar({ 
   user: propUser, 
@@ -275,8 +277,8 @@ export default function Navbar({
                 </div>
               </div>
               <div className="flex justify-between pt-3 border-t border-slate-700/50">
-                <button type="button" onClick={handleLogout} className="text-slate-300 text-xs font-bold uppercase tracking-wider hover:text-white">Ieșire Cont</button>
-                <button type="button" onClick={stergeCont} className="text-red-500 text-xs font-bold uppercase tracking-wider hover:text-red-400">Șterge Cont</button>
+                <button type="button" onClick={() => { setIsMobileMenuOpen(false); handleLogout(); }} className="text-slate-300 text-xs font-bold uppercase tracking-wider hover:text-white">Ieșire Cont</button>
+                <button type="button" onClick={() => { setIsMobileMenuOpen(false); stergeCont(); }} className="text-red-500 text-xs font-bold uppercase tracking-wider hover:text-red-400">Șterge Cont</button>
               </div>
             </div>
           )}
