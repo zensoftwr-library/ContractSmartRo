@@ -298,3 +298,26 @@ html.matcha-light-theme .bg-white {
   color: #1f2937 !important;
   border: 1px solid #cbd5e1 !important;
 }
+
+/* Forțăm textul închis pe orice element sau input din Hero Section pe tema de zi */
+html.matcha-light-theme section input,
+html.matcha-light-theme section button:not(.bg-\[\#8ba888\]):not(.bg-purple-600) {
+  color: #1f2937 !important;
+}
+
+/* Dacă elementul din mijloc este un input sau conține text invizibil */
+html.matcha-light-theme input::placeholder {
+  color: #6b7280 !important;
+}
+
+/* ✨ FIX DEFINITIV PENTRU ANIMATIILE DE LOADING (SPINNERE) PE LIGHT THEME ✨ */
+html.matcha-light-theme .animate-spin {
+  border-color: #cbd5e1 !important;
+  border-top-color: #8ba888 !important;
+  border-left-color: #8ba888 !important;
+}
+
+html.matcha-light-theme div[class*="animate-spin"] {
+  border-color: #cbd5e1 !important;
+  border-top-color: #8ba888 !important;
+}
