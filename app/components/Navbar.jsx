@@ -12,6 +12,28 @@ export default function Navbar({
   handleInapoiPrincipal 
 }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMatchaLight, setIsMatchaLight] = useState(false);
+
+  // Aplicăm clasa pe <html> pentru tema de culori
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'matcha-light') {
+      setIsMatchaLight(true);
+      document.documentElement.classList.add('matcha-light-theme');
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    if (isMatchaLight) {
+      document.documentElement.classList.remove('matcha-light-theme');
+      localStorage.setItem('theme', 'dark');
+      setIsMatchaLight(false);
+    } else {
+      document.documentElement.classList.add('matcha-light-theme');
+      localStorage.setItem('theme', 'matcha-light');
+      setIsMatchaLight(true);
+    }
+  };
 
   // Funcție inteligentă pentru scroll sau redirect către prețuri
   const mergiLaPreturi = () => {
@@ -140,6 +162,10 @@ export default function Navbar({
           )}
           
           <button onClick={mergiLaPreturi} className="bg-gradient-to-r from-[#8ba888] to-[#6d8a6a] text-black font-black text-[11px] px-5 py-2.5 rounded-xl uppercase tracking-widest transition-all shadow-[0_0_15px_rgba(139,168,136,0.3)] hover:scale-[1.02] active:scale-[0.98]">Tarife</button>
+          
+          <button onClick={toggleTheme} className="ml-4 w-9 h-9 flex items-center justify-center rounded-full bg-[#12181D] border border-slate-700 hover:border-[#8ba888] transition-all" title="Schimbă Tema">
+            {isMatchaLight ? '🌙' : '☀️'}
+          </button>
         </div>
       </div>
 

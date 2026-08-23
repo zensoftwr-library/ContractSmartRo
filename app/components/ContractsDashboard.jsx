@@ -57,8 +57,8 @@ export default function ContractsDashboard({ userId }) {
         <span className="text-[10px] font-mono text-[#8ba888] bg-[#16221A] border border-emerald-900/30 px-3 py-1 rounded-full uppercase tracking-widest">Smart Vault Activ</span>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-xs text-left">
+      <div className="overflow-x-auto pb-4 custom-scrollbar">
+        <table className="w-full text-xs text-left min-w-[700px]">
           <thead className="text-slate-500 uppercase border-b border-slate-800/80 font-black tracking-widest text-[10px]">
             <tr>
               <th className="pb-3">Contract</th>

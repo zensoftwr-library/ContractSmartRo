@@ -180,6 +180,8 @@ export default function Home() {
 
   const [captchaToken, setCaptchaToken] = useState(null); 
   const isProcessingForm = useRef(false);
+  const turnstileRef = useRef(null);
+  const [isClausesOpen, setIsClausesOpen] = useState(false);
 
   // STATE-URI MEGA QR
   const [qrType, setQrType] = useState('url'); 
@@ -545,6 +547,33 @@ export default function Home() {
   const autoSigCanvasRef = useRef(null);
   const [isAutoDrawing, setIsAutoDrawing] = useState(false);
   const [autoUploadedSig, setAutoUploadedSig] = useState(null);
+
+  // Stări pentru semnături duble
+  const [autoSignStep, setAutoSignStep] = useState('vanzator'); // 'vanzator' -> 'cumparator' -> 'done'
+  const [autoSigVanzator, setAutoSigVanzator] = useState(null);
+  const [autoSigCumparator, setAutoSigCumparator] = useState(null);
+
+  const salveazaSemnaturaAuto = (rol) => {
+    let sig = null;
+    if (autoSignatureTab === 'draw' && autoSigCanvasRef.current) sig = autoSigCanvasRef.current.toDataURL('image/png');
+    else if (autoSignatureTab === 'upload' && autoUploadedSig) sig = autoUploadedSig;
+    
+    if (!sig || sig.length < 100) return alert('Te rugăm să adaugi o semnătură validă!');
+
+    if (rol === 'vanzator') {
+      setAutoSigVanzator(sig);
+      curataCanvasAuto();
+      setAutoSignStep('cumparator');
+    } else {
+      setAutoSigCumparator(sig);
+      curataCanvasAuto();
+      setAutoSignStep('done');
+    }
+  };
+
+  const reseteazaSemnaturiA = () => {
+    setAutoSigVanzator(null); setAutoSigCumparator(null); setAutoSignStep('vanzator'); curataCanvasAuto();
+  };
 
   const [autoData, setAutoData] = useState({
     vanzatorTip: 'PF', 
@@ -994,6 +1023,11 @@ export default function Home() {
   const handleLansareContract = async (e) => {
     e.preventDefault();
     if (isProcessingForm.current) return;
+    
+    if (prestatorCuiStatus?.toUpperCase().includes('INACTIV') || clientCuiStatus?.toUpperCase().includes('INACTIV')) {
+      if(!confirm('ATENȚIE! Una din firme este INACTIVĂ FISCAL. Contractul are risc major de nedeductibilitate. Continui?')) return;
+    }
+
     if (!acordGdpr) {
       alert('Pentru a continua, trebuie să fii de acord cu prelucrarea tranzitorie a datelor (GDPR).');
       return;
@@ -1056,6 +1090,7 @@ export default function Home() {
     } finally {
       isProcessingForm.current = false;
       setLoadingText(null);
+      if (turnstileRef.current) { turnstileRef.current.reset(); setCaptchaToken(null); }
     }
   };
 
@@ -1076,6 +1111,12 @@ export default function Home() {
       localFormData.append('context', 'auto'); // Îi spunem AI-ului din route.js că e auto
 
       const res = await fetch('/api/auto/upload-ocr', { method: 'POST', body: localFormData });
+      
+      if (!res.ok) {
+         const errText = await res.text();
+         throw new Error(`Cod ${res.status}: ${errText.substring(0,80)}`);
+      }
+      
       const data = await res.json();
 
       if (data.success && data.extractedData) {
@@ -1111,8 +1152,7 @@ export default function Home() {
       } else {
         alert('Datele nu au putut fi extrase. Încearcă o poză mai clară.');
       }
-    } catch (err) {
-      alert('Eroare tehnică la citirea documentului.');
+    } catch (err) { alert('Eroare OCR: ' + err.message); 
     } finally {
       setIsScanning(null); // Oprește rotița
       if (e.target) e.target.value = ''; // Resetează input-ul
@@ -1140,6 +1180,11 @@ export default function Home() {
   const handleGenereazaPachetAuto = async (e) => {
     e.preventDefault();
     if (isProcessingForm.current) return;
+    
+    if (prestatorCuiStatus?.toUpperCase().includes('INACTIV') || clientCuiStatus?.toUpperCase().includes('INACTIV')) {
+      if(!confirm('ATENȚIE! Una din firme este INACTIVĂ FISCAL la ANAF. Contractul are risc major de nedeductibilitate. Continui generarea?')) return;
+    }
+
     if (!acordGdpr) {
       alert('Pentru a continua, trebuie să fii de acord cu prelucrarea tranzitorie a datelor (GDPR).');
       return;
@@ -1163,11 +1208,8 @@ export default function Home() {
     isProcessingForm.current = true;
     setLoadingText({ title: "COMPILARE DOSAR AUTO...", desc: "Generăm cele 5 exemplare DITL și fișa de înmatriculare." });
 
-    let imagineSemnaturaText = '';
-    if (autoSignatureTab === 'draw' && autoSigCanvasRef.current) {
-      imagineSemnaturaText = autoSigCanvasRef.current.toDataURL('image/png');
-    } else if (autoSignatureTab === 'upload' && autoUploadedSig) {
-      imagineSemnaturaText = autoUploadedSig;
+    if (!autoSigVanzator && !autoSigCumparator && (autoSignatureTab === 'draw' || autoUploadedSig)) {
+       // Permitem generarea și fără, e opțional.
     }
 
     try {
@@ -1177,7 +1219,8 @@ export default function Home() {
         clientEmail: user.email,
         userId: user.id, 
         pretIncludeTVA: autoData.pretIncludeTVA,
-        semnaturaBase64: imagineSemnaturaText,
+        semnaturaVanzatorBase64: autoSigVanzator,
+        semnaturaCumparatorBase64: autoSigCumparator,
         captchaToken
       };
 
@@ -1211,7 +1254,7 @@ export default function Home() {
         setAutoStep('success');
         setAutoData({ vanzatorTip: 'PF', vanzatorNume: '', vanzatorCnp: '', vanzatorCui: '', vanzatorRegCom: '', vanzatorSediu: '', cumparatorTip: 'PF', cumparatorNume: '', cumparatorCnp: '', cumparatorCui: '', cumparatorRegCom: '', cumparatorSediu: '', autoVin: '', autoMarcaModel: '', autoNumarInmatriculare: '', autoPret: '', clientEmail: '', autoAdresaVanzator: '', autoAdresaCumparator: '', pretIncludeTVA: false, autoMoneda: 'RON', semnaturaBase64: null });
         setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon: null });
-        curataCanvasAuto();
+        reseteazaSemnaturiA();
       } else {
         const textEroare = await res.json();
         if (textEroare.needsPayment) {
@@ -1760,7 +1803,8 @@ export default function Home() {
                             </div>
                             <div className="shrink-0 w-full md:w-auto mt-2 md:mt-0 flex items-end">
                               {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
-                                <div className="hidden"><Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} /></div>
+                                <div className="hidden"><Turnstile ref={turnstileRef} siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} onExpire={() => { setCaptchaToken(null); turnstileRef.current?.reset(); }} options={{ theme: 'dark', size: 'invisible' }} />
+                                </div>
                               )}
                               <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="w-full h-[38px] bg-purple-600 text-white font-black px-4 rounded-lg text-xs hover:bg-purple-500 transition-colors uppercase tracking-wide shadow-[0_0_10px_rgba(147,51,234,0.3)]">
                                 {isGeneratingShortlink ? 'Procesare...' : 'SALVEAZA'}
@@ -1781,7 +1825,7 @@ export default function Home() {
                             <input type="url" placeholder="Link Google Play" value={androidUrl} onChange={(e) => setAndroidUrl(e.target.value)} className="w-full flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-blue-500 outline-none transition-all" />
                             <div className="shrink-0 w-full md:w-auto">
                               {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
-                                <div className="hidden"><Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} /></div>
+                                <div className="hidden"><Turnstile ref={turnstileRef} siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} onExpire={() => { setCaptchaToken(null); turnstileRef.current?.reset(); }} options={{ theme: 'dark', size: 'invisible' }} /></div>
                               )}
                               <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="w-full h-[38px] bg-blue-600 text-white font-black px-4 rounded-lg text-[11px] hover:bg-blue-500 transition-colors uppercase tracking-wide shadow-[0_0_10px_rgba(37,99,235,0.3)]">Activează Routing</button>
                             </div>
@@ -1805,7 +1849,7 @@ export default function Home() {
                             <div className="flex justify-between items-center mt-3">
                               <button type="button" onClick={() => setGeoRules([...geoRules.slice(0, -1), { country: '', url: '' }, geoRules[geoRules.length-1]])} className="text-[10px] text-blue-400 font-bold hover:text-white transition-colors uppercase">ADAUGA REGULA TARA</button>
                               {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
-                                <div className="hidden"><Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} /></div>
+                                <div className="hidden"><Turnstile ref={turnstileRef} siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} onExpire={() => { setCaptchaToken(null); turnstileRef.current?.reset(); }} options={{ theme: 'dark', size: 'invisible' }} /></div>
                               )}
                               <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="bg-blue-600 text-white font-black px-4 py-2.5 rounded-lg text-[11px] hover:bg-blue-500 transition-colors uppercase tracking-wide shadow-[0_0_10px_rgba(37,99,235,0.3)]">Activează Geo-Route</button>
                             </div>
@@ -1837,7 +1881,7 @@ export default function Home() {
                             <div className="flex justify-between items-center mt-2">
                               <button type="button" onClick={() => setLandingData({...landingData, links: [...landingData.links, { label: '', url: '' }]})} className="text-[10px] text-blue-400 font-bold hover:text-white transition-colors uppercase">ADAUGA LINK EXTRA</button>
                               {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
-                                <div className="hidden"><Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} /></div>
+                                <div className="hidden"><Turnstile ref={turnstileRef} siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} onExpire={() => { setCaptchaToken(null); turnstileRef.current?.reset(); }} options={{ theme: 'dark', size: 'invisible' }} /></div>
                               )}
                               <button type="button" onClick={handleGenerateDynamicQr} disabled={isGeneratingShortlink} className="bg-blue-600 text-white font-black px-5 py-2.5 rounded-lg text-[11px] hover:bg-blue-500 transition-colors uppercase tracking-wide shadow-[0_0_10px_rgba(37,99,235,0.3)]">Generează Landing</button>
                             </div>
@@ -1953,13 +1997,6 @@ export default function Home() {
             <div className="max-w-6xl mx-auto border-t border-slate-800/80 pt-16 mt-8">
               <PricingAddons handleCumparaPremium={handleCumparaPremium} />
             </div>
-
-            {/* DASHBOARD-UL CRM PENTRU UTILIZATORII AUTENTIFICATI */}
-          {user && (
-            <div className="max-w-6xl mx-auto px-6 mb-12">
-              <ContractsDashboard userId={user.id} />
-            </div>
-          )}            
 
             <LiveNewsSection stiriLive={stiriLive} />
 
@@ -2190,54 +2227,63 @@ export default function Home() {
                     {/* 04. Clauze Protectie */}
                     <div className="p-4 sm:p-6 bg-[#12181D]/40 border border-slate-800/80 rounded-xl space-y-4 sm:space-y-5 relative overflow-hidden group hover:border-slate-700/60 transition-colors">
                       <div className="absolute top-0 left-0 w-1 h-full bg-slate-700 group-hover:bg-amber-500 transition-colors"></div>
-                      <div className="border-b border-slate-800/60 pb-3">
-                        <span className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2"><span className="text-slate-500 font-mono">04.</span> Clauze de Protecție & Personalizare</span>
+                      <div className="flex justify-between items-center border-b border-slate-800/60 pb-3 cursor-pointer" onClick={() => setIsClausesOpen(!isClausesOpen)}>
+                        <span className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                          <span className="text-slate-500 font-mono">04.</span> Clauze de Protecție ({(Object.values(formData).filter(v => v === true).length - (formData.estePlatitorTVA ? 1 : 0) - (formData.adaugaProcesVerbal ? 1 : 0) - (formData.adaugaQrPlata ? 1 : 0))} Active)
+                        </span>
+                        <button type="button" className="text-slate-400 text-xs font-bold bg-slate-800 px-3 py-1 rounded">
+                          {isClausesOpen ? 'Ascunde ▲' : 'Modifică Clauze ▼'}
+                        </button>
                       </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs mb-2">
-                        <label className="flex items-start p-4 bg-amber-900/10 border border-amber-900/30 rounded-xl cursor-pointer hover:bg-amber-900/20 transition-colors">
-                          <input type="checkbox" checked={!!formData.clauzaLimitareRaspundere} onChange={e => setFormData({...formData, clauzaLimitareRaspundere: e.target.checked})} className="mt-0.5 mr-3 w-4 h-4 accent-amber-500 shrink-0" />
-                          <div>
-                            <span className="font-bold text-amber-500 block text-xs">Limitare Răspundere Comercială</span>
-                            <span className="text-[10px] text-slate-400 block mt-1 leading-relaxed">Nu vei plăti niciodată daune mai mari decât factura încasată. Protecție juridică esențială.</span>
+                      {isClausesOpen && (
+                        <div className="animate-fadeIn space-y-4 pt-2">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs mb-2">
+                            <label className="flex items-start p-4 bg-amber-900/10 border border-amber-900/30 rounded-xl cursor-pointer hover:bg-amber-900/20 transition-colors">
+                              <input type="checkbox" checked={!!formData.clauzaLimitareRaspundere} onChange={e => setFormData({...formData, clauzaLimitareRaspundere: e.target.checked})} className="mt-0.5 mr-3 w-4 h-4 accent-amber-500 shrink-0" />
+                              <div>
+                                <span className="font-bold text-amber-500 block text-xs">Limitare Răspundere Comercială</span>
+                                <span className="text-[10px] text-slate-400 block mt-1 leading-relaxed">Nu vei plăti niciodată daune mai mari decât factura încasată. Protecție juridică esențială.</span>
+                              </div>
+                            </label>
+
+                            <label className="flex items-start p-4 bg-amber-900/10 border border-amber-900/30 rounded-xl cursor-pointer hover:bg-amber-900/20 transition-colors">
+                              <input type="checkbox" checked={!!formData.clauzaInflatie} onChange={e => setFormData({...formData, clauzaInflatie: e.target.checked})} className="mt-0.5 mr-3 w-4 h-4 accent-amber-500 shrink-0" />
+                              <div>
+                                <span className="font-bold text-amber-500 block text-xs">Indexare Anti-Inflație (BNR)</span>
+                                <span className="text-[10px] text-slate-400 block mt-1 leading-relaxed">Actualizează automat suma contractului dacă BNR crește cursul EUR oficial.</span>
+                              </div>
+                            </label>
                           </div>
-                        </label>
 
-                        <label className="flex items-start p-4 bg-amber-900/10 border border-amber-900/30 rounded-xl cursor-pointer hover:bg-amber-900/20 transition-colors">
-                          <input type="checkbox" checked={!!formData.clauzaInflatie} onChange={e => setFormData({...formData, clauzaInflatie: e.target.checked})} className="mt-0.5 mr-3 w-4 h-4 accent-amber-500 shrink-0" />
-                          <div>
-                            <span className="font-bold text-amber-500 block text-xs">Indexare Anti-Inflație (BNR)</span>
-                            <span className="text-[10px] text-slate-400 block mt-1 leading-relaxed">Actualizează automat suma contractului dacă BNR crește cursul EUR oficial.</span>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                            {(nomenclatorClauze[formData.tipContract] || nomenclatorClauze.prestari).map((clauza) => (
+                              <label key={clauza.id} className="flex items-start p-4 bg-[#0B0F12] border border-slate-700/60 rounded-xl cursor-pointer hover:border-slate-500 transition-colors group/clauza">
+                                <input type="checkbox" checked={!!formData[clauza.id]} onChange={e => setFormData({...formData, [clauza.id]: e.target.checked})} className="mt-0.5 mr-3 w-4 h-4 accent-[#8ba888] shrink-0" />
+                                <div>
+                                  <span className="font-bold text-white block group-hover/clauza:text-slate-200">{clauza.titlu}</span>
+                                  <span className="text-[10px] text-slate-500 block mt-1 leading-relaxed">{clauza.detaliu || clauza.text}</span>
+                                </div>
+                              </label>
+                            ))}
                           </div>
-                        </label>
-                      </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                        {(nomenclatorClauze[formData.tipContract] || nomenclatorClauze.prestari).map((clauza) => (
-                          <label key={clauza.id} className="flex items-start p-4 bg-[#0B0F12] border border-slate-700/60 rounded-xl cursor-pointer hover:border-slate-500 transition-colors group/clauza">
-                            <input type="checkbox" checked={!!formData[clauza.id]} onChange={e => setFormData({...formData, [clauza.id]: e.target.checked})} className="mt-0.5 mr-3 w-4 h-4 accent-[#8ba888] shrink-0" />
-                            <div>
-                              <span className="font-bold text-white block group-hover/clauza:text-slate-200">{clauza.titlu}</span>
-                              <span className="text-[10px] text-slate-500 block mt-1 leading-relaxed">{clauza.detaliu || clauza.text}</span>
-                            </div>
-                          </label>
-                        ))}
-                      </div>
-
-                      {/* CLAUZĂ CUSTOM ADĂUGATĂ MANUAL */}
-                      <div className="pt-3 mt-2 border-t border-slate-800/50">
-                        <label className="flex flex-wrap items-center gap-3 mb-2">
-                          <span className="text-xs font-bold text-[#8ba888] uppercase tracking-wider block">Adaugă Clauză Specifică (Opțional)</span>
-                          <span className="bg-[#16221A] text-[#8ba888] text-[9px] px-2 py-1 rounded font-bold border border-[#8ba888]/30 tracking-widest shadow-sm">AUTO-NUMEROTARE</span>
-                        </label>
-                        <p className="text-[10px] text-slate-500 leading-relaxed mb-3">Dacă lipsește ceva din lista de mai sus, redactează textul aici. Sistemul ContractSmart îl va numerota și integra perfect la finalul contractului, păstrând formatul juridic.</p>
-                        <textarea 
-                          placeholder="Ex: Părțile convin ca predarea materialelor finale să se facă exclusiv pe un hard-disk extern furnizat de Beneficiar la sediul acestuia..." 
-                          value={formData.clauzaCustom} 
-                          onChange={e => setFormData({...formData, clauzaCustom: e.target.value})} 
-                          className="w-full p-4 bg-[#0B0F12] border border-slate-700/60 rounded-xl text-xs h-24 text-white resize-y focus:ring-1 focus:ring-[#8ba888]/50 focus:border-[#8ba888] outline-none transition-all shadow-inner" 
-                        ></textarea>
-                      </div>
+                          {/* CLAUZĂ CUSTOM ADĂUGATĂ MANUAL */}
+                          <div className="pt-3 mt-2 border-t border-slate-800/50">
+                            <label className="flex flex-wrap items-center gap-3 mb-2">
+                              <span className="text-xs font-bold text-[#8ba888] uppercase tracking-wider block">Adaugă Clauză Specifică (Opțional)</span>
+                              <span className="bg-[#16221A] text-[#8ba888] text-[9px] px-2 py-1 rounded font-bold border border-[#8ba888]/30 tracking-widest shadow-sm">AUTO-NUMEROTARE</span>
+                            </label>
+                            <p className="text-[10px] text-slate-500 leading-relaxed mb-3">Dacă lipsește ceva din lista de mai sus, redactează textul aici. Sistemul ContractSmart îl va numerota și integra perfect la finalul contractului, păstrând formatul juridic.</p>
+                            <textarea 
+                              placeholder="Ex: Părțile convin ca predarea materialelor finale să se facă exclusiv pe un hard-disk extern furnizat de Beneficiar la sediul acestuia..." 
+                              value={formData.clauzaCustom} 
+                              onChange={e => setFormData({...formData, clauzaCustom: e.target.value})} 
+                              className="w-full p-4 bg-[#0B0F12] border border-slate-700/60 rounded-xl text-xs h-24 text-white resize-y focus:ring-1 focus:ring-[#8ba888]/50 focus:border-[#8ba888] outline-none transition-all shadow-inner" 
+                            ></textarea>
+                          </div>
+                        </div>
+                      )} {/* <-- AICI SE ÎNCHIDE BLOCUL EXTENSIBIL (isClausesOpen) */}
                     </div>
 
                     {/* 05. SISTEM AVANSAT DE SEMNĂTURI */}
@@ -2317,7 +2363,7 @@ export default function Home() {
 
                     {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
                       <div className="flex justify-center">
-                        <Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} />
+                        <Turnstile ref={turnstileRef} siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} onExpire={() => { setCaptchaToken(null); turnstileRef.current?.reset(); }} options={{ theme: 'dark', size: 'invisible' }} />
                       </div>
                     )}
 
@@ -2718,69 +2764,64 @@ export default function Home() {
                           <div className="absolute top-0 left-0 w-1 h-full bg-slate-700 group-hover:bg-[#8ba888] transition-colors"></div>
                           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800/60 pb-3 gap-4 sm:gap-0">
                             <span className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2"><span className="text-slate-500 font-mono">05.</span> Aprobare și Semnare Dosar</span>
-                            <div className="flex bg-[#0B0F12] p-1 rounded-lg border border-slate-700/60 shadow-inner w-full sm:w-auto">
-                              <button type="button" onClick={() => { setAutoSignatureTab('draw'); curataCanvasAuto(); }} className={`flex-1 sm:flex-none px-4 py-1.5 rounded-md text-[10px] font-bold transition-all duration-200 ${autoSignatureTab === 'draw' ? 'bg-[#8ba888] text-black shadow-sm' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}> Desenează</button>
-                              <button type="button" onClick={() => { setAutoSignatureTab('upload'); curataCanvasAuto(); }} className={`flex-1 sm:flex-none px-4 py-1.5 rounded-md text-[10px] font-bold transition-all duration-200 ${autoSignatureTab === 'upload' ? 'bg-[#8ba888] text-black shadow-sm' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}>📁 Încarcă PNG/JPG</button>
-                            </div>
+                            {autoSignStep !== 'done' && (
+                              <div className="flex bg-[#0B0F12] p-1 rounded-lg border border-slate-700/60 shadow-inner w-full sm:w-auto">
+                                <button type="button" onClick={() => { setAutoSignatureTab('draw'); curataCanvasAuto(); }} className={`flex-1 sm:flex-none px-4 py-1.5 rounded-md text-[10px] font-bold transition-all duration-200 ${autoSignatureTab === 'draw' ? 'bg-[#8ba888] text-black shadow-sm' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}> Desenează</button>
+                                <button type="button" onClick={() => { setAutoSignatureTab('upload'); curataCanvasAuto(); }} className={`flex-1 sm:flex-none px-4 py-1.5 rounded-md text-[10px] font-bold transition-all duration-200 ${autoSignatureTab === 'upload' ? 'bg-[#8ba888] text-black shadow-sm' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}>📁 Încarcă PNG</button>
+                              </div>
+                            )}
                           </div>
 
                           <div className="bg-[#0B0F12] p-4 rounded-xl border border-slate-700/60">
-                            {autoSignatureTab === 'draw' && (
-                              <div className="space-y-3 relative">
-                                <div className="relative border-2 border-dashed border-slate-600 rounded-xl bg-white overflow-hidden shadow-inner">
-                                  {!isAutoDrawing && !autoSigCanvasRef.current?.toDataURL().length > 100 && (
-                                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
-                                      <span className="text-slate-800 text-3xl font-black italic tracking-tighter">Semnează aici</span>
-                                    </div>
-                                  )}
-                                  {/* Grilă de fundal */}
-                                  <div className="absolute inset-0 pointer-events-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9IiNlMmU4ZjAiLz48L3N2Zz4=')] opacity-50"></div>
-                                  <canvas 
-                                    ref={autoSigCanvasRef} 
-                                    width={600} 
-                                    height={160} 
-                                    onTouchStart={pornesteDesenulAuto} 
-                                    onTouchMove={deseneazaAuto} 
-                                    onTouchEnd={opresteDesenulAuto} 
-                                    onMouseDown={pornesteDesenulAuto} 
-                                    onMouseMove={deseneazaAuto} 
-                                    onMouseUp={opresteDesenulAuto} 
-                                    onMouseLeave={opresteDesenulAuto} 
-                                    className="w-full h-40 cursor-crosshair block touch-none relative z-10" 
-                                  />
-                                </div>
-                                <div className="flex justify-center sm:justify-end">
-                                  <button type="button" onClick={curataCanvasAuto} className="text-[10px] font-bold text-red-400 hover:text-red-300 transition-colors uppercase tracking-widest flex items-center gap-1.5 bg-red-400/10 px-3 py-1.5 rounded-lg border border-red-400/20">
-                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                    Curăță / Resemnează
-                                  </button>
-                                </div>
+                            {autoSignStep === 'done' ? (
+                              <div className="text-center py-6 animate-fadeIn">
+                                <div className="text-emerald-400 mb-2 font-bold text-sm">✔️ Ambele semnături au fost salvate (Vânzător + Cumpărător).</div>
+                                <button type="button" onClick={reseteazaSemnaturiA} className="text-[10px] text-slate-400 hover:text-white underline mt-2 transition-colors">Resetează și semnează din nou</button>
                               </div>
-                            )}
-
-                            {autoSignatureTab === 'upload' && (
-                              <div className="flex flex-col items-center justify-center py-10 border-2 border-dashed border-slate-600 rounded-xl bg-[#12181D]/50 transition-colors hover:border-[#8ba888]/50 hover:bg-[#12181D]">
-                                {!autoUploadedSig ? (
-                                  <>
-                                    <div className="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center mb-4 text-[#8ba888] shadow-inner">
-                                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                                    </div>
-                                    <label className="cursor-pointer bg-[#8ba888] text-black px-6 py-2.5 rounded-lg text-xs font-bold hover:opacity-90 transition-opacity shadow-lg shadow-[#8ba888]/20">
-                                      Selectează Imaginea
-                                      <input type="file" accept="image/png, image/jpeg" onChange={handleIncarcareSemnaturaAuto} className="hidden" />
-                                    </label>
-                                    <span className="text-[10px] text-slate-500 mt-3 max-w-xs text-center leading-relaxed">Sistemul ContractSmart o va aplica perfect pe toate cele 5 exemplare DITL.</span>
-                                  </>
-                                ) : (
-                                  <div className="flex flex-col items-center w-full px-4">
-                                    <div className="bg-white p-4 rounded-xl mb-5 w-full max-w-sm flex justify-center border border-slate-300 shadow-inner relative overflow-hidden">
+                            ) : (
+                              <div className="animate-fadeIn">
+                                <div className="mb-4 text-center">
+                                  <span className="text-[10px] font-black uppercase text-amber-500 tracking-widest bg-amber-900/20 px-3 py-1.5 rounded border border-amber-500/20 shadow-sm">
+                                    PASUL {autoSignStep === 'vanzator' ? '1: Semnează Vânzătorul' : '2: Semnează Cumpărătorul'}
+                                  </span>
+                                </div>
+                                
+                                {autoSignatureTab === 'draw' && (
+                                  <div className="space-y-3 relative">
+                                    <div className="relative border-2 border-dashed border-slate-600 rounded-xl bg-white overflow-hidden shadow-inner">
+                                      {!isAutoDrawing && !autoSigCanvasRef.current?.toDataURL().length > 100 && (
+                                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+                                          <span className="text-slate-800 text-3xl font-black italic tracking-tighter">Semnează {autoSignStep === 'vanzator' ? 'Vânzător' : 'Cumpărător'}</span>
+                                        </div>
+                                      )}
                                       <div className="absolute inset-0 pointer-events-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9IiNlMmU4ZjAiLz48L3N2Zz4=')] opacity-50"></div>
-                                      <img src={autoUploadedSig} alt="Semnatura Incarcata" className="max-h-28 object-contain relative z-10 drop-shadow-sm" />
+                                      <canvas ref={autoSigCanvasRef} width={600} height={160} onTouchStart={pornesteDesenulAuto} onTouchMove={deseneazaAuto} onTouchEnd={opresteDesenulAuto} onMouseDown={pornesteDesenulAuto} onMouseMove={deseneazaAuto} onMouseUp={opresteDesenulAuto} onMouseLeave={opresteDesenulAuto} className="w-full h-40 cursor-crosshair block touch-none relative z-10" />
                                     </div>
-                                    <button type="button" onClick={() => setAutoUploadedSig(null)} className="text-[10px] font-bold text-red-400 hover:text-red-300 transition-colors uppercase tracking-widest flex items-center gap-1.5 bg-red-400/10 px-4 py-2 rounded-lg border border-red-400/20">
-                                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                      Șterge & Reîncarcă
-                                    </button>
+                                    <div className="flex justify-between items-center">
+                                      <button type="button" onClick={curataCanvasAuto} className="text-[10px] font-bold text-slate-400 hover:text-white transition-colors uppercase">Curăță</button>
+                                      <button type="button" onClick={() => salveazaSemnaturaAuto(autoSignStep)} className="bg-[#8ba888] hover:scale-105 active:scale-95 transition-transform text-black px-5 py-2.5 rounded-lg text-xs font-black uppercase shadow-sm">Confirmă {autoSignStep === 'vanzator' ? 'Vânzător' : 'Cumpărător'} &rarr;</button>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {autoSignatureTab === 'upload' && (
+                                  <div className="flex flex-col items-center justify-center py-6 border-2 border-dashed border-slate-600 rounded-xl bg-[#12181D]/50 transition-colors">
+                                    {!autoUploadedSig ? (
+                                      <label className="cursor-pointer bg-[#8ba888] text-black px-6 py-2.5 rounded-lg text-xs font-bold hover:opacity-90 transition-opacity">
+                                        Încarcă Semnătură {autoSignStep === 'vanzator' ? 'Vânzător' : 'Cumpărător'}
+                                        <input type="file" accept="image/png, image/jpeg" onChange={handleIncarcareSemnaturaAuto} className="hidden" />
+                                      </label>
+                                    ) : (
+                                      <div className="flex flex-col items-center w-full px-4">
+                                        <div className="bg-white p-4 rounded-xl mb-4 w-full max-w-sm flex justify-center border border-slate-300">
+                                          <img src={autoUploadedSig} alt="Semnatura" className="max-h-24 object-contain" />
+                                        </div>
+                                        <div className="flex gap-4">
+                                          <button type="button" onClick={() => setAutoUploadedSig(null)} className="text-[10px] text-slate-400 hover:text-white transition-colors uppercase font-bold px-4 py-2 border border-slate-700 rounded-lg">Șterge</button>
+                                          <button type="button" onClick={() => salveazaSemnaturaAuto(autoSignStep)} className="bg-[#8ba888] hover:scale-105 active:scale-95 transition-transform text-black px-5 py-2.5 rounded-lg text-xs font-black uppercase shadow-sm">Confirmă &rarr;</button>
+                                        </div>
+                                      </div>
+                                    )}
                                   </div>
                                 )}
                               </div>
@@ -2792,7 +2833,7 @@ export default function Home() {
 
                     {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
                       <div className="flex justify-center">
-                        <Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} options={{ theme: 'dark', size: 'invisible' }} />
+                        <Turnstile ref={turnstileRef} siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} onExpire={() => { setCaptchaToken(null); turnstileRef.current?.reset(); }} options={{ theme: 'dark', size: 'invisible' }} />
                       </div>
                     )}
 
@@ -2853,6 +2894,13 @@ export default function Home() {
                 )}
               </div>
             </div>
+
+            {/* DASHBOARD MUTAT IN STEP 2 */}
+            {user && (
+              <div className="max-w-6xl mx-auto mt-12 px-4">
+                <ContractsDashboard userId={user.id} />
+              </div>
+            )}
 
             {/* WIDGET-URI (DOAR LA B2B) */}
             <div className="w-full">

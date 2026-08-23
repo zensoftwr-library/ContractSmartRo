@@ -159,7 +159,7 @@ export default function AiAuditWidget({ handleInapoiPrincipal, user, isPremium }
 
             <div className="mt-8 pt-6 border-t border-slate-800/80 flex justify-between items-center">
               <button onClick={() => setReport(null)} className="text-xs text-slate-400 hover:text-white transition-colors">Auditează alt document</button>
-              <button className="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-lg text-xs font-bold transition-colors shadow-sm">
+              <button onClick={() => window.print()} className="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-lg text-xs font-bold transition-colors shadow-sm print:hidden">
                 Descarcă Raport (PDF)
               </button>
             </div>
