@@ -315,3 +315,8 @@ html.matcha-light-theme svg.animate-spin path {
 html.matcha-light-theme label span:not([class*="text-"]) {
   color: #1f2937 !important;
 }
+html.matcha-light-theme button.bg-\[\#12181D\].text-white {
+  background: #fff !important;
+  color: #111 !important;
+  border-color: #cbd5e1 !important;
+}
