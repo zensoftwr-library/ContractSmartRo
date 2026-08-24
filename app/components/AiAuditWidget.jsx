@@ -89,18 +89,19 @@ export default function AiAuditWidget({ handleInapoiPrincipal, user, isPremium, 
     return (
       <div className="max-w-3xl mx-auto py-10 px-4 sm:px-6 animate-fadeIn">
         
-        {/* Buton Înapoi */}
-        <div className="mb-6 flex items-center justify-between bg-[#0B0F12]/80 backdrop-blur-sm border border-slate-800/80 px-4 py-4 rounded-xl shadow-sm">
-          <button type="button" onClick={handleInapoiPrincipal} className="text-[11px] font-bold text-purple-400 hover:text-purple-300 flex items-center gap-2 transition-colors uppercase tracking-wider">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-            Înapoi la Panoul Principal
-          </button>
-          <div className="flex items-center gap-2">
-            <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-purple-500"></span></span>
-            <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest">AI AGENT ACTIV</span>
-          </div>
-        </div>
-
+        {/* TOP BAR / BREADCRUMB */}
+              <div className="mb-6 flex items-center justify-between bg-[#0B0F12]/80 backdrop-blur-sm border border-slate-800/80 px-4 sm:px-6 py-4 rounded-xl shadow-sm">
+                <button type="button" onClick={handleInapoiPrincipal} className="text-[11px] font-bold text-[#8ba888] hover:text-white flex items-center gap-2 transition-colors">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                  <span className="hidden sm:inline">Înapoi la Panoul Principal</span>
+                  <span className="sm:hidden">Înapoi</span>
+                </button>
+                <div className="flex items-center gap-2">
+                  <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span>
+                  <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest">Conexiune Securizată v2.0</span>
+                </div>
+              </div>
+              
         <div className="bg-[#12181D]/60 backdrop-blur-xl p-6 sm:p-10 rounded-3xl border border-slate-800/80 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.5)]">
           <span className="bg-purple-900/20 text-purple-400 border border-purple-500/30 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 inline-block">Raport Finalizat</span>
           <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight mb-2">Diagnostic Contract:</h2>
@@ -203,6 +204,7 @@ export default function AiAuditWidget({ handleInapoiPrincipal, user, isPremium, 
   // ECRANUL DE UPLOAD INIȚIAL
   return (
     <div className="max-w-2xl mx-auto py-16 px-4 sm:px-6 animate-fadeIn text-center">
+      <div className="mb-8 p-4 rounded-xl bg-[#0B0F12]/80 border border-slate-800/80 text-left"><button onClick={handleInapoiPrincipal} className="text-[11px] font-bold text-purple-400 uppercase">&larr; Înapoi la Panou</button></div>
       <div className="w-16 h-16 bg-purple-900/20 text-purple-400 border border-purple-500/30 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-inner">
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
       </div>
