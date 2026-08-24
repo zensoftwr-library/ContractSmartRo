@@ -232,25 +232,37 @@ html.matcha-light-theme div[class*="bg-[#12181D]"] {
 }
 
 /* ========================================================== */
-/* ✨ FIXURI CHIRURGICALE FINALE: HERO, QR, NAVBAR ȘI SPINNERE ✨ */
+/* ✨ SOLUȚIA FINALĂ SUPREMĂ: HERO, QR, NAVBAR, PREȚURI ✨ */
 /* ========================================================== */
 
-/* 1. Corectare texte albe (Prețuri, Titluri) să devină negre pe zi */
-html.matcha-light-theme span.text-white,
-html.matcha-light-theme div.text-white,
-html.matcha-light-theme p.text-white,
-html.matcha-light-theme h1.text-white,
+/* A. REPARARE BUTON ALB HERO (PACHET ACTE AUTO) */
+html.matcha-light-theme a.bg-white,
+html.matcha-light-theme button.bg-white,
+html.matcha-light-theme a.bg-white *,
+html.matcha-light-theme button.bg-white * {
+  background-color: #ffffff !important;
+  color: #1f2937 !important; 
+  border-color: #cbd5e1 !important;
+}
+html.matcha-light-theme a.bg-white:hover,
+html.matcha-light-theme button.bg-white:hover {
+  background-color: #f1f5f9 !important;
+}
+
+/* B. REPARARE PREȚURI INVIZIBILE (ex. "99 RON", "19 RON") */
+html.matcha-light-theme .text-lg.text-white,
+html.matcha-light-theme .text-xl.text-white,
+html.matcha-light-theme .text-2xl.text-white,
+html.matcha-light-theme .text-3xl.text-white,
 html.matcha-light-theme h2.text-white,
 html.matcha-light-theme h3.text-white,
 html.matcha-light-theme h4.text-white,
-html.matcha-light-theme strong.text-white,
-html.matcha-light-theme .text-lg.text-white,
-html.matcha-light-theme .text-xl.text-white,
-html.matcha-light-theme .text-2xl.text-white {
-  color: #1f2937 !important;
+html.matcha-light-theme p.text-white,
+html.matcha-light-theme strong.text-white {
+    color: #1f2937 !important;
 }
 
-/* 🔒 EXCLUDEM BUTTONUL ALB (.bg-white) DE LA REGULA DE CULOARE ALBĂ 🔒 */
+/* Protejăm textele albe DOAR din butoanele de acțiune colorate */
 html.matcha-light-theme button:not(.bg-white) span.text-white,
 html.matcha-light-theme button:not(.bg-white) .text-white,
 html.matcha-light-theme button:not(.bg-white).text-white,
@@ -258,55 +270,38 @@ html.matcha-light-theme a[class*="bg-"]:not(.bg-white) .text-white {
   color: #ffffff !important;
 }
 
-/* 2. Butonul alb din Hero (Pachet Acte Auto) */
-html.matcha-light-theme .bg-white,
-html.matcha-light-theme a.bg-white,
-html.matcha-light-theme button.bg-white {
-  background-color: #ffffff !important;
-  color: #1f2937 !important;
-  border: 1px solid #cbd5e1 !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
-}
-html.matcha-light-theme .bg-white *,
-html.matcha-light-theme a.bg-white *,
-html.matcha-light-theme button.bg-white *,
-html.matcha-light-theme .bg-white .text-white {
-  color: #1f2937 !important;
-}
-html.matcha-light-theme a.bg-white:hover,
-html.matcha-light-theme button.bg-white:hover {
-  background-color: #f1f5f9 !important;
-}
-
-/* 3. Butoanele INACTIVE de la QR Code Terminal (FĂRĂ să stricăm Navbar-ul!) */
-html.matcha-light-theme button.bg-\[\#16221A\].text-slate-400 {
+/* C. BUTOANELE INACTIVE DIN QR STUDIO (Fără să afectăm Navbar-ul!) */
+/* Butoanele gri (Standard, Crypto, vCard) */
+html.matcha-light-theme button.bg-\[\#16221A\] {
   background-color: #f1f5f9 !important;
   color: #334155 !important;
   border: 1px solid #cbd5e1 !important;
 }
-html.matcha-light-theme button.bg-\[\#16221A\].text-slate-400:hover {
+html.matcha-light-theme button.bg-\[\#16221A\]:hover {
   background-color: #e2e8f0 !important;
 }
 
-html.matcha-light-theme button.bg-purple-900\/10.text-purple-400 {
+/* Butoanele mov (Dinamic / PDF) */
+html.matcha-light-theme button.bg-purple-900\/10 {
   background-color: #f3e8ff !important;
   color: #6b21a8 !important;
   border: 1px solid #d8b4fe !important;
 }
-html.matcha-light-theme button.bg-purple-900\/10.text-purple-400:hover {
+html.matcha-light-theme button.bg-purple-900\/10:hover {
   background-color: #e9d5ff !important;
 }
 
-html.matcha-light-theme button.bg-blue-900\/10.text-blue-400 {
+/* Butoanele albastre (Smart, Geo, Landing) */
+html.matcha-light-theme button.bg-blue-900\/10 {
   background-color: #dbeafe !important;
   color: #1e3a8a !important;
   border: 1px solid #bfdbfe !important;
 }
-html.matcha-light-theme button.bg-blue-900\/10.text-blue-400:hover {
+html.matcha-light-theme button.bg-blue-900\/10:hover {
   background-color: #bfdbfe !important;
 }
 
-/* 4. Animații Loading (Spinners) */
+/* D. SPINNERE LOADING (SVG) - Aspect premium doar pe Light Theme */
 html.matcha-light-theme svg.animate-spin circle {
   stroke: #cbd5e1 !important;
   opacity: 1 !important;
@@ -316,7 +311,7 @@ html.matcha-light-theme svg.animate-spin path {
   opacity: 1 !important;
 }
 
-/* 5. Restul Formularului */
+/* E. CÂMPURI FORMULAR ȘI RADIO BUTTONS */
 html.matcha-light-theme label span:not([class*="text-"]) {
   color: #1f2937 !important;
 }
