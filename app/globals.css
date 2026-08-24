@@ -112,7 +112,7 @@ html.matcha-light-theme figure {
   filter: none !important;
 }
 
-/* Protejăm overlay-urile semi-transparente (cum ar fi bg-black/20 de pe știri) să nu devină solid albe/gri */
+/* Protejăm overlay-urile semi-transparente */
 html.matcha-light-theme [class*="bg-black/"] {
   background-color: rgba(0, 0, 0, 0.15) !important;
 }
@@ -141,7 +141,7 @@ html.matcha-light-theme [class*="chat"] {
   box-shadow: none !important;
 }
 
-/* 4. Cardul VIP Fondator (Targetat specific pe baza chenarului de amber, lăsând știrile intacte) */
+/* 4. Cardul VIP Fondator */
 html.matcha-light-theme div.border-amber-500\/40,
 html.matcha-light-theme div.border-amber-500\/30 {
   background: #ffffff !important;
@@ -179,7 +179,7 @@ html.matcha-light-theme hr {
   border-color: var(--border-color) !important;
 }
 
-/* 7. Transformarea textelor generice în text închis lizibil de zi (Păstrând culorile din Footer/Disclaimer) */
+/* 7. Transformarea textelor generice în text închis lizibil de zi */
 html.matcha-light-theme h1,
 html.matcha-light-theme h2,
 html.matcha-light-theme h3,
@@ -207,6 +207,9 @@ html.matcha-light-theme select {
   color: #111827 !important;
   border-color: #cbd5e1 !important;
 }
+html.matcha-light-theme label span:not([class*="text-"]) {
+  color: #1f2937 !important;
+}
 
 /* ========================================================== */
 /* FIXURI Punctuale (Cameră Live Auto & Casetă Total Fiscal)  */
@@ -223,33 +226,18 @@ html.matcha-light-theme button[class*="bg-[#1e293b]"] svg {
   color: #334155 !important;
 }
 
-html.matcha-light-theme div[class*="bg-[#0B0F12]"],
 html.matcha-light-theme div[class*="bg-black"],
-html.matcha-light-theme span[class*="bg-black"],
-html.matcha-light-theme div[class*="bg-[#12181D]"] {
+html.matcha-light-theme span[class*="bg-black"] {
   background-color: #f1f5f9 !important;
   border: 1px solid #cbd5e1 !important;
 }
 
+
 /* ========================================================== */
-/* ✨ SOLUȚIA FINALĂ SUPREMĂ: HERO, QR, NAVBAR, PREȚURI ✨ */
+/* ✨ SOLUȚIA FINALĂ CHIRURGICALĂ: HERO, QR ȘI PREȚURI ✨ */
 /* ========================================================== */
 
-/* A. REPARARE BUTON ALB HERO (PACHET ACTE AUTO) */
-html.matcha-light-theme a.bg-white,
-html.matcha-light-theme button.bg-white,
-html.matcha-light-theme a.bg-white *,
-html.matcha-light-theme button.bg-white * {
-  background-color: #ffffff !important;
-  color: #1f2937 !important; 
-  border-color: #cbd5e1 !important;
-}
-html.matcha-light-theme a.bg-white:hover,
-html.matcha-light-theme button.bg-white:hover {
-  background-color: #f1f5f9 !important;
-}
-
-/* B. REPARARE PREȚURI INVIZIBILE (ex. "99 RON", "19 RON") */
+/* A. REPARARE PREȚURI INVIZIBILE (ex. "99 RON") */
 html.matcha-light-theme .text-lg.text-white,
 html.matcha-light-theme .text-xl.text-white,
 html.matcha-light-theme .text-2xl.text-white,
@@ -262,69 +250,53 @@ html.matcha-light-theme strong.text-white {
     color: #1f2937 !important;
 }
 
-/* Protejăm textele albe DOAR din butoanele de acțiune colorate */
-html.matcha-light-theme button:not(.bg-white) span.text-white,
-html.matcha-light-theme button:not(.bg-white) .text-white,
-html.matcha-light-theme button:not(.bg-white).text-white,
-html.matcha-light-theme a[class*="bg-"]:not(.bg-white) .text-white {
-  color: #ffffff !important;
+/* B. BUTONUL "PACHET ACTE AUTO" DIN HERO (Clasa unică: 12181D) */
+/* Căutăm exact butonul care are acea culoare hex de background pentru a nu strica altceva */
+html.matcha-light-theme button[class*="12181D"] {
+    background-color: #ffffff !important;
+    color: #111827 !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+html.matcha-light-theme button[class*="12181D"]:hover {
+    background-color: #f1f5f9 !important;
 }
 
-/* 3. Butoanele INACTIVE de la QR Code Terminal (FĂRĂ să stricăm Navbar-ul!) */
-
-/* Butoanele Standard (URL, Wi-Fi, Crypto, vCard) - Inactive */
-html.matcha-light-theme button[class*="bg-[#16221A]"] {
-  background-color: #f1f5f9 !important;
-  color: #334155 !important;
-  border: 1px solid #cbd5e1 !important;
-  box-shadow: none !important;
+/* C. BUTOANELE INACTIVE DIN QR STUDIO (Fără Slash sau Paranteze, 100% sigur pe Mobil) */
+/* Butoanele Gri Inactive (conțin 16221A) */
+html.matcha-light-theme button[class*="16221A"] {
+    background-color: #f1f5f9 !important;
+    color: #334155 !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: none !important;
 }
-html.matcha-light-theme button[class*="bg-[#16221A]"]:hover {
-  background-color: #e2e8f0 !important;
-  color: #0f172a !important;
-}
-
-/* Butonul Mov (Dinamic / PDF) - Inactiv */
-html.matcha-light-theme button[class*="bg-purple-900/10"] {
-  background-color: #f3e8ff !important;
-  color: #6b21a8 !important;
-  border: 1px solid #d8b4fe !important;
-  box-shadow: none !important;
-}
-html.matcha-light-theme button[class*="bg-purple-900/10"]:hover {
-  background-color: #e9d5ff !important;
+html.matcha-light-theme button[class*="16221A"]:hover {
+    background-color: #e2e8f0 !important;
+    color: #0f172a !important;
 }
 
-/* Butoanele Albastre (Smart, Geo, Landing) - Inactive */
-html.matcha-light-theme button[class*="bg-blue-900/10"] {
-  background-color: #dbeafe !important;
-  color: #1e3a8a !important;
-  border: 1px solid #bfdbfe !important;
-  box-shadow: none !important;
+/* Butonul Mov Inactiv (conține purple-900) */
+html.matcha-light-theme button[class*="purple-900"] {
+    background-color: #f3e8ff !important;
+    color: #6b21a8 !important;
+    border: 1px solid #d8b4fe !important;
+    box-shadow: none !important;
 }
-html.matcha-light-theme button[class*="bg-blue-900/10"]:hover {
-  background-color: #bfdbfe !important;
-}
-
-/* 4. Animații Loading (Spinners) */
-html.matcha-light-theme svg.animate-spin {
-  color: inherit !important;
-}
-html.matcha-light-theme svg.animate-spin path {
-  fill: currentColor !important;
-  opacity: 0.8 !important;
-}
-html.matcha-light-theme svg.animate-spin circle {
-  stroke: currentColor !important;
-  opacity: 0.2 !important;
+html.matcha-light-theme button[class*="purple-900"]:hover {
+    background-color: #e9d5ff !important;
 }
 
-/* E. CÂMPURI FORMULAR ȘI RADIO BUTTONS */
-html.matcha-light-theme label span:not([class*="text-"]) {
-  color: #1f2937 !important;
+/* Butoanele Albastre Inactive (conțin blue-900) */
+html.matcha-light-theme button[class*="blue-900"] {
+    background-color: #dbeafe !important;
+    color: #1e3a8a !important;
+    border: 1px solid #bfdbfe !important;
+    box-shadow: none !important;
 }
-html.matcha-light-theme button.bg-\[\#12181D\].text-white {
-  background: #fff !important;
-  color: #111 !important;
-  border-color: #cbd5e1 !important;
+html.matcha-light-theme button[class*="blue-900"]:hover {
+    background-color: #bfdbfe !important;
 }
+
+/* D. SPINNERE & ANIMAȚII (Niciun override!) */
+/* SVGs din React funcționează perfect cu `text-black` sau `text-[#8ba888]`.
+   Nu adăugăm reguli forțate aici, pentru ca animațiile să nu se camufleze. */
