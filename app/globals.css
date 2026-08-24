@@ -304,3 +304,5 @@ html.matcha-light-theme button.bg-\[\#1e293b\] {
 html.matcha-light-theme button.bg-\[\#1e293b\] svg {
   color: #334155 !important;
 }
+.matcha-light-theme .bg-white {background:#fff!important;border:1px solid #cbd5e1!important}
+.matcha-light-theme .bg-white,.matcha-light-theme .bg-white * {color:#1f2937!important}
