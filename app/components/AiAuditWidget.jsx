@@ -10,15 +10,26 @@ export default function AiAuditWidget({ handleInapoiPrincipal, user, isPremium, 
   const [auditResult, setAuditResult] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
 
+  // LOGICA DE ACCES / CREDITE PENTRU AI AUDIT
+  const linkAchizitieAuditUnic = 'https://zensoftware.gumroad.com/l/fjtkd'; // <-- AICI VEI PUNE LINK-UL TĂU NOU
+  
+  const isFounder = user?.status === 'founder';
+  const auditsUsed = user?.aiAuditsUsed || 0;
+  const isProWithFreeAudits = user?.status === 'pro' && auditsUsed < 5;
+  const hasAccess = isFounder || isProWithFreeAudits;
+
   // Funcție simulată/reală de audit
   const handleAudit = async (e) => {
     e.preventDefault();
     if (!file) return alert('Te rugăm să încarci un contract PDF.');
 
     setIsAuditing(true);
-    setIsSaved(false); // Resetăm starea de salvare la fiecare audit nou
+    setIsSaved(false);
 
-    // Simularea procesării AI (Aici vei pune fetch-ul tău real către OpenAI)
+    // TODO REAL: În integrarea reală cu OpenAI, aici vei face fetch-ul și, la succes, vei rula
+    // o funcție care crește 'ai_audits_used' în Supabase pentru conturile PRO.
+
+    // Simularea procesării AI 
     setTimeout(() => {
       const mockResult = {
         score: 8.5,
@@ -34,9 +45,8 @@ export default function AiAuditWidget({ handleInapoiPrincipal, user, isPremium, 
           "Lipsește clauza de Forță Majoră.",
           "Nu este definită instanța de judecată competentă în caz de litigiu."
         ],
-        // AICI ESTE MAGIA: Datele extrase din PDF pentru a genera varianta corectată
         extractedData: {
-          tipContract_detectat: 'prestari', // Schimbă în 'necunoscut' dacă vrei să testezi alerta
+          tipContract_detectat: 'prestari', 
           prestatorNume: 'Compania Veche SRL',
           clientNume: 'Compania Ta SRL',
           valoare: '5000',
@@ -49,7 +59,7 @@ export default function AiAuditWidget({ handleInapoiPrincipal, user, isPremium, 
     }, 2500);
   };
 
-  // Funcția MAnuală de Salvare în CRM
+  // Funcția Manuală de Salvare în CRM
   const handleSaveToCRM = async () => {
     if (!user?.id || !auditResult) return;
     setIsSaved('loading');
@@ -90,18 +100,18 @@ export default function AiAuditWidget({ handleInapoiPrincipal, user, isPremium, 
       <div className="max-w-3xl mx-auto py-10 px-4 sm:px-6 animate-fadeIn">
         
         {/* TOP BAR / BREADCRUMB */}
-              <div className="mb-6 flex items-center justify-between bg-[#0B0F12]/80 backdrop-blur-sm border border-slate-800/80 px-4 sm:px-6 py-4 rounded-xl shadow-sm">
-                <button type="button" onClick={handleInapoiPrincipal} className="text-[11px] font-bold text-[#8ba888] hover:text-white flex items-center gap-2 transition-colors">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                  <span className="hidden sm:inline">Înapoi la Panoul Principal</span>
-                  <span className="sm:hidden">Înapoi</span>
-                </button>
-                <div className="flex items-center gap-2">
-                  <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span>
-                  <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest">Conexiune Securizată v2.0</span>
-                </div>
-              </div>
-              
+          <div className="mb-6 flex items-center justify-between bg-[#0B0F12]/80 backdrop-blur-sm border border-slate-800/80 px-4 sm:px-6 py-4 rounded-xl shadow-sm">
+            <button type="button" onClick={handleInapoiPrincipal} className="text-[11px] font-bold text-[#8ba888] hover:text-white flex items-center gap-2 transition-colors">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+              <span className="hidden sm:inline">Înapoi la Panoul Principal</span>
+              <span className="sm:hidden">Înapoi</span>
+            </button>
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span>
+              <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest">Conexiune Securizată v2.0</span>
+            </div>
+          </div>
+
         <div className="bg-[#12181D]/60 backdrop-blur-xl p-6 sm:p-10 rounded-3xl border border-slate-800/80 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.5)]">
           <span className="bg-purple-900/20 text-purple-400 border border-purple-500/30 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 inline-block">Raport Finalizat</span>
           <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight mb-2">Diagnostic Contract:</h2>
@@ -211,7 +221,7 @@ export default function AiAuditWidget({ handleInapoiPrincipal, user, isPremium, 
       <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-4">Analiză AI de Risc Juridic</h2>
       <p className="text-slate-400 mb-10 max-w-lg mx-auto">Încarcă orice contract PDF pe care l-ai primit de la un partener. Inteligența artificială va detecta clauzele abuzive, toxice sau ascunse în mai puțin de 5 secunde.</p>
       
-      <form onSubmit={handleAudit} className="bg-[#12181D]/60 backdrop-blur-xl border border-slate-800/80 p-8 rounded-3xl shadow-2xl relative overflow-hidden">
+      <form className="bg-[#12181D]/60 backdrop-blur-xl border border-slate-800/80 p-8 rounded-3xl shadow-2xl relative overflow-hidden">
         <div className="absolute -top-20 -left-20 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
         
         <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-purple-500/30 bg-[#0B0F12] hover:bg-purple-900/10 hover:border-purple-500/50 rounded-2xl cursor-pointer transition-all relative z-10 group">
@@ -225,11 +235,31 @@ export default function AiAuditWidget({ handleInapoiPrincipal, user, isPremium, 
           <button type="button" onClick={handleInapoiPrincipal} className="w-full sm:w-1/3 bg-transparent text-slate-400 border border-slate-700 hover:text-white hover:bg-slate-800 px-6 py-4 rounded-xl text-xs font-bold uppercase transition-colors">
             Înapoi
           </button>
-          <button type="submit" disabled={isAuditing || !file} className="w-full sm:w-2/3 bg-gradient-to-r from-purple-600 to-blue-500 text-white font-black px-6 py-4 rounded-xl text-sm uppercase tracking-wide hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(147,51,234,0.3)]">
+
+          {/* BUTONUL DINAMIC CARE VERIFICĂ CREDITELE ȘI REDIRECȚIONEAZĂ LA NEVOIE */}
+          <button 
+            type="button" 
+            onClick={(e) => {
+              if (!hasAccess) {
+                window.open(linkAchizitieAuditUnic, '_blank');
+              } else {
+                handleAudit(e);
+              }
+            }} 
+            disabled={isAuditing || (!file && hasAccess)} 
+            className="w-full sm:w-2/3 bg-gradient-to-r from-purple-600 to-blue-500 text-white font-black px-6 py-4 rounded-xl text-sm uppercase tracking-wide hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(147,51,234,0.3)]"
+          >
             {isAuditing ? (
               <><svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Auditează Acum...</>
-            ) : 'Începe Auditul AI'}
+            ) : isFounder ? (
+              'Începe Audit AI (Nelimitat)'
+            ) : isProWithFreeAudits ? (
+              `Începe Audit AI (${5 - auditsUsed}/5 Gratuite)`
+            ) : (
+              'Cumpără Audit (19 RON)'
+            )}
           </button>
+
         </div>
       </form>
     </div>
