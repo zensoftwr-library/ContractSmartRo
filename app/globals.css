@@ -314,8 +314,16 @@ html.matcha-light-theme label[class*="group/clauza"] span.text-slate-500 {
 }
 
 /* Culori Butoane Inactive QR Studio Light Mode */
-html.matcha-light-theme .qr-inactive-btn {
-  background-color: #ecfdf5 !important;
-  color: #065f46 !important;
-  border: 1px solid #a7f3d0 !important;
+html.matcha-light-theme button.qr-inactive-btn,
+html.matcha-light-theme button.qr-inactive-btn * {
+    background-color: #f1f5f9 !important;
+    color: #1f2937 !important;
+    border-color: #94a3b8 !important;
+    font-weight: 900 !important;
+}
+
+html.matcha-light-theme button.qr-inactive-btn:hover,
+html.matcha-light-theme button.qr-inactive-btn:hover * {
+    background-color: #e2e8f0 !important;
+    color: #0f172a !important;
 }
