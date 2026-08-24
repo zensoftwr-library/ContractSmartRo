@@ -320,6 +320,4 @@ html.matcha-light-theme label span:not([class*="text-"]) {
 .matcha-light-theme .bg-white {background:#fff!important}
 .matcha-light-theme .bg-white *, .matcha-light-theme button.bg-white .text-white {color:#111!important}
 html.matcha-light-theme .bg-white .text-white, 
-html.matcha-light-theme .bg-white {
-  color: #111 !important;
-}
+html.matcha-light-theme a.bg-white .text-white { color: #111 !important; }
