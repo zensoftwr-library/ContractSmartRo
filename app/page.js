@@ -513,7 +513,7 @@ export default function Home() {
       if (formData.prestatorCui?.replace(/[^0-9]/g, '').length >= 5) {
         handleAutofillCui(formData.prestatorCui, 'prestator');
       } else if (!formData.prestatorCui || formData.prestatorCui.trim() === '') {
-        setFormData(prev => ({ ...prev, prestatorNume: '', prestatorReprezentant: '', prestatorAdresa: '' }));
+        // Am scos setFormData de aici ca să nu șteargă ce completează AI-ul sau utilizatorul manual
         setPrestatorCuiStatus('');
       }
     }, 800);
@@ -525,7 +525,7 @@ export default function Home() {
       if (formData.clientCui?.replace(/[^0-9]/g, '').length >= 5) {
         handleAutofillCui(formData.clientCui, 'client');
       } else if (!formData.clientCui || formData.clientCui.trim() === '') {
-        setFormData(prev => ({ ...prev, clientNume: '', clientReprezentant: '', clientAdresa: '' }));
+        // Am scos setFormData de aici
         setClientCuiStatus('');
       }
     }, 800);
@@ -2955,8 +2955,8 @@ const reseteazaSemnaturiB2B = () => {
               </div>
             </div>
 
-            {/* DASHBOARD MUTAT IN STEP 2 */}
-            {user && (
+            {/* DASHBOARD MUTAT IN STEP 2 (Apare doar la B2B, ascuns la Auto) */}
+            {user && formData.tipContract !== 'auto' && (
               <div className="max-w-6xl mx-auto mt-12 px-4">
                 <ContractsDashboard userId={user.id} />
               </div>
@@ -3043,7 +3043,7 @@ const reseteazaSemnaturiB2B = () => {
             return;
           }
 
-          // Dacă a trecut filtrul, aruncăm automat datele în formular
+          // Preluăm datele extrase din contractul auditat și le punem în formular
           setFormData(prev => ({ 
             ...prev, 
             tipContract: extractedData.tipContract_detectat || 'prestari',
@@ -3052,13 +3052,13 @@ const reseteazaSemnaturiB2B = () => {
             valoare: extractedData.valoare || '',
             moneda: extractedData.moneda || 'RON',
             obiect: extractedData.obiect || '',
-            // Bifăm automat cele mai importante clauze de protecție ContractSmart
+            // Bifăm automat clauzele esențiale de protecție ContractSmart
             clauzaLimitareRaspundere: true, 
             clauzaPi: true,
             clauzaPenalitati: true
           }));
 
-          // Mutăm utilizatorul direct la pasul 2 (configuratorul)
+          // Ducem utilizatorul la pasul 2 (configurator) unde va vedea datele deja completate
           setStep(2);
         }}
       />
