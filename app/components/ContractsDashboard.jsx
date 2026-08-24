@@ -91,42 +91,48 @@ export default function ContractsDashboard({ userId }) {
                     {c.hash_sha256 ? `${c.hash_sha256.substring(0, 12)}...` : 'N/A'}
                   </td>
                   <td className="py-4 text-right">
-                    <div className="flex flex-col items-end gap-2">
-                      <button 
-                        onClick={() => handleGeneratesSomatie(c.id)}
-                        disabled={loadingId === c.id}
-                        className="bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg font-black uppercase text-[9px] tracking-wider transition-all disabled:opacity-50"
-                      >
-                        {loadingId === c.id ? 'Se generează...' : ' Generează Somație'}
-                      </button>
-                      <button 
-                        onClick={() => {
-                          const printWindow = window.open('', '_blank');
-                          printWindow.document.write(`
-                            <html style="font-family: monospace; padding: 40px; color: #111;">
-                              <h2 style="color: #16a34a;">CERTIFICAT DE AUTENTICITATE SHA-256</h2>
-                              <hr />
-                              <p><strong>Document ID:</strong> ${c.id}</p>
-                              <p><strong>Titlu Contract:</strong> ${c.titlu_contract}</p>
-                              <p><strong>Părți Implicate:</strong> ${c.client_nume}</p>
-                              <p><strong>Valoare:</strong> ${c.valoare} ${c.moneda}</p>
-                              <div style="background: #f1f5f9; padding: 20px; border: 1px solid #cbd5e1; word-wrap: break-word;">
-                                <strong>HASH CRIPTOGRAFIC IMUABIL:</strong><br/>
-                                ${c.hash_sha256 || 'Lipsă amprentă în baza de date'}
-                              </div>
-                              <p style="font-size: 12px; margin-top: 40px; color: #64748b;">
-                                Acest certificat garantează faptul că documentul binar generat nu a fost alterat din momentul semnării.
-                              </p>
-                              <script>window.print();</script>
-                            </html>
-                          `);
-                          printWindow.document.close();
-                        }}
-                        className="bg-[#8ba888]/10 hover:bg-[#8ba888]/20 text-[#8ba888] border border-[#8ba888]/30 px-3 py-1.5 rounded-lg font-black uppercase text-[9px] tracking-wider transition-all"
-                      >
-                        Descarcă Certificat SHA-256
-                      </button>
-                    </div>
+                    {c.tip_contract === 'audit' ? (
+                      <span className="text-[10px] text-purple-400 bg-purple-900/20 border border-purple-500/30 px-3 py-1.5 rounded-lg font-black uppercase tracking-wider inline-block">
+                        Raport Salvat
+                      </span>
+                    ) : (
+                      <div className="flex flex-col items-end gap-2">
+                        <button 
+                          onClick={() => handleGeneratesSomatie(c.id)}
+                          disabled={loadingId === c.id}
+                          className="bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg font-black uppercase text-[9px] tracking-wider transition-all disabled:opacity-50"
+                        >
+                          {loadingId === c.id ? 'Se generează...' : ' Generează Somație'}
+                        </button>
+                        <button 
+                          onClick={() => {
+                            const printWindow = window.open('', '_blank');
+                            printWindow.document.write(`
+                              <html style="font-family: monospace; padding: 40px; color: #111;">
+                                <h2 style="color: #16a34a;">CERTIFICAT DE AUTENTICITATE SHA-256</h2>
+                                <hr />
+                                <p><strong>Document ID:</strong> ${c.id}</p>
+                                <p><strong>Titlu Contract:</strong> ${c.titlu_contract}</p>
+                                <p><strong>Părți Implicate:</strong> ${c.client_nume}</p>
+                                <p><strong>Valoare:</strong> ${c.valoare} ${c.moneda}</p>
+                                <div style="background: #f1f5f9; padding: 20px; border: 1px solid #cbd5e1; word-wrap: break-word;">
+                                  <strong>HASH CRIPTOGRAFIC IMUABIL:</strong><br/>
+                                  ${c.hash_sha256 || 'Lipsă amprentă în baza de date'}
+                                </div>
+                                <p style="font-size: 12px; margin-top: 40px; color: #64748b;">
+                                  Acest certificat garantează faptul că documentul binar generat nu a fost alterat din momentul semnării.
+                                </p>
+                                <script>window.print();</script>
+                              </html>
+                            `);
+                            printWindow.document.close();
+                          }}
+                          className="bg-[#8ba888]/10 hover:bg-[#8ba888]/20 text-[#8ba888] border border-[#8ba888]/30 px-3 py-1.5 rounded-lg font-black uppercase text-[9px] tracking-wider transition-all"
+                        >
+                          Descarcă Certificat SHA-256
+                        </button>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))

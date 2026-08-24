@@ -14,10 +14,12 @@ export default function AiAuditWidget({ handleInapoiPrincipal, user, isPremium, 
   const handleAudit = async (e) => {
     e.preventDefault();
     if (!file) return alert('Te rugăm să încarci un contract PDF.');
-    
+
     setIsAuditing(true);
-    // AICI: Înlocuiești cu fetch-ul tău real către OpenAI/Endpoint
-    setTimeout(async () => {
+    setIsSaved(false); // Resetăm starea de salvare la fiecare audit nou
+
+    // Simularea procesării AI (Aici vei pune fetch-ul tău real către OpenAI)
+    setTimeout(() => {
       const mockResult = {
         score: 8.5,
         fileName: file.name,
@@ -31,23 +33,44 @@ export default function AiAuditWidget({ handleInapoiPrincipal, user, isPremium, 
         missingClauses: [
           "Lipsește clauza de Forță Majoră.",
           "Nu este definită instanța de judecată competentă în caz de litigiu."
-        ]
+        ],
+        // AICI ESTE MAGIA: Datele extrase din PDF pentru a genera varianta corectată
+        extractedData: {
+          tipContract_detectat: 'prestari', // Schimbă în 'necunoscut' dacă vrei să testezi alerta
+          prestatorNume: 'Compania Veche SRL',
+          clientNume: 'Compania Ta SRL',
+          valoare: '5000',
+          moneda: 'EUR',
+          obiect: 'Servicii de dezvoltare conform anexei din contractul inițial.'
+        }
       };
       setAuditResult(mockResult);
       setIsAuditing(false);
-
-      // Auto-Salvare în CRM
-      if (user?.id) {
-        await supabase.from('user_contracts').insert({
-          user_id: user.id,
-          titlu_contract: `Audit AI: ${file.name}`,
-          tip_contract: 'audit',
-          hash_sha256: `Scor Toxic: ${mockResult.score}`,
-          stare_plata: 'auditat'
-        });
-        setIsSaved(true);
-      }
     }, 2500);
+  };
+
+  // Funcția MAnuală de Salvare în CRM
+  const handleSaveToCRM = async () => {
+    if (!user?.id || !auditResult) return;
+    setIsSaved('loading');
+
+    const { error } = await supabase.from('user_contracts').insert({
+      user_id: user.id,
+      titlu_contract: `Raport AI: ${auditResult.fileName}`,
+      tip_contract: 'audit',
+      client_nume: '-',
+      valoare: auditResult.score,
+      moneda: 'Risc',
+      hash_sha256: `Scor: ${auditResult.score}/10 | ${auditResult.toxicClauses.length} Clauze Toxice`,
+      stare_plata: 'auditat'
+    });
+
+    if (!error) {
+      setIsSaved('done');
+    } else {
+      setIsSaved(false);
+      alert('Eroare la salvarea în CRM-ul Supabase.');
+    }
   };
 
   // Culoarea și progresul cercului
@@ -140,21 +163,31 @@ export default function AiAuditWidget({ handleInapoiPrincipal, user, isPremium, 
           </div>
 
           {/* ACTION BUTTONS */}
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-slate-800/80">
-            <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-start">
-              <button onClick={() => { setAuditResult(null); setFile(null); }} className="text-xs text-slate-400 hover:text-white transition-colors underline underline-offset-4">Auditează alt document</button>
-              {isSaved && <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-widest bg-emerald-900/20 px-2 py-1 rounded border border-emerald-500/20">💾 Salvat CRM</span>}
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-              <button onClick={() => window.print()} className="w-full sm:w-auto bg-[#1e293b] hover:bg-slate-700 text-white px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-wide transition-colors border border-slate-600">
-                Descarcă PDF
-              </button>
-              <button onClick={onGenerateCorrected} className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-blue-500 text-white px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-wide hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(147,51,234,0.4)]">
-                Generează Contract Corectat
-              </button>
-            </div>
-          </div>
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-slate-800/80">
+        <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-start">
+          <button onClick={() => { setAuditResult(null); setFile(null); setIsSaved(false); }} className="text-xs text-slate-400 hover:text-white transition-colors underline underline-offset-4 shrink-0">Auditează alt document</button>
+
+          {/* BUTONUL DE SALVARE MANUALĂ CRM */}
+          {!isSaved ? (
+            <button onClick={handleSaveToCRM} className="text-[10px] text-emerald-400 font-bold uppercase tracking-widest bg-emerald-900/10 px-3 py-1.5 rounded border border-emerald-500/20 hover:bg-emerald-900/30 transition-colors shadow-sm shrink-0">
+              💾 Salvează în CRM
+            </button>
+          ) : isSaved === 'loading' ? (
+            <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-widest bg-emerald-900/10 px-3 py-1.5 rounded border border-emerald-500/20 shrink-0">Se salvează...</span>
+          ) : (
+            <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-widest bg-emerald-900/20 px-3 py-1.5 rounded border border-emerald-500/20 shrink-0">✓ Salvat în CRM</span>
+          )}
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <button onClick={() => window.print()} className="w-full sm:w-auto bg-[#1e293b] hover:bg-slate-700 text-white px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-wide transition-colors border border-slate-600">
+            Descarcă PDF
+          </button>
+          <button onClick={() => onGenerateCorrected(auditResult.extractedData)} className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-blue-500 text-white px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-wide hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(147,51,234,0.4)]">
+            Generează Contract Corectat
+          </button>
+        </div>
+      </div>
 
         </div>
       </div>

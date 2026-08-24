@@ -3033,17 +3033,36 @@ const reseteazaSemnaturiB2B = () => {
                                     STEP 3: AI AUDIT JURO-STYLE
             ========================================================================= */}
         {step === 3 && (
-          <AiAuditWidget 
-            handleInapoiPrincipal={() => { setStep(1); setAutoStep('upload'); }} 
-            user={user} 
-            isPremium={isPremium} 
-            onGenerateCorrected={() => {
-              // Precompletăm cu un șablon curat
-              setFormData(prev => ({ ...prev, tipContract: 'prestari', clauzaLimitareRaspundere: true, clauzaPi: true }));
-              setStep(2);
-            }}
-          />
-        )}
+      <AiAuditWidget 
+        handleInapoiPrincipal={() => { setStep(1); setAutoStep('upload'); }} 
+        user={user} 
+        isPremium={isPremium} 
+        onGenerateCorrected={(extractedData) => {
+          if (!extractedData || extractedData.tipContract_detectat === 'necunoscut') {
+            alert("Acest tip de document nu se încadrează în șabloanele suportate de platforma noastră (ex: prestări, B2B, auto, NDA etc.). Te rugăm să folosești generatorul pentru a crea un contract nou.");
+            return;
+          }
+
+          // Dacă a trecut filtrul, aruncăm automat datele în formular
+          setFormData(prev => ({ 
+            ...prev, 
+            tipContract: extractedData.tipContract_detectat || 'prestari',
+            prestatorNume: extractedData.prestatorNume || '',
+            clientNume: extractedData.clientNume || '',
+            valoare: extractedData.valoare || '',
+            moneda: extractedData.moneda || 'RON',
+            obiect: extractedData.obiect || '',
+            // Bifăm automat cele mai importante clauze de protecție ContractSmart
+            clauzaLimitareRaspundere: true, 
+            clauzaPi: true,
+            clauzaPenalitati: true
+          }));
+
+          // Mutăm utilizatorul direct la pasul 2 (configuratorul)
+          setStep(2);
+        }}
+      />
+    )}
 
         {/* TRUST BADGES ENTERPRISE */}
         <div className="max-w-6xl mx-auto px-6 my-16">
