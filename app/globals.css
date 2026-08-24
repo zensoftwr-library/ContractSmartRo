@@ -286,3 +286,6 @@ html.matcha-light-theme select {
 html.matcha-light-theme label span:not([class*="text-"]) {
   color: #1f2937 !important;
 }
+.matcha-light-theme button.text-slate-400{background:#e2e8f0!important;color:#111!important;border:1px solid #ccc!important}
+.matcha-light-theme .animate-spin circle{stroke:#ccc!important}
+.matcha-light-theme .animate-spin path{fill:#8ba888!important}
