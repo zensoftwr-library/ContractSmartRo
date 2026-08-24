@@ -209,6 +209,29 @@ html.matcha-light-theme select {
 }
 
 /* ========================================================== */
+/* FIXURI Punctuale (Cameră Live Auto & Casetă Total Fiscal)  */
+/* ========================================================== */
+
+html.matcha-light-theme button.bg-\[\#1e293b\],
+html.matcha-light-theme button[class*="bg-[#1e293b]"] {
+  background-color: #f1f5f9 !important;
+  color: #1f2937 !important;
+  border: 1px solid #cbd5e1 !important;
+}
+html.matcha-light-theme button.bg-\[\#1e293b\] svg,
+html.matcha-light-theme button[class*="bg-[#1e293b]"] svg {
+  color: #334155 !important;
+}
+
+html.matcha-light-theme div[class*="bg-[#0B0F12]"],
+html.matcha-light-theme div[class*="bg-black"],
+html.matcha-light-theme span[class*="bg-black"],
+html.matcha-light-theme div[class*="bg-[#12181D]"] {
+  background-color: #f1f5f9 !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+/* ========================================================== */
 /* ✨ FIXURI CHIRURGICALE FINALE: HERO, QR, NAVBAR ȘI SPINNERE ✨ */
 /* ========================================================== */
 
@@ -220,15 +243,18 @@ html.matcha-light-theme h1.text-white,
 html.matcha-light-theme h2.text-white,
 html.matcha-light-theme h3.text-white,
 html.matcha-light-theme h4.text-white,
-html.matcha-light-theme strong.text-white {
+html.matcha-light-theme strong.text-white,
+html.matcha-light-theme .text-lg.text-white,
+html.matcha-light-theme .text-xl.text-white,
+html.matcha-light-theme .text-2xl.text-white {
   color: #1f2937 !important;
 }
 
-/* Salvăm butoanele colorate care trebuie să aibă text alb */
-html.matcha-light-theme button span.text-white,
-html.matcha-light-theme button .text-white,
-html.matcha-light-theme button.text-white,
-html.matcha-light-theme a[class*="bg-"] .text-white {
+/* 🔒 EXCLUDEM BUTTONUL ALB (.bg-white) DE LA REGULA DE CULOARE ALBĂ 🔒 */
+html.matcha-light-theme button:not(.bg-white) span.text-white,
+html.matcha-light-theme button:not(.bg-white) .text-white,
+html.matcha-light-theme button:not(.bg-white).text-white,
+html.matcha-light-theme a[class*="bg-"]:not(.bg-white) .text-white {
   color: #ffffff !important;
 }
 
@@ -243,7 +269,8 @@ html.matcha-light-theme button.bg-white {
 }
 html.matcha-light-theme .bg-white *,
 html.matcha-light-theme a.bg-white *,
-html.matcha-light-theme button.bg-white * {
+html.matcha-light-theme button.bg-white *,
+html.matcha-light-theme .bg-white .text-white {
   color: #1f2937 !important;
 }
 html.matcha-light-theme a.bg-white:hover,
@@ -252,7 +279,6 @@ html.matcha-light-theme button.bg-white:hover {
 }
 
 /* 3. Butoanele INACTIVE de la QR Code Terminal (FĂRĂ să stricăm Navbar-ul!) */
-/* Doar butoanele gri care au background-ul specific #16221A din Terminal QR */
 html.matcha-light-theme button.bg-\[\#16221A\].text-slate-400 {
   background-color: #f1f5f9 !important;
   color: #334155 !important;
@@ -262,7 +288,6 @@ html.matcha-light-theme button.bg-\[\#16221A\].text-slate-400:hover {
   background-color: #e2e8f0 !important;
 }
 
-/* Butoanele mov inactive (Dinamic / PDF) */
 html.matcha-light-theme button.bg-purple-900\/10.text-purple-400 {
   background-color: #f3e8ff !important;
   color: #6b21a8 !important;
@@ -272,7 +297,6 @@ html.matcha-light-theme button.bg-purple-900\/10.text-purple-400:hover {
   background-color: #e9d5ff !important;
 }
 
-/* Butoanele albastre inactive (Smart, Geo, Landing) */
 html.matcha-light-theme button.bg-blue-900\/10.text-blue-400 {
   background-color: #dbeafe !important;
   color: #1e3a8a !important;
@@ -282,7 +306,7 @@ html.matcha-light-theme button.bg-blue-900\/10.text-blue-400:hover {
   background-color: #bfdbfe !important;
 }
 
-/* 4. Animații Loading (Spinners) - Aspect premium pe Light Theme */
+/* 4. Animații Loading (Spinners) */
 html.matcha-light-theme svg.animate-spin circle {
   stroke: #cbd5e1 !important;
   opacity: 1 !important;
@@ -292,32 +316,7 @@ html.matcha-light-theme svg.animate-spin path {
   opacity: 1 !important;
 }
 
-/* 5. Câmpuri de formular & Butoanele Camera Live din Dosar Auto */
+/* 5. Restul Formularului */
 html.matcha-light-theme label span:not([class*="text-"]) {
   color: #1f2937 !important;
 }
-html.matcha-light-theme button.bg-\[\#1e293b\] {
-  background-color: #f1f5f9 !important;
-  color: #1f2937 !important;
-  border: 1px solid #cbd5e1 !important;
-}
-html.matcha-light-theme button.bg-\[\#1e293b\] svg {
-  color: #334155 !important;
-}
-/* Asigurăm că input-urile și textele din radio butoane rămân negre */
-html.matcha-light-theme input, 
-html.matcha-light-theme textarea, 
-html.matcha-light-theme select {
-  background-color: #ffffff !important;
-  color: #111827 !important;
-  border-color: #cbd5e1 !important;
-}
-
-html.matcha-light-theme label span:not([class*="text-"]) {
-  color: #1f2937 !important;
-}
-
-.matcha-light-theme .bg-white {background:#fff!important}
-.matcha-light-theme .bg-white *, .matcha-light-theme button.bg-white .text-white {color:#111!important}
-html.matcha-light-theme .bg-white .text-white, 
-html.matcha-light-theme a.bg-white .text-white { color: #111 !important; }
