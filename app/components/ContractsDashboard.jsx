@@ -8,7 +8,24 @@ export default function ContractsDashboard({ userId }) {
   const [contracts, setContracts] = useState([]);
   const [loadingId, setLoadingId] = useState(null);
 
-  // FUNCȚIE NOUĂ PENTRU ȘTERGERE
+  // EFECTUL CARE ADUCE CONTRACTELE DIN SUPABASE (Asta lipsea!)
+  useEffect(() => {
+    const fetchContracts = async () => {
+      if (!userId) return;
+      const { data, error } = await supabase
+        .from('user_contracts')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+      
+      if (!error) {
+        setContracts(data || []);
+      }
+    };
+    fetchContracts();
+  }, [userId]);
+
+  // FUNCȚIE PENTRU ȘTERGERE CONTRACT
   const handleDeleteContract = async (contractId) => {
     if (!confirm('Ești sigur că vrei să ștergi acest document din CRM? Acțiunea este ireversibilă.')) return;
 
@@ -104,7 +121,7 @@ export default function ContractsDashboard({ userId }) {
 
                 <div className="flex items-center justify-end gap-3">
 
-                  {/* Buton Ștergere (Apare la hover sau pe mobile) */}
+                  {/* Buton Ștergere */}
                   <button 
                     onClick={() => handleDeleteContract(c.id)}
                     className="text-slate-500 hover:text-red-400 transition-colors p-1.5 rounded-md hover:bg-red-900/10 opacity-60 hover:opacity-100"
@@ -130,7 +147,6 @@ export default function ContractsDashboard({ userId }) {
                         {loadingId === c.id ? 'Se generează...' : ' Generează Somație'}
                       </button>
 
-                      {/* Generare Blob pentru descărcare directă ca fișier txt/certificat */}
                       <button 
                         onClick={() => {
                           const content = `CERTIFICAT DE AUTENTICITATE SHA-256\n===================================\n\nDocument ID: ${c.id}\nTitlu Contract: ${c.titlu_contract}\nPărți Implicate: ${c.client_nume}\nValoare: ${c.valoare} ${c.moneda}\n\nHASH CRIPTOGRAFIC IMUABIL:\n${c.hash_sha256 || 'N/A'}\n\n===================================\nSistem auditat. Acest certificat garantează integritatea fișierului.`;
@@ -152,13 +168,13 @@ export default function ContractsDashboard({ userId }) {
                   )}
 
                 </div>
-              </td>
-            </tr>
-          ))
-        )}
-      </tbody>
-    </table>
-  </div>
-</div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }
