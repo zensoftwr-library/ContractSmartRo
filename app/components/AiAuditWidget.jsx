@@ -163,31 +163,36 @@ export default function AiAuditWidget({ handleInapoiPrincipal, user, isPremium, 
           </div>
 
           {/* ACTION BUTTONS */}
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-slate-800/80">
-            <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-start">
-              <button onClick={() => { setAuditResult(null); setFile(null); setIsSaved(false); }} className="text-xs text-slate-400 hover:text-white transition-colors underline underline-offset-4 shrink-0">Auditează alt document</button>
-              
-              {/* BUTONUL DE SALVARE MANUALĂ CRM */}
-              {!isSaved ? (
-                <button onClick={handleSaveToCRM} className="text-[10px] text-emerald-400 font-bold uppercase tracking-widest bg-emerald-900/10 px-3 py-1.5 rounded border border-emerald-500/20 hover:bg-emerald-900/30 transition-colors shadow-sm shrink-0">
-                  💾 Salvează în CRM
-                </button>
-              ) : isSaved === 'loading' ? (
-                <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-widest bg-emerald-900/10 px-3 py-1.5 rounded border border-emerald-500/20 shrink-0">Se salvează...</span>
-              ) : (
-                <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-widest bg-emerald-900/20 px-3 py-1.5 rounded border border-emerald-500/20 shrink-0">✓ Salvat în CRM</span>
-              )}
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto mt-4 sm:mt-0">
-              <button onClick={() => window.print()} className="w-full sm:w-auto shrink-0 bg-[#1e293b] hover:bg-slate-700 text-white px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-wide transition-colors border border-slate-600">
-                Descarcă PDF
-              </button>
-              <button onClick={() => onGenerateCorrected(auditResult.extractedData)} className="w-full sm:w-auto shrink-0 bg-gradient-to-r from-purple-600 to-blue-500 text-white px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-wide hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(147,51,234,0.4)]">
-                Generează Contract Corectat
-              </button>
-            </div>
-          </div>
+      <div className="flex flex-col gap-6 pt-6 border-t border-slate-800/80 mt-6">
+
+        {/* Secțiunea de sus: Butoanele mici de acțiune secundară */}
+        <div className="flex flex-row justify-between items-center w-full">
+          <button onClick={() => { setAuditResult(null); setFile(null); setIsSaved(false); }} className="text-[11px] font-bold text-slate-400 hover:text-white transition-colors underline underline-offset-4">
+            &larr; Auditează alt document
+          </button>
+
+          {!isSaved ? (
+            <button onClick={handleSaveToCRM} className="text-[10px] text-emerald-400 font-black uppercase tracking-widest bg-emerald-900/10 px-4 py-2 rounded-lg border border-emerald-500/30 hover:bg-emerald-900/30 transition-colors shadow-sm">
+              💾 Salvează în CRM
+            </button>
+          ) : isSaved === 'loading' ? (
+            <span className="text-[10px] text-emerald-400 font-black uppercase tracking-widest bg-emerald-900/10 px-4 py-2 rounded-lg border border-emerald-500/30">Se salvează...</span>
+          ) : (
+            <span className="text-[10px] text-emerald-400 font-black uppercase tracking-widest bg-emerald-900/20 px-4 py-2 rounded-lg border border-emerald-500/30">✓ Salvat în CRM</span>
+          )}
+        </div>
+
+        {/* Secțiunea de jos: Butoanele mari de acțiune principală */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
+          <button onClick={() => window.print()} className="w-full bg-[#1e293b] hover:bg-slate-700 text-white py-4 rounded-xl text-xs font-black uppercase tracking-widest transition-colors border border-slate-600 shadow-sm">
+            Descarcă PDF
+          </button>
+          <button onClick={() => onGenerateCorrected(auditResult.extractedData)} className="w-full bg-gradient-to-r from-purple-600 to-blue-500 text-white py-4 rounded-xl text-xs font-black uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_0_20px_rgba(147,51,234,0.4)]">
+            Generează Contract Corectat
+          </button>
+        </div>
+
+      </div>
 
         </div>
       </div>
@@ -209,7 +214,7 @@ export default function AiAuditWidget({ handleInapoiPrincipal, user, isPremium, 
         <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-purple-500/30 bg-[#0B0F12] hover:bg-purple-900/10 hover:border-purple-500/50 rounded-2xl cursor-pointer transition-all relative z-10 group">
           <svg className="w-8 h-8 text-purple-400 mb-3 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
           <span className="text-sm font-bold text-white mb-1">{file ? file.name : 'Apasă pentru a alege PDF-ul'}</span>
-          <span className="text-[10px] text-slate-500 uppercase tracking-widest">{file ? 'Fișier Încărcat' : 'Dimensiune maximă 5MB'}</span>
+          <span className="text-[10px] text-slate-500 uppercase tracking-widest">{file ? 'Fișier Încărcat' : 'Dimensiune maximă 10MB'}</span>
           <input type="file" accept="application/pdf" className="hidden" onChange={e => setFile(e.target.files[0])} />
         </label>
         
