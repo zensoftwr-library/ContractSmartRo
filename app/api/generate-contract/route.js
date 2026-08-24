@@ -19,7 +19,7 @@ export async function POST(request) {
     const { 
       tipContract, initiatorRol, obiect, valoare, moneda, 
       prestatorNume, prestatorCui, prestatorReprezentant, clientNume, clientCui, clientReprezentant, 
-      clientEmail, semnăturaBase64, userId, adaugaProcesVerbal, captchaToken,
+      clientEmail, semnaturaPrestatorBase64, semnaturaClientBase64, userId, adaugaProcesVerbal, captchaToken,
       constructiiMateriale, constructiiManopera, constructiiSuprafata, constructiiPretMp,
       adaugaQrPlata, ibanPlata, clauzaCustom
     } = body;
@@ -190,14 +190,14 @@ export async function POST(request) {
       { cond: body.clauzaItEscrow, html: `<li><strong>ART. 4.20. DEPOZITARE COD SURSĂ (ESCROW):</strong> Codul sursă va fi depozitat la o entitate terță de tip escrow, activându-se dreptul de eliberare și utilizare în beneficiul clientului exclusiv în caz de insolvență a furnizorului.</li>` }
     ];
 
-    let nrClauzeBifate = 0;
     rules.forEach(r => {
       if (r.cond) {
         clauzeInjectateHtml += r.html;
-        nrClauzeBifate++;
       }
     });
 
+    // Numărăm dinamic câte clauze reale au fost trimise ca 'true' din frontend pentru a evita suprapunerile de index
+    let nrClauzeBifate = Object.keys(body).filter(k => k.startsWith('clauza') && k !== 'clauzaCustom' && body[k] === true).length;
     if (clauzaCustom && clauzaCustom.trim() !== '') {
       const numarUrmator = nrClauzeBifate + 1;
       clauzeInjectateHtml += `<li><strong>ART. 4.${numarUrmator}. CLAUZĂ SPECIALĂ ADIȚIONALĂ:</strong> ${clauzaCustom.trim()}</li>`;
@@ -240,8 +240,8 @@ export async function POST(request) {
         </style>
       </head>
       <body>
-        <div class="brand-header">Sistem de Certificare și Audit Criptografic // ContractSmart 2026</div>
-        <div class="contract-title">${titluContractOficial}</div>
+        <!-- Brand header eliminat -->
+        <div class="contract-title" style="max-width: 80%; margin: 0 auto; line-height: 1.4;">${titluContractOficial}</div>
         <div class="contract-subtitle">Nr. Identificare Digitală: CS-${Math.floor(10000 + Math.random() * 90000)} / Data Generării: ${dataCurenta}</div>
         
         <div class="capitol-title">CAPITOLUL I. PĂRȚILE CONTRACTANTE</div>
@@ -297,36 +297,68 @@ export async function POST(request) {
         </div>
 
         <div class="signature-layout" style="margin-top: 40px; border-top: 1px solid #cbd5e1; padding-top: 20px;">
-          <div class="signature-column">
-            <strong>PENTRU PRESTATOR (PREDARE)</strong><br>
-            <span style="font-size: 10px; color: #64748b;">(Pasul 1: Emitent)</span><br><br>
-            ${initiatorRol === 'prestator' && semnăturaBase64 ? `
-              <img src="${semnăturaBase64}" class="signature-image" alt="Semnatura Prestator" />
-              <div style="font-size: 10px; color: #16a34a; background: #f0fdf4; padding: 4px; border-radius: 4px; margin-top: 5px;">
-                ✓ Recepție &amp; Predare Validată
-              </div>
-            ` : `
-              <div class="signature-placeholder" style="border: 1px dashed #cbd5e1; padding: 10px; border-radius: 4px; color: #d97706;">
-               [Așteaptă Validarea]
-              </div>
-            `}
-          </div>
+  <div class="signature-column">
+    <strong>PENTRU PRESTATOR (PREDARE)</strong><br>
+    <span style="font-size: 10px; color: #64748b;">(Pasul 1: Emitent)</span><br><br>
+    ${semnaturaPrestatorBase64 ? `
+      <img src="${semnaturaPrestatorBase64}" class="signature-image" alt="Semnatura Prestator" />
+      <div style="font-size: 10px; color: #16a34a; background: #f0fdf4; padding: 4px; border-radius: 4px; margin-top: 5px;">
+        ✓ Validat Electronic
+      </div>
+    ` : `
+      <div class="signature-placeholder" style="border: 1px dashed #cbd5e1; padding: 10px; border-radius: 4px; color: #d97706;">
+        [Așteaptă Validarea]
+      </div>
+    `}
+  </div>
+
+  <div class="signature-column">
+    <strong>PENTRU BENEFICIAR (PRIMIRE)</strong><br>
+    <span style="font-size: 10px; color: #64748b;">(Pasul 2: Receptor)</span><br><br>
+    ${semnaturaClientBase64 ? `
+      <img src="${semnaturaClientBase64}" class="signature-image" alt="Semnatura Beneficiar" />
+      <div style="font-size: 10px; color: #16a34a; background: #f0fdf4; padding: 4px; border-radius: 4px; margin-top: 5px;">
+        ✓ Validat Electronic
+      </div>
+    ` : `
+      <div class="signature-placeholder" style="border: 1px dashed #cbd5e1; padding: 10px; border-radius: 4px; color: #ef4444;">
+        Așteaptă semnare partener
+      </div>
+    `}
+  </div>
+</div>
           
-          <div class="signature-column">
-            <strong>PENTRU BENEFICIAR (PRIMIRE)</strong><br>
-            <span style="font-size: 10px; color: #64748b;">(Pasul 2: Receptor)</span><br><br>
-            ${initiatorRol === 'client' && semnăturaBase64 ? `
-              <img src="${semnăturaBase64}" class="signature-image" alt="Semnatura Beneficiar" />
-              <div style="font-size: 10px; color: #16a34a; background: #f0fdf4; padding: 4px; border-radius: 4px; margin-top: 5px;">
-                ✓ Recepție &amp; Primire Validată
-              </div>
-            ` : `
-              <div class="signature-placeholder" style="border: 1px dashed #cbd5e1; padding: 10px; border-radius: 4px; color: #ef4444;">
-               În așteptarea semnăturii beneficiarului
-              </div>
-            `}
-          </div>
-        </div>
+          <div class="signature-layout" style="margin-top: 40px; border-top: 1px solid #cbd5e1; padding-top: 20px;">
+  <div class="signature-column">
+    <strong>PENTRU PRESTATOR (PREDARE)</strong><br>
+    <span style="font-size: 10px; color: #64748b;">(Pasul 1: Emitent)</span><br><br>
+    ${semnaturaPrestatorBase64 ? `
+      <img src="${semnaturaPrestatorBase64}" class="signature-image" alt="Semnatura Prestator" />
+      <div style="font-size: 10px; color: #16a34a; background: #f0fdf4; padding: 4px; border-radius: 4px; margin-top: 5px;">
+        ✓ Validat Electronic
+      </div>
+    ` : `
+      <div class="signature-placeholder" style="border: 1px dashed #cbd5e1; padding: 10px; border-radius: 4px; color: #d97706;">
+        [Așteaptă Validarea]
+      </div>
+    `}
+  </div>
+
+  <div class="signature-column">
+    <strong>PENTRU BENEFICIAR (PRIMIRE)</strong><br>
+    <span style="font-size: 10px; color: #64748b;">(Pasul 2: Receptor)</span><br><br>
+    ${semnaturaClientBase64 ? `
+      <img src="${semnaturaClientBase64}" class="signature-image" alt="Semnatura Beneficiar" />
+      <div style="font-size: 10px; color: #16a34a; background: #f0fdf4; padding: 4px; border-radius: 4px; margin-top: 5px;">
+        ✓ Validat Electronic
+      </div>
+    ` : `
+      <div class="signature-placeholder" style="border: 1px dashed #cbd5e1; padding: 10px; border-radius: 4px; color: #ef4444;">
+        Așteaptă semnare partener
+      </div>
+    `}
+  </div>
+</div>
 
         <div class="legal-footer">
           Document binar securizat generat digital. Proprietate exclusivă a proceselor auditate ContractSmart 2026.
@@ -338,8 +370,7 @@ export async function POST(request) {
     // -------------------------------------------------------------------------
     if (adaugaProcesVerbal === true || adaugaProcesVerbal === "true") {
       htmlContract += `
-        <div style="page-break-before: always; clear: both; padding-top: 40px;"></div>
-        <div class="brand-header">Sistem de Certificare și Audit Criptografic // ContractSmart 2026</div>
+        <div class="contract-title" style="max-width: 80%; margin: 0 auto; line-height: 1.4;">${titluContractOficial}</div>
         <div class="contract-title">ANEXA 1: PROCES-VERBAL DE PREDARE-PRIMIRE</div>
         <div class="contract-subtitle">Anexă la Contractul nr. CS-${Math.floor(10000 + Math.random() * 90000)} / ${dataCurenta}</div>
         

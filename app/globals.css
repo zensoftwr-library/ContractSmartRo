@@ -297,6 +297,25 @@ html.matcha-light-theme button[class*="blue-900"]:hover {
     background-color: #bfdbfe !important;
 }
 
-/* D. SPINNERE & ANIMAȚII (Niciun override!) */
-/* SVGs din React funcționează perfect cu `text-black` sau `text-[#8ba888]`.
-   Nu adăugăm reguli forțate aici, pentru ca animațiile să nu se camufleze. */
+/* Fix Text Invizibil pe Radio Buttons în Light Mode */
+html.matcha-light-theme label[class*="group/lbl"] span {
+  color: #1f2937 !important;
+}
+html.matcha-light-theme label[class*="group/lbl"]:hover span {
+  color: #8ba888 !important;
+}
+html.matcha-light-theme label[class*="group/lbl"] input:checked + span {
+  color: #8ba888 !important;
+}
+
+/* Contrast Text Clauze în Light Mode */
+html.matcha-light-theme label[class*="group/clauza"] span.text-slate-500 {
+  color: #4b5563 !important;
+}
+
+/* Culori Butoane Inactive QR Studio Light Mode */
+html.matcha-light-theme .qr-inactive-btn {
+  background-color: #ecfdf5 !important;
+  color: #065f46 !important;
+  border: 1px solid #a7f3d0 !important;
+}

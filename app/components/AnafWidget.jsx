@@ -46,7 +46,7 @@ export default function AnafWidget({
             </div>
           ) : (
             <div className="w-full bg-[#0B0F12] border border-slate-700/80 rounded-2xl p-6 animate-fadeIn text-left shadow-inner mt-auto">
-              <div className="flex justify-between items-start mb-4 gap-4">
+              <div className="flex flex-wrap justify-between items-start mb-4 gap-4">
                 <div>
                   <h4 className="text-sm font-black text-white uppercase leading-snug">{cuiDataResult.denumire}</h4>
                   <div className="flex flex-wrap gap-x-4 gap-y-2 mt-2">
@@ -58,7 +58,7 @@ export default function AnafWidget({
                     )}
                   </div>
                 </div>
-                <span className={`px-2.5 py-1 rounded-md text-[9px] font-black uppercase shrink-0 mt-0.5 shadow-sm border ${cuiDataResult.stare?.toLowerCase().includes('inactiv') || cuiDataResult.stare?.toLowerCase().includes('radiat') ? 'bg-red-900/20 text-red-400 border-red-500/30' : 'bg-emerald-900/20 text-emerald-400 border-emerald-500/30'}`}>
+                <span className={`px-2.5 py-1 rounded-md text-[9px] font-black uppercase shrink-0 mt-0.5 shadow-sm border max-w-full text-center whitespace-normal ${cuiDataResult.stare?.toLowerCase().includes('inactiv') || cuiDataResult.stare?.toLowerCase().includes('radiat') ? 'bg-red-900/20 text-red-400 border-red-500/30' : 'bg-emerald-900/20 text-emerald-400 border-emerald-500/30'}`}>
                   {cuiDataResult.stare || 'Necunoscut'}
                 </span>
               </div>

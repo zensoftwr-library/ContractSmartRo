@@ -126,9 +126,13 @@ export async function POST(req) {
       ? `Societatea ${field(data.cumparatorNume, "200px")}, CUI ${field(data.cumparatorCui, "100px")}, Reg. Com. ${field(data.cumparatorRegCom, "100px")}, cu sediul social în ${field(data.cumparatorSediu, "220px")}, reprezentată legal conform actelor constitutive`
       : `Subsemnatul/a ${field(data.cumparatorNume, "200px")}, CNP ${field(data.cumparatorCnp, "110px")}, cu domiciliul în localitatea ${field(data.autoAdresaCumparator, "220px")}`;
 
-    const sigHtml = data.semnaturaBase64 && data.semnaturaBase64.length > 100 
-      ? `<img src="${data.semnaturaBase64}" style="max-height: 40px; margin-top: 5px;"/>`
-      : `<span style="font-size: 9px; font-weight: normal;">(Semnătura și ștampila)</span>`;
+    const sigVanzatorHtml = data.semnaturaVanzatorBase64 && data.semnaturaVanzatorBase64.length > 100 
+  ? `<img src="${data.semnaturaVanzatorBase64}" style="max-height: 45px; display: block; margin: 5px auto 0 auto;"/><div style="font-size: 9px; color: #16a34a; margin-top: 2px;">✓ Validat Electronic</div>`
+  : `<br/><span style="font-size: 9px; font-weight: normal; color: #d97706;">[Așteaptă Validarea]</span>`;
+
+    const sigCumparatorHtml = data.semnaturaCumparatorBase64 && data.semnaturaCumparatorBase64.length > 100 
+      ? `<img src="${data.semnaturaCumparatorBase64}" style="max-height: 45px; display: block; margin: 5px auto 0 auto;"/><div style="font-size: 9px; color: #16a34a; margin-top: 2px;">✓ Validat Electronic</div>`
+      : `<br/><span style="font-size: 9px; font-weight: normal; color: #ef4444;">[Așteaptă Semnarea]</span>`;
 
     const zip = new JSZip();
 
@@ -258,9 +262,9 @@ export async function POST(req) {
           <div class="legal-clause">Prezentul contract a fost încheiat astăzi, <strong>${dataCurenta}</strong>, în 5 (cinci) exemplare originale, având aceeași forță juridică probantă, câte unul pentru fiecare parte, și 3 exemplare pentru autoritățile competente. Eventualele litigii decurgând din executarea prezentului contract se vor soluționa pe cale amiabilă, iar în caz de eșec, de către instanțele judecătorești competente material și teritorial.</div>
 
           <div class="signature-area">
-            <div class="sig-box">VÂNZĂTOR <br/> ${sigHtml}</div>
-            <div class="sig-box">CUMPĂRĂTOR <br/> ${sigHtml}</div>
-          </div>
+        <div class="sig-box">VÂNZĂTOR <br/> ${sigVanzatorHtml}</div>
+          <div class="sig-box">CUMPĂRĂTOR <br/> ${sigCumparatorHtml}</div>
+        </div>
         </body>
         </html>
       `;
@@ -352,8 +356,8 @@ export async function POST(req) {
         </div>
 
         <div class="sig-layout">
-          <div class="sig-box">VÂNZĂTOR <br/><span style="font-weight: normal; font-size:10px;">(Am predat vehiculul și actele)</span><br/>${sigHtml}</div>
-          <div class="sig-box">CUMPĂRĂTOR <br/><span style="font-weight: normal; font-size:10px;">(Am primit vehiculul și actele)</span><br/>${sigHtml}</div>
+          <div class="sig-box">VÂNZĂTOR <br/><span style="font-weight: normal; font-size:10px;">(Am predat vehiculul și actele)</span><br/>${sigVanzatorHtml}</div>
+          <div class="sig-box">CUMPĂRĂTOR <br/><span style="font-weight: normal; font-size:10px;">(Am primit vehiculul și actele)</span><br/>${sigCumparatorHtml}</div>
         </div>
       </body>
       </html>
@@ -411,9 +415,9 @@ export async function POST(req) {
         <div class="field-row">Motivul radierii: Înstrăinare conform contractului de vânzare-cumpărare anexat, încheiat la data de ${dataCurenta}.</div>
         
         <div style="margin-top: 40px; text-align: right; font-weight: bold; padding-right: 50px;">
-          Data: ${dataCurenta}<br/><br/><br/>
+          Data: ${dataCurenta}<br/><br/>
           Semnătură Vânzător / Ștampilă<br/>
-          ${sigHtml}
+          <div style="display: inline-block; text-align: center; min-width: 150px;">${sigVanzatorHtml}</div>
         </div>
 
         <div class="page-break"></div>
@@ -434,9 +438,9 @@ export async function POST(req) {
         </div>
         
         <div style="margin-top: 40px; text-align: right; font-weight: bold; padding-right: 50px;">
-          Data: ${dataCurenta}<br/><br/><br/>
+          Data: ${dataCurenta}<br/><br/>
           Semnătură Cumpărător / Ștampilă<br/>
-          ${sigHtml}
+          <div style="display: inline-block; text-align: center; min-width: 150px;">${sigCumparatorHtml}</div>
         </div>
       </body>
       </html>

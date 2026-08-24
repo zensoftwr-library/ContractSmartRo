@@ -883,6 +883,9 @@ const reseteazaSemnaturiB2B = () => {
     curataCanvasAuto();
     setAutoData({ vanzatorTip: 'PF', vanzatorNume: '', vanzatorCnp: '', vanzatorCui: '', vanzatorRegCom: '', vanzatorSediu: '', cumparatorTip: 'PF', cumparatorNume: '', cumparatorCnp: '', cumparatorCui: '', cumparatorRegCom: '', cumparatorSediu: '', autoVin: '', autoMarcaModel: '', autoNumarInmatriculare: '', autoPret: '', clientEmail: '', autoAdresaVanzator: '', autoAdresaCumparator: '', pretIncludeTVA: false, autoMoneda: 'RON', semnaturaBase64: null });
     setAutoDocs({ civ: null, buletin_vanzator: null, buletin_cumparator: null, talon: null });
+    setB2bSigPrestator(null);
+    setB2bSigClient(null);
+    setB2bSignStep('prestator');
   };
 
   useEffect(() => {
@@ -1727,11 +1730,11 @@ const reseteazaSemnaturiB2B = () => {
                 
                 {/* Butoanele de tip - COMPACT */}
                 <div className="flex flex-wrap justify-center sm:justify-start gap-2">
-                  <button onClick={() => setQrType('url')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm ${qrType === 'url' ? 'bg-[#8ba888] text-[#0B0F12] shadow-[0_0_10px_rgba(139,168,136,0.2)]' : 'bg-[#16221A] text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800'}`}>Standard URL</button>
-                  <button onClick={() => setQrType('wifi')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm ${qrType === 'wifi' ? 'bg-[#8ba888] text-[#0B0F12] shadow-[0_0_10px_rgba(139,168,136,0.2)]' : 'bg-[#16221A] text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800'}`}>Rețea Wi-Fi</button>
-                  <button onClick={() => setQrType('crypto')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm ${qrType === 'crypto' ? 'bg-[#8ba888] text-[#0B0F12] shadow-[0_0_10px_rgba(139,168,136,0.2)]' : 'bg-[#16221A] text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800'}`}>Portofel Crypto</button>
+                  <button onClick={() => setQrType('url')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm ${qrType === 'url' ? 'bg-[#8ba888] text-[#0B0F12] shadow-[0_0_10px_rgba(139,168,136,0.2)]' : 'qr-inactive-btn bg-[#8ba888]/10 text-[#8ba888] border border-[#8ba888]/20 hover:bg-[#8ba888]/20'}`}>Standard URL</button>
+                  <button onClick={() => setQrType('wifi')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm ${qrType === 'wifi' ? 'bg-[#8ba888] text-[#0B0F12] shadow-[0_0_10px_rgba(139,168,136,0.2)]' : 'qr-inactive-btn bg-[#8ba888]/10 text-[#8ba888] border border-[#8ba888]/20 hover:bg-[#8ba888]/20'}`}>Rețea Wi-Fi</button>
+                  <button onClick={() => setQrType('crypto')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm ${qrType === 'crypto' ? 'bg-[#8ba888] text-[#0B0F12] shadow-[0_0_10px_rgba(139,168,136,0.2)]' : 'qr-inactive-btn bg-[#8ba888]/10 text-[#8ba888] border border-[#8ba888]/20 hover:bg-[#8ba888]/20'}`}>Portofel Crypto</button>
                   
-                  <button onClick={() => { if(!isPremium && !profil?.has_qr_vcard) handleCheckout('qr_vcard'); else setQrType('vcard'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm ${qrType === 'vcard' ? 'bg-[#8ba888] text-[#0B0F12] shadow-[0_0_10px_rgba(139,168,136,0.2)]' : 'bg-[#16221A] text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800'}`}>
+                  <button onClick={() => { if(!isPremium && !profil?.has_qr_vcard) handleCheckout('qr_vcard'); else setQrType('vcard'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm ${qrType === 'vcard' ? 'bg-[#8ba888] text-[#0B0F12] shadow-[0_0_10px_rgba(139,168,136,0.2)]' : 'qr-inactive-btn bg-[#8ba888]/10 text-[#8ba888] border border-[#8ba888]/20 hover:bg-[#8ba888]/20'}`}>
                     vCard Contact
                     {(!isPremium && !profil?.has_qr_vcard) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-amber-400 to-amber-600 text-black px-1.5 py-0.5 rounded shadow-md border border-amber-300">69 RON</span>}
                   </button>
@@ -3031,9 +3034,14 @@ const reseteazaSemnaturiB2B = () => {
             ========================================================================= */}
         {step === 3 && (
           <AiAuditWidget 
-            handleInapoiPrincipal={() => setStep(1)} 
+            handleInapoiPrincipal={() => { setStep(1); setAutoStep('upload'); }} 
             user={user} 
             isPremium={isPremium} 
+            onGenerateCorrected={() => {
+              // Precompletăm cu un șablon curat
+              setFormData(prev => ({ ...prev, tipContract: 'prestari', clauzaLimitareRaspundere: true, clauzaPi: true }));
+              setStep(2);
+            }}
           />
         )}
 
