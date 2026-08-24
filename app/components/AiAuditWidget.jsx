@@ -256,7 +256,7 @@ export default function AiAuditWidget({ handleInapoiPrincipal, user, isPremium, 
             ) : isProWithFreeAudits ? (
               `Începe Audit AI (${5 - auditsUsed}/5 Gratuite)`
             ) : (
-              'Cumpără Audit (19 RON)'
+              'Cumpără Audit (19 RON/3.99€)'
             )}
           </button>
 
