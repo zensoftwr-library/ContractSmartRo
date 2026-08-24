@@ -8,17 +8,27 @@ export default function ContractsDashboard({ userId }) {
   const [contracts, setContracts] = useState([]);
   const [loadingId, setLoadingId] = useState(null);
 
-  useEffect(() => {
-    const fetchContracts = async () => {
-      const { data } = await supabase
+  // FUNCȚIE NOUĂ PENTRU ȘTERGERE
+  const handleDeleteContract = async (contractId) => {
+    if (!confirm('Ești sigur că vrei să ștergi acest document din CRM? Acțiunea este ireversibilă.')) return;
+
+    try {
+      const { error } = await supabase
         .from('user_contracts')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false });
-      setContracts(data || []);
-    };
-    fetchContracts();
-  }, [userId]);
+        .delete()
+        .eq('id', contractId)
+        .eq('user_id', userId);
+
+      if (error) {
+        alert('Eroare la ștergerea contractului: ' + error.message);
+      } else {
+        // Eliminăm rândul din interfață instantaneu
+        setContracts(contracts.filter(c => c.id !== contractId));
+      }
+    } catch (e) {
+      alert('Eroare de rețea. Încearcă din nou.');
+    }
+  };
 
   const handleGeneratesSomatie = async (contractId) => {
     setLoadingId(contractId);
@@ -91,55 +101,64 @@ export default function ContractsDashboard({ userId }) {
                     {c.hash_sha256 ? `${c.hash_sha256.substring(0, 12)}...` : 'N/A'}
                   </td>
                   <td className="py-4 text-right">
-                    {c.tip_contract === 'audit' ? (
-                      <span className="text-[10px] text-purple-400 bg-purple-900/20 border border-purple-500/30 px-3 py-1.5 rounded-lg font-black uppercase tracking-wider inline-block">
+
+                <div className="flex items-center justify-end gap-3">
+
+                  {/* Buton Ștergere (Apare la hover sau pe mobile) */}
+                  <button 
+                    onClick={() => handleDeleteContract(c.id)}
+                    className="text-slate-500 hover:text-red-400 transition-colors p-1.5 rounded-md hover:bg-red-900/10 opacity-60 hover:opacity-100"
+                    title="Șterge documentul"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                  </button>
+
+                  {/* Secțiunea Butoanelor Utile */}
+                  {c.tip_contract === 'audit' ? (
+                    <div className="w-[180px] flex justify-end">
+                      <span className="text-[10px] text-purple-400 bg-purple-900/20 border border-purple-500/30 px-3 py-1.5 rounded-lg font-black uppercase tracking-wider inline-block text-center w-full">
                         Raport Salvat
                       </span>
-                    ) : (
-                      <div className="flex flex-col items-end gap-2">
-                        <button 
-                          onClick={() => handleGeneratesSomatie(c.id)}
-                          disabled={loadingId === c.id}
-                          className="bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg font-black uppercase text-[9px] tracking-wider transition-all disabled:opacity-50"
-                        >
-                          {loadingId === c.id ? 'Se generează...' : ' Generează Somație'}
-                        </button>
-                        <button 
-                          onClick={() => {
-                            const printWindow = window.open('', '_blank');
-                            printWindow.document.write(`
-                              <html style="font-family: monospace; padding: 40px; color: #111;">
-                                <h2 style="color: #16a34a;">CERTIFICAT DE AUTENTICITATE SHA-256</h2>
-                                <hr />
-                                <p><strong>Document ID:</strong> ${c.id}</p>
-                                <p><strong>Titlu Contract:</strong> ${c.titlu_contract}</p>
-                                <p><strong>Părți Implicate:</strong> ${c.client_nume}</p>
-                                <p><strong>Valoare:</strong> ${c.valoare} ${c.moneda}</p>
-                                <div style="background: #f1f5f9; padding: 20px; border: 1px solid #cbd5e1; word-wrap: break-word;">
-                                  <strong>HASH CRIPTOGRAFIC IMUABIL:</strong><br/>
-                                  ${c.hash_sha256 || 'Lipsă amprentă în baza de date'}
-                                </div>
-                                <p style="font-size: 12px; margin-top: 40px; color: #64748b;">
-                                  Acest certificat garantează faptul că documentul binar generat nu a fost alterat din momentul semnării.
-                                </p>
-                                <script>window.print();</script>
-                              </html>
-                            `);
-                            printWindow.document.close();
-                          }}
-                          className="bg-[#8ba888]/10 hover:bg-[#8ba888]/20 text-[#8ba888] border border-[#8ba888]/30 px-3 py-1.5 rounded-lg font-black uppercase text-[9px] tracking-wider transition-all"
-                        >
-                          Descarcă Certificat SHA-256
-                        </button>
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-end gap-2 w-[180px]">
+                      <button 
+                        onClick={() => handleGeneratesSomatie(c.id)}
+                        disabled={loadingId === c.id}
+                        className="w-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg font-black uppercase text-[9px] tracking-wider transition-all disabled:opacity-50"
+                      >
+                        {loadingId === c.id ? 'Se generează...' : ' Generează Somație'}
+                      </button>
+
+                      {/* Generare Blob pentru descărcare directă ca fișier txt/certificat */}
+                      <button 
+                        onClick={() => {
+                          const content = `CERTIFICAT DE AUTENTICITATE SHA-256\n===================================\n\nDocument ID: ${c.id}\nTitlu Contract: ${c.titlu_contract}\nPărți Implicate: ${c.client_nume}\nValoare: ${c.valoare} ${c.moneda}\n\nHASH CRIPTOGRAFIC IMUABIL:\n${c.hash_sha256 || 'N/A'}\n\n===================================\nSistem auditat. Acest certificat garantează integritatea fișierului.`;
+                          const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                          const url = window.URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = `Certificat_SHA256_${c.id.split('-')[0]}.txt`;
+                          document.body.appendChild(a);
+                          a.click();
+                          document.body.removeChild(a);
+                          window.URL.revokeObjectURL(url);
+                        }}
+                        className="w-full bg-[#8ba888]/10 hover:bg-[#8ba888]/20 text-[#8ba888] border border-[#8ba888]/30 px-3 py-1.5 rounded-lg font-black uppercase text-[9px] tracking-wider transition-all"
+                      >
+                        Descarcă SHA-256
+                      </button>
+                    </div>
+                  )}
+
+                </div>
+              </td>
+            </tr>
+          ))
+        )}
+      </tbody>
+    </table>
+  </div>
+</div>
   );
 }

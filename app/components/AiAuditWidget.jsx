@@ -69,7 +69,8 @@ export default function AiAuditWidget({ handleInapoiPrincipal, user, isPremium, 
       setIsSaved('done');
     } else {
       setIsSaved(false);
-      alert('Eroare la salvarea în CRM-ul Supabase.');
+      console.error("Supabase Error Details:", error);
+      alert('Eroare Supabase: ' + error.message);
     }
   };
 
