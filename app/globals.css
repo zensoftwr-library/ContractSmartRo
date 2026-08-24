@@ -316,3 +316,6 @@ html.matcha-light-theme select {
 html.matcha-light-theme label span:not([class*="text-"]) {
   color: #1f2937 !important;
 }
+
+.matcha-light-theme .bg-white {background:#fff!important}
+.matcha-light-theme .bg-white *, .matcha-light-theme button.bg-white .text-white {color:#111!important}
