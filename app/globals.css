@@ -347,18 +347,72 @@ html.matcha-light-theme label[class*="group/clauza"]:hover span.text-white {
     color: #8ba888 !important;
 }
 
-/* 3. Butoanele Inactive din QR Code Studio */
-html.matcha-light-theme [class*="bg-[#8ba888]/15"],
-html.matcha-light-theme [class*="bg-[#9333ea]/15"],
-html.matcha-light-theme [class*="bg-[#2563eb]/15"] {
-    background-color: #f1f5f9 !important;
-    color: #334155 !important;
-    border: 1px solid #cbd5e1 !important;
+/* ========================================================== */
+/* STILIZARE BUTOANE QR STUDIO (DARK & LIGHT MODE)            */
+/* ========================================================== */
+.qr-btn {
+  padding: 0.375rem 1rem; 
+  border-radius: 0.5rem; 
+  font-size: 10px; 
+  font-weight: 900; 
+  text-transform: uppercase;
+  letter-spacing: 0.025em; 
+  transition: all 0.2s ease;
 }
 
-html.matcha-light-theme [class*="bg-[#8ba888]/15"]:hover,
-html.matcha-light-theme [class*="bg-[#9333ea]/15"]:hover,
-html.matcha-light-theme [class*="bg-[#2563eb]/15"]:hover {
-    background-color: #e2e8f0 !important;
-    color: #0f172a !important;
+/* --- DARK MODE (Default) --- */
+/* Green */
+.qr-btn-green { background-color: rgba(139, 168, 136, 0.15); color: #8ba888; border: 1px solid rgba(139, 168, 136, 0.4); }
+.qr-btn-green:hover { background-color: rgba(139, 168, 136, 0.25); }
+.qr-btn-green.active { background-color: #8ba888; color: #0B0F12; border-color: #8ba888; box-shadow: 0 0 12px rgba(139, 168, 136, 0.3); }
+
+/* Purple */
+.qr-btn-purple { background-color: rgba(147, 51, 234, 0.15); color: #a855f7; border: 1px solid rgba(147, 51, 234, 0.4); }
+.qr-btn-purple:hover { background-color: rgba(147, 51, 234, 0.25); }
+.qr-btn-purple.active { background-color: #9333ea; color: #ffffff; border-color: #9333ea; box-shadow: 0 0 12px rgba(147, 51, 234, 0.4); }
+
+/* Blue */
+.qr-btn-blue { background-color: rgba(37, 99, 235, 0.15); color: #3b82f6; border: 1px solid rgba(37, 99, 235, 0.4); }
+.qr-btn-blue:hover { background-color: rgba(37, 99, 235, 0.25); }
+.qr-btn-blue.active { background-color: #2563eb; color: #ffffff; border-color: #2563eb; box-shadow: 0 0 12px rgba(37, 99, 235, 0.4); }
+
+/* --- LIGHT MODE (matcha-light-theme) --- */
+html.matcha-light-theme .qr-btn {
+  box-shadow: none !important;
+}
+
+/* Inactive State Light Mode */
+html.matcha-light-theme .qr-btn-green,
+html.matcha-light-theme .qr-btn-purple,
+html.matcha-light-theme .qr-btn-blue {
+  background-color: #f1f5f9 !important;
+  color: #475569 !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+html.matcha-light-theme .qr-btn-green:hover,
+html.matcha-light-theme .qr-btn-purple:hover,
+html.matcha-light-theme .qr-btn-blue:hover {
+  background-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+/* Active State Light Mode - Textul trebuie să fie alb pentru contrast perfect */
+html.matcha-light-theme .qr-btn-green.active {
+  background-color: #8ba888 !important;
+  color: #ffffff !important;
+  border-color: #8ba888 !important;
+  box-shadow: 0 4px 10px rgba(139, 168, 136, 0.3) !important;
+}
+html.matcha-light-theme .qr-btn-purple.active {
+  background-color: #9333ea !important;
+  color: #ffffff !important;
+  border-color: #9333ea !important;
+  box-shadow: 0 4px 10px rgba(147, 51, 234, 0.3) !important;
+}
+html.matcha-light-theme .qr-btn-blue.active {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  border-color: #2563eb !important;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3) !important;
 }
