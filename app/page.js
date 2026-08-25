@@ -1741,26 +1741,26 @@ const reseteazaSemnaturiB2B = () => {
               <div className="flex flex-wrap justify-center sm:justify-start gap-2">
                 <button onClick={() => setQrType('url')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all border ${
                   qrType === 'url' 
-                    ? 'bg-[#8ba888] text-[#0B0F12] border-[#8ba888] shadow-[0_0_15px_rgba(139,168,136,0.6)] [.matcha-light-theme_&]:!shadow-none [.matcha-light-theme_&]:!text-white' 
-                    : 'bg-[#8ba888]/10 text-[#8ba888] border-[#8ba888]/30 hover:bg-[#8ba888]/20 hover:shadow-[0_0_10px_rgba(139,168,136,0.2)] [.matcha-light-theme_&]:!bg-slate-100 [.matcha-light-theme_&]:!text-slate-600 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-200 [.matcha-light-theme_&]:!shadow-none'
+                    ? 'bg-[#8ba888] text-[#0B0F12] border-[#8ba888] shadow-[0_0_15px_rgba(139,168,136,0.6)] [.matcha-light-theme_&]:!bg-emerald-600 [.matcha-light-theme_&]:!text-white [.matcha-light-theme_&]:!border-emerald-700 [.matcha-light-theme_&]:!shadow-[0_4px_10px_rgba(5,150,105,0.3)]' 
+                    : 'bg-[#8ba888]/10 text-[#8ba888] border-[#8ba888]/30 hover:bg-[#8ba888]/20 hover:shadow-[0_0_10px_rgba(139,168,136,0.2)] [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-emerald-700 [.matcha-light-theme_&]:!border-emerald-200 [.matcha-light-theme_&]:hover:!bg-emerald-50 [.matcha-light-theme_&]:!shadow-sm'
                 }`}>Standard URL</button>
                 
                 <button onClick={() => setQrType('wifi')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all border ${
                   qrType === 'wifi' 
-                    ? 'bg-[#8ba888] text-[#0B0F12] border-[#8ba888] shadow-[0_0_15px_rgba(139,168,136,0.6)] [.matcha-light-theme_&]:!shadow-none [.matcha-light-theme_&]:!text-white' 
-                    : 'bg-[#8ba888]/10 text-[#8ba888] border-[#8ba888]/30 hover:bg-[#8ba888]/20 hover:shadow-[0_0_10px_rgba(139,168,136,0.2)] [.matcha-light-theme_&]:!bg-slate-100 [.matcha-light-theme_&]:!text-slate-600 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-200 [.matcha-light-theme_&]:!shadow-none'
+                    ? 'bg-[#8ba888] text-[#0B0F12] border-[#8ba888] shadow-[0_0_15px_rgba(139,168,136,0.6)] [.matcha-light-theme_&]:!bg-emerald-600 [.matcha-light-theme_&]:!text-white [.matcha-light-theme_&]:!border-emerald-700 [.matcha-light-theme_&]:!shadow-[0_4px_10px_rgba(5,150,105,0.3)]' 
+                    : 'bg-[#8ba888]/10 text-[#8ba888] border-[#8ba888]/30 hover:bg-[#8ba888]/20 hover:shadow-[0_0_10px_rgba(139,168,136,0.2)] [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-emerald-700 [.matcha-light-theme_&]:!border-emerald-200 [.matcha-light-theme_&]:hover:!bg-emerald-50 [.matcha-light-theme_&]:!shadow-sm'
                 }`}>Rețea Wi-Fi</button>
                 
                 <button onClick={() => setQrType('crypto')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all border ${
                   qrType === 'crypto' 
-                    ? 'bg-[#8ba888] text-[#0B0F12] border-[#8ba888] shadow-[0_0_15px_rgba(139,168,136,0.6)] [.matcha-light-theme_&]:!shadow-none [.matcha-light-theme_&]:!text-white' 
-                    : 'bg-[#8ba888]/10 text-[#8ba888] border-[#8ba888]/30 hover:bg-[#8ba888]/20 hover:shadow-[0_0_10px_rgba(139,168,136,0.2)] [.matcha-light-theme_&]:!bg-slate-100 [.matcha-light-theme_&]:!text-slate-600 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-200 [.matcha-light-theme_&]:!shadow-none'
+                    ? 'bg-[#8ba888] text-[#0B0F12] border-[#8ba888] shadow-[0_0_15px_rgba(139,168,136,0.6)] [.matcha-light-theme_&]:!bg-emerald-600 [.matcha-light-theme_&]:!text-white [.matcha-light-theme_&]:!border-emerald-700 [.matcha-light-theme_&]:!shadow-[0_4px_10px_rgba(5,150,105,0.3)]' 
+                    : 'bg-[#8ba888]/10 text-[#8ba888] border-[#8ba888]/30 hover:bg-[#8ba888]/20 hover:shadow-[0_0_10px_rgba(139,168,136,0.2)] [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-emerald-700 [.matcha-light-theme_&]:!border-emerald-200 [.matcha-light-theme_&]:hover:!bg-emerald-50 [.matcha-light-theme_&]:!shadow-sm'
                 }`}>Portofel Crypto</button>
                 
                 <button onClick={() => { if(!isPremium && !profil?.has_qr_vcard) handleCheckout('qr_vcard'); else setQrType('vcard'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all border ${
                   qrType === 'vcard' 
-                    ? 'bg-[#8ba888] text-[#0B0F12] border-[#8ba888] shadow-[0_0_15px_rgba(139,168,136,0.6)] [.matcha-light-theme_&]:!shadow-none [.matcha-light-theme_&]:!text-white' 
-                    : 'bg-[#8ba888]/10 text-[#8ba888] border-[#8ba888]/30 hover:bg-[#8ba888]/20 hover:shadow-[0_0_10px_rgba(139,168,136,0.2)] [.matcha-light-theme_&]:!bg-slate-100 [.matcha-light-theme_&]:!text-slate-600 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-200 [.matcha-light-theme_&]:!shadow-none'
+                    ? 'bg-[#8ba888] text-[#0B0F12] border-[#8ba888] shadow-[0_0_15px_rgba(139,168,136,0.6)] [.matcha-light-theme_&]:!bg-emerald-600 [.matcha-light-theme_&]:!text-white [.matcha-light-theme_&]:!border-emerald-700 [.matcha-light-theme_&]:!shadow-[0_4px_10px_rgba(5,150,105,0.3)]' 
+                    : 'bg-[#8ba888]/10 text-[#8ba888] border-[#8ba888]/30 hover:bg-[#8ba888]/20 hover:shadow-[0_0_10px_rgba(139,168,136,0.2)] [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-emerald-700 [.matcha-light-theme_&]:!border-emerald-200 [.matcha-light-theme_&]:hover:!bg-emerald-50 [.matcha-light-theme_&]:!shadow-sm'
                 }`}>
                   vCard Contact
                   {(!isPremium && !profil?.has_qr_vcard) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-amber-400 to-amber-600 text-black px-1.5 py-0.5 rounded shadow-md border border-amber-300">69 RON</span>}
@@ -1768,8 +1768,8 @@ const reseteazaSemnaturiB2B = () => {
                 
                 <button onClick={() => { if(!isPremium && !profil?.has_qr_pdf) handleCheckout('qr_dynamic'); else setQrType('dynamic'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all border ${
                   qrType === 'dynamic' 
-                    ? 'bg-[#9333ea] text-white border-[#9333ea] shadow-[0_0_15px_rgba(147,51,234,0.6)] [.matcha-light-theme_&]:!shadow-none' 
-                    : 'bg-[#9333ea]/10 text-[#a855f7] border-[#9333ea]/30 hover:bg-[#9333ea]/20 hover:shadow-[0_0_10px_rgba(147,51,234,0.2)] [.matcha-light-theme_&]:!bg-slate-100 [.matcha-light-theme_&]:!text-slate-600 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-200 [.matcha-light-theme_&]:!shadow-none'
+                    ? 'bg-[#9333ea] text-white border-[#9333ea] shadow-[0_0_15px_rgba(147,51,234,0.6)] [.matcha-light-theme_&]:!bg-purple-600 [.matcha-light-theme_&]:!text-white [.matcha-light-theme_&]:!border-purple-700 [.matcha-light-theme_&]:!shadow-[0_4px_10px_rgba(147,51,234,0.3)]' 
+                    : 'bg-[#9333ea]/10 text-[#a855f7] border-[#9333ea]/30 hover:bg-[#9333ea]/20 hover:shadow-[0_0_10px_rgba(147,51,234,0.2)] [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-purple-700 [.matcha-light-theme_&]:!border-purple-200 [.matcha-light-theme_&]:hover:!bg-purple-50 [.matcha-light-theme_&]:!shadow-sm'
                 }`}>
                   Dinamic / PDF
                   {(!isPremium && !profil?.has_qr_pdf) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-purple-500 to-purple-600 text-white px-1.5 py-0.5 rounded shadow-md border border-purple-400">39 RON</span>}
@@ -1777,8 +1777,8 @@ const reseteazaSemnaturiB2B = () => {
                 
                 <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('smart'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all border ${
                   qrType === 'smart' 
-                    ? 'bg-[#2563eb] text-white border-[#2563eb] shadow-[0_0_15px_rgba(37,99,235,0.6)] [.matcha-light-theme_&]:!shadow-none' 
-                    : 'bg-[#2563eb]/10 text-[#3b82f6] border-[#2563eb]/30 hover:bg-[#2563eb]/20 hover:shadow-[0_0_10px_rgba(37,99,235,0.2)] [.matcha-light-theme_&]:!bg-slate-100 [.matcha-light-theme_&]:!text-slate-600 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-200 [.matcha-light-theme_&]:!shadow-none'
+                    ? 'bg-[#2563eb] text-white border-[#2563eb] shadow-[0_0_15px_rgba(37,99,235,0.6)] [.matcha-light-theme_&]:!bg-blue-600 [.matcha-light-theme_&]:!text-white [.matcha-light-theme_&]:!border-blue-700 [.matcha-light-theme_&]:!shadow-[0_4px_10px_rgba(37,99,235,0.3)]' 
+                    : 'bg-[#2563eb]/10 text-[#3b82f6] border-[#2563eb]/30 hover:bg-[#2563eb]/20 hover:shadow-[0_0_10px_rgba(37,99,235,0.2)] [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-blue-700 [.matcha-light-theme_&]:!border-blue-200 [.matcha-light-theme_&]:hover:!bg-blue-50 [.matcha-light-theme_&]:!shadow-sm'
                 }`}>
                   Smart OS Route
                   {(!isPremium) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-blue-500 to-blue-600 text-white px-1.5 py-0.5 rounded shadow-md border border-blue-400">PRO</span>}
@@ -1786,8 +1786,8 @@ const reseteazaSemnaturiB2B = () => {
                 
                 <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('geo'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all border ${
                   qrType === 'geo' 
-                    ? 'bg-[#2563eb] text-white border-[#2563eb] shadow-[0_0_15px_rgba(37,99,235,0.6)] [.matcha-light-theme_&]:!shadow-none' 
-                    : 'bg-[#2563eb]/10 text-[#3b82f6] border-[#2563eb]/30 hover:bg-[#2563eb]/20 hover:shadow-[0_0_10px_rgba(37,99,235,0.2)] [.matcha-light-theme_&]:!bg-slate-100 [.matcha-light-theme_&]:!text-slate-600 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-200 [.matcha-light-theme_&]:!shadow-none'
+                    ? 'bg-[#2563eb] text-white border-[#2563eb] shadow-[0_0_15px_rgba(37,99,235,0.6)] [.matcha-light-theme_&]:!bg-blue-600 [.matcha-light-theme_&]:!text-white [.matcha-light-theme_&]:!border-blue-700 [.matcha-light-theme_&]:!shadow-[0_4px_10px_rgba(37,99,235,0.3)]' 
+                    : 'bg-[#2563eb]/10 text-[#3b82f6] border-[#2563eb]/30 hover:bg-[#2563eb]/20 hover:shadow-[0_0_10px_rgba(37,99,235,0.2)] [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-blue-700 [.matcha-light-theme_&]:!border-blue-200 [.matcha-light-theme_&]:hover:!bg-blue-50 [.matcha-light-theme_&]:!shadow-sm'
                 }`}>
                   Geo-Target
                   {(!isPremium) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-blue-500 to-blue-600 text-white px-1.5 py-0.5 rounded shadow-md border border-blue-400">PRO</span>}
@@ -1795,8 +1795,8 @@ const reseteazaSemnaturiB2B = () => {
                 
                 <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('landing'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all border ${
                   qrType === 'landing' 
-                    ? 'bg-[#2563eb] text-white border-[#2563eb] shadow-[0_0_15px_rgba(37,99,235,0.6)] [.matcha-light-theme_&]:!shadow-none' 
-                    : 'bg-[#2563eb]/10 text-[#3b82f6] border-[#2563eb]/30 hover:bg-[#2563eb]/20 hover:shadow-[0_0_10px_rgba(37,99,235,0.2)] [.matcha-light-theme_&]:!bg-slate-100 [.matcha-light-theme_&]:!text-slate-600 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-200 [.matcha-light-theme_&]:!shadow-none'
+                    ? 'bg-[#2563eb] text-white border-[#2563eb] shadow-[0_0_15px_rgba(37,99,235,0.6)] [.matcha-light-theme_&]:!bg-blue-600 [.matcha-light-theme_&]:!text-white [.matcha-light-theme_&]:!border-blue-700 [.matcha-light-theme_&]:!shadow-[0_4px_10px_rgba(37,99,235,0.3)]' 
+                    : 'bg-[#2563eb]/10 text-[#3b82f6] border-[#2563eb]/30 hover:bg-[#2563eb]/20 hover:shadow-[0_0_10px_rgba(37,99,235,0.2)] [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-blue-700 [.matcha-light-theme_&]:!border-blue-200 [.matcha-light-theme_&]:hover:!bg-blue-50 [.matcha-light-theme_&]:!shadow-sm'
                 }`}>
                   Mini-Landing Page
                   {(!isPremium) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-blue-500 to-blue-600 text-white px-1.5 py-0.5 rounded shadow-md border border-blue-400">PRO</span>}

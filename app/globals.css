@@ -289,3 +289,8 @@ html.matcha-light-theme .fixed.z-\[100\] h3 {
 html.matcha-light-theme .fixed.z-\[100\] p {
     color: #4b5563 !important;
 }
+
+html.matcha-light-theme [class*="animate-glow"],
+html.matcha-light-theme .fixed.inset-0.pointer-events-none {
+  display: none !important;
+}
