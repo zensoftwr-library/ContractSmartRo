@@ -6,7 +6,6 @@ import Navbar from '../components/Navbar';
 
 export default function TermeniSiConditii() {
   const [scrollPercent, setScrollPercent] = useState(0);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,13 +28,13 @@ export default function TermeniSiConditii() {
 
       <Navbar />
 
-            {/* PREMIUM CINEMATIC LIGHT LEAKS (BACKGROUND) */}
+      {/* PREMIUM CINEMATIC LIGHT LEAKS (BACKGROUND) */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         <div className="absolute top-[5%] left-[50%] transform -translate-x-1/2 w-[90vw] h-[90vw] min-w-[800px] min-h-[800px] rounded-full"
           style={{ background: 'radial-gradient(circle, rgba(139, 168, 136, 0.04) 0%, rgba(11, 15, 18, 0) 60%)' }} />
       </div>
 
-      <div className="relative z-10 max-w-4xl mx-auto px-6 py-10 md:py-16">
+      <div className="relative z-10 max-w-4xl mx-auto px-6 py-10 md:py-16 animate-fadeIn">
         
         {/* BUTON INAPOI RAPID */}
         <div className="mb-8">
@@ -212,7 +211,7 @@ export default function TermeniSiConditii() {
       </div>
 
       {/* TRUST BADGES ENTERPRISE */}
-      <div className="max-w-6xl mx-auto px-6 my-16">
+      <div className="max-w-6xl mx-auto px-6 my-16 relative z-10">
         <div className="bg-[#12181D]/40 border border-slate-800/80 backdrop-blur-xl p-6 rounded-2xl flex flex-col md:flex-row items-center justify-around gap-6 text-center shadow-lg">
           
           <div className="flex items-center gap-3">
@@ -243,7 +242,7 @@ export default function TermeniSiConditii() {
       </div>
 
       {/* FOOTER STANDARD PLATFORMA */}
-      <footer className="relative z-10 border-t border-slate-800/80 bg-[#0B0F12] pt-12 pb-8 mt-16 text-center">
+      <footer className="relative z-10 border-t border-slate-800/80 bg-[#0B0F12] pt-12 pb-8 text-center">
         <div className="max-w-5xl mx-auto px-6 space-y-6">
           <div className="flex justify-center">
             <Link href="/" className="w-[180px] h-[30px] cursor-pointer block hover:opacity-90 transition-opacity">

@@ -1,23 +1,39 @@
 'use client';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 
 export default function PoliticaConfidentialitate() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [scrollPercent, setScrollPercent] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (totalHeight > 0) {
+        setScrollPercent(window.scrollY / totalHeight);
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-[#0B0F12] text-slate-300 font-sans selection:bg-[#8ba888]/30 selection:text-[#8ba888]">
+    <div 
+      className="min-h-screen bg-[#0B0F12] text-slate-300 font-sans relative overflow-clip selection:bg-[#8ba888]/30 selection:text-[#8ba888]"
+      style={{
+        '--scroll-y': `${scrollPercent * 100}%`,
+      }}
+    >
       
-  <Navbar />
+      <Navbar />
 
-            {/* BACKGROUND EFFECTS */}
+      {/* BACKGROUND EFFECTS */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         <div className="absolute top-[5%] left-[50%] transform -translate-x-1/2 w-[90vw] h-[90vw] min-w-[800px] min-h-[800px] rounded-full"
           style={{ background: 'radial-gradient(circle, rgba(139, 168, 136, 0.04) 0%, rgba(11, 15, 18, 0) 60%)' }} />
       </div>
 
-      <div className="relative z-10 max-w-4xl mx-auto px-6 py-10 md:py-16">
+      <div className="relative z-10 max-w-4xl mx-auto px-6 py-10 md:py-16 animate-fadeIn">
         
         {/* BUTON INAPOI */}
         <div className="mb-8">
@@ -66,7 +82,7 @@ export default function PoliticaConfidentialitate() {
             <ul className="space-y-3 text-sm text-slate-400">
               <li className="flex gap-3"><span className="text-[#8ba888]">▹</span> <strong>Procesare Exclusiv în RAM:</strong> Documentele încărcate sunt procesate strict în memoria volatilă pe durata a câteva secunde.</li>
               <li className="flex gap-3"><span className="text-[#8ba888]">▹</span> <strong>Audit AI Extern:</strong> Fișierele trimise către modulul de audit AI sunt procesate prin intermediul algoritmilor securizați (Google Gemini), fără a fi stocate permanent pe serverele terțe ale furnizorului de inteligență artificială.</li>
-              <li className="flex gap-3"><span className="text-[#8ba888]">▹</span> <strong>Smart Vault & CRM:</strong> În vederea funcționării istoricfului din CRM și a verificării criptografice (hash SHA-256), platforma stochează în baza de date Supabase strict metadatele esențiale (titlu contract, nume client, CUI, valoare, dată și amprenta unică).</li>
+              <li className="flex gap-3"><span className="text-[#8ba888]">▹</span> <strong>Smart Vault & CRM:</strong> În vederea funcționării istoricului din CRM și a verificării criptografice (hash SHA-256), platforma stochează în baza de date Supabase strict metadatele esențiale (titlu contract, nume client, CUI, valoare, dată și amprenta unică).</li>
             </ul>
           </section>
 
@@ -96,7 +112,7 @@ export default function PoliticaConfidentialitate() {
               Drepturile Dumneavoastră și ANSPDCP
             </h2>
             <p className="text-sm leading-relaxed text-slate-300 mb-5">
-              Conform GDPR, beneficiați de dreptul la informare, acces, rectificare și ștergere a datelor asociate contului dumneavoastră din platformă, putând solicita oricând eliminarea istoriccului din baza de date.
+              Conform GDPR, beneficiați de dreptul la informare, acces, rectificare și ștergere a datelor asociate contului dumneavoastră din platformă, putând solicita oricând eliminarea istoricului din baza de date.
             </p>
             <p className="text-sm leading-relaxed text-slate-300">
               Dacă considerați că drepturile privind protecția datelor v-au fost încălcate, aveți dreptul de a depune o plângere la Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal (ANSPDCP):
@@ -112,7 +128,7 @@ export default function PoliticaConfidentialitate() {
       </div>
 
       {/* TRUST BADGES ENTERPRISE */}
-      <div className="max-w-6xl mx-auto px-6 my-16">
+      <div className="max-w-6xl mx-auto px-6 my-16 relative z-10">
         <div className="bg-[#12181D]/40 border border-slate-800/80 backdrop-blur-xl p-6 rounded-2xl flex flex-col md:flex-row items-center justify-around gap-6 text-center shadow-lg">
           
           <div className="flex items-center gap-3">
@@ -143,7 +159,7 @@ export default function PoliticaConfidentialitate() {
       </div>
 
       {/* FOOTER STANDARD PLATFORMA */}
-      <footer className="relative z-10 border-t border-slate-800/80 bg-[#0B0F12] pt-12 pb-8 mt-16 text-center">
+      <footer className="relative z-10 border-t border-slate-800/80 bg-[#0B0F12] pt-12 pb-8 text-center">
         <div className="max-w-5xl mx-auto px-6 space-y-6">
           <div className="flex justify-center">
             <Link href="/" className="w-[180px] h-[30px] cursor-pointer block hover:opacity-90 transition-opacity">
