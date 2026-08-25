@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import puppeteer from 'puppeteer';
 import JSZip from 'jszip';
+import crypto from 'crypto'; // <--- NOU: Adăugat pentru a genera semnătura SHA-256
 
 export const dynamic = 'force-dynamic';
 
@@ -79,6 +80,7 @@ export async function POST(req) {
       }
     }
 
+    // Salvare istoric vechi (opțional)
     try {
       const insertPayload = {
         tip_contract: 'auto',
@@ -538,6 +540,41 @@ Infrastructură operată automat prin platforma securizată ContractSmart 2026.
     zip.file(`Ghid_Post_Vanzare.txt`, continutGhidTxt);
 
     const zipContent = await zip.generateAsync({ type: "uint8array" });
+
+    // -------------------------------------------------------------------------
+    // NOU: SMART VAULT (SALVARE ÎN CRM) PENTRU AUTO
+    // -------------------------------------------------------------------------
+    try {
+      const hashSha256 = crypto.createHash('sha256').update(zipContent).digest('hex');
+      const fileName = `pachet_auto_${data.userId}_${Date.now()}.zip`;
+
+      // Încărcăm arhiva .zip direct în Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from('contract_vault')
+        .upload(fileName, zipContent, { contentType: 'application/zip', upsert: false });
+
+      if (!uploadError) {
+        // Obținem URL-ul public pentru fișierul proaspăt încărcat
+        const { data: publicUrlData } = supabase.storage.from('contract_vault').getPublicUrl(fileName);
+        
+        // Salvăm intrarea în tabelul CRM (user_contracts) ca să apară în panou!
+        await supabase.from('user_contracts').insert({
+          user_id: data.userId,
+          titlu_contract: `Pachet Auto (${data.autoMarcaModel || 'Vehicul'})`,
+          tip_contract: 'auto',
+          client_nume: data.cumparatorNume || 'N/A',
+          valoare: parseFloat(data.autoPret) || 0,
+          moneda: data.autoMoneda || 'RON',
+          hash_sha256: hashSha256,
+          stare_plata: 'generat',
+          pdf_url: publicUrlData.publicUrl
+        });
+      } else {
+        console.error("Eroare upload zip in vault:", uploadError);
+      }
+    } catch (vaultErr) {
+      console.error("Eroare la salvarea Auto în CRM Vault:", vaultErr);
+    }
 
     // EMAIL RESEND (Fără Twilio)
     if (process.env.RESEND_API_KEY && data.clientEmail) {

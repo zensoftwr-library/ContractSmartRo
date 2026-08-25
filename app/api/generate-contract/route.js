@@ -297,75 +297,42 @@ export async function POST(request) {
         </div>
 
         <div class="signature-layout" style="margin-top: 40px; border-top: 1px solid #cbd5e1; padding-top: 20px;">
-  <div class="signature-column">
-    <strong>PENTRU PRESTATOR (PREDARE)</strong><br>
-    <span style="font-size: 10px; color: #64748b;">(Pasul 1: Emitent)</span><br><br>
-    ${semnaturaPrestatorBase64 ? `
-      <img src="${semnaturaPrestatorBase64}" class="signature-image" alt="Semnatura Prestator" />
-      <div style="font-size: 10px; color: #16a34a; background: #f0fdf4; padding: 4px; border-radius: 4px; margin-top: 5px;">
-        ✓ Validat Electronic
-      </div>
-    ` : `
-      <div class="signature-placeholder" style="border: 1px dashed #cbd5e1; padding: 10px; border-radius: 4px; color: #d97706;">
-        [Așteaptă Validarea]
-      </div>
-    `}
-  </div>
+          <div class="signature-column">
+            <strong>PENTRU PRESTATOR (PREDARE)</strong><br>
+            <span style="font-size: 10px; color: #64748b;">(Pasul 1: Emitent)</span><br><br>
+            ${semnaturaPrestatorBase64 ? `
+              <img src="${semnaturaPrestatorBase64}" class="signature-image" alt="Semnatura Prestator" />
+              <div style="font-size: 10px; color: #16a34a; background: #f0fdf4; padding: 4px; border-radius: 4px; margin-top: 5px;">
+                ✓ Validat Electronic
+              </div>
+            ` : `
+              <div class="signature-placeholder" style="border: 1px dashed #cbd5e1; padding: 10px; border-radius: 4px; color: #d97706;">
+                [Așteaptă Semnătură]
+              </div>
+            `}
+          </div>
 
-  <div class="signature-column">
-    <strong>PENTRU BENEFICIAR (PRIMIRE)</strong><br>
-    <span style="font-size: 10px; color: #64748b;">(Pasul 2: Receptor)</span><br><br>
-    ${semnaturaClientBase64 ? `
-      <img src="${semnaturaClientBase64}" class="signature-image" alt="Semnatura Beneficiar" />
-      <div style="font-size: 10px; color: #16a34a; background: #f0fdf4; padding: 4px; border-radius: 4px; margin-top: 5px;">
-        ✓ Validat Electronic
-      </div>
-    ` : `
-      <div class="signature-placeholder" style="border: 1px dashed #cbd5e1; padding: 10px; border-radius: 4px; color: #ef4444;">
-        Așteaptă semnare partener
-      </div>
-    `}
-  </div>
-</div>
-          
-          <div class="signature-layout" style="margin-top: 40px; border-top: 1px solid #cbd5e1; padding-top: 20px;">
-  <div class="signature-column">
-    <strong>PENTRU PRESTATOR (PREDARE)</strong><br>
-    <span style="font-size: 10px; color: #64748b;">(Pasul 1: Emitent)</span><br><br>
-    ${semnaturaPrestatorBase64 ? `
-      <img src="${semnaturaPrestatorBase64}" class="signature-image" alt="Semnatura Prestator" />
-      <div style="font-size: 10px; color: #16a34a; background: #f0fdf4; padding: 4px; border-radius: 4px; margin-top: 5px;">
-        ✓ Validat Electronic
-      </div>
-    ` : `
-      <div class="signature-placeholder" style="border: 1px dashed #cbd5e1; padding: 10px; border-radius: 4px; color: #d97706;">
-        [Așteaptă Validarea]
-      </div>
-    `}
-  </div>
-
-  <div class="signature-column">
-    <strong>PENTRU BENEFICIAR (PRIMIRE)</strong><br>
-    <span style="font-size: 10px; color: #64748b;">(Pasul 2: Receptor)</span><br><br>
-    ${semnaturaClientBase64 ? `
-      <img src="${semnaturaClientBase64}" class="signature-image" alt="Semnatura Beneficiar" />
-      <div style="font-size: 10px; color: #16a34a; background: #f0fdf4; padding: 4px; border-radius: 4px; margin-top: 5px;">
-        ✓ Validat Electronic
-      </div>
-    ` : `
-      <div class="signature-placeholder" style="border: 1px dashed #cbd5e1; padding: 10px; border-radius: 4px; color: #ef4444;">
-        Așteaptă semnare partener
-      </div>
-    `}
-  </div>
-</div>
+          <div class="signature-column">
+            <strong>PENTRU BENEFICIAR (PRIMIRE)</strong><br>
+            <span style="font-size: 10px; color: #64748b;">(Pasul 2: Receptor)</span><br><br>
+            ${semnaturaClientBase64 ? `
+              <img src="${semnaturaClientBase64}" class="signature-image" alt="Semnatura Beneficiar" />
+              <div style="font-size: 10px; color: #16a34a; background: #f0fdf4; padding: 4px; border-radius: 4px; margin-top: 5px;">
+                ✓ Validat Electronic
+              </div>
+            ` : `
+              <div class="signature-placeholder" style="border: 1px dashed #cbd5e1; padding: 10px; border-radius: 4px; color: #ef4444;">
+                Așteaptă Semnătură
+              </div>
+            `}
+          </div>
+        </div>
 
         <div class="legal-footer">
           Document binar securizat generat digital. Proprietate exclusivă a proceselor auditate ContractSmart 2026.
         </div>
     `;
 
-    // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // 6. ADĂUGARE PROCES VERBAL OPȚIONAL
     // -------------------------------------------------------------------------
@@ -387,11 +354,11 @@ export async function POST(request) {
         <div class="signature-layout">
           <div class="signature-column">
             PENTRU PRESTATOR (PREDARE)<br><br>
-            ${initiatorRol === 'prestator' && semnaturaPrestatorBase64 ? `<img src="${semnaturaPrestatorBase64}" class="signature-image" alt="Semnatura Prestator" /><span style="font-size: 10px; font-weight: normal; color: #16a34a; display:block;">Semnat digital creator</span>` : `<div class="signature-placeholder">[Validat Electronic]</div>`}
+            ${semnaturaPrestatorBase64 ? `<img src="${semnaturaPrestatorBase64}" class="signature-image" alt="Semnatura Prestator" /><span style="font-size: 10px; font-weight: normal; color: #16a34a; display:block;">Semnat digital</span>` : `<div class="signature-placeholder" style="color: #ef4444;">[Lipsă Semnătură]</div>`}
           </div>
           <div class="signature-column">
             PENTRU BENEFICIAR (PRIMIRE)<br><br>
-            ${initiatorRol === 'client' && semnaturaClientBase64 ? `<img src="${semnaturaClientBase64}" class="signature-image" alt="Semnatura Beneficiar" /><span style="font-size: 10px; font-weight: normal; color: #16a34a; display:block;">Semnat digital creator</span>` : `<div class="signature-placeholder" style="color: #ef4444;">Așteaptă semnare partener</div>`}
+            ${semnaturaClientBase64 ? `<img src="${semnaturaClientBase64}" class="signature-image" alt="Semnatura Beneficiar" /><span style="font-size: 10px; font-weight: normal; color: #16a34a; display:block;">Semnat digital</span>` : `<div class="signature-placeholder" style="color: #ef4444;">[Lipsă Semnătură]</div>`}
           </div>
         </div>
       `;
