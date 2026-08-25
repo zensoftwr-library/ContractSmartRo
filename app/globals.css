@@ -327,3 +327,38 @@ html.matcha-light-theme button.qr-inactive-btn:hover * {
     background-color: #e2e8f0 !important;
     color: #0f172a !important;
 }
+/* ========================================================== */
+/* FIXURI FINALE TEMA LIGHT (Modal Loading, Clauze, QR)       */
+/* ========================================================== */
+
+/* 1. Modalul de Loading (Securizare Contract) */
+html.matcha-light-theme .fixed.z-\[100\] h3 {
+    color: #1f2937 !important;
+}
+html.matcha-light-theme .fixed.z-\[100\] p {
+    color: #4b5563 !important;
+}
+
+/* 2. Textul Clauzelor de Protecție */
+html.matcha-light-theme label[class*="group/clauza"] span.text-white {
+    color: #1f2937 !important;
+}
+html.matcha-light-theme label[class*="group/clauza"]:hover span.text-white {
+    color: #8ba888 !important;
+}
+
+/* 3. Butoanele Inactive din QR Code Studio */
+html.matcha-light-theme [class*="bg-[#8ba888]/15"],
+html.matcha-light-theme [class*="bg-[#9333ea]/15"],
+html.matcha-light-theme [class*="bg-[#2563eb]/15"] {
+    background-color: #f1f5f9 !important;
+    color: #334155 !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+html.matcha-light-theme [class*="bg-[#8ba888]/15"]:hover,
+html.matcha-light-theme [class*="bg-[#9333ea]/15"]:hover,
+html.matcha-light-theme [class*="bg-[#2563eb]/15"]:hover {
+    background-color: #e2e8f0 !important;
+    color: #0f172a !important;
+}

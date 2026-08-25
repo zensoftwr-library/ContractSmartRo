@@ -2177,12 +2177,13 @@ const reseteazaSemnaturiB2B = () => {
                             <input type="email" placeholder="Email Client (pentru trimitere)" autoComplete="new-password" value={formData.clientEmail} onChange={e => setFormData({...formData, clientEmail: e.target.value})} className="w-full p-3 bg-[#0B0F12] border border-slate-700/60 rounded-lg text-xs text-white outline-none focus:ring-1 focus:ring-[#8ba888]/50 focus:border-[#8ba888] transition-all" required />
                           </div>
 
-                          <div className="pt-2">
-                             <label className="flex items-center p-3 bg-[#0B0F12] rounded-lg border border-slate-700/60 cursor-pointer select-none transition-colors hover:border-slate-600">
-                              <input type="checkbox" checked={formData.adaugaProcesVerbal || false} onChange={e => setFormData({...formData, adaugaProcesVerbal: e.target.checked})} className="mr-3 w-4 h-4 accent-[#8ba888] bg-slate-800 border-slate-700 shrink-0" />
+                          {/* PROCES VERBAL OPTION */}
+                          <div className="bg-[#0B0F12] p-4 sm:p-5 rounded-xl border border-slate-700/60 mt-4">
+                            <label className="flex items-start sm:items-center cursor-pointer group">
+                              <input type="checkbox" checked={formData.adaugaProcesVerbal || false} onChange={e => setFormData({...formData, adaugaProcesVerbal: e.target.checked})} className="mr-3 mt-1 sm:mt-0 w-4 h-4 accent-[#8ba888] shrink-0" />
                               <div>
-                                <span className="font-bold block text-white text-xs">Atașează Proces Verbal PV</span>
-                                <span className="text-[10px] text-slate-500 block mt-0.5 leading-tight">Generează automat PV anexă la contract.</span>
+                                <span className="text-xs text-white font-bold block group-hover:text-[#8ba888] transition-colors">Atașează Proces-Verbal (PV)</span>
+                                <span className="text-[10px] text-slate-500 leading-tight block mt-0.5">Generează automat o anexă de predare-primire atașată contractului.</span>
                               </div>
                             </label>
                           </div>
@@ -2275,6 +2276,17 @@ const reseteazaSemnaturiB2B = () => {
                           </div>
                         )}
                       </div>
+                    </div>
+
+                    {/* PROCES VERBAL OPTION */}
+                    <div className="bg-[#0B0F12] p-4 sm:p-5 rounded-xl border border-slate-700/60 mt-4">
+                      <label className="flex items-start sm:items-center cursor-pointer group">
+                        <input type="checkbox" checked={formData.adaugaProcesVerbal || false} onChange={e => setFormData({...formData, adaugaProcesVerbal: e.target.checked})} className="mr-3 mt-1 sm:mt-0 w-4 h-4 accent-[#8ba888] shrink-0" />
+                        <div>
+                          <span className="text-xs text-white font-bold block group-hover:text-[#8ba888] transition-colors">Atașează Proces-Verbal (PV)</span>
+                          <span className="text-[10px] text-slate-500 leading-tight block mt-0.5">Generează automat o anexă de predare-primire atașată contractului.</span>
+                        </div>
+                      </label>
                     </div>
 
                     {/* 04. Clauze Protectie */}
@@ -2450,12 +2462,12 @@ const reseteazaSemnaturiB2B = () => {
                     </div>
 
                     <div className="flex flex-col gap-5 pt-6 sm:pt-8 border-t border-slate-800/80">
-                      {/* Butonul Principal - Generează și Descarcă */}
+                      {/* Butonul Principal - Generează, Descarcă și Salvează */}
                       <button 
                         type="button" 
                         onClick={(e) => handleLansareContract(e, 'download')}
                         disabled={!!loadingText} 
-                        className="w-full bg-gradient-to-r from-[#8ba888] to-[#6d8a6a] text-[#0B0F12] font-black px-10 py-4 rounded-xl text-sm tracking-wide transition-all shadow-[0_0_20px_rgba(139,168,136,0.3)] hover:shadow-[0_0_25px_rgba(139,168,136,0.5)] hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+                        className="w-full bg-gradient-to-r from-[#8ba888] to-[#6d8a6a] text-[#0B0F12] font-black px-6 sm:px-10 py-4 rounded-xl text-[13px] tracking-wide transition-all shadow-[0_0_20px_rgba(139,168,136,0.3)] hover:shadow-[0_0_25px_rgba(139,168,136,0.5)] hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
                       >
                         {loadingText && loadingText.title === "SECURIZARE ȘI DESCĂRCARE..." ? (
                           <>
@@ -2464,32 +2476,32 @@ const reseteazaSemnaturiB2B = () => {
                           </>
                         ) : (
                           <>
-                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                             Generează Contractul (PDF)
+                             <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                             <span>Generează (PDF) & Salvează în CRM</span>
                           </>
                         )}
                       </button>
 
-                      {/* Rândul Secundar - Anulează / Salvează în CRM */}
-                      <div className="flex justify-between items-center w-full mt-1">
+                      {/* Rândul Secundar - Responsive Mobile */}
+                      <div className="flex flex-col sm:flex-row justify-between items-center w-full gap-4 sm:gap-0 mt-1">
                         <button 
                           type="button" 
                           onClick={handleInapoiPrincipal} 
-                          className="text-[11px] font-bold text-slate-400 hover:text-white transition-colors underline underline-offset-4"
+                          className="text-[11px] font-bold text-slate-400 hover:text-white transition-colors underline underline-offset-4 order-2 sm:order-1"
                         >
-                          Anulează și întoarce-te
+                          Anulează formularul
                         </button>
 
                         <button 
                           type="button" 
                           onClick={(e) => handleLansareContract(e, 'save_only')}
                           disabled={!!loadingText} 
-                          className="text-[10px] text-emerald-400 font-black uppercase tracking-widest bg-emerald-900/10 px-4 py-2.5 rounded-lg border border-emerald-500/30 hover:bg-emerald-900/30 transition-colors shadow-sm flex items-center gap-1.5"
+                          className="w-full sm:w-auto text-[10px] text-emerald-400 font-black uppercase tracking-widest bg-emerald-900/10 px-4 py-3 sm:py-2.5 rounded-lg border border-emerald-500/30 hover:bg-emerald-900/30 transition-colors shadow-sm flex items-center justify-center gap-1.5 order-1 sm:order-2"
                         >
                           {loadingText && loadingText.title === "SALVARE ÎN CRM..." ? (
                              <svg className="animate-spin h-3 w-3 text-emerald-400" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                           ) : '💾 '}
-                          Doar Salvează în CRM
+                          Doar Salvează în Vault
                         </button>
                       </div>
                     </div>

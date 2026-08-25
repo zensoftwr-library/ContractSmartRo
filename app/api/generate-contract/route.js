@@ -366,10 +366,12 @@ export async function POST(request) {
     `;
 
     // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // 6. ADĂUGARE PROCES VERBAL OPȚIONAL
     // -------------------------------------------------------------------------
     if (adaugaProcesVerbal === true || adaugaProcesVerbal === "true") {
       htmlContract += `
+        <div style="page-break-before: always;"></div>
         <div class="contract-title" style="max-width: 80%; margin: 0 auto; line-height: 1.4;">${titluContractOficial}</div>
         <div class="contract-title">ANEXA 1: PROCES-VERBAL DE PREDARE-PRIMIRE</div>
         <div class="contract-subtitle">Anexă la Contractul nr. CS-${Math.floor(10000 + Math.random() * 90000)} / ${dataCurenta}</div>
@@ -385,11 +387,11 @@ export async function POST(request) {
         <div class="signature-layout">
           <div class="signature-column">
             PENTRU PRESTATOR (PREDARE)<br><br>
-            ${initiatorRol === 'prestator' && semnăturaBase64 ? `<img src="${semnăturaBase64}" class="signature-image" alt="Semnatura Prestator" /><span style="font-size: 10px; font-weight: normal; color: #16a34a; display:block;">Semnat digital creator</span>` : `<div class="signature-placeholder">[Validat Electronic]</div>`}
+            ${initiatorRol === 'prestator' && semnaturaPrestatorBase64 ? `<img src="${semnaturaPrestatorBase64}" class="signature-image" alt="Semnatura Prestator" /><span style="font-size: 10px; font-weight: normal; color: #16a34a; display:block;">Semnat digital creator</span>` : `<div class="signature-placeholder">[Validat Electronic]</div>`}
           </div>
           <div class="signature-column">
             PENTRU BENEFICIAR (PRIMIRE)<br><br>
-            ${initiatorRol === 'client' && semnăturaBase64 ? `<img src="${semnăturaBase64}" class="signature-image" alt="Semnatura Beneficiar" /><span style="font-size: 10px; font-weight: normal; color: #16a34a; display:block;">Semnat digital creator</span>` : `<div class="signature-placeholder" style="color: #ef4444;">Așteaptă semnare partener</div>`}
+            ${initiatorRol === 'client' && semnaturaClientBase64 ? `<img src="${semnaturaClientBase64}" class="signature-image" alt="Semnatura Beneficiar" /><span style="font-size: 10px; font-weight: normal; color: #16a34a; display:block;">Semnat digital creator</span>` : `<div class="signature-placeholder" style="color: #ef4444;">Așteaptă semnare partener</div>`}
           </div>
         </div>
       `;
