@@ -1954,8 +1954,19 @@ const reseteazaSemnaturiB2B = () => {
                           </div>
                           <div className="border-t border-blue-500/20 pt-3 space-y-3">
                             <div className="flex flex-col sm:flex-row gap-2">
-                              <input type="text" placeholder="Titlu Pagină" value={landingData.title} onChange={(e) => setLandingData({...landingData, title: e.target.value})} className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs outline-none focus:border-blue-500 transition-all" />
-                              <input type="file" accept="image/png, image/jpeg" onChange={(e) => handleUploadGeneric(e, (url) => setLandingData({...landingData, avatarUrl: url}), 'landing_images', setIsUploadingPdf)} className="flex-1 text-[10px] font-bold text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-blue-600 file:text-white cursor-pointer hover:file:bg-blue-500 file:transition-colors" />
+                              <input 
+                                type="text" 
+                                placeholder="Titlu Pagină" 
+                                value={landingData.title} 
+                                onChange={(e) => setLandingData({...landingData, title: e.target.value})} 
+                                className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs outline-none focus:border-blue-500 transition-all shadow-inner" 
+                              />
+                              <input 
+                                type="file" 
+                                accept="image/png, image/jpeg" 
+                                onChange={(e) => handleUploadGeneric(e, (url) => setLandingData({...landingData, avatarUrl: url}), 'landing_images', setIsUploadingPdf)} 
+                                className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-1.5 text-[10px] font-bold text-slate-400 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:bg-blue-600 file:text-white cursor-pointer hover:file:bg-blue-500 transition-all shadow-inner" 
+                              />
                             </div>
                             
                             <div className="bg-[#0B0F12] p-3 rounded-xl border border-slate-800 space-y-2">
