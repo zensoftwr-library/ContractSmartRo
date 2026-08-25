@@ -162,39 +162,210 @@ export async function POST(request) {
     }
 
     let clauzeInjectateHtml = '';
-    
-    const rules = [
-      { cond: body.clauzaPi && tipContract === 'inchiriere_imobil', html: `<li><strong>ART. 4.1. CLAUZĂ DE INVESTIRE CU TITLU EXECUTORIU:</strong> În conformitate cu art. 1798 Cod Civil, prezentul contract constituie titlu executoriu de drept pentru recuperarea chiriilor restante și pentru evacuarea rapidă a Locatarului la expirarea termenului sau în caz de neplată, fără somație și fără procedură judecătorească prealabilă.</li>` },
-      { cond: body.clauzaPi && tipContract === 'cda', html: `<li><strong>ART. 4.1. TRANSFER CONDIȚIONAT DE REMUNERAȚIE:</strong> Drepturile patrimoniale de exploatare a operei se transferă exclusiv condiționat de decontarea integrală, efectivă și confirmată bancar a prețului. Orice utilizare anterioară constituie delict civil și încălcare a drepturilor de autor.</li>` },
-      { cond: body.clauzaPi && tipContract !== 'inchiriere_imobil' && tipContract !== 'cda', html: `<li><strong>ART. 4.1. REȚINERE DE PROPRIETATE INTELECTUALĂ:</strong> Toate livrabilele, planurile, codul sursă și materialele de proiect rămân în proprietatea exclusivă a Prestatorului până la momentul stingerii integrale a tuturor obligațiilor de plată.</li>` },
-      { cond: body.clauzaPenalitati, html: `<li><strong>ART. 4.2. REGIM PENALIZATOR ȘI DAUNE INTERESE:</strong> Depășirea scadenței facturilor atrage penalități de întârziere în cuantum de 0.5% pe zi calendaristică, calculate din suma restantă.</li>` },
-      { cond: body.clauzaLimitareRaspundere, html: `<li><strong>ART. 4.3. LIMITAREA RĂSPUNDERII COMERCIALE:</strong> Sub nicio formă și indiferent de natura litigiului, răspunderea financiară totală a Prestatorului pentru orice daune dovedite nu va depăși valoarea netă încasată efectiv pentru serviciile prestate în cadrul acestui contract.</li>` },
-      { cond: body.clauzaInflatie, html: `<li><strong>ART. 4.4. INDEXARE ANTI-INFLAȚIONISTĂ (EUR/BNR):</strong> Pentru a menține echilibrul prestațiilor, prețul contractului va fi actualizat/indexat automat raportat la evoluția cursului EUR/RON comunicat de BNR sau la indicele inflației comunicat de INS, aplicându-se valoarea cea mai favorabilă Prestatorului.</li>` },
-      { cond: body.clauzaRevizii, html: `<li><strong>ART. 4.5. PLAFONARE STRUCTURALĂ FEEDBACK:</strong> Modificările sau revizile sunt limitate la maximum 2 runde incluse în buget. Orice solicitare ulterioară va fi tarifată suplimentar prin act adițional.</li>` },
-      { cond: body.clauzaTaxaAnulare && tipContract === 'promisiune_vanzare', html: `<li><strong>ART. 4.6. EXECUTARE ARVUNĂ CONFIRMATORIE:</strong> În caz de reziliere din culpa Promitentului Cumpărător, sumele predate cu titlu de avans vor fi reținute integral. În caz de renunțare a Promitentului Vânzător, acesta este obligat de drept la restituirea dublului sumei încasate.</li>` },
-      { cond: body.clauzaTaxaAnulare && tipContract === 'evenimente', html: `<li><strong>ART. 4.6. REȚINERE AVANS (NON-REFUNDABLE RETAINER):</strong> Avansul încasat reprezintă rezervarea fermă a datei și a resurselor. În cazul în care Beneficiarul anulează evenimentul cu mai puțin de 90 de zile înainte, avansul este considerat daune-interese compensatorii nereturnabile.</li>` },
-      { cond: body.clauzaTaxaAnulare && tipContract !== 'promisiune_vanzare' && tipContract !== 'evenimente', html: `<li><strong>ART. 4.6. PENALITATE DE ANULARE (KILL FEE):</strong> În cazul denunțării unilaterale a contractului din culpa exclusivă a Beneficiarului, sumele achitate cu titlu de avans rămân integral în posesia Prestatorului pentru blocarea resurselor operaționale.</li>` },
-      { cond: body.clauzaSplitPayment, html: `<li><strong>ART. 4.7. PLĂȚI FRACȚIONATE (MILESTONES):</strong> Decontarea și recepția fiecărei etape intermediare (milestones) condiționează în mod direct și imperativ deblocarea execuției pentru fazele de lucru subsecvente.</li>` },
-      { cond: body.clauzaRetentie, html: `<li><strong>ART. 4.8. DREPT DE RETENȚIE TEHNICĂ:</strong> În caz de neplată a oricărei facturi scadente în termen de 15 zile, Prestatorul are facultatea legală de a sista serviciile, de a revoca permisiunile de acces sau de a suspenda instanțele de server și activele digitale.</li>` },
-      { cond: body.clauzaItNonSolicit, html: `<li><strong>ART. 4.9. CLAUZĂ DE NON-SOLICITARE PERSONAL:</strong> Beneficiarul se obligă ferm să nu recruteze, direct sau indirect prin interpuși, angajații sau subcontractorii Prestatorului pe o perioadă de 24 de luni de la încetarea contractului.</li>` },
-      { cond: body.clauzaAntiRecalificare, html: `<li><strong>ART. 4.10. INDEPENDEȚĂ OPERAȚIONALĂ ȘI FISCALĂ:</strong> Relația este strict comercială (B2B). Prestatorul dispune de libertate absolută în organizare, utilizarea echipamentelor proprii și stabilirea programului, fiind eliminat orice element de subordonare (Art. 7 Cod Fiscal).</li>` },
-      { cond: body.clauzaSuspendareFeedback, html: `<li><strong>ART. 4.11. SUSPENDARE PENTRU LIPSĂ FEEDBACK:</strong> Orice întârziere a Beneficiarului în furnizarea materialelor ce depășește 5 zile lucrătoare atrage decalarea automată a predării. Depășirea a 15 zile dă dreptul facturării integrale a stadiului curent.</li>` },
-      { cond: body.clauzaLogisticaHoreca, html: `<li><strong>ART. 4.12. ASIGURARE LOGISTICĂ EVENIMENT:</strong> Beneficiarul se obligă să asigure Prestatorului acces la curent electric stabil (220V), mese calde pe durata evenimentelor ce depășesc 4 ore, și loc de parcare garantat pentru echipamente.</li>` },
-      { cond: body.clauzaOriginalitate, html: `<li><strong>ART. 4.13. GARANȚIA ORIGINALITĂȚII:</strong> Autorul garantează absolut și sub sancțiunea legii penale că opera este 100% creație originală, nu încalcă drepturile terților (fără plagiat) și nu a mai fost cedată anterior.</li>` },
-      { cond: body.clauzaDauneTerti, html: `<li><strong>ART. 4.14. RĂSPUNDEREA PENTRU DAUNE PROVOCATE TERȚILOR:</strong> Locatarul este 100% solidar responsabil pentru orice distrugeri (inundații, incendii din culpă, vandalism) provocate vecinilor sau spațiilor comune, degrevând total Locatorul de orice acțiune în regres.</li>` },
-      { cond: body.clauzaRiscPieire, html: `<li><strong>ART. 4.15. RISCUL PIEIRII BUNULUI:</strong> Până la semnarea formei autentice, riscul pieirii fortuite a imobilului rămâne în sarcina Promitentului-Vânzător. Orice degradare a stării fizice dă dreptul Cumpărătorului să ceară reducerea prețului sau rezilierea de drept.</li>` },
-      { cond: body.clauzaConstrucVicii, html: `<li><strong>ART. 4.16. GARANȚIE DE BUNĂ EXECUȚIE:</strong> Executantul garantează calitatea lucrărilor pe o perioadă de 36 de luni de la Procesul-Verbal de recepție finală, obligându-se la remedieri gratuite pentru viciile ascunse conform Legii 10/1995.</li>` },
-      { cond: body.clauzaConstrucAsigurare, html: `<li><strong>ART. 4.17. POLIZĂ DE ASIGURARE ȘANTIER (C.A.R.):</strong> Constructorul trebuie să dețină asigurare validă tip Contractors All Risks pe durata execuției, preluând 100% din răspunderea civilă pentru daunele cauzate terților pe șantier.</li>` },
-      { cond: body.clauzaConstrucGrafic, html: `<li><strong>ART. 4.18. PENALITĂȚI GRAFIC DE EXECUȚIE:</strong> Întârzierea nejustificată a predării frontului de lucru sau a lucrărilor la termenele agreate atrage penalități de 0.15% per zi de întârziere din valoarea stadiului fizic nerealizat.</li>` },
-      { cond: body.clauzaItSla, html: `<li><strong>ART. 4.19. SERVICE LEVEL AGREEMENT (SLA):</strong> Se garantează un uptime de 99.9% și un timp de răspuns la incidente critice de maximum 24h. Nerespectarea atrage credite de penalizare deduse direct din viitoarele facturi de abonament.</li>` },
-      { cond: body.clauzaItEscrow, html: `<li><strong>ART. 4.20. DEPOZITARE COD SURSĂ (ESCROW):</strong> Codul sursă va fi depozitat la o entitate terță de tip escrow, activându-se dreptul de eliberare și utilizare în beneficiul clientului exclusiv în caz de insolvență a furnizorului.</li>` }
-    ];
+    let clauseCounter = 1;
 
-    rules.forEach(r => {
-      if (r.cond) {
-        clauzeInjectateHtml += r.html;
-      }
-    });
+    // Funcție inteligentă de auto-numerotare a clauzelor
+    const adaugaClauza = (titlu, text) => {
+        clauzeInjectateHtml += `<li style="margin-bottom: 8px;"><strong>ART. 4.${clauseCounter}. ${titlu}:</strong> ${text}</li>`;
+        clauseCounter++;
+    };
+
+    // --- CLAUZE DE BAZĂ (Din afara nomenclatorului) ---
+    if (body.clauzaLimitareRaspundere) {
+        adaugaClauza('LIMITAREA RĂSPUNDERII COMERCIALE', 'Sub nicio formă și indiferent de natura litigiului, răspunderea financiară totală a Prestatorului pentru orice daune dovedite nu va depăși valoarea netă încasată efectiv pentru serviciile prestate în cadrul acestui contract.');
+    }
+    if (body.clauzaInflatie) {
+        adaugaClauza('INDEXARE ANTI-INFLAȚIONISTĂ (EUR/BNR)', 'Pentru a menține echilibrul prestațiilor, prețul contractului va fi actualizat/indexat automat raportat la evoluția cursului EUR/RON comunicat de BNR sau la indicele inflației comunicat de INS, aplicându-se valoarea cea mai favorabilă Prestatorului.');
+    }
+
+    // --- NOMENCLATOR CLAUZE DINAMICE COMPLETE ---
+    if (body.clauzaPi) {
+        if (tipContract === 'inchiriere_imobil') {
+            adaugaClauza('CLAUZĂ DE INVESTIRE CU TITLU EXECUTORIU', 'În conformitate cu art. 1798 Cod Civil, prezentul contract constituie titlu executoriu de drept pentru recuperarea chiriilor restante și pentru evacuarea rapidă a Locatarului la expirarea termenului sau în caz de neplată, fără somație și fără procedură judecătorească prealabilă.');
+        } else if (tipContract === 'cda') {
+            adaugaClauza('TRANSFER CONDIȚIONAT DE REMUNERAȚIE', 'Drepturile patrimoniale de exploatare a operei se transferă exclusiv condiționat de decontarea integrală, efectivă și confirmată bancar a prețului. Orice utilizare anterioară constituie delict civil și încălcare a drepturilor de autor.');
+        } else {
+            adaugaClauza('REȚINERE DE PROPRIETATE INTELECTUALĂ', 'Toate livrabilele, planurile, codul sursă și materialele de proiect rămân în proprietatea exclusivă a Prestatorului până la momentul stingerii integrale a tuturor obligațiilor de plată.');
+        }
+    }
+
+    if (body.clauzaPenalitati) {
+        if (tipContract === 'cda') {
+             adaugaClauza('PENALITĂȚI DE UTILIZARE NEAUTORIZATĂ', 'Utilizarea, difuzarea sau exploatarea operei înainte de achitarea integrală a prețului sau cu depășirea limitelor convenite atrage aplicarea unui tarif penalizator dublu per incidență.');
+        } else if (tipContract === 'promisiune_vanzare') {
+             adaugaClauza('PENALITĂȚI ZI DE ÎNTÂRZIERE ACT NOTARIAL', 'Refuzul nejustificat sau neprezentarea uneia dintre părți la biroul notarial la data fixată atrage o penalitate simetrică pe fiecare zi de întârziere, datorată cu titlu de daune interese moratorii.');
+        } else {
+             adaugaClauza('REGIM PENALIZATOR ȘI DAUNE INTERESE', 'Depășirea scadenței facturilor atrage penalități de întârziere în cuantum de 0.5% pe zi calendaristică, calculate din suma restantă, constituind clauză penală conform Art. 1538 Cod Civil.');
+        }
+    }
+
+    if (body.clauzaRevizii) {
+        adaugaClauza('PLAFONARE STRUCTURALĂ FEEDBACK / REVIZII', 'Modificările sau revizile sunt limitate la maximum 2 runde incluse în bugetul agreat. Orice solicitare ulterioară de modificare structurală va fi tarifată suplimentar prin act adițional.');
+    }
+
+    if (body.clauzaRawFoto) {
+        if (tipContract === 'inchiriere_imobil') {
+             adaugaClauza('REȚINERE GARANȚIE / DEPOZIT DAUNE', 'Fondul de garanție constituit este reținut de Locator la încetarea contractului pentru acoperirea eventualelor deteriorări aduse imobilului sau a restanțelor la utilități din culpa Locatarului.');
+        } else {
+             adaugaClauza('RETENȚIE FIȘIERE SURSĂ / RAW', 'Obiectul contractului se predă exclusiv în format final/compilat. Transmiterea proiectelor deschise sau a fișierelor sursă necesită achitarea unei taxe de cesiune stabilite separat.');
+        }
+    }
+
+    if (body.clauzaMarketingTerti) {
+        if (tipContract === 'cda') {
+            adaugaClauza('DREPT DE CREDITARE PATERNITATE', 'Beneficiarul are obligația corelativă de a menționa numele Autorului pe toate materialele publicate, pe canalele de difuzare și suporturile media electronice sau fizice utilizate.');
+        } else {
+            adaugaClauza('DREPT PORTOFOLIU & MARKETING', 'Prestatorul își rezervă dreptul inalienabil de a utiliza elemente din lucrare/materiale în portofoliul public cu titlu de studiu de caz comercial, exceptând datele protejate de confidențialitate.');
+        }
+    }
+
+    if (body.clauzaAprobareTacita) {
+        if (tipContract === 'inchiriere_imobil') {
+            adaugaClauza('DREPT DE INSPECȚIE PROPRIETAR', 'Locatorul își rezervă dreptul de a inspecta starea tehnică a imobilului o dată pe lună, în prezența Locatarului, în baza unei notificări scrise prealabile transmise cu minimum 24 de ore înainte.');
+        } else if (tipContract === 'promisiune_vanzare') {
+            adaugaClauza('REZOLUȚIUNE DE DREPT LA TERMENUL FIXAT', 'Împlinirea termenului extinctiv fără perfectarea contractului de vânzare determină desființarea de drept a promisiunii prin efectul pactului comisoriu, fără punere în întârziere sau formalități.');
+        } else {
+            adaugaClauza('APROBARE TACITĂ LIVRABILE', 'Livrabilele transmise se consideră recepționate fără obiecțiuni și aprobate în lipsa unui refuz scris, explicit și motivat din partea Beneficiarului în termen de 5 zile calendaristice.');
+        }
+    }
+
+    if (body.clauzaTaxaAnulare) {
+        if (tipContract === 'promisiune_vanzare') {
+             adaugaClauza('EXECUTARE ARVUNĂ CONFIRMATORIE', 'În caz de reziliere din culpa Promitentului Cumpărător, sumele predate cu titlu de avans vor fi reținute integral. În caz de renunțare a Promitentului Vânzător, acesta este obligat de drept la restituirea dublului sumei încasate.');
+        } else if (tipContract === 'evenimente') {
+             adaugaClauza('REȚINERE AVANS (NON-REFUNDABLE RETAINER)', 'Sumele achitate cu titlu de avans reprezintă rezervarea fermă a datei și a resurselor. Dacă Beneficiarul anulează evenimentul, avansul este considerat daune-interese compensatorii nereturnabile.');
+        } else if (tipContract === 'inchiriere_imobil') {
+             adaugaClauza('INTERDICȚIE SUBÎNCHIRIERE SPAȚIU', 'Locatarului îi este interzisă în mod absolut subînchirierea, cedarea folosinței sau darea în comodat a imobilului, total sau parțial, către terțe persoane fără acordul prealabil scris al Locatorului.');
+        } else if (tipContract === 'influencer') {
+             adaugaClauza('PENALITĂȚI PENTRU ÎNTÂRZIERE LIVRABILE', 'Depășirea termenului agreat de publicare atrage penalități de 10% per zi de întârziere din onorariul total stabilit.');
+        } else {
+             adaugaClauza('PENALITATE DE ANULARE (KILL FEE)', 'În cazul denunțării unilaterale a contractului din culpa exclusivă a Beneficiarului, sumele achitate cu titlu de avans rămân integral în posesia Prestatorului pentru blocarea resurselor operaționale.');
+        }
+    }
+
+    if (body.clauzaSplitPayment) {
+        adaugaClauza('PLĂȚI FRACȚIONATE (MILESTONES)', 'Decontarea și recepția fiecărei etape intermediare (milestones) condiționează în mod direct și imperativ deblocarea execuției pentru fazele de lucru subsecvente.');
+    }
+
+    if (body.clauzaRetentie) {
+        if (tipContract === 'nda') {
+             adaugaClauza('DISTRUGERE OBLIGATORIE DATE', 'La încetarea discuțiilor, Partea Primitoare se obligă să returneze sau să distrugă definitiv toate documentele și copiile digitale primite, transmițând o confirmare scrisă în 48 de ore.');
+        } else {
+             adaugaClauza('DREPT DE RETENȚIE TEHNICĂ', 'În caz de neplată a oricărei facturi scadente în termen de 15 zile, Prestatorul are facultatea legală de a sista serviciile, de a revoca permisiunile de acces sau de a suspenda instanțele de server și activele digitale.');
+        }
+    }
+
+    if (body.clauzaItNonSolicit) {
+        adaugaClauza('CLAUZĂ DE NON-SOLICITARE PERSONAL / CLIENȚI', 'Părțile se interzic reciproc de a racola, angaja sau contracta direct sau indirect personalul tehnic sau clienții celeilalte părți pe o durată de 2 ani de la încetarea relațiilor comerciale.');
+    }
+
+    if (body.clauzaAntiRecalificare) {
+        if (tipContract === 'influencer') {
+            adaugaClauza('EXCLUSIVITATE SECTORIALĂ', 'Creatorului îi este strict interzis să asocieze imaginea sau să promoveze branduri concurente directe pe o perioadă de 6 luni de la publicare.');
+        } else {
+            adaugaClauza('INDEPENDEȚĂ OPERAȚIONALĂ ȘI FISCALĂ (ANTI-RECALIFICARE)', 'Contractul elimină total subordonarea (Art. 7 Cod Fiscal). Prestatorul acționează pe riscul și cu mijloacele sale proprii, nefiind integrat în organigrama Beneficiarului.');
+        }
+    }
+
+    if (body.clauzaSuspendareFeedback) {
+        adaugaClauza('SUSPENDARE PENTRU LIPSĂ FEEDBACK', 'Orice întârziere a Beneficiarului în furnizarea materialelor sau aprobărilor ce depășește 5 zile lucrătoare atrage decalarea automată a predării și dreptul de a factura stadiul curent.');
+    }
+
+    if (body.clauzaLogisticaHoreca) {
+        adaugaClauza('ASIGURARE LOGISTICĂ EVENIMENT', 'Beneficiarul se obligă să asigure Prestatorului acces la curent electric stabil (220V), mese calde pe durata evenimentelor ce depășesc 4 ore, și loc de parcare garantat pentru echipamente.');
+    }
+
+    if (body.clauzaOriginalitate) {
+        adaugaClauza('GARANȚIA ORIGINALITĂȚII (ANTI-PLAGIAT)', 'Autorul garantează absolut și sub sancțiunea legii penale că opera este 100% creație originală, nu încalcă drepturile terților și nu a mai fost cedată anterior.');
+    }
+
+    if (body.clauzaDauneTerti) {
+        adaugaClauza('RĂSPUNDEREA PENTRU DAUNE PROVOCATE TERȚILOR', 'Locatarul este 100% solidar responsabil pentru orice distrugeri (inundații, incendii din culpă, vandalism) provocate vecinilor sau spațiilor comune, degrevând total Locatorul de orice acțiune în regres.');
+    }
+
+    if (body.clauzaRiscPieire) {
+        adaugaClauza('RISCUL PIEIRII BUNULUI', 'Până la semnarea formei autentice, riscul pieirii fortuite a imobilului rămâne în sarcina Promitentului-Vânzător. Orice degradare a stării fizice dă dreptul Cumpărătorului să ceară reducerea prețului sau rezilierea de drept.');
+    }
+
+    if (body.clauzaConstrucVicii) {
+        adaugaClauza('GARANȚIE DE BUNĂ EXECUȚIE ȘI VICII ASCUNSE', 'Executantul garantează calitatea lucrărilor pe o perioadă de 36 de luni de la Procesul-Verbal de recepție finală, obligându-se la remedieri gratuite pentru viciile ascunse conform Legii 10/1995.');
+    }
+
+    if (body.clauzaConstrucAsigurare) {
+        adaugaClauza('POLIZĂ DE ASIGURARE ȘANTIER (C.A.R.)', 'Constructorul trebuie să dețină asigurare validă tip Contractors All Risks pe durata execuției, preluând 100% din răspunderea civilă pentru daunele cauzate terților pe șantier.');
+    }
+
+    if (body.clauzaConstrucGrafic) {
+        adaugaClauza('PENALITĂȚI GRAFIC DE EXECUȚIE', 'Întârzierea nejustificată a predării frontului de lucru sau a lucrărilor la termenele agreate atrage penalități de 0.15% per zi de întârziere din valoarea stadiului fizic nerealizat.');
+    }
+
+    if (body.clauzaItSla) {
+        adaugaClauza('SERVICE LEVEL AGREEMENT (SLA)', 'Se garantează un uptime de 99.9% și un timp de răspuns la incidente critice de maximum 24h. Nerespectarea atrage credite de penalizare deduse direct din viitoarele facturi de abonament.');
+    }
+
+    if (body.clauzaItEscrow) {
+        adaugaClauza('DEPOZITARE COD SURSĂ (ESCROW)', 'Codul sursă va fi depozitat la o entitate terță de tip escrow, activându-se dreptul de eliberare și utilizare în beneficiul clientului exclusiv în caz de insolvență sau faliment al furnizorului.');
+    }
+
+    if (body.clauzaHorecaForceMajeure) {
+        adaugaClauza('DREPT DE REPORTARE ȘI FORȚĂ MAJORĂ SPECIALĂ', 'În caz de forță majoră sau restricții administrative, contractul se suspendă fără penalități, cu obligația de reprogramare obligatorie a evenimentului în limitele calendaristice disponibile.');
+    }
+
+    if (body.clauzaHorecaGarantat) {
+        adaugaClauza('NUMĂR MINIM GARANTAT DE PARTICIPANȚI', 'Beneficiarul garantează un prag minim de facturare de 80% din volumul estimat inițial, valoarea fiind datorată integral indiferent de numărul real al participanților prezenți.');
+    }
+
+    if (body.clauzaMedicalMalpraxis) {
+        adaugaClauza('EXONERARE RĂSPUNDERE ȘI MALPRAXIS', 'Delimitarea răspunderii furnizorului în limitele obligațiilor de mijloace și a consimțământului informat semnat, sub acoperirea exclusivă a poliței de răspundere civilă profesională.');
+    }
+
+    if (body.clauzaMedicalNoShow) {
+        adaugaClauza('POLITICĂ STRICTĂ DE ANULARE PROGRAMĂRI', 'Anularea ședințelor programate cu mai puțin de 24 de ore înainte atrage facturarea integrală a tarifelor aferente sau reținerea definitivă a creditului din pachetul achiziționat.');
+    }
+
+    if (body.clauzaTranspCmr) {
+        adaugaClauza('RĂSPUNDERE CONFORM CONVENȚIEI CMR', 'Angajarea răspunderii transportatorului pentru pierderea, avarierea mărfii sau depășirea termenului de livrare se guvernează strict de limitele plafonate impuse de Convenția CMR.');
+    }
+
+    if (body.clauzaTranspStationare) {
+        adaugaClauza('TAXĂ DE STAȚIONARE / DEMURRAGE', 'Depășirea timpului alocat pentru operațiunile de încărcare/descărcare la rampă atrage aplicarea unei taxe fixe de staționare, calculată pe fiecare oră de imobilizare a autovehiculului.');
+    }
+
+    if (body.clauzaNdaDurata) {
+        adaugaClauza('ULTRAACTIVITATEA OBLIGAȚIILOR', 'Obligațiile de confidențialitate și neutilizare a informațiilor supraviețuiesc încetării contractului cadru sau a negocierilor și rămân în vigoare pentru o durată de minimum 5 ani.');
+    }
+
+    if (body.clauzaNdaPermis) {
+        adaugaClauza('DEZVĂLUIRI PERMISE PRIN LEGE', 'Divulgarea nu constituie o încălcare a confidențialității dacă este cerută de o autoritate judecătorească, cu condiția notificării imediate a celeilalte părți în scopul obținerii unei măsuri de protecție.');
+    }
+
+    if (body.clauzaCdaMoral) {
+        adaugaClauza('INALIENABILITATEA DREPTURILOR MORALE', 'Drepturile morale de autor (paternitatea operei, dreptul de a se opune oricărei deformări sau modificări aduse operei) rămân atașate Autorului în mod perpetuu, inalienabil și imprescriptibil.');
+    }
+
+    if (body.clauzaCdaTeritoriu) {
+        adaugaClauza('DELIMITARE TERITORIALĂ ȘI CANALE', 'Drepturile de exploatare comercială transmise sunt limitate strict la aria geografică și canalele media indicate în anexa tehnică, orice extindere necesitând un acord scris distinct.');
+    }
+
+    if (body.clauzaInchiriereRegie) {
+        adaugaClauza('DOVADA PLĂȚII UTILITĂȚILOR LA ZI', 'Locatarul are obligația de a transmite lunar către Locator dovezile de plată ale utilităților. Acumularea de restanțe pe mai mult de 45 de zile dă dreptul la rezilierea de drept a contractului.');
+    }
+
+    if (body.clauzaInchiriereDest) {
+        adaugaClauza('SCHIMBARE DESTINAȚIE SPAȚIU', 'Imobilul va fi utilizat exclusiv conform destinației stabilite. Schimbarea destinației în spațiu comercial, sediu social sau desfășurarea de activități economice fără acord scris este strict interzisă.');
+    }
+
+    if (body.clauzaPromisSarcini) {
+        adaugaClauza('GARANȚIE EVICȚIUNE ȘI SARCINI IMOBIL', 'Promitentul-Vânzător garantează pe propria răspundere că imobilul este liber de orice sarcini, ipoteci, privilegii, procese de revendicare sau litigii aflate pe rolul instanțelor judecătorești.');
+    }
+
+    if (body.clauzaPromisCheltuieli) {
+        adaugaClauza('REPARTIZARE TAXE NOTARIALE', 'Cheltuielile ocazionate de autentificarea actelor, onorariile notariale, taxele de intabulare în Cartea Funciară (OCPI) și extrasul de autentificare vor fi suportate conform convenției părților.');
+    }
+
+    if (clauzaCustom && clauzaCustom.trim() !== '') {
+        adaugaClauza('CLAUZĂ SPECIALĂ ADIȚIONALĂ', clauzaCustom.trim());
+    }
 
     // Numărăm dinamic câte clauze reale au fost trimise ca 'true' din frontend pentru a evita suprapunerile de index
     let nrClauzeBifate = Object.keys(body).filter(k => k.startsWith('clauza') && k !== 'clauzaCustom' && body[k] === true).length;
