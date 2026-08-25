@@ -294,3 +294,53 @@ html.matcha-light-theme [class*="animate-glow"],
 html.matcha-light-theme .fixed.inset-0.pointer-events-none {
   display: none !important;
 }
+
+/* ========================================================== */
+/* BUTOANE QR STUDIO TABS (DARK & LIGHT) */
+/* ========================================================== */
+.qr-tab-btn {
+    padding: 0.375rem 1rem !important;
+    border-radius: 0.5rem !important;
+    font-size: 10px !important;
+    font-weight: 900 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.025em !important;
+    transition: all 0.2s ease !important;
+    border: 1px solid transparent !important;
+}
+
+/* --- DARK MODE (Default) --- */
+/* Verde */
+.qr-tab-green { background-color: rgba(139,168,136,0.1) !important; color: #8ba888 !important; border-color: rgba(139,168,136,0.3) !important; }
+.qr-tab-green:hover { background-color: rgba(139,168,136,0.2) !important; box-shadow: 0 0 10px rgba(139,168,136,0.2) !important; }
+.qr-tab-green.active { background-color: #8ba888 !important; color: #0B0F12 !important; border-color: #8ba888 !important; box-shadow: 0 0 15px rgba(139,168,136,0.6) !important; }
+
+/* Mov */
+.qr-tab-purple { background-color: rgba(147,51,234,0.1) !important; color: #a855f7 !important; border-color: rgba(147,51,234,0.3) !important; }
+.qr-tab-purple:hover { background-color: rgba(147,51,234,0.2) !important; box-shadow: 0 0 10px rgba(147,51,234,0.2) !important; }
+.qr-tab-purple.active { background-color: #9333ea !important; color: #ffffff !important; border-color: #9333ea !important; box-shadow: 0 0 15px rgba(147,51,234,0.6) !important; }
+
+/* Albastru */
+.qr-tab-blue { background-color: rgba(37,99,235,0.1) !important; color: #3b82f6 !important; border-color: rgba(37,99,235,0.3) !important; }
+.qr-tab-blue:hover { background-color: rgba(37,99,235,0.2) !important; box-shadow: 0 0 10px rgba(37,99,235,0.2) !important; }
+.qr-tab-blue.active { background-color: #2563eb !important; color: #ffffff !important; border-color: #2563eb !important; box-shadow: 0 0 15px rgba(37,99,235,0.6) !important; }
+
+/* --- LIGHT MODE --- */
+html.matcha-light-theme .qr-tab-btn {
+    box-shadow: none !important;
+}
+
+/* Verde Light */
+html.matcha-light-theme .qr-tab-green { background-color: #ffffff !important; color: #059669 !important; border-color: #a7f3d0 !important; }
+html.matcha-light-theme .qr-tab-green:hover { background-color: #ecfdf5 !important; }
+html.matcha-light-theme .qr-tab-green.active { background-color: #059669 !important; color: #ffffff !important; border-color: #047857 !important; box-shadow: 0 4px 10px rgba(5,150,105,0.3) !important; }
+
+/* Mov Light */
+html.matcha-light-theme .qr-tab-purple { background-color: #ffffff !important; color: #7e22ce !important; border-color: #e9d5ff !important; }
+html.matcha-light-theme .qr-tab-purple:hover { background-color: #faf5ff !important; }
+html.matcha-light-theme .qr-tab-purple.active { background-color: #7e22ce !important; color: #ffffff !important; border-color: #6b21a8 !important; box-shadow: 0 4px 10px rgba(126,34,206,0.3) !important; }
+
+/* Albastru Light */
+html.matcha-light-theme .qr-tab-blue { background-color: #ffffff !important; color: #2563eb !important; border-color: #bfdbfe !important; }
+html.matcha-light-theme .qr-tab-blue:hover { background-color: #eff6ff !important; }
+html.matcha-light-theme .qr-tab-blue.active { background-color: #2563eb !important; color: #ffffff !important; border-color: #1d4ed8 !important; box-shadow: 0 4px 10px rgba(37,99,235,0.3) !important; }
