@@ -1737,8 +1737,7 @@ const reseteazaSemnaturiB2B = () => {
                   <h3 className="text-xs font-black text-white uppercase tracking-wider block">Terminal Generare QR</h3>
                 </div>
                 
-                {/* Butoanele de tip - COMPACT */}
-              {/* Butoanele de tip - COMPACT */}
+                              {/* Butoanele de tip - COMPACT */}
               <div className="flex flex-wrap justify-center sm:justify-start gap-2">
                 <button onClick={() => setQrType('url')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm border ${
                   qrType === 'url' 
@@ -1812,44 +1811,44 @@ const reseteazaSemnaturiB2B = () => {
                   <div className="flex-1 flex flex-col justify-between space-y-4">
                     <div>
                       {qrType === 'url' && (
-                        <div className="p-4 bg-[#0B0F12] border border-slate-700/60 rounded-xl shadow-inner">
+                        <div className="p-4 bg-[#0B0F12] border border-slate-700/60 rounded-xl shadow-inner [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!border-slate-200">
                           <div className="mb-3">
-                            <label className="text-[10px] text-[#8ba888] uppercase font-black tracking-widest block mb-1">Standard URL (Link Web)</label>
-                            <p className="text-[10px] text-slate-400 leading-tight">Direcționează utilizatorul instant către site-ul tău sau profilul social.</p>
+                            <label className="text-[10px] text-[#8ba888] uppercase font-black tracking-widest block mb-1 [.matcha-light-theme_&]:!text-emerald-700">Standard URL (Link Web)</label>
+                            <p className="text-[10px] text-slate-400 leading-tight [.matcha-light-theme_&]:!text-slate-500">Direcționează utilizatorul instant către site-ul tău sau profilul social.</p>
                           </div>
-                          <input type="text" placeholder="https://site-ul-tau.ro" value={qrUrl} onChange={(e) => setQrUrl(e.target.value)} className="w-full bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-[#8ba888] focus:ring-1 focus:ring-[#8ba888]/30 outline-none transition-all" />
+                          <input type="text" placeholder="https://site-ul-tau.ro" value={qrUrl} onChange={(e) => setQrUrl(e.target.value)} className="w-full bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-[#8ba888] focus:ring-1 focus:ring-[#8ba888]/30 outline-none transition-all [.matcha-light-theme_&]:!bg-slate-50 [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:focus:!border-emerald-500" />
                         </div>
                       )}
 
                       {qrType === 'crypto' && (
-                        <div className="p-4 bg-[#0B0F12] border border-slate-700/60 rounded-xl shadow-inner">
+                        <div className="p-4 bg-[#0B0F12] border border-slate-700/60 rounded-xl shadow-inner [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!border-slate-200">
                           <div className="mb-3">
-                            <label className="text-[10px] text-[#8ba888] uppercase font-black tracking-widest block mb-1">Cerere Încasare Crypto</label>
-                            <p className="text-[10px] text-slate-400 leading-tight">Generează un cod QR scanabil pentru a primi fonduri instant în portofel.</p>
+                            <label className="text-[10px] text-[#8ba888] uppercase font-black tracking-widest block mb-1 [.matcha-light-theme_&]:!text-emerald-700">Cerere Încasare Crypto</label>
+                            <p className="text-[10px] text-slate-400 leading-tight [.matcha-light-theme_&]:!text-slate-500">Generează un cod QR scanabil pentru a primi fonduri instant în portofel.</p>
                           </div>
                           <div className="flex gap-2 mb-2">
-                            <select value={cryptoData.coin} onChange={e => setCryptoData({...cryptoData, coin: e.target.value})} className="w-1/3 bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-xs outline-none focus:border-[#8ba888] appearance-none font-bold">
+                            <select value={cryptoData.coin} onChange={e => setCryptoData({...cryptoData, coin: e.target.value})} className="w-1/3 bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-xs outline-none focus:border-[#8ba888] appearance-none font-bold [.matcha-light-theme_&]:!bg-slate-50 [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300">
                               <option value="bitcoin">BTC</option>
                               <option value="ethereum">ETH</option>
                               <option value="solana">SOL</option>
                               <option value="tether">USDT</option>
                             </select>
-                            <input type="number" placeholder="Sumă (Opțional)" value={cryptoData.amount} onChange={(e) => setCryptoData({...cryptoData, amount: e.target.value})} className="flex-1 bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-[#8ba888] outline-none transition-all" />
+                            <input type="number" placeholder="Sumă (Opțional)" value={cryptoData.amount} onChange={(e) => setCryptoData({...cryptoData, amount: e.target.value})} className="flex-1 bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-[#8ba888] outline-none transition-all [.matcha-light-theme_&]:!bg-slate-50 [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300" />
                           </div>
-                          <input type="text" placeholder="Adresă Publică Portofel" value={cryptoData.address} onChange={(e) => setCryptoData({...cryptoData, address: e.target.value})} className="w-full bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-[#8ba888] outline-none font-mono transition-all" />
+                          <input type="text" placeholder="Adresă Publică Portofel" value={cryptoData.address} onChange={(e) => setCryptoData({...cryptoData, address: e.target.value})} className="w-full bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-[#8ba888] outline-none font-mono transition-all [.matcha-light-theme_&]:!bg-slate-50 [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300" />
                         </div>
                       )}
 
                       {qrType === 'wifi' && (
-                        <div className="p-4 bg-[#0B0F12] border border-slate-700/60 rounded-xl shadow-inner">
+                        <div className="p-4 bg-[#0B0F12] border border-slate-700/60 rounded-xl shadow-inner [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!border-slate-200">
                           <div className="mb-3">
-                            <label className="text-[10px] text-[#8ba888] uppercase font-black tracking-widest block mb-1">Conectare Rapidă Wi-Fi</label>
-                            <p className="text-[10px] text-slate-400 leading-tight">Clienții se conectează la rețea instant, fără parolă, doar scanând codul.</p>
+                            <label className="text-[10px] text-[#8ba888] uppercase font-black tracking-widest block mb-1 [.matcha-light-theme_&]:!text-emerald-700">Conectare Rapidă Wi-Fi</label>
+                            <p className="text-[10px] text-slate-400 leading-tight [.matcha-light-theme_&]:!text-slate-500">Clienții se conectează la rețea instant, fără parolă, doar scanând codul.</p>
                           </div>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            <input type="text" placeholder="Nume Rețea (SSID)" value={wifiData.ssid} onChange={(e) => setWifiData({...wifiData, ssid: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-[#8ba888] outline-none sm:col-span-2 transition-all" />
-                            <input type="text" placeholder="Parolă Rețea" value={wifiData.password} onChange={(e) => setWifiData({...wifiData, password: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-[#8ba888] outline-none transition-all" />
-                            <select value={wifiData.type} onChange={e => setWifiData({...wifiData, type: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-xs outline-none focus:border-[#8ba888] appearance-none font-bold">
+                            <input type="text" placeholder="Nume Rețea (SSID)" value={wifiData.ssid} onChange={(e) => setWifiData({...wifiData, ssid: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-[#8ba888] outline-none sm:col-span-2 transition-all [.matcha-light-theme_&]:!bg-slate-50 [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300" />
+                            <input type="text" placeholder="Parolă Rețea" value={wifiData.password} onChange={(e) => setWifiData({...wifiData, password: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-[#8ba888] outline-none transition-all [.matcha-light-theme_&]:!bg-slate-50 [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300" />
+                            <select value={wifiData.type} onChange={e => setWifiData({...wifiData, type: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-xs outline-none focus:border-[#8ba888] appearance-none font-bold [.matcha-light-theme_&]:!bg-slate-50 [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300">
                               <option value="WPA">Securitate WPA/WPA2</option>
                               <option value="WEP">Securitate WEP</option>
                               <option value="nopass">Fără parolă (Liber)</option>
@@ -1859,36 +1858,36 @@ const reseteazaSemnaturiB2B = () => {
                       )}
 
                       {qrType === 'vcard' && (
-                        <div className="p-4 bg-[#0B0F12] border border-slate-700/60 rounded-xl shadow-inner">
+                        <div className="p-4 bg-[#0B0F12] border border-slate-700/60 rounded-xl shadow-inner [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!border-slate-200">
                           <div className="mb-3">
-                            <label className="text-[10px] text-[#8ba888] uppercase font-black tracking-widest block mb-1">Carte de Vizită Digitală</label>
-                            <p className="text-[10px] text-slate-400 leading-tight">Deschide automat o fișă de contact gata de salvat în agendă.</p>
+                            <label className="text-[10px] text-[#8ba888] uppercase font-black tracking-widest block mb-1 [.matcha-light-theme_&]:!text-emerald-700">Carte de Vizită Digitală</label>
+                            <p className="text-[10px] text-slate-400 leading-tight [.matcha-light-theme_&]:!text-slate-500">Deschide automat o fișă de contact gata de salvat în agendă.</p>
                           </div>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            <input type="text" placeholder="Nume Complet" value={qrData.nume} onChange={(e) => setQrData({...qrData, nume: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-[#8ba888] outline-none sm:col-span-2 transition-all" />
-                            <input type="text" placeholder="Funcție / Titlu" value={qrData.functie} onChange={(e) => setQrData({...qrData, functie: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-[#8ba888] outline-none sm:col-span-2 transition-all" />
-                            <input type="text" placeholder="Telefon" value={qrData.telefon} onChange={(e) => setQrData({...qrData, telefon: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-[#8ba888] outline-none transition-all" />
-                            <input type="email" placeholder="Email" value={qrData.email} onChange={(e) => setQrData({...qrData, email: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-[#8ba888] outline-none transition-all" />
+                            <input type="text" placeholder="Nume Complet" value={qrData.nume} onChange={(e) => setQrData({...qrData, nume: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-[#8ba888] outline-none sm:col-span-2 transition-all [.matcha-light-theme_&]:!bg-slate-50 [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300" />
+                            <input type="text" placeholder="Funcție / Titlu" value={qrData.functie} onChange={(e) => setQrData({...qrData, functie: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-[#8ba888] outline-none sm:col-span-2 transition-all [.matcha-light-theme_&]:!bg-slate-50 [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300" />
+                            <input type="text" placeholder="Telefon" value={qrData.telefon} onChange={(e) => setQrData({...qrData, telefon: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-[#8ba888] outline-none transition-all [.matcha-light-theme_&]:!bg-slate-50 [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300" />
+                            <input type="email" placeholder="Email" value={qrData.email} onChange={(e) => setQrData({...qrData, email: e.target.value})} className="bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-[#8ba888] outline-none transition-all [.matcha-light-theme_&]:!bg-slate-50 [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300" />
                           </div>
                         </div>
                       )}
 
                       {qrType === 'dynamic' && (
-                        <div className="p-4 bg-purple-900/10 border border-purple-500/30 rounded-xl shadow-inner">
+                        <div className="p-4 bg-purple-900/10 border border-purple-500/30 rounded-xl shadow-inner [.matcha-light-theme_&]:!bg-purple-50/50 [.matcha-light-theme_&]:!border-purple-200">
                           <div className="mb-3">
-                            <label className="text-[10px] text-purple-400 uppercase font-black tracking-widest block mb-1">Redirecționare Dinamică & PDF</label>
-                            <p className="text-[10px] text-slate-400 leading-tight">Codul fizic rămâne neschimbat, dar poți modifica destinația oricând.</p>
+                            <label className="text-[10px] text-purple-400 uppercase font-black tracking-widest block mb-1 [.matcha-light-theme_&]:!text-purple-700">Redirecționare Dinamică & PDF</label>
+                            <p className="text-[10px] text-slate-400 leading-tight [.matcha-light-theme_&]:!text-slate-500">Codul fizic rămâne neschimbat, dar poți modifica destinația oricând.</p>
                           </div>
-                          <div className="flex flex-col md:flex-row gap-3 border-t border-purple-500/20 pt-3">
+                          <div className="flex flex-col md:flex-row gap-3 border-t border-purple-500/20 pt-3 [.matcha-light-theme_&]:!border-purple-200">
                             <div className="w-full md:w-1/2">
-                              <label className="text-[9px] text-purple-400 uppercase font-bold block mb-1">A. Link URL Simplu</label>
-                              <input type="text" placeholder="https://..." value={dynamicDestUrl} onChange={e => setDynamicDestUrl(e.target.value)} className="w-full bg-[#0B0F12] border border-purple-500/50 rounded-lg p-2.5 text-white text-xs outline-none focus:ring-1 focus:ring-purple-500 transition-all" />
+                              <label className="text-[9px] text-purple-400 uppercase font-bold block mb-1 [.matcha-light-theme_&]:!text-purple-600">A. Link URL Simplu</label>
+                              <input type="text" placeholder="https://..." value={dynamicDestUrl} onChange={e => setDynamicDestUrl(e.target.value)} className="w-full bg-[#0B0F12] border border-purple-500/50 rounded-lg p-2.5 text-white text-xs outline-none focus:ring-1 focus:ring-purple-500 transition-all [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-purple-300" />
                             </div>
                             <div className="w-full md:w-1/2">
-                              <label className="text-[9px] text-purple-400 uppercase font-bold block mb-1">B. Încărcare Meniu / PDF</label>
-                              <input type="file" accept="application/pdf" onChange={(e) => handleUploadGeneric(e, setUploadedPdfUrl, 'qr_pdfs', setIsUploadingPdf)} className="block w-full text-[10px] text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:font-bold file:bg-purple-600 file:text-white cursor-pointer hover:file:bg-purple-500 file:transition-colors" />
-                              {isUploadingPdf && <span className="text-[9px] text-purple-400 mt-1 block font-bold uppercase tracking-wider animate-pulse">Se încarcă...</span>}
-                              {uploadedPdfUrl && <span className="text-[9px] text-emerald-400 mt-1 block font-bold uppercase tracking-wider">PDF Securizat</span>}
+                              <label className="text-[9px] text-purple-400 uppercase font-bold block mb-1 [.matcha-light-theme_&]:!text-purple-600">B. Încărcare Meniu / PDF</label>
+                              <input type="file" accept="application/pdf" onChange={(e) => handleUploadGeneric(e, setUploadedPdfUrl, 'qr_pdfs', setIsUploadingPdf)} className="w-full bg-[#0B0F12] border border-purple-500/50 rounded-lg p-1.5 text-[10px] font-bold text-slate-400 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:bg-purple-600 file:text-white cursor-pointer hover:file:bg-purple-500 transition-all shadow-inner [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!border-purple-300 [.matcha-light-theme_&]:!text-slate-600" />
+                              {isUploadingPdf && <span className="text-[9px] text-purple-400 mt-1 block font-bold uppercase tracking-wider animate-pulse [.matcha-light-theme_&]:!text-purple-600">Se încarcă...</span>}
+                              {uploadedPdfUrl && <span className="text-[9px] text-emerald-400 mt-1 block font-bold uppercase tracking-wider [.matcha-light-theme_&]:!text-emerald-600">PDF Securizat</span>}
                             </div>
                             <div className="shrink-0 w-full md:w-auto mt-2 md:mt-0 flex items-end">
                               {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
@@ -1904,14 +1903,14 @@ const reseteazaSemnaturiB2B = () => {
                       )}
 
                       {qrType === 'smart' && (
-                        <div className="p-4 bg-blue-900/10 border border-blue-500/30 rounded-xl shadow-inner">
+                        <div className="p-4 bg-blue-900/10 border border-blue-500/30 rounded-xl shadow-inner [.matcha-light-theme_&]:!bg-blue-50/50 [.matcha-light-theme_&]:!border-blue-200">
                           <div className="mb-3">
-                            <label className="text-[10px] text-blue-400 uppercase font-black tracking-widest block mb-1">Smart OS Routing (App Stores)</label>
-                            <p className="text-[10px] text-slate-400 leading-tight">Detectează OS-ul și redirecționează către magazinul de aplicații corect.</p>
+                            <label className="text-[10px] text-blue-400 uppercase font-black tracking-widest block mb-1 [.matcha-light-theme_&]:!text-blue-700">Smart OS Routing (App Stores)</label>
+                            <p className="text-[10px] text-slate-400 leading-tight [.matcha-light-theme_&]:!text-slate-500">Detectează OS-ul și redirecționează către magazinul de aplicații corect.</p>
                           </div>
-                          <div className="flex flex-col md:flex-row gap-2 border-t border-blue-500/20 pt-3">
-                            <input type="url" placeholder="Link App Store (iOS)" value={iosUrl} onChange={(e) => setIosUrl(e.target.value)} className="w-full flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-blue-500 outline-none transition-all" />
-                            <input type="url" placeholder="Link Google Play" value={androidUrl} onChange={(e) => setAndroidUrl(e.target.value)} className="w-full flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-blue-500 outline-none transition-all" />
+                          <div className="flex flex-col md:flex-row gap-2 border-t border-blue-500/20 pt-3 [.matcha-light-theme_&]:!border-blue-200">
+                            <input type="url" placeholder="Link App Store (iOS)" value={iosUrl} onChange={(e) => setIosUrl(e.target.value)} className="w-full flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-blue-500 outline-none transition-all [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300" />
+                            <input type="url" placeholder="Link Google Play" value={androidUrl} onChange={(e) => setAndroidUrl(e.target.value)} className="w-full flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-blue-500 outline-none transition-all [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300" />
                             <div className="shrink-0 w-full md:w-auto">
                               {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
                                 <div className="hidden"><Turnstile ref={turnstileRef} siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} onExpire={() => { setCaptchaToken(null); turnstileRef.current?.reset(); }} options={{ theme: 'dark', size: 'invisible' }} /></div>
@@ -1923,20 +1922,20 @@ const reseteazaSemnaturiB2B = () => {
                       )}
 
                       {qrType === 'geo' && (
-                        <div className="p-4 bg-blue-900/10 border border-blue-500/30 rounded-xl shadow-inner">
+                        <div className="p-4 bg-blue-900/10 border border-blue-500/30 rounded-xl shadow-inner [.matcha-light-theme_&]:!bg-blue-50/50 [.matcha-light-theme_&]:!border-blue-200">
                           <div className="mb-3">
-                            <label className="text-[10px] text-blue-400 uppercase font-black tracking-widest block mb-1">Geo-Targeting Inteligent</label>
-                            <p className="text-[10px] text-slate-400 leading-tight">Redirecționează utilizatorii diferit în funcție de țara în care se află.</p>
+                            <label className="text-[10px] text-blue-400 uppercase font-black tracking-widest block mb-1 [.matcha-light-theme_&]:!text-blue-700">Geo-Targeting Inteligent</label>
+                            <p className="text-[10px] text-slate-400 leading-tight [.matcha-light-theme_&]:!text-slate-500">Redirecționează utilizatorii diferit în funcție de țara în care se află.</p>
                           </div>
-                          <div className="border-t border-blue-500/20 pt-3 space-y-2">
+                          <div className="border-t border-blue-500/20 pt-3 space-y-2 [.matcha-light-theme_&]:!border-blue-200">
                             {geoRules.map((rule, idx) => (
                               <div key={idx} className="flex gap-2">
-                                <input type="text" placeholder="Cod (RO)" value={rule.country} onChange={(e) => { const newRules = [...geoRules]; newRules[idx].country = e.target.value.toUpperCase(); setGeoRules(newRules); }} className="w-20 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs text-center font-bold outline-none uppercase transition-all" disabled={rule.country === 'DEFAULT'} />
-                                <input type="url" placeholder="URL Destinație" value={rule.url} onChange={(e) => { const newRules = [...geoRules]; newRules[idx].url = e.target.value; setGeoRules(newRules); }} className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs outline-none focus:border-blue-500 transition-all" />
+                                <input type="text" placeholder="Cod (RO)" value={rule.country} onChange={(e) => { const newRules = [...geoRules]; newRules[idx].country = e.target.value.toUpperCase(); setGeoRules(newRules); }} className="w-20 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs text-center font-bold outline-none uppercase transition-all disabled:opacity-50 [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300" disabled={rule.country === 'DEFAULT'} />
+                                <input type="url" placeholder="URL Destinație" value={rule.url} onChange={(e) => { const newRules = [...geoRules]; newRules[idx].url = e.target.value; setGeoRules(newRules); }} className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs outline-none focus:border-blue-500 transition-all [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300" />
                               </div>
                             ))}
                             <div className="flex justify-between items-center mt-3">
-                              <button type="button" onClick={() => setGeoRules([...geoRules.slice(0, -1), { country: '', url: '' }, geoRules[geoRules.length-1]])} className="text-[10px] text-blue-400 font-bold hover:text-white transition-colors uppercase">ADAUGA REGULA TARA</button>
+                              <button type="button" onClick={() => setGeoRules([...geoRules.slice(0, -1), { country: '', url: '' }, geoRules[geoRules.length-1]])} className="text-[10px] text-blue-400 font-bold hover:text-white transition-colors uppercase [.matcha-light-theme_&]:!text-blue-600 [.matcha-light-theme_&]:hover:!text-blue-800">ADAUGA REGULA TARA</button>
                               {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
                                 <div className="hidden"><Turnstile ref={turnstileRef} siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} onExpire={() => { setCaptchaToken(null); turnstileRef.current?.reset(); }} options={{ theme: 'dark', size: 'invisible' }} /></div>
                               )}
@@ -1947,39 +1946,39 @@ const reseteazaSemnaturiB2B = () => {
                       )}
 
                       {qrType === 'landing' && (
-                        <div className="p-4 bg-blue-900/10 border border-blue-500/30 rounded-xl shadow-inner">
+                        <div className="p-4 bg-blue-900/10 border border-blue-500/30 rounded-xl shadow-inner [.matcha-light-theme_&]:!bg-blue-50/50 [.matcha-light-theme_&]:!border-blue-200">
                           <div className="mb-3">
-                            <label className="text-[10px] text-blue-400 uppercase font-black tracking-widest block mb-1">Mini Landing-Page Generator</label>
-                            <p className="text-[10px] text-slate-400 leading-tight">Generează o pagină de prezentare (Link-in-Bio) cu multiple butoane.</p>
+                            <label className="text-[10px] text-blue-400 uppercase font-black tracking-widest block mb-1 [.matcha-light-theme_&]:!text-blue-700">Mini Landing-Page Generator</label>
+                            <p className="text-[10px] text-slate-400 leading-tight [.matcha-light-theme_&]:!text-slate-500">Generează o pagină de prezentare (Link-in-Bio) cu multiple butoane.</p>
                           </div>
-                          <div className="border-t border-blue-500/20 pt-3 space-y-3">
+                          <div className="border-t border-blue-500/20 pt-3 space-y-3 [.matcha-light-theme_&]:!border-blue-200">
                             <div className="flex flex-col sm:flex-row gap-2">
                               <input 
                                 type="text" 
                                 placeholder="Titlu Pagină" 
                                 value={landingData.title} 
                                 onChange={(e) => setLandingData({...landingData, title: e.target.value})} 
-                                className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs outline-none focus:border-blue-500 transition-all shadow-inner" 
+                                className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs outline-none focus:border-blue-500 transition-all shadow-inner [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:!text-slate-800" 
                               />
                               <input 
                                 type="file" 
                                 accept="image/png, image/jpeg" 
                                 onChange={(e) => handleUploadGeneric(e, (url) => setLandingData({...landingData, avatarUrl: url}), 'landing_images', setIsUploadingPdf)} 
-                                className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-1.5 text-[10px] font-bold text-slate-400 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:bg-blue-600 file:text-white cursor-pointer hover:file:bg-blue-500 transition-all shadow-inner" 
+                                className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-1.5 text-[10px] font-bold text-slate-400 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:bg-blue-600 file:text-white cursor-pointer hover:file:bg-blue-500 transition-all shadow-inner [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:!text-slate-600" 
                               />
                             </div>
                             
-                            <div className="bg-[#0B0F12] p-3 rounded-xl border border-slate-800 space-y-2">
+                            <div className="bg-[#0B0F12] p-3 rounded-xl border border-slate-800 space-y-2 [.matcha-light-theme_&]:!bg-slate-50 [.matcha-light-theme_&]:!border-slate-200">
                               {landingData.links.map((link, idx) => (
                                 <div key={idx} className="flex flex-col sm:flex-row gap-2">
-                                  <input type="text" placeholder="Nume Buton" value={link.label} onChange={(e) => { const newLinks = [...landingData.links]; newLinks[idx].label = e.target.value; setLandingData({...landingData, links: newLinks}); }} className="w-full sm:w-1/3 bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-[11px] outline-none focus:border-blue-500 transition-all" />
-                                  <input type="url" placeholder="https://..." value={link.url} onChange={(e) => { const newLinks = [...landingData.links]; newLinks[idx].url = e.target.value; setLandingData({...landingData, links: newLinks}); }} className="w-full sm:flex-1 bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-[11px] outline-none focus:border-blue-500 transition-all" />
+                                  <input type="text" placeholder="Nume Buton" value={link.label} onChange={(e) => { const newLinks = [...landingData.links]; newLinks[idx].label = e.target.value; setLandingData({...landingData, links: newLinks}); }} className="w-full sm:w-1/3 bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-[11px] outline-none focus:border-blue-500 transition-all [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300" />
+                                  <input type="url" placeholder="https://..." value={link.url} onChange={(e) => { const newLinks = [...landingData.links]; newLinks[idx].url = e.target.value; setLandingData({...landingData, links: newLinks}); }} className="w-full sm:flex-1 bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-[11px] outline-none focus:border-blue-500 transition-all [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300" />
                                 </div>
                               ))}
                             </div>
                             
                             <div className="flex justify-between items-center mt-2">
-                              <button type="button" onClick={() => setLandingData({...landingData, links: [...landingData.links, { label: '', url: '' }]})} className="text-[10px] text-blue-400 font-bold hover:text-white transition-colors uppercase">ADAUGA LINK EXTRA</button>
+                              <button type="button" onClick={() => setLandingData({...landingData, links: [...landingData.links, { label: '', url: '' }]})} className="text-[10px] text-blue-400 font-bold hover:text-white transition-colors uppercase [.matcha-light-theme_&]:!text-blue-600 [.matcha-light-theme_&]:hover:!text-blue-800">ADAUGA LINK EXTRA</button>
                               {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
                                 <div className="hidden"><Turnstile ref={turnstileRef} siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} onExpire={() => { setCaptchaToken(null); turnstileRef.current?.reset(); }} options={{ theme: 'dark', size: 'invisible' }} /></div>
                               )}
@@ -1991,9 +1990,9 @@ const reseteazaSemnaturiB2B = () => {
                     </div>
                     
                     {/* Branding Bar sub form - COMPACT */}
-                    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-800/60 mt-2">
-                      <div className="flex items-center gap-3 bg-[#0B0F12] px-4 py-2 rounded-lg border border-slate-800 shadow-inner">
-                        <label className="text-[10px] text-slate-400 font-black uppercase tracking-widest shrink-0">Culoare QR</label>
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-800/60 mt-2 [.matcha-light-theme_&]:!border-slate-200">
+                      <div className="flex items-center gap-3 bg-[#0B0F12] px-4 py-2 rounded-lg border border-slate-800 shadow-inner [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!border-slate-300">
+                        <label className="text-[10px] text-slate-400 font-black uppercase tracking-widest shrink-0 [.matcha-light-theme_&]:!text-slate-600">Culoare QR</label>
                         <input type="color" value={qrColor} onChange={(e) => setQrColor(e.target.value)} className="w-6 h-6 rounded cursor-pointer shrink-0 bg-transparent border-0 p-0" />
                       </div>
                       
@@ -2003,20 +2002,20 @@ const reseteazaSemnaturiB2B = () => {
                             href="https://zensoftware.gumroad.com/l/qr-branding" 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="relative text-[9px] text-slate-300 font-black uppercase tracking-wide border border-slate-700 px-4 py-2.5 rounded-lg bg-[#0B0F12] cursor-pointer hover:bg-slate-800 transition-colors shadow-sm"
+                            className="relative text-[9px] text-slate-300 font-black uppercase tracking-wide border border-slate-700 px-4 py-2.5 rounded-lg bg-[#0B0F12] cursor-pointer hover:bg-slate-800 transition-colors shadow-sm [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-slate-700 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-100"
                           >
                             INCARCA LOGO CENTRAL
                             <span className="absolute -top-2 -right-2 text-[8px] bg-gradient-to-r from-amber-400 to-amber-600 text-black px-1.5 py-0.5 rounded shadow-md border border-amber-300">49 RON</span>
                           </a>
                         ) : (
-                          <label className="text-[9px] text-slate-300 font-black uppercase tracking-wide border border-slate-700 px-4 py-2.5 rounded-lg bg-[#0B0F12] cursor-pointer hover:bg-slate-800 transition-colors shadow-sm">
+                          <label className="text-[9px] text-slate-300 font-black uppercase tracking-wide border border-slate-700 px-4 py-2.5 rounded-lg bg-[#0B0F12] cursor-pointer hover:bg-slate-800 transition-colors shadow-sm [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-slate-700 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-100">
                             <span>INCARCA LOGO CENTRAL</span>
                             <input type="file" accept="image/png, image/jpeg, image/svg+xml" onChange={handleQrLogoUpload} className="hidden" />
                           </label>
                         )}
 
                         {qrLogo && (
-                          <button type="button" onClick={() => { setQrLogo(null); setQrLogoRatio(1); }} className="text-[9px] text-red-400 font-black uppercase tracking-wider bg-red-900/10 border border-red-500/20 px-3 py-2.5 rounded-lg hover:bg-red-900/30 transition-colors">
+                          <button type="button" onClick={() => { setQrLogo(null); setQrLogoRatio(1); }} className="text-[9px] text-red-400 font-black uppercase tracking-wider bg-red-900/10 border border-red-500/20 px-3 py-2.5 rounded-lg hover:bg-red-900/30 transition-colors [.matcha-light-theme_&]:!bg-red-50 [.matcha-light-theme_&]:!border-red-200 [.matcha-light-theme_&]:!text-red-600 [.matcha-light-theme_&]:hover:!bg-red-100">
                             ELIMINA LOGO
                           </button>
                         )}
@@ -2025,10 +2024,10 @@ const reseteazaSemnaturiB2B = () => {
                   </div>
 
                   {/* Right: QR Preview Area - COMPACT */}
-                  <div className="w-full lg:w-[280px] shrink-0 border border-slate-800/80 rounded-2xl bg-[#0B0F12] p-5 flex flex-col justify-center items-center shadow-inner relative">
-                    <span className="text-[9px] font-black text-[#8ba888] uppercase tracking-widest mb-4 block bg-[#16221A] px-2.5 py-1 rounded border border-emerald-900/30">Live Preview</span>
+                  <div className="w-full lg:w-[280px] shrink-0 border border-slate-800/80 rounded-2xl bg-[#0B0F12] p-5 flex flex-col justify-center items-center shadow-inner relative [.matcha-light-theme_&]:!bg-slate-50/80 [.matcha-light-theme_&]:!border-slate-200">
+                    <span className="text-[9px] font-black text-[#8ba888] uppercase tracking-widest mb-4 block bg-[#16221A] px-2.5 py-1 rounded border border-emerald-900/30 [.matcha-light-theme_&]:!bg-emerald-50 [.matcha-light-theme_&]:!border-emerald-200 [.matcha-light-theme_&]:!text-emerald-700">Live Preview</span>
                     
-                    <div className="bg-white p-3 rounded-2xl shadow-[0_0_20px_rgba(255,255,255,0.1)] relative flex justify-center items-center overflow-hidden mb-5 border-4 border-slate-200">
+                    <div className="bg-white p-3 rounded-2xl shadow-[0_0_20px_rgba(255,255,255,0.1)] relative flex justify-center items-center overflow-hidden mb-5 border-4 border-slate-200 [.matcha-light-theme_&]:!shadow-md">
                       <QRCodeCanvas 
                         id="contract-qr"
                         value={getQrValue()} 
@@ -2074,7 +2073,7 @@ const reseteazaSemnaturiB2B = () => {
                         disabled={!getQrValue() || getQrValue().trim() === "" || getQrValue() === "WIFI:S:;T:WPA;P:;;; " || getQrValue() === "bitcoin:?amount=&label="}
                         className={`w-full py-3 font-black rounded-lg transition-all flex justify-center items-center text-[11px] uppercase tracking-widest ${
                           (!getQrValue() || getQrValue().trim() === "" || getQrValue() === "WIFI:S:;T:WPA;P:;;; " || getQrValue() === "bitcoin:?amount=&label=") 
-                            ? 'bg-slate-800 text-slate-500 cursor-not-allowed opacity-50' 
+                            ? 'bg-slate-800 text-slate-500 cursor-not-allowed opacity-50 [.matcha-light-theme_&]:!bg-slate-200 [.matcha-light-theme_&]:!text-slate-400' 
                             : 'bg-gradient-to-r from-[#8ba888] to-[#6d8a6a] hover:scale-[1.02] active:scale-[0.98] text-[#0B0F12] shadow-[0_0_15px_rgba(139,168,136,0.3)]'
                         }`}
                       >
@@ -2082,7 +2081,7 @@ const reseteazaSemnaturiB2B = () => {
                       </button>
                       
                       {(['dynamic', 'smart', 'geo', 'landing'].includes(qrType) && (isPremium || profil?.has_qr_dynamic)) && (
-                        <button onClick={fetchStats} className="w-full py-2.5 border border-purple-500/30 text-purple-400 hover:bg-purple-500/10 font-black rounded-lg transition-colors uppercase tracking-widest text-[10px]">
+                        <button onClick={fetchStats} className="w-full py-2.5 border border-purple-500/30 text-purple-400 hover:bg-purple-500/10 font-black rounded-lg transition-colors uppercase tracking-widest text-[10px] [.matcha-light-theme_&]:!border-purple-300 [.matcha-light-theme_&]:!text-purple-600 [.matcha-light-theme_&]:hover:!bg-purple-50">
                           Statistici Scanări
                         </button>
                       )}
@@ -2094,7 +2093,7 @@ const reseteazaSemnaturiB2B = () => {
             </div>
 
             {/* SEPARATOR BORDER - EXTENSII QR */}
-            <div className="max-w-6xl mx-auto border-t border-slate-800/80 pt-16 mt-8 w-full px-4">
+            <div className="max-w-6xl mx-auto border-t border-slate-800/80 pt-16 mt-8 w-full px-4 [.matcha-light-theme_&]:!border-slate-200">
               <PricingAddons handleCumparaPremium={handleCumparaPremium} user={user} />
             </div>
 
