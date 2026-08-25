@@ -139,6 +139,19 @@ export default function ContractsDashboard({ userId }) {
                     </div>
                   ) : (
                     <div className="flex flex-col items-end gap-2 w-[180px]">
+                      
+                      {/* NOU: BUTON VEZI CONTRACT (DOAR DACĂ EXISTĂ LINK) */}
+                      {c.pdf_url && (
+                        <a 
+                          href={c.pdf_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-lg font-black uppercase text-[9px] tracking-wider transition-all text-center"
+                        >
+                          👁️ Vezi Contract
+                        </a>
+                      )}
+
                       <button 
                         onClick={() => handleGeneratesSomatie(c.id)}
                         disabled={loadingId === c.id}

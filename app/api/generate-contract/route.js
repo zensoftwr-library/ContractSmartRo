@@ -437,7 +437,8 @@ export async function POST(request) {
     }
 
     // -------------------------------------------------------------------------
-    // 9. GESTIUNE CREDITE ȘI SMART VAULT
+    // -------------------------------------------------------------------------
+    // 9. GESTIUNE CREDITE ȘI SMART VAULT (UPLOAD PDF)
     // -------------------------------------------------------------------------
     if (!isPremium && availableCredits > 0) {
       await supabase.from('profiles').update({ credits_remaining: availableCredits - 1 }).eq('id', userId);
@@ -445,6 +446,27 @@ export async function POST(request) {
 
     const hashSha256 = crypto.createHash('sha256').update(pdfBuffer).digest('hex');
 
+    // NOU: Urcăm PDF-ul fizic în Supabase Storage (Seif)
+    let pdfUrl = null;
+    const fileName = `contract_${userId}_${Date.now()}.pdf`;
+    
+    const { data: uploadData, error: uploadError } = await supabase
+      .storage
+      .from('contract_vault')
+      .upload(fileName, pdfBuffer, {
+        contentType: 'application/pdf',
+        upsert: false
+      });
+
+    if (uploadError) {
+      console.error("Eroare la upload PDF în contract_vault:", uploadError.message);
+    } else {
+      // Dacă upload-ul a reușit, obținem link-ul public către fișier
+      const { data: publicUrlData } = supabase.storage.from('contract_vault').getPublicUrl(fileName);
+      pdfUrl = publicUrlData.publicUrl;
+    }
+
+    // Salvăm în baza de date noul contract, INCLUSIV link-ul proaspăt generat
     const { error: dbError } = await supabase.from('user_contracts').insert({
       user_id: userId,
       titlu_contract: `Contract ${tipContract || 'prestari'}`,
@@ -454,13 +476,15 @@ export async function POST(request) {
       valoare: valoare ? Number(valoare) : 0,
       moneda: moneda || 'RON',
       hash_sha256: hashSha256,
-      stare_plata: 'generat'
+      stare_plata: 'generat',
+      pdf_url: pdfUrl // <--- MAGIC: Aici salvăm link-ul către PDF!
     });
 
     if (dbError) {
-      console.error("Eroare salvare Smart Vault:", dbError.message);
+      console.error("Eroare salvare Smart Vault în DB:", dbError.message);
     }
 
+    // AICI ERA PARTEA LIPSĂ: Returnăm PDF-ul către client
     return new NextResponse(pdfBuffer, { 
       status: 200, 
       headers: { 
@@ -469,7 +493,8 @@ export async function POST(request) {
         'Content-Length': pdfBuffer.length 
       }
     });
-  } catch (error) {
+
+  } catch (error) { // AICI ERA A DOUA PARTE LIPSĂ: Închiderea blocului Try
     console.error("CATCH GLOBAL:", error.message);
     return NextResponse.json({ success: false, message: 'A picat generarea din server: ' + error.message }, { status: 500 });
   }

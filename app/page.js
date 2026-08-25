@@ -1058,8 +1058,8 @@ const reseteazaSemnaturiB2B = () => {
     }
   };
 
-  const handleLansareContract = async (e) => {
-    e.preventDefault();
+  const handleLansareContract = async (e, actiune = 'download') => {
+    if (e) e.preventDefault();
     if (isProcessingForm.current) return;
     
     if (prestatorCuiStatus?.toUpperCase().includes('INACTIV') || clientCuiStatus?.toUpperCase().includes('INACTIV')) {
@@ -1072,7 +1072,7 @@ const reseteazaSemnaturiB2B = () => {
     }
 
     if (!user) {
-      alert('Pentru a descărca documentul direct în format binar, creează un cont rapid în 10 secunde.');
+      alert('Pentru a descărca sau salva documentul, creează un cont rapid în 10 secunde.');
       setIsSignUp(false);
       setAuthEmail('');
       setAuthPassword('');
@@ -1087,7 +1087,10 @@ const reseteazaSemnaturiB2B = () => {
     }
 
     isProcessingForm.current = true;
-    setLoadingText({ title: "SECURIZARE CONTRACT...", desc: "Redactăm articolele din Codul Civil și pregătim PDF-ul." });
+    setLoadingText({ 
+      title: actiune === 'download' ? "SECURIZARE ȘI DESCĂRCARE..." : "SALVARE ÎN CRM...", 
+      desc: "Redactăm articolele din Codul Civil și procesăm documentul." 
+    });
 
     let imagineSemnaturaText = '';
     if (signatureTab === 'draw' && canvasRef.current) {
@@ -1111,16 +1114,21 @@ const reseteazaSemnaturiB2B = () => {
       });
 
       if (res.ok) {
-        const blob = await res.blob();
-        const urlDownload = window.URL.createObjectURL(blob);
-        const elementA = document.createElement('a');
-        elementA.href = urlDownload;
-        elementA.download = `contract_${formData.tipContract}_securizat.pdf`;
-        document.body.appendChild(elementA);
-        elementA.click();
-        document.body.removeChild(elementA);
-        window.URL.revokeObjectURL(urlDownload);
-        alert('Succes! Contractul a fost generat dinamic și descărcat automat în format PDF.');
+        if (actiune === 'download') {
+          const blob = await res.blob();
+          const urlDownload = window.URL.createObjectURL(blob);
+          const elementA = document.createElement('a');
+          elementA.href = urlDownload;
+          elementA.download = `contract_${formData.tipContract}_securizat.pdf`;
+          document.body.appendChild(elementA);
+          elementA.click();
+          document.body.removeChild(elementA);
+          window.URL.revokeObjectURL(urlDownload);
+          alert('Succes! Contractul a fost generat dinamic și descărcat automat în format PDF.');
+        } else {
+          // A fost doar salvat in baza de date
+          alert('Succes! Contractul a fost înregistrat și arhivat în CRM-ul tău.');
+        }
         handleInapoiPrincipal();
       } else {
         const textEroare = await res.json();
@@ -1730,33 +1738,33 @@ const reseteazaSemnaturiB2B = () => {
                 
                 {/* Butoanele de tip - COMPACT */}
                 <div className="flex flex-wrap justify-center sm:justify-start gap-2">
-                  <button onClick={() => setQrType('url')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm ${qrType === 'url' ? 'bg-[#8ba888] text-[#0B0F12] shadow-[0_0_10px_rgba(139,168,136,0.2)]' : 'border !bg-slate-200 !text-slate-800 !border-slate-400 hover:!bg-slate-300'}`}>Standard URL</button>
+                  <button onClick={() => setQrType('url')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm ${qrType === 'url' ? 'bg-[#8ba888] text-[#0B0F12] shadow-[0_0_10px_rgba(139,168,136,0.3)]' : 'bg-[#8ba888]/15 text-[#8ba888] border border-[#8ba888]/40 hover:bg-[#8ba888]/25'}`}>Standard URL</button>
                   
-                  <button onClick={() => setQrType('wifi')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm ${qrType === 'wifi' ? 'bg-[#8ba888] text-[#0B0F12] shadow-[0_0_10px_rgba(139,168,136,0.2)]' : 'border !bg-slate-200 !text-slate-800 !border-slate-400 hover:!bg-slate-300'}`}>Rețea Wi-Fi</button>
+                  <button onClick={() => setQrType('wifi')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm ${qrType === 'wifi' ? 'bg-[#8ba888] text-[#0B0F12] shadow-[0_0_10px_rgba(139,168,136,0.3)]' : 'bg-[#8ba888]/15 text-[#8ba888] border border-[#8ba888]/40 hover:bg-[#8ba888]/25'}`}>Rețea Wi-Fi</button>
                   
-                  <button onClick={() => setQrType('crypto')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm ${qrType === 'crypto' ? 'bg-[#8ba888] text-[#0B0F12] shadow-[0_0_10px_rgba(139,168,136,0.2)]' : 'border !bg-slate-200 !text-slate-800 !border-slate-400 hover:!bg-slate-300'}`}>Portofel Crypto</button>
+                  <button onClick={() => setQrType('crypto')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm ${qrType === 'crypto' ? 'bg-[#8ba888] text-[#0B0F12] shadow-[0_0_10px_rgba(139,168,136,0.3)]' : 'bg-[#8ba888]/15 text-[#8ba888] border border-[#8ba888]/40 hover:bg-[#8ba888]/25'}`}>Portofel Crypto</button>
                   
-                  <button onClick={() => { if(!isPremium && !profil?.has_qr_vcard) handleCheckout('qr_vcard'); else setQrType('vcard'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm ${qrType === 'vcard' ? 'bg-[#8ba888] text-[#0B0F12] shadow-[0_0_10px_rgba(139,168,136,0.2)]' : 'border !bg-slate-200 !text-slate-800 !border-slate-400 hover:!bg-slate-300'}`}>
+                  <button onClick={() => { if(!isPremium && !profil?.has_qr_vcard) handleCheckout('qr_vcard'); else setQrType('vcard'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm ${qrType === 'vcard' ? 'bg-[#8ba888] text-[#0B0F12] shadow-[0_0_10px_rgba(139,168,136,0.3)]' : 'bg-[#8ba888]/15 text-[#8ba888] border border-[#8ba888]/40 hover:bg-[#8ba888]/25'}`}>
                     vCard Contact
                     {(!isPremium && !profil?.has_qr_vcard) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-amber-400 to-amber-600 text-black px-1.5 py-0.5 rounded shadow-md border border-amber-300">69 RON</span>}
                   </button>
                   
-                  <button onClick={() => { if(!isPremium && !profil?.has_qr_pdf) handleCheckout('qr_dynamic'); else setQrType('dynamic'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm ${qrType === 'dynamic' ? 'bg-purple-600 text-white shadow-[0_0_10px_rgba(147,51,234,0.3)]' : 'bg-purple-900/10 text-purple-400 hover:bg-purple-900/30 border border-purple-500/20'}`}>
+                  <button onClick={() => { if(!isPremium && !profil?.has_qr_pdf) handleCheckout('qr_dynamic'); else setQrType('dynamic'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm ${qrType === 'dynamic' ? 'bg-[#9333ea] text-white shadow-[0_0_10px_rgba(147,51,234,0.4)]' : 'bg-[#9333ea]/15 text-[#a855f7] border border-[#9333ea]/40 hover:bg-[#9333ea]/25'}`}>
                     Dinamic / PDF
                     {(!isPremium && !profil?.has_qr_pdf) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-purple-500 to-purple-600 text-white px-1.5 py-0.5 rounded shadow-md border border-purple-400">39 RON</span>}
                   </button>
                   
-                  <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('smart'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm ${qrType === 'smart' ? 'bg-blue-600 text-white shadow-[0_0_10px_rgba(37,99,235,0.3)]' : 'bg-blue-900/10 text-blue-400 hover:bg-blue-900/30 border border-blue-500/20'}`}>
+                  <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('smart'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm ${qrType === 'smart' ? 'bg-[#2563eb] text-white shadow-[0_0_10px_rgba(37,99,235,0.4)]' : 'bg-[#2563eb]/15 text-[#3b82f6] border border-[#2563eb]/40 hover:bg-[#2563eb]/25'}`}>
                     Smart OS Route
                     {(!isPremium) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-blue-500 to-blue-600 text-white px-1.5 py-0.5 rounded shadow-md border border-blue-400">PRO</span>}
                   </button>
                   
-                  <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('geo'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm ${qrType === 'geo' ? 'bg-blue-600 text-white shadow-[0_0_10px_rgba(37,99,235,0.3)]' : 'bg-blue-900/10 text-blue-400 hover:bg-blue-900/30 border border-blue-500/20'}`}>
+                  <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('geo'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm ${qrType === 'geo' ? 'bg-[#2563eb] text-white shadow-[0_0_10px_rgba(37,99,235,0.4)]' : 'bg-[#2563eb]/15 text-[#3b82f6] border border-[#2563eb]/40 hover:bg-[#2563eb]/25'}`}>
                     Geo-Target
                     {(!isPremium) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-blue-500 to-blue-600 text-white px-1.5 py-0.5 rounded shadow-md border border-blue-400">PRO</span>}
                   </button>
                   
-                  <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('landing'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm ${qrType === 'landing' ? 'bg-blue-600 text-white shadow-[0_0_10px_rgba(37,99,235,0.3)]' : 'bg-blue-900/10 text-blue-400 hover:bg-blue-900/30 border border-blue-500/20'}`}>
+                  <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('landing'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm ${qrType === 'landing' ? 'bg-[#2563eb] text-white shadow-[0_0_10px_rgba(37,99,235,0.4)]' : 'bg-[#2563eb]/15 text-[#3b82f6] border border-[#2563eb]/40 hover:bg-[#2563eb]/25'}`}>
                     Mini-Landing Page
                     {(!isPremium) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-blue-500 to-blue-600 text-white px-1.5 py-0.5 rounded shadow-md border border-blue-400">PRO</span>}
                   </button>
@@ -2074,7 +2082,7 @@ const reseteazaSemnaturiB2B = () => {
 
                 {formData.tipContract !== 'auto' ? (
                   /* ========================== FORMULAR B2B ========================== */
-                  <form onSubmit={handleLansareContract} className="space-y-6 md:space-y-8 relative z-10">
+                  <form className="space-y-6 md:space-y-8 relative z-10">
                     <div className="border-b border-slate-800/80 pb-5 mb-2">
                       <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">Configurator Document Comercial</h2>
                       <p className="text-xs text-slate-400 mt-2 leading-relaxed">Completează datele de mai jos pentru a genera contractul electronic perfect adaptat.</p>
@@ -2441,13 +2449,18 @@ const reseteazaSemnaturiB2B = () => {
                       </label>
                     </div>
 
-                    <div className="flex flex-col-reverse sm:flex-row justify-between items-center pt-6 sm:pt-8 border-t border-slate-800/80 gap-4 sm:gap-0">
-                      <button type="button" onClick={handleInapoiPrincipal} className="text-xs font-semibold text-slate-400 hover:text-white transition-colors underline underline-offset-4">Anulează și întoarce-te</button>
-                      <button type="submit" disabled={!!loadingText} className="w-full sm:w-auto bg-gradient-to-r from-[#8ba888] to-[#6d8a6a] text-[#0B0F12] font-black px-10 py-4 rounded-xl text-sm tracking-wide transition-all shadow-[0_0_20px_rgba(139,168,136,0.3)] hover:shadow-[0_0_25px_rgba(139,168,136,0.5)] hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2">
-                        {loadingText ? (
+                    <div className="flex flex-col gap-5 pt-6 sm:pt-8 border-t border-slate-800/80">
+                      {/* Butonul Principal - Generează și Descarcă */}
+                      <button 
+                        type="button" 
+                        onClick={(e) => handleLansareContract(e, 'download')}
+                        disabled={!!loadingText} 
+                        className="w-full bg-gradient-to-r from-[#8ba888] to-[#6d8a6a] text-[#0B0F12] font-black px-10 py-4 rounded-xl text-sm tracking-wide transition-all shadow-[0_0_20px_rgba(139,168,136,0.3)] hover:shadow-[0_0_25px_rgba(139,168,136,0.5)] hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+                      >
+                        {loadingText && loadingText.title === "SECURIZARE ȘI DESCĂRCARE..." ? (
                           <>
                              <svg className="animate-spin h-4 w-4 text-[#0B0F12]" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                             <span>Se Înregistrează Securizat...</span>
+                             <span>Se Procesează...</span>
                           </>
                         ) : (
                           <>
@@ -2456,14 +2469,36 @@ const reseteazaSemnaturiB2B = () => {
                           </>
                         )}
                       </button>
+
+                      {/* Rândul Secundar - Anulează / Salvează în CRM */}
+                      <div className="flex justify-between items-center w-full mt-1">
+                        <button 
+                          type="button" 
+                          onClick={handleInapoiPrincipal} 
+                          className="text-[11px] font-bold text-slate-400 hover:text-white transition-colors underline underline-offset-4"
+                        >
+                          Anulează și întoarce-te
+                        </button>
+
+                        <button 
+                          type="button" 
+                          onClick={(e) => handleLansareContract(e, 'save_only')}
+                          disabled={!!loadingText} 
+                          className="text-[10px] text-emerald-400 font-black uppercase tracking-widest bg-emerald-900/10 px-4 py-2.5 rounded-lg border border-emerald-500/30 hover:bg-emerald-900/30 transition-colors shadow-sm flex items-center gap-1.5"
+                        >
+                          {loadingText && loadingText.title === "SALVARE ÎN CRM..." ? (
+                             <svg className="animate-spin h-3 w-3 text-emerald-400" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                          ) : '💾 '}
+                          Doar Salvează în CRM
+                        </button>
+                      </div>
                     </div>
                   </form>
                 ) : (
                   
                   /* ========================== FORMULAR AUTO ========================== */
                   
-                  <form onSubmit={handleGenereazaPachetAuto} className="space-y-6 md:space-y-8 relative z-10" autoComplete="off">
-                    <div className="border-b border-slate-800/80 pb-5 mb-2">
+                  <form onSubmit={handleGenereazaPachetAuto} className="space-y-6 md:space-y-8 relative z-10" autoComplete="off">  <div className="border-b border-slate-800/80 pb-5 mb-2">
                       <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#8ba888]/10 border border-[#8ba888]/20 text-[#8ba888] text-[10px] font-black uppercase tracking-widest mb-3">
                         <span className="relative flex h-1.5 w-1.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span></span>
                         Modul Auto
@@ -3034,37 +3069,20 @@ const reseteazaSemnaturiB2B = () => {
         {/* =========================================================================
                                     STEP 3: AI AUDIT JURO-STYLE
             ========================================================================= */}
+        {/* =========================================================================
+                                    STEP 3: AI AUDIT JURO-STYLE
+            ========================================================================= */}
         {step === 3 && (
-      <AiAuditWidget 
-        handleInapoiPrincipal={() => { setStep(1); setAutoStep('upload'); }} 
-        user={user} 
-        isPremium={isPremium} 
-        onGenerateCorrected={(extractedData) => {
-          if (!extractedData || extractedData.tipContract_detectat === 'necunoscut') {
-            alert("Acest tip de document nu se încadrează în șabloanele suportate de platforma noastră (ex: prestări, B2B, auto, NDA etc.). Te rugăm să folosești generatorul pentru a crea un contract nou.");
-            return;
-          }
-
-          // Preluăm datele extrase din contractul auditat și le punem în formular
-          setFormData(prev => ({ 
-            ...prev, 
-            tipContract: extractedData.tipContract_detectat || 'prestari',
-            prestatorNume: extractedData.prestatorNume || '',
-            clientNume: extractedData.clientNume || '',
-            valoare: extractedData.valoare || '',
-            moneda: extractedData.moneda || 'RON',
-            obiect: extractedData.obiect || '',
-            // Bifăm automat clauzele esențiale de protecție ContractSmart
-            clauzaLimitareRaspundere: true, 
-            clauzaPi: true,
-            clauzaPenalitati: true
-          }));
-
-          // Ducem utilizatorul la pasul 2 (configurator) unde va vedea datele deja completate
-          setStep(2);
-        }}
-      />
-    )}
+          <AiAuditWidget 
+            handleInapoiPrincipal={() => { setStep(1); setAutoStep('upload'); }} 
+            user={user} 
+            isPremium={isPremium} 
+            onGenerateCorrected={() => {
+              // Doar ducem utilizatorul la pasul 2 (configuratorul gol)
+              setStep(2);
+            }}
+          />
+        )}
 
         {/* TRUST BADGES ENTERPRISE */}
         <div className="max-w-6xl mx-auto px-6 my-16">

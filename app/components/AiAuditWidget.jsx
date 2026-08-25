@@ -199,7 +199,7 @@ export default function AiAuditWidget({ handleInapoiPrincipal, user, isPremium, 
           <button onClick={() => window.print()} className="w-full bg-[#1e293b] hover:bg-slate-700 text-white py-4 rounded-xl text-xs font-black uppercase tracking-widest transition-colors border border-slate-600 shadow-sm">
             Descarcă Raport PDF
           </button>
-          <button onClick={() => onGenerateCorrected(auditResult.extractedData)} className="w-full bg-gradient-to-r from-purple-600 to-blue-500 text-white py-4 rounded-xl text-xs font-black uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_0_20px_rgba(147,51,234,0.4)]">
+          <button onClick={onGenerateCorrected} className="w-full bg-gradient-to-r from-purple-600 to-blue-500 text-white py-4 rounded-xl text-xs font-black uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_0_20px_rgba(147,51,234,0.4)]">
             Generează Contract Corectat
           </button>
         </div>
