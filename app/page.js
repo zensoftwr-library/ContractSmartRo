@@ -1738,38 +1738,71 @@ const reseteazaSemnaturiB2B = () => {
                 </div>
                 
                 {/* Butoanele de tip - COMPACT */}
-                <div className="flex flex-wrap justify-center sm:justify-start gap-2">
-                  <button onClick={() => setQrType('url')} className={`qr-btn qr-btn-green ${qrType === 'url' ? 'active' : ''}`}>Standard URL</button>
-                  
-                  <button onClick={() => setQrType('wifi')} className={`qr-btn qr-btn-green ${qrType === 'wifi' ? 'active' : ''}`}>Rețea Wi-Fi</button>
-                  
-                  <button onClick={() => setQrType('crypto')} className={`qr-btn qr-btn-green ${qrType === 'crypto' ? 'active' : ''}`}>Portofel Crypto</button>
-                  
-                  <button onClick={() => { if(!isPremium && !profil?.has_qr_vcard) handleCheckout('qr_vcard'); else setQrType('vcard'); }} className={`qr-btn qr-btn-green relative ${qrType === 'vcard' ? 'active' : ''}`}>
-                    vCard Contact
-                    {(!isPremium && !profil?.has_qr_vcard) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-amber-400 to-amber-600 text-black px-1.5 py-0.5 rounded shadow-md border border-amber-300">69 RON</span>}
-                  </button>
-                  
-                  <button onClick={() => { if(!isPremium && !profil?.has_qr_pdf) handleCheckout('qr_dynamic'); else setQrType('dynamic'); }} className={`qr-btn qr-btn-purple relative ${qrType === 'dynamic' ? 'active' : ''}`}>
-                    Dinamic / PDF
-                    {(!isPremium && !profil?.has_qr_pdf) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-purple-500 to-purple-600 text-white px-1.5 py-0.5 rounded shadow-md border border-purple-400">39 RON</span>}
-                  </button>
-                  
-                  <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('smart'); }} className={`qr-btn qr-btn-blue relative ${qrType === 'smart' ? 'active' : ''}`}>
-                    Smart OS Route
-                    {(!isPremium) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-blue-500 to-blue-600 text-white px-1.5 py-0.5 rounded shadow-md border border-blue-400">PRO</span>}
-                  </button>
-                  
-                  <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('geo'); }} className={`qr-btn qr-btn-blue relative ${qrType === 'geo' ? 'active' : ''}`}>
-                    Geo-Target
-                    {(!isPremium) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-blue-500 to-blue-600 text-white px-1.5 py-0.5 rounded shadow-md border border-blue-400">PRO</span>}
-                  </button>
-                  
-                  <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('landing'); }} className={`qr-btn qr-btn-blue relative ${qrType === 'landing' ? 'active' : ''}`}>
-                    Mini-Landing Page
-                    {(!isPremium) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-blue-500 to-blue-600 text-white px-1.5 py-0.5 rounded shadow-md border border-blue-400">PRO</span>}
-                  </button>
-                </div>
+              {/* Butoanele de tip - COMPACT */}
+              <div className="flex flex-wrap justify-center sm:justify-start gap-2">
+                <button onClick={() => setQrType('url')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm border ${
+                  qrType === 'url' 
+                    ? 'bg-[#8ba888] text-[#0B0F12] border-[#8ba888] shadow-[0_0_10px_rgba(139,168,136,0.3)] [.matcha-light-theme_&]:!bg-[#8ba888] [.matcha-light-theme_&]:!text-white' 
+                    : 'bg-[#8ba888]/15 text-[#8ba888] border-[#8ba888]/40 hover:bg-[#8ba888]/25 [.matcha-light-theme_&]:!bg-slate-200 [.matcha-light-theme_&]:!text-slate-700 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-300'
+                }`}>Standard URL</button>
+                
+                <button onClick={() => setQrType('wifi')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm border ${
+                  qrType === 'wifi' 
+                    ? 'bg-[#8ba888] text-[#0B0F12] border-[#8ba888] shadow-[0_0_10px_rgba(139,168,136,0.3)] [.matcha-light-theme_&]:!bg-[#8ba888] [.matcha-light-theme_&]:!text-white' 
+                    : 'bg-[#8ba888]/15 text-[#8ba888] border-[#8ba888]/40 hover:bg-[#8ba888]/25 [.matcha-light-theme_&]:!bg-slate-200 [.matcha-light-theme_&]:!text-slate-700 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-300'
+                }`}>Rețea Wi-Fi</button>
+                
+                <button onClick={() => setQrType('crypto')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm border ${
+                  qrType === 'crypto' 
+                    ? 'bg-[#8ba888] text-[#0B0F12] border-[#8ba888] shadow-[0_0_10px_rgba(139,168,136,0.3)] [.matcha-light-theme_&]:!bg-[#8ba888] [.matcha-light-theme_&]:!text-white' 
+                    : 'bg-[#8ba888]/15 text-[#8ba888] border-[#8ba888]/40 hover:bg-[#8ba888]/25 [.matcha-light-theme_&]:!bg-slate-200 [.matcha-light-theme_&]:!text-slate-700 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-300'
+                }`}>Portofel Crypto</button>
+                
+                <button onClick={() => { if(!isPremium && !profil?.has_qr_vcard) handleCheckout('qr_vcard'); else setQrType('vcard'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm border ${
+                  qrType === 'vcard' 
+                    ? 'bg-[#8ba888] text-[#0B0F12] border-[#8ba888] shadow-[0_0_10px_rgba(139,168,136,0.3)] [.matcha-light-theme_&]:!bg-[#8ba888] [.matcha-light-theme_&]:!text-white' 
+                    : 'bg-[#8ba888]/15 text-[#8ba888] border-[#8ba888]/40 hover:bg-[#8ba888]/25 [.matcha-light-theme_&]:!bg-slate-200 [.matcha-light-theme_&]:!text-slate-700 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-300'
+                }`}>
+                  vCard Contact
+                  {(!isPremium && !profil?.has_qr_vcard) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-amber-400 to-amber-600 text-black px-1.5 py-0.5 rounded shadow-md border border-amber-300">69 RON</span>}
+                </button>
+                
+                <button onClick={() => { if(!isPremium && !profil?.has_qr_pdf) handleCheckout('qr_dynamic'); else setQrType('dynamic'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm border ${
+                  qrType === 'dynamic' 
+                    ? 'bg-[#9333ea] text-white border-[#9333ea] shadow-[0_0_10px_rgba(147,51,234,0.4)] [.matcha-light-theme_&]:!bg-[#9333ea] [.matcha-light-theme_&]:!text-white' 
+                    : 'bg-[#9333ea]/15 text-[#a855f7] border-[#9333ea]/40 hover:bg-[#9333ea]/25 [.matcha-light-theme_&]:!bg-slate-200 [.matcha-light-theme_&]:!text-slate-700 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-300'
+                }`}>
+                  Dinamic / PDF
+                  {(!isPremium && !profil?.has_qr_pdf) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-purple-500 to-purple-600 text-white px-1.5 py-0.5 rounded shadow-md border border-purple-400">39 RON</span>}
+                </button>
+                
+                <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('smart'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm border ${
+                  qrType === 'smart' 
+                    ? 'bg-[#2563eb] text-white border-[#2563eb] shadow-[0_0_10px_rgba(37,99,235,0.4)] [.matcha-light-theme_&]:!bg-[#2563eb] [.matcha-light-theme_&]:!text-white' 
+                    : 'bg-[#2563eb]/15 text-[#3b82f6] border-[#2563eb]/40 hover:bg-[#2563eb]/25 [.matcha-light-theme_&]:!bg-slate-200 [.matcha-light-theme_&]:!text-slate-700 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-300'
+                }`}>
+                  Smart OS Route
+                  {(!isPremium) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-blue-500 to-blue-600 text-white px-1.5 py-0.5 rounded shadow-md border border-blue-400">PRO</span>}
+                </button>
+                
+                <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('geo'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm border ${
+                  qrType === 'geo' 
+                    ? 'bg-[#2563eb] text-white border-[#2563eb] shadow-[0_0_10px_rgba(37,99,235,0.4)] [.matcha-light-theme_&]:!bg-[#2563eb] [.matcha-light-theme_&]:!text-white' 
+                    : 'bg-[#2563eb]/15 text-[#3b82f6] border-[#2563eb]/40 hover:bg-[#2563eb]/25 [.matcha-light-theme_&]:!bg-slate-200 [.matcha-light-theme_&]:!text-slate-700 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-300'
+                }`}>
+                  Geo-Target
+                  {(!isPremium) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-blue-500 to-blue-600 text-white px-1.5 py-0.5 rounded shadow-md border border-blue-400">PRO</span>}
+                </button>
+                
+                <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('landing'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm border ${
+                  qrType === 'landing' 
+                    ? 'bg-[#2563eb] text-white border-[#2563eb] shadow-[0_0_10px_rgba(37,99,235,0.4)] [.matcha-light-theme_&]:!bg-[#2563eb] [.matcha-light-theme_&]:!text-white' 
+                    : 'bg-[#2563eb]/15 text-[#3b82f6] border-[#2563eb]/40 hover:bg-[#2563eb]/25 [.matcha-light-theme_&]:!bg-slate-200 [.matcha-light-theme_&]:!text-slate-700 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-300'
+                }`}>
+                  Mini-Landing Page
+                  {(!isPremium) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-blue-500 to-blue-600 text-white px-1.5 py-0.5 rounded shadow-md border border-blue-400">PRO</span>}
+                </button>
+              </div>
               </div>
 
                 {/* Main Content Area */}
