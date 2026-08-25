@@ -200,7 +200,7 @@ html.matcha-light-theme .text-gray-400 {
 }
 
 /* 8. Câmpuri de formular */
-html.matcha-light-theme input, 
+html.matcha-light-theme input:not([type="file"]):not([type="color"]):not([type="checkbox"]):not([type="radio"]), 
 html.matcha-light-theme textarea, 
 html.matcha-light-theme select {
   background-color: #ffffff !important;

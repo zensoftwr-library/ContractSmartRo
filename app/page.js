@@ -1737,66 +1737,66 @@ const reseteazaSemnaturiB2B = () => {
                   <h3 className="text-xs font-black text-white uppercase tracking-wider block">Terminal Generare QR</h3>
                 </div>
                 
-                              {/* Butoanele de tip - COMPACT */}
+              {/* Butoanele de tip - COMPACT */}
               <div className="flex flex-wrap justify-center sm:justify-start gap-2">
-                <button onClick={() => setQrType('url')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm border ${
+                <button onClick={() => setQrType('url')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all border ${
                   qrType === 'url' 
-                    ? 'bg-[#8ba888] text-[#0B0F12] border-[#8ba888] shadow-[0_0_10px_rgba(139,168,136,0.3)] [.matcha-light-theme_&]:!bg-[#8ba888] [.matcha-light-theme_&]:!text-white' 
-                    : 'bg-[#8ba888]/15 text-[#8ba888] border-[#8ba888]/40 hover:bg-[#8ba888]/25 [.matcha-light-theme_&]:!bg-slate-200 [.matcha-light-theme_&]:!text-slate-700 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-300'
+                    ? 'bg-[#8ba888] text-[#0B0F12] border-[#8ba888] shadow-[0_0_15px_rgba(139,168,136,0.6)] [.matcha-light-theme_&]:!shadow-none [.matcha-light-theme_&]:!text-white' 
+                    : 'bg-[#8ba888]/10 text-[#8ba888] border-[#8ba888]/30 hover:bg-[#8ba888]/20 hover:shadow-[0_0_10px_rgba(139,168,136,0.2)] [.matcha-light-theme_&]:!bg-slate-100 [.matcha-light-theme_&]:!text-slate-600 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-200 [.matcha-light-theme_&]:!shadow-none'
                 }`}>Standard URL</button>
                 
-                <button onClick={() => setQrType('wifi')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm border ${
+                <button onClick={() => setQrType('wifi')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all border ${
                   qrType === 'wifi' 
-                    ? 'bg-[#8ba888] text-[#0B0F12] border-[#8ba888] shadow-[0_0_10px_rgba(139,168,136,0.3)] [.matcha-light-theme_&]:!bg-[#8ba888] [.matcha-light-theme_&]:!text-white' 
-                    : 'bg-[#8ba888]/15 text-[#8ba888] border-[#8ba888]/40 hover:bg-[#8ba888]/25 [.matcha-light-theme_&]:!bg-slate-200 [.matcha-light-theme_&]:!text-slate-700 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-300'
+                    ? 'bg-[#8ba888] text-[#0B0F12] border-[#8ba888] shadow-[0_0_15px_rgba(139,168,136,0.6)] [.matcha-light-theme_&]:!shadow-none [.matcha-light-theme_&]:!text-white' 
+                    : 'bg-[#8ba888]/10 text-[#8ba888] border-[#8ba888]/30 hover:bg-[#8ba888]/20 hover:shadow-[0_0_10px_rgba(139,168,136,0.2)] [.matcha-light-theme_&]:!bg-slate-100 [.matcha-light-theme_&]:!text-slate-600 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-200 [.matcha-light-theme_&]:!shadow-none'
                 }`}>Rețea Wi-Fi</button>
                 
-                <button onClick={() => setQrType('crypto')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm border ${
+                <button onClick={() => setQrType('crypto')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all border ${
                   qrType === 'crypto' 
-                    ? 'bg-[#8ba888] text-[#0B0F12] border-[#8ba888] shadow-[0_0_10px_rgba(139,168,136,0.3)] [.matcha-light-theme_&]:!bg-[#8ba888] [.matcha-light-theme_&]:!text-white' 
-                    : 'bg-[#8ba888]/15 text-[#8ba888] border-[#8ba888]/40 hover:bg-[#8ba888]/25 [.matcha-light-theme_&]:!bg-slate-200 [.matcha-light-theme_&]:!text-slate-700 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-300'
+                    ? 'bg-[#8ba888] text-[#0B0F12] border-[#8ba888] shadow-[0_0_15px_rgba(139,168,136,0.6)] [.matcha-light-theme_&]:!shadow-none [.matcha-light-theme_&]:!text-white' 
+                    : 'bg-[#8ba888]/10 text-[#8ba888] border-[#8ba888]/30 hover:bg-[#8ba888]/20 hover:shadow-[0_0_10px_rgba(139,168,136,0.2)] [.matcha-light-theme_&]:!bg-slate-100 [.matcha-light-theme_&]:!text-slate-600 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-200 [.matcha-light-theme_&]:!shadow-none'
                 }`}>Portofel Crypto</button>
                 
-                <button onClick={() => { if(!isPremium && !profil?.has_qr_vcard) handleCheckout('qr_vcard'); else setQrType('vcard'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm border ${
+                <button onClick={() => { if(!isPremium && !profil?.has_qr_vcard) handleCheckout('qr_vcard'); else setQrType('vcard'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all border ${
                   qrType === 'vcard' 
-                    ? 'bg-[#8ba888] text-[#0B0F12] border-[#8ba888] shadow-[0_0_10px_rgba(139,168,136,0.3)] [.matcha-light-theme_&]:!bg-[#8ba888] [.matcha-light-theme_&]:!text-white' 
-                    : 'bg-[#8ba888]/15 text-[#8ba888] border-[#8ba888]/40 hover:bg-[#8ba888]/25 [.matcha-light-theme_&]:!bg-slate-200 [.matcha-light-theme_&]:!text-slate-700 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-300'
+                    ? 'bg-[#8ba888] text-[#0B0F12] border-[#8ba888] shadow-[0_0_15px_rgba(139,168,136,0.6)] [.matcha-light-theme_&]:!shadow-none [.matcha-light-theme_&]:!text-white' 
+                    : 'bg-[#8ba888]/10 text-[#8ba888] border-[#8ba888]/30 hover:bg-[#8ba888]/20 hover:shadow-[0_0_10px_rgba(139,168,136,0.2)] [.matcha-light-theme_&]:!bg-slate-100 [.matcha-light-theme_&]:!text-slate-600 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-200 [.matcha-light-theme_&]:!shadow-none'
                 }`}>
                   vCard Contact
                   {(!isPremium && !profil?.has_qr_vcard) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-amber-400 to-amber-600 text-black px-1.5 py-0.5 rounded shadow-md border border-amber-300">69 RON</span>}
                 </button>
                 
-                <button onClick={() => { if(!isPremium && !profil?.has_qr_pdf) handleCheckout('qr_dynamic'); else setQrType('dynamic'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm border ${
+                <button onClick={() => { if(!isPremium && !profil?.has_qr_pdf) handleCheckout('qr_dynamic'); else setQrType('dynamic'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all border ${
                   qrType === 'dynamic' 
-                    ? 'bg-[#9333ea] text-white border-[#9333ea] shadow-[0_0_10px_rgba(147,51,234,0.4)] [.matcha-light-theme_&]:!bg-[#9333ea] [.matcha-light-theme_&]:!text-white' 
-                    : 'bg-[#9333ea]/15 text-[#a855f7] border-[#9333ea]/40 hover:bg-[#9333ea]/25 [.matcha-light-theme_&]:!bg-slate-200 [.matcha-light-theme_&]:!text-slate-700 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-300'
+                    ? 'bg-[#9333ea] text-white border-[#9333ea] shadow-[0_0_15px_rgba(147,51,234,0.6)] [.matcha-light-theme_&]:!shadow-none' 
+                    : 'bg-[#9333ea]/10 text-[#a855f7] border-[#9333ea]/30 hover:bg-[#9333ea]/20 hover:shadow-[0_0_10px_rgba(147,51,234,0.2)] [.matcha-light-theme_&]:!bg-slate-100 [.matcha-light-theme_&]:!text-slate-600 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-200 [.matcha-light-theme_&]:!shadow-none'
                 }`}>
                   Dinamic / PDF
                   {(!isPremium && !profil?.has_qr_pdf) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-purple-500 to-purple-600 text-white px-1.5 py-0.5 rounded shadow-md border border-purple-400">39 RON</span>}
                 </button>
                 
-                <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('smart'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm border ${
+                <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('smart'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all border ${
                   qrType === 'smart' 
-                    ? 'bg-[#2563eb] text-white border-[#2563eb] shadow-[0_0_10px_rgba(37,99,235,0.4)] [.matcha-light-theme_&]:!bg-[#2563eb] [.matcha-light-theme_&]:!text-white' 
-                    : 'bg-[#2563eb]/15 text-[#3b82f6] border-[#2563eb]/40 hover:bg-[#2563eb]/25 [.matcha-light-theme_&]:!bg-slate-200 [.matcha-light-theme_&]:!text-slate-700 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-300'
+                    ? 'bg-[#2563eb] text-white border-[#2563eb] shadow-[0_0_15px_rgba(37,99,235,0.6)] [.matcha-light-theme_&]:!shadow-none' 
+                    : 'bg-[#2563eb]/10 text-[#3b82f6] border-[#2563eb]/30 hover:bg-[#2563eb]/20 hover:shadow-[0_0_10px_rgba(37,99,235,0.2)] [.matcha-light-theme_&]:!bg-slate-100 [.matcha-light-theme_&]:!text-slate-600 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-200 [.matcha-light-theme_&]:!shadow-none'
                 }`}>
                   Smart OS Route
                   {(!isPremium) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-blue-500 to-blue-600 text-white px-1.5 py-0.5 rounded shadow-md border border-blue-400">PRO</span>}
                 </button>
                 
-                <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('geo'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm border ${
+                <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('geo'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all border ${
                   qrType === 'geo' 
-                    ? 'bg-[#2563eb] text-white border-[#2563eb] shadow-[0_0_10px_rgba(37,99,235,0.4)] [.matcha-light-theme_&]:!bg-[#2563eb] [.matcha-light-theme_&]:!text-white' 
-                    : 'bg-[#2563eb]/15 text-[#3b82f6] border-[#2563eb]/40 hover:bg-[#2563eb]/25 [.matcha-light-theme_&]:!bg-slate-200 [.matcha-light-theme_&]:!text-slate-700 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-300'
+                    ? 'bg-[#2563eb] text-white border-[#2563eb] shadow-[0_0_15px_rgba(37,99,235,0.6)] [.matcha-light-theme_&]:!shadow-none' 
+                    : 'bg-[#2563eb]/10 text-[#3b82f6] border-[#2563eb]/30 hover:bg-[#2563eb]/20 hover:shadow-[0_0_10px_rgba(37,99,235,0.2)] [.matcha-light-theme_&]:!bg-slate-100 [.matcha-light-theme_&]:!text-slate-600 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-200 [.matcha-light-theme_&]:!shadow-none'
                 }`}>
                   Geo-Target
                   {(!isPremium) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-blue-500 to-blue-600 text-white px-1.5 py-0.5 rounded shadow-md border border-blue-400">PRO</span>}
                 </button>
                 
-                <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('landing'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all shadow-sm border ${
+                <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('landing'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all border ${
                   qrType === 'landing' 
-                    ? 'bg-[#2563eb] text-white border-[#2563eb] shadow-[0_0_10px_rgba(37,99,235,0.4)] [.matcha-light-theme_&]:!bg-[#2563eb] [.matcha-light-theme_&]:!text-white' 
-                    : 'bg-[#2563eb]/15 text-[#3b82f6] border-[#2563eb]/40 hover:bg-[#2563eb]/25 [.matcha-light-theme_&]:!bg-slate-200 [.matcha-light-theme_&]:!text-slate-700 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-300'
+                    ? 'bg-[#2563eb] text-white border-[#2563eb] shadow-[0_0_15px_rgba(37,99,235,0.6)] [.matcha-light-theme_&]:!shadow-none' 
+                    : 'bg-[#2563eb]/10 text-[#3b82f6] border-[#2563eb]/30 hover:bg-[#2563eb]/20 hover:shadow-[0_0_10px_rgba(37,99,235,0.2)] [.matcha-light-theme_&]:!bg-slate-100 [.matcha-light-theme_&]:!text-slate-600 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-200 [.matcha-light-theme_&]:!shadow-none'
                 }`}>
                   Mini-Landing Page
                   {(!isPremium) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-blue-500 to-blue-600 text-white px-1.5 py-0.5 rounded shadow-md border border-blue-400">PRO</span>}
@@ -1881,11 +1881,11 @@ const reseteazaSemnaturiB2B = () => {
                           <div className="flex flex-col md:flex-row gap-3 border-t border-purple-500/20 pt-3 [.matcha-light-theme_&]:!border-purple-200">
                             <div className="w-full md:w-1/2">
                               <label className="text-[9px] text-purple-400 uppercase font-bold block mb-1 [.matcha-light-theme_&]:!text-purple-600">A. Link URL Simplu</label>
-                              <input type="text" placeholder="https://..." value={dynamicDestUrl} onChange={e => setDynamicDestUrl(e.target.value)} className="w-full bg-[#0B0F12] border border-purple-500/50 rounded-lg p-2.5 text-white text-xs outline-none focus:ring-1 focus:ring-purple-500 transition-all [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-purple-300" />
+                              <input type="text" placeholder="https://..." value={dynamicDestUrl} onChange={e => setDynamicDestUrl(e.target.value)} className="w-full bg-[#12181D] border border-purple-500/40 rounded-lg p-2.5 text-white text-xs outline-none focus:ring-1 focus:ring-purple-500 transition-all [.matcha-light-theme_&]:!bg-slate-50 [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300" />
                             </div>
                             <div className="w-full md:w-1/2">
                               <label className="text-[9px] text-purple-400 uppercase font-bold block mb-1 [.matcha-light-theme_&]:!text-purple-600">B. Încărcare Meniu / PDF</label>
-                              <input type="file" accept="application/pdf" onChange={(e) => handleUploadGeneric(e, setUploadedPdfUrl, 'qr_pdfs', setIsUploadingPdf)} className="w-full bg-[#0B0F12] border border-purple-500/50 rounded-lg p-1.5 text-[10px] font-bold text-slate-400 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:bg-purple-600 file:text-white cursor-pointer hover:file:bg-purple-500 transition-all shadow-inner [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!border-purple-300 [.matcha-light-theme_&]:!text-slate-600" />
+                              <input type="file" accept="application/pdf" onChange={(e) => handleUploadGeneric(e, setUploadedPdfUrl, 'qr_pdfs', setIsUploadingPdf)} className="w-full bg-[#12181D] border border-purple-500/40 rounded-lg p-1.5 text-[10px] font-bold text-slate-400 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:bg-purple-600 file:text-white cursor-pointer hover:file:bg-purple-500 transition-all [.matcha-light-theme_&]:!bg-slate-50 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:!text-slate-600" />
                               {isUploadingPdf && <span className="text-[9px] text-purple-400 mt-1 block font-bold uppercase tracking-wider animate-pulse [.matcha-light-theme_&]:!text-purple-600">Se încarcă...</span>}
                               {uploadedPdfUrl && <span className="text-[9px] text-emerald-400 mt-1 block font-bold uppercase tracking-wider [.matcha-light-theme_&]:!text-emerald-600">PDF Securizat</span>}
                             </div>
@@ -1909,8 +1909,8 @@ const reseteazaSemnaturiB2B = () => {
                             <p className="text-[10px] text-slate-400 leading-tight [.matcha-light-theme_&]:!text-slate-500">Detectează OS-ul și redirecționează către magazinul de aplicații corect.</p>
                           </div>
                           <div className="flex flex-col md:flex-row gap-2 border-t border-blue-500/20 pt-3 [.matcha-light-theme_&]:!border-blue-200">
-                            <input type="url" placeholder="Link App Store (iOS)" value={iosUrl} onChange={(e) => setIosUrl(e.target.value)} className="w-full flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-blue-500 outline-none transition-all [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300" />
-                            <input type="url" placeholder="Link Google Play" value={androidUrl} onChange={(e) => setAndroidUrl(e.target.value)} className="w-full flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-blue-500 outline-none transition-all [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300" />
+                            <input type="url" placeholder="Link App Store (iOS)" value={iosUrl} onChange={(e) => setIosUrl(e.target.value)} className="w-full flex-1 bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-blue-500 outline-none transition-all [.matcha-light-theme_&]:!bg-slate-50 [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300" />
+                            <input type="url" placeholder="Link Google Play" value={androidUrl} onChange={(e) => setAndroidUrl(e.target.value)} className="w-full flex-1 bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:border-blue-500 outline-none transition-all [.matcha-light-theme_&]:!bg-slate-50 [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300" />
                             <div className="shrink-0 w-full md:w-auto">
                               {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
                                 <div className="hidden"><Turnstile ref={turnstileRef} siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onSuccess={setCaptchaToken} onExpire={() => { setCaptchaToken(null); turnstileRef.current?.reset(); }} options={{ theme: 'dark', size: 'invisible' }} /></div>
@@ -1930,8 +1930,8 @@ const reseteazaSemnaturiB2B = () => {
                           <div className="border-t border-blue-500/20 pt-3 space-y-2 [.matcha-light-theme_&]:!border-blue-200">
                             {geoRules.map((rule, idx) => (
                               <div key={idx} className="flex gap-2">
-                                <input type="text" placeholder="Cod (RO)" value={rule.country} onChange={(e) => { const newRules = [...geoRules]; newRules[idx].country = e.target.value.toUpperCase(); setGeoRules(newRules); }} className="w-20 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs text-center font-bold outline-none uppercase transition-all disabled:opacity-50 [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300" disabled={rule.country === 'DEFAULT'} />
-                                <input type="url" placeholder="URL Destinație" value={rule.url} onChange={(e) => { const newRules = [...geoRules]; newRules[idx].url = e.target.value; setGeoRules(newRules); }} className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs outline-none focus:border-blue-500 transition-all [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300" />
+                                <input type="text" placeholder="Cod (RO)" value={rule.country} onChange={(e) => { const newRules = [...geoRules]; newRules[idx].country = e.target.value.toUpperCase(); setGeoRules(newRules); }} className="w-20 bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-xs text-center font-bold outline-none uppercase transition-all disabled:opacity-50 [.matcha-light-theme_&]:!bg-slate-50 [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300" disabled={rule.country === 'DEFAULT'} />
+                                <input type="url" placeholder="URL Destinație" value={rule.url} onChange={(e) => { const newRules = [...geoRules]; newRules[idx].url = e.target.value; setGeoRules(newRules); }} className="flex-1 bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-xs outline-none focus:border-blue-500 transition-all [.matcha-light-theme_&]:!bg-slate-50 [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300" />
                               </div>
                             ))}
                             <div className="flex justify-between items-center mt-3">
@@ -1958,21 +1958,21 @@ const reseteazaSemnaturiB2B = () => {
                                 placeholder="Titlu Pagină" 
                                 value={landingData.title} 
                                 onChange={(e) => setLandingData({...landingData, title: e.target.value})} 
-                                className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-2.5 text-white text-xs outline-none focus:border-blue-500 transition-all shadow-inner [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:!text-slate-800" 
+                                className="flex-1 bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-xs outline-none focus:border-blue-500 transition-all shadow-inner [.matcha-light-theme_&]:!bg-slate-50 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:!text-slate-800" 
                               />
                               <input 
                                 type="file" 
                                 accept="image/png, image/jpeg" 
                                 onChange={(e) => handleUploadGeneric(e, (url) => setLandingData({...landingData, avatarUrl: url}), 'landing_images', setIsUploadingPdf)} 
-                                className="flex-1 bg-[#0B0F12] border border-slate-700 rounded-lg p-1.5 text-[10px] font-bold text-slate-400 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:bg-blue-600 file:text-white cursor-pointer hover:file:bg-blue-500 transition-all shadow-inner [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:!text-slate-600" 
+                                className="flex-1 bg-[#12181D] border border-blue-500/40 rounded-lg p-1.5 text-[10px] font-bold text-slate-400 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:bg-blue-600 file:text-white cursor-pointer hover:file:bg-blue-500 transition-all [.matcha-light-theme_&]:!bg-slate-50 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:!text-slate-600" 
                               />
                             </div>
                             
-                            <div className="bg-[#0B0F12] p-3 rounded-xl border border-slate-800 space-y-2 [.matcha-light-theme_&]:!bg-slate-50 [.matcha-light-theme_&]:!border-slate-200">
+                            <div className="bg-[#0B0F12] p-3 rounded-xl border border-slate-800 space-y-2 [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!border-slate-200">
                               {landingData.links.map((link, idx) => (
                                 <div key={idx} className="flex flex-col sm:flex-row gap-2">
-                                  <input type="text" placeholder="Nume Buton" value={link.label} onChange={(e) => { const newLinks = [...landingData.links]; newLinks[idx].label = e.target.value; setLandingData({...landingData, links: newLinks}); }} className="w-full sm:w-1/3 bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-[11px] outline-none focus:border-blue-500 transition-all [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300" />
-                                  <input type="url" placeholder="https://..." value={link.url} onChange={(e) => { const newLinks = [...landingData.links]; newLinks[idx].url = e.target.value; setLandingData({...landingData, links: newLinks}); }} className="w-full sm:flex-1 bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-[11px] outline-none focus:border-blue-500 transition-all [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300" />
+                                  <input type="text" placeholder="Nume Buton" value={link.label} onChange={(e) => { const newLinks = [...landingData.links]; newLinks[idx].label = e.target.value; setLandingData({...landingData, links: newLinks}); }} className="w-full sm:w-1/3 bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-[11px] outline-none focus:border-blue-500 transition-all [.matcha-light-theme_&]:!bg-slate-50 [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300" />
+                                  <input type="url" placeholder="https://..." value={link.url} onChange={(e) => { const newLinks = [...landingData.links]; newLinks[idx].url = e.target.value; setLandingData({...landingData, links: newLinks}); }} className="w-full sm:flex-1 bg-[#12181D] border border-slate-700 rounded-lg p-2.5 text-white text-[11px] outline-none focus:border-blue-500 transition-all [.matcha-light-theme_&]:!bg-slate-50 [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300" />
                                 </div>
                               ))}
                             </div>
@@ -2002,13 +2002,13 @@ const reseteazaSemnaturiB2B = () => {
                             href="https://zensoftware.gumroad.com/l/qr-branding" 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="relative text-[9px] text-slate-300 font-black uppercase tracking-wide border border-slate-700 px-4 py-2.5 rounded-lg bg-[#0B0F12] cursor-pointer hover:bg-slate-800 transition-colors shadow-sm [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-slate-700 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-100"
+                            className="relative text-[9px] text-slate-300 font-black uppercase tracking-wide border border-slate-700 px-4 py-2.5 rounded-lg bg-[#12181D] cursor-pointer hover:bg-slate-800 transition-colors shadow-sm [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-slate-700 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-100"
                           >
                             INCARCA LOGO CENTRAL
                             <span className="absolute -top-2 -right-2 text-[8px] bg-gradient-to-r from-amber-400 to-amber-600 text-black px-1.5 py-0.5 rounded shadow-md border border-amber-300">49 RON</span>
                           </a>
                         ) : (
-                          <label className="text-[9px] text-slate-300 font-black uppercase tracking-wide border border-slate-700 px-4 py-2.5 rounded-lg bg-[#0B0F12] cursor-pointer hover:bg-slate-800 transition-colors shadow-sm [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-slate-700 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-100">
+                          <label className="text-[9px] text-slate-300 font-black uppercase tracking-wide border border-slate-700 px-4 py-2.5 rounded-lg bg-[#12181D] cursor-pointer hover:bg-slate-800 transition-colors shadow-sm [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-slate-700 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-100">
                             <span>INCARCA LOGO CENTRAL</span>
                             <input type="file" accept="image/png, image/jpeg, image/svg+xml" onChange={handleQrLogoUpload} className="hidden" />
                           </label>
