@@ -2176,17 +2176,6 @@ const reseteazaSemnaturiB2B = () => {
                             <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wide mb-1.5 block">Email Contract Finalizat</label>
                             <input type="email" placeholder="Email Client (pentru trimitere)" autoComplete="new-password" value={formData.clientEmail} onChange={e => setFormData({...formData, clientEmail: e.target.value})} className="w-full p-3 bg-[#0B0F12] border border-slate-700/60 rounded-lg text-xs text-white outline-none focus:ring-1 focus:ring-[#8ba888]/50 focus:border-[#8ba888] transition-all" required />
                           </div>
-
-                          {/* PROCES VERBAL OPTION */}
-                          <div className="bg-[#0B0F12] p-4 sm:p-5 rounded-xl border border-slate-700/60 mt-4">
-                            <label className="flex items-start sm:items-center cursor-pointer group">
-                              <input type="checkbox" checked={formData.adaugaProcesVerbal || false} onChange={e => setFormData({...formData, adaugaProcesVerbal: e.target.checked})} className="mr-3 mt-1 sm:mt-0 w-4 h-4 accent-[#8ba888] shrink-0" />
-                              <div>
-                                <span className="text-xs text-white font-bold block group-hover:text-[#8ba888] transition-colors">Atașează Proces-Verbal (PV)</span>
-                                <span className="text-[10px] text-slate-500 leading-tight block mt-0.5">Generează automat o anexă de predare-primire atașată contractului.</span>
-                              </div>
-                            </label>
-                          </div>
                         </div>
                         <div className="flex flex-col space-y-3">
                           <div>
