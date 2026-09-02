@@ -367,13 +367,6 @@ export async function POST(request) {
         adaugaClauza('CLAUZĂ SPECIALĂ ADIȚIONALĂ', clauzaCustom.trim());
     }
 
-    // Numărăm dinamic câte clauze reale au fost trimise ca 'true' din frontend pentru a evita suprapunerile de index
-    let nrClauzeBifate = Object.keys(body).filter(k => k.startsWith('clauza') && k !== 'clauzaCustom' && body[k] === true).length;
-    if (clauzaCustom && clauzaCustom.trim() !== '') {
-      const numarUrmator = nrClauzeBifate + 1;
-      clauzeInjectateHtml += `<li><strong>ART. 4.${numarUrmator}. CLAUZĂ SPECIALĂ ADIȚIONALĂ:</strong> ${clauzaCustom.trim()}</li>`;
-    }
-
     const fieldHtml = (valoare, minWidth = "120px") => {
       if (valoare && valoare.toString().trim() !== '') {
         return `<span class="valoare-importata">${valoare.toString().trim()}</span>`;
@@ -382,6 +375,7 @@ export async function POST(request) {
     };
 
     const dataCurenta = new Date().toLocaleDateString('ro-RO');
+    const numarContractUnic = `CS-${Math.floor(10000 + Math.random() * 90000)}`;
 
     // -------------------------------------------------------------------------
     // 5. REDACTARE HTML
@@ -512,7 +506,7 @@ export async function POST(request) {
         <div style="page-break-before: always;"></div>
         <div class="contract-title" style="max-width: 80%; margin: 0 auto; line-height: 1.4;">${titluContractOficial}</div>
         <div class="contract-title">ANEXA 1: PROCES-VERBAL DE PREDARE-PRIMIRE</div>
-        <div class="contract-subtitle">Anexă la Contractul nr. CS-${Math.floor(10000 + Math.random() * 90000)} / ${dataCurenta}</div>
+        <div class="contract-subtitle">Anexă la Contractul nr. ${numarContractUnic} / ${dataCurenta}</div>
         
         <div class="text-paragraph">Încheiat astăzi, ${dataCurenta}, între:</div>
         <div class="text-paragraph">1. <strong>${fieldHtml(prestatorNume, "220px")}</strong> (în calitate de Prestator / Vânzător)</div>
