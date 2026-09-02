@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
+// 1. IMPORTĂM NOMENCLATORUL CAEN REV. 3 (Ajustează calea către fișierul tău real)
+import caenRev3 from './caen_rev3.json'; 
+
 export const dynamic = 'force-dynamic';
 
 const supabase = createClient(
@@ -9,7 +12,6 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 );
 
-// Inițializăm Gemini API cu cheia din .env
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
 export async function POST(request) {
@@ -44,23 +46,17 @@ export async function POST(request) {
       }
     }
 
-    // ==========================================
-    // INCEPUT SISTEM RAG CU GEMINI EMBEDDINGS
-    // ==========================================
-
-    // A. Transformăm întrebarea într-un vector numeric
+    // A. RAG cu Supabase (Vector Search)
     const embeddingModel = genAI.getGenerativeModel({ model: "gemini-embedding-2" });
     const embeddingResult = await embeddingModel.embedContent(message);
     const queryEmbedding = embeddingResult.embedding.values;
 
-    // B. Căutăm în Supabase cele mai relevante 3 articole de lege
     const { data: contextLegal } = await supabase.rpc('match_documents', {
       query_embedding: queryEmbedding,
       match_threshold: 0.75, 
       match_count: 3
     });
 
-    // C. Formatăm contextul găsit pentru a-l injecta în creierul AI-ului
     let contextText = "";
     if (contextLegal && contextLegal.length > 0) {
       contextText = "CONTEXT LEGISLATIV EXTRAS (Folosește aceste informații pentru a răspunde):\n";
@@ -71,11 +67,10 @@ export async function POST(request) {
       contextText = "Nu s-au găsit actualizări specifice în baza de date. Răspunde folosind cunoștințele tale generale despre legislația din România.";
     }
 
-    // ==========================================
-    // SFÂRȘIT SISTEM RAG
-    // ==========================================
+    // 2. CONFIGURAREA PROMPT-ULUI DE SISTEM (Cu injecție CAEN Rev. 3)
+    // Am transformat JSON-ul în string pentru a fi procesat de AI
+    const caenContextData = JSON.stringify(caenRev3);
 
-    // 2. Configurarea Prompt-ului de Sistem (acum include și RAG)
     const systemInstruction = `Ești "Consilierul Smart AI", un asistent virtual dinamic și agil, specializat exclusiv în legislație comercială (Codul Civil), contracte B2B, prestări servicii, freelancing și birocrație auto din România.
     
     REGULI ABSOLUTE DE OPERARE (Nerespectarea este interzisă):
@@ -85,12 +80,18 @@ export async function POST(request) {
     3. CITARE EXACTĂ ȘI LINK-URI: Dacă informația există, oferă baza legală exactă (Lege, Articol). Include link-uri reale către sursele oficiale (ex: legislatie.just.ro, anaf.ro, drpciv.ro). NU genera link-uri inventate sau sparte.
     4. ZERO HALUCINAȚII (ANTI-INVENȚIE): Dacă utilizatorul întreabă ceva nereglementat sau în afara bazei tale, NU inventa. Răspunde strict: "Informația solicitată nu poate fi confirmată în mod cert în baza mea de date. Vă recomand să verificați procedura direct la [Nume Instituție] sau cu un specialist."
     5. PROTECȚIE LEGALĂ (DISCLAIMER): La finalul oricărui răspuns procedural sau juridic, adaugă obligatoriu: "Notă: Informațiile au caracter de ghidaj administrativ. Platforma ContractSmart nu își asumă răspunderea pentru posibile modificări legislative de ultimă oră. Recomandăm validarea spețelor complexe cu un expert."
+    
+    6. NOMENCLATOR CAEN REV. 3 (NOU): Ai interdicție strictă să folosești cunoștințele tale generale despre vechile coduri CAEN. Când un utilizator cere recomandări de coduri CAEN, TREBUIE să cauți și să extragi codurile EXCLUSIV din această listă de mai jos (Rev. 3).
+    
+    --- BAZĂ DE DATE CAEN REV. 3 ---
+    ${caenContextData}
+    --- SFÂRȘIT BAZĂ DE DATE CAEN ---
 
-    BAZEAZĂ-TE ÎN PRIMUL RÂND pe următorul context legislativ extras din Monitorul Oficial pentru a răspunde:
+    BAZEAZĂ-TE ÎN PRIMUL RÂND pe următorul context legislativ extras din Monitorul Oficial pentru a răspunde la alte spețe:
     
     ${contextText}`;
 
-    // 3. Formatarea istoricului pentru Gemini
+    // 3. Formatarea istoricului
     const contents = [];
     if (history && history.length > 0) {
       history.forEach(msg => {
@@ -102,10 +103,9 @@ export async function POST(request) {
     }
     contents.push({ role: 'user', parts: [{ text: message }] });
 
-    // 4. Generarea răspunsului cu SISTEM CASCADĂ (Fallback)
+    // 4. Generarea răspunsului cu CASCADĂ (Fallback)
     let result;
     try {
-      // Încercăm prima dată cu noul model 3.7
       const primaryModel = genAI.getGenerativeModel({ 
         model: "gemini-3.7-flash",
         systemInstruction: { parts: [{ text: systemInstruction }] }
@@ -115,7 +115,6 @@ export async function POST(request) {
     } catch (primaryError) {
       console.warn("[Cascadă AI] Modelul 3.7 e suprasolicitat. Trecem automat pe 3.6. Motiv:", primaryError.message);
       
-      // Dacă 3.7 crapă (Eroare 503 etc.), activăm instant modelul 3.6
       const fallbackModel = genAI.getGenerativeModel({ 
         model: "gemini-3.6-flash",
         systemInstruction: { parts: [{ text: systemInstruction }] }
@@ -124,7 +123,6 @@ export async function POST(request) {
     }
 
     let raspunsAI = result.response.text();
-    // AICI AM INTEGRAT DISCLAIMER-UL OFICIAL ȘI NOTIFICAREA DE ACURATEȚE (PUNCTUL 2)
     raspunsAI += `\n\n---\n⚠️ **Notă:** *S-au interogat sursele oficiale pentru acuratețe. Informațiile au caracter de ghidaj administrativ. Platforma ContractSmart nu își asumă răspunderea pentru posibile modificări legislative de ultimă oră. Recomandăm validarea spețelor complexe cu un expert.*`;
 
     return NextResponse.json({ success: true, response: raspunsAI });

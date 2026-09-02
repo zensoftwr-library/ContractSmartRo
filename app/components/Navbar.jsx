@@ -178,6 +178,12 @@ export default function Navbar({
             <button type="button" onClick={() => { setIsSignUp?.(false); setShowAuthModal?.(true); }} className="text-[11px] font-black text-slate-200 hover:text-[#8ba888] transition-colors uppercase tracking-widest bg-slate-800/50 px-4 py-2 rounded-lg border border-slate-700 hover:border-[#8ba888]/50 shadow-sm">Autentificare</button>
           ) : (
             <div className="flex items-center space-x-4">
+              <Link 
+                href="/dashboard" 
+                className="hidden sm:flex items-center gap-1.5 bg-[#16221A] hover:bg-[#8ba888]/20 text-[#8ba888] border border-emerald-900/40 px-3 py-1.5 rounded-lg font-black uppercase text-[10px] tracking-wider transition-all shadow-sm"
+              >
+                Smart Vault
+              </Link>
               <div className="flex flex-col items-end mr-2">
                 <span className="text-[10px] text-slate-500 font-mono leading-none mb-1.5">{user.email}</span>
                 <div className="flex items-center gap-1.5">
@@ -245,6 +251,14 @@ export default function Navbar({
               <div className="flex flex-col space-y-2 mb-2">
                 <span className="text-xs text-slate-400">Logat ca: <strong className="text-white font-mono break-all">{user.email}</strong></span>
                 <div className="flex items-center gap-2 flex-wrap">
+
+                  <Link 
+                    href="/dashboard" 
+                    onClick={() => setIsMobileMenuOpen(false)} 
+                    className="w-full bg-[#16221A] hover:bg-[#8ba888]/20 text-[#8ba888] border border-emerald-900/40 px-3 py-2.5 rounded-lg font-black uppercase text-[11px] tracking-widest transition-all text-center mt-3 shadow-sm flex justify-center items-center gap-2"
+                  >
+                    Deschide Smart Vault
+                  </Link>
                   
                   {/* LOGICA DE AFIȘARE A STATUSURILOR - MOBILE */}
                   {user.status === 'founder' ? (

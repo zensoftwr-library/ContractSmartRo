@@ -2289,11 +2289,11 @@ const reseteazaSemnaturiB2B = () => {
                       )}
 
                       {/* QR PAY OPTION */}
-                      <div className="bg-[#0B0F12] p-4 sm:p-5 rounded-xl border border-slate-700/60 space-y-4">
+                      <div className="bg-[#0B0F12] p-4 sm:p-5 rounded-xl border border-slate-700/60 space-y-4 [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!border-slate-200">
                         <label className="flex items-start sm:items-center cursor-pointer group">
                           <input type="checkbox" checked={formData.adaugaQrPlata} onChange={e => setFormData({...formData, adaugaQrPlata: e.target.checked})} className="mr-3 mt-1 sm:mt-0 w-4 h-4 accent-[#8ba888] shrink-0" />
                           <div>
-                            <span className="text-xs text-white font-bold block group-hover:text-[#8ba888] transition-colors">Atașează Cod QR de Plată pe Contract</span>
+                            <span className="text-xs text-white font-bold block group-hover:text-[#8ba888] transition-colors [.matcha-light-theme_&]:!text-slate-800">Atașează Cod QR de Plată pe Contract</span>
                             <span className="text-[10px] text-slate-500 leading-tight block mt-0.5">Permite clientului să scaneze și să plătească direct din contract.</span>
                           </div>
                         </label>
@@ -2304,7 +2304,7 @@ const reseteazaSemnaturiB2B = () => {
                               placeholder="Introdu Contul IBAN sau Link de Plată (Stripe/Revolut)" 
                               value={formData.ibanPlata} 
                               onChange={e => setFormData({...formData, ibanPlata: e.target.value})} 
-                              className="w-full p-3 bg-[#12181D] border border-[#8ba888]/50 rounded-lg text-xs text-white focus:ring-1 focus:ring-[#8ba888] outline-none font-mono transition shadow-sm" 
+                              className="w-full p-3 bg-[#12181D] border border-[#8ba888]/50 rounded-lg text-xs text-white focus:ring-1 focus:ring-[#8ba888] outline-none font-mono transition shadow-sm [.matcha-light-theme_&]:!bg-slate-50 [.matcha-light-theme_&]:!text-slate-900 [.matcha-light-theme_&]:!border-slate-300" 
                             />
                           </div>
                         )}
@@ -2312,24 +2312,24 @@ const reseteazaSemnaturiB2B = () => {
                     </div>
 
                     {/* PROCES VERBAL OPTION */}
-                    <div className="bg-[#0B0F12] p-4 sm:p-5 rounded-xl border border-slate-700/60 mt-4">
+                    <div className="bg-[#0B0F12] p-4 sm:p-5 rounded-xl border border-slate-700/60 mt-4 [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!border-slate-200">
                       <label className="flex items-start sm:items-center cursor-pointer group">
                         <input type="checkbox" checked={formData.adaugaProcesVerbal || false} onChange={e => setFormData({...formData, adaugaProcesVerbal: e.target.checked})} className="mr-3 mt-1 sm:mt-0 w-4 h-4 accent-[#8ba888] shrink-0" />
                         <div>
-                          <span className="text-xs text-white font-bold block group-hover:text-[#8ba888] transition-colors">Atașează Proces-Verbal (PV)</span>
+                          <span className="text-xs text-white font-bold block group-hover:text-[#8ba888] transition-colors [.matcha-light-theme_&]:!text-slate-800">Atașează Proces-Verbal (PV)</span>
                           <span className="text-[10px] text-slate-500 leading-tight block mt-0.5">Generează automat o anexă de predare-primire atașată contractului.</span>
                         </div>
                       </label>
                     </div>
 
                     {/* 04. Clauze Protectie */}
-                    <div className="p-4 sm:p-6 bg-[#12181D]/40 border border-slate-800/80 rounded-xl space-y-4 sm:space-y-5 relative overflow-hidden group hover:border-slate-700/60 transition-colors">
+                    <div className="p-4 sm:p-6 bg-[#12181D]/40 border border-slate-800/80 rounded-xl space-y-4 sm:space-y-5 relative overflow-hidden group hover:border-slate-700/60 transition-colors [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!border-slate-200">
                       <div className="absolute top-0 left-0 w-1 h-full bg-slate-700 group-hover:bg-amber-500 transition-colors"></div>
-                      <div className="flex justify-between items-center border-b border-slate-800/60 pb-3 cursor-pointer" onClick={() => setIsClausesOpen(!isClausesOpen)}>
-                        <span className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                      <div className="flex justify-between items-center border-b border-slate-800/60 pb-3 cursor-pointer [.matcha-light-theme_&]:!border-slate-200" onClick={() => setIsClausesOpen(!isClausesOpen)}>
+                        <span className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2 [.matcha-light-theme_&]:!text-slate-800">
                           <span className="text-slate-500 font-mono">04.</span> Clauze de Protecție ({(Object.values(formData).filter(v => v === true).length - (formData.estePlatitorTVA ? 1 : 0) - (formData.adaugaProcesVerbal ? 1 : 0) - (formData.adaugaQrPlata ? 1 : 0))} Active)
                         </span>
-                        <button type="button" className="text-slate-400 text-xs font-bold bg-slate-800 px-3 py-1 rounded">
+                        <button type="button" className="text-slate-400 text-xs font-bold bg-slate-800 px-3 py-1 rounded [.matcha-light-theme_&]:!bg-slate-100 [.matcha-light-theme_&]:!text-slate-600">
                           {isClausesOpen ? 'Ascunde ▲' : 'Modifică Clauze ▼'}
                         </button>
                       </div>
@@ -3036,14 +3036,7 @@ const reseteazaSemnaturiB2B = () => {
                 )}
               </div>
             </div>
-
-            {/* DASHBOARD MUTAT IN STEP 2 (Apare doar la B2B, ascuns la Auto) */}
-            {user && formData.tipContract !== 'auto' && (
-              <div className="max-w-6xl mx-auto mt-12 px-4">
-                <ContractsDashboard userId={user.id} />
-              </div>
-            )}
-
+            
             {/* WIDGET-URI (DOAR LA B2B) */}
             <div className="w-full">
               
@@ -3111,10 +3104,7 @@ const reseteazaSemnaturiB2B = () => {
           </div>
         )}
 
-        {/* =========================================================================
-                                    STEP 3: AI AUDIT JURO-STYLE
-            ========================================================================= */}
-        {/* =========================================================================
+          {/* =========================================================================
                                     STEP 3: AI AUDIT JURO-STYLE
             ========================================================================= */}
         {step === 3 && (
