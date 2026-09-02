@@ -43,9 +43,19 @@ export default function DashboardPage() {
       <Navbar user={user} />
       
       <main className="flex-grow max-w-6xl mx-auto w-full px-4 pt-12 pb-24 relative z-10">
-        <div className="mb-10 text-center sm:text-left">
-          <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight">Arhiva Mea</h1>
-          <p className="text-slate-400 mt-2 text-sm leading-relaxed max-w-2xl">Aici se regăsesc toate documentele generate de tine. Amprentele criptografice SHA-256 garantează autenticitatea și imuabilitatea datelor în fața oricărei terțe părți.</p>
+        
+        {/* HEADER NOU */}
+        <div className="text-center mb-16 border-b border-slate-800/80 pb-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#16221A] border border-[#8ba888]/20 text-[#8ba888] text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
+            <span className="relative flex h-1.5 w-1.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span></span>
+            CRM Dashboard
+          </div>
+          <h1 className="text-4xl md:text-5xl font-black text-white leading-tight tracking-tighter mb-5">
+            Arhiva Contracte <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8ba888] to-emerald-400">si Rapoarte</span>
+          </h1>
+          <p className="text-sm text-slate-400 max-w-2xl mx-auto leading-relaxed">
+            Aici se regăsesc toate documentele generate de tine. Amprentele criptografice SHA-256 garantează autenticitatea și imuabilitatea datelor în fața oricărei terțe părți.
+          </p>
         </div>
         
         <ContractsDashboard userId={user.id} />
