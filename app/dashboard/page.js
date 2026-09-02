@@ -44,6 +44,10 @@ export default function DashboardPage() {
       
       <main className="flex-grow max-w-6xl mx-auto w-full px-4 pt-12 pb-24 relative z-10">
         
+        <a href="/" className="text-[11px] font-bold text-[#8ba888] hover:text-white flex items-center gap-2 mb-6 transition-colors w-fit">
+        &larr; Înapoi la Panoul Principal
+        </a>
+
         {/* HEADER NOU */}
         <div className="text-center mb-16 border-b border-slate-800/80 pb-10">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#16221A] border border-[#8ba888]/20 text-[#8ba888] text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
