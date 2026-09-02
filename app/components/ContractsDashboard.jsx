@@ -8,7 +8,7 @@ export default function ContractsDashboard({ userId }) {
   const [contracts, setContracts] = useState([]);
   const [loadingId, setLoadingId] = useState(null);
 
-  // EFECTUL CARE ADUCE CONTRACTELE DIN SUPABASE (Asta lipsea!)
+  // EFECTUL CARE ADUCE CONTRACTELE DIN SUPABASE
   useEffect(() => {
     const fetchContracts = async () => {
       if (!userId) return;
@@ -162,7 +162,39 @@ export default function ContractsDashboard({ userId }) {
 
                       <button 
                         onClick={() => {
-                          const content = `CERTIFICAT DE AUTENTICITATE SHA-256\n===================================\n\nDocument ID: ${c.id}\nTitlu Contract: ${c.titlu_contract}\nPărți Implicate: ${c.client_nume}\nValoare: ${c.valoare} ${c.moneda}\n\nHASH CRIPTOGRAFIC IMUABIL:\n${c.hash_sha256 || 'N/A'}\n\n===================================\nSistem auditat. Acest certificat garantează integritatea fișierului.`;
+                          const timestamp = new Date().toLocaleString('ro-RO', { timeZone: 'Europe/Bucharest' });
+                          const content = `====================================================================
+             CERTIFICAT DE AUTENTICITATE ȘI INTEGRITATE
+                     CONTRACTSMART SMART VAULT
+====================================================================
+
+Acest document atestă amprentarea digitală și înregistrarea imuabilă 
+a contractului în ecosistemul ContractSmart, securizat prin algoritmul 
+criptografic SHA-256.
+
+[ DATE DE IDENTIFICARE DOCUMENT ]
+• ID Unic Sistem (UUID)   : ${c.id}
+• Tip Document            : ${c.titlu_contract}
+• Părți Implicate         : ${c.client_nume}
+• Valoare Contractuală    : ${c.valoare} ${c.moneda}
+• Dată Generare Certificat: ${timestamp}
+
+[ AMPRENTĂ CRIPTOGRAFICĂ SHA-256 ]
+Hash Imuabil: 
+${c.hash_sha256 || 'N/A'}
+
+[ NOTĂ DE VERIFICARE JURIDICĂ ]
+Acest hash reprezintă semnătura unică a fișierului PDF original. 
+Orice modificare adusă documentului (inclusiv alterarea unui singur 
+caracter, spațiu sau pixel) va genera un hash complet diferit. 
+Integritatea contractului poate fi dovedită în fața oricărei terțe 
+părți prin încărcarea fișierului PDF într-un utilitar public de 
+verificare SHA-256 și compararea rezultatului cu amprenta de mai sus.
+
+====================================================================
+Emis automat de infrastructura ContractSmart.ro
+Validat și arhivat electronic.
+====================================================================`;
                           const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
                           const url = window.URL.createObjectURL(blob);
                           const a = document.createElement('a');

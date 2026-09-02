@@ -30,6 +30,14 @@ export async function POST(request) {
 
     const dataCurenta = new Date().toLocaleDateString('ro-RO');
     
+    // Extragere robustă a IBAN-ului din structura JSON salvată
+    const ibanDebitor = contract.date_formular?.ibanPlata || contract.date_json?.ibanPlata || contract.iban_plata || "";
+    
+    // Generare text dinamic pentru modalitatea de plată
+    const textModalitatePlata = ibanDebitor 
+      ? `Plata se va efectua prin virament bancar în următorul cont: <strong>${ibanDebitor}</strong>. Vă rugăm să transmiteți confirmarea plății pe adresa electronică asociată.`
+      : `Plata se va efectua prin virament bancar în contul menționat în documentul inițial. Vă rugăm să transmiteți confirmarea plății pe adresa electronică asociată.`;
+
     // HTML-ul oficial pentru Notificarea de Plată pe Codul Civil (Art. 1522)
     const htmlSomatie = `
       <!DOCTYPE html>
@@ -75,7 +83,7 @@ export async function POST(request) {
 
         <div class="section-title">CAPITOLUL III. MODALITATEA DE STINGERE A DEBITULUI</div>
         <div class="paragraph">
-          Plata se va efectua prin virament bancar în contul menționat în documentul inițial. Vă rugăm să transmiteți confirmarea plății pe adresa electronică asociată.
+          ${textModalitatePlata}
         </div>
 
         <div style="margin-top: 50px; display: flex; justify-content: space-between;">
