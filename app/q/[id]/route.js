@@ -10,7 +10,7 @@ export async function GET(req, { params }) {
 
         const { data: qr } = await supabase.from('qr_codes').select('destination_url').eq('id', id).single();
         
-        if (!qr) return NextResponse.redirect(new URL('/', req.url));
+        if (!qr) return NextResponse.redirect('https://contractsmart.ro/');
 
         // Salvăm scanarea silențios (fără await, pentru ca utilizatorul să fie redirectat instantaneu)
         supabase.from('qr_scans').insert([{ qr_code_id: id, user_agent: userAgent }]).then();
@@ -22,6 +22,6 @@ export async function GET(req, { params }) {
         
         return NextResponse.redirect(dest);
     } catch (e) {
-        return NextResponse.redirect(new URL('/', req.url));
+        return NextResponse.redirect('https://contractsmart.ro/');
     }
 }
