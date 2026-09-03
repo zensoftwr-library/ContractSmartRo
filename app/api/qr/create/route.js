@@ -22,8 +22,7 @@ export async function POST(req) {
 
         if (error) throw error;
 
-        // Am hardcodat direct domeniul de producție pentru a suprascrie 
-        // orice variabilă de mediu care ar putea trage "localhost:3000"
+        
         const shortUrl = `https://contractsmart.ro/q/${shortId}`;
         
         return NextResponse.json({ success: true, shortUrl });
