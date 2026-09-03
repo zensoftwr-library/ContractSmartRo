@@ -7,7 +7,10 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SER
 export async function POST(req) {
     try {
         const { url, userId } = await req.json();
-        if (!url || !userId) return NextResponse.json({ success: false, message: 'URL sau Date utilizator lipsă.' }, { status: 400 });
+        
+        if (!url || !userId) {
+            return NextResponse.json({ success: false, message: 'URL sau Date utilizator lipsă.' }, { status: 400 });
+        }
 
         const shortId = crypto.randomBytes(3).toString('hex'); // Generează ex: a1b2c3
         
@@ -19,9 +22,9 @@ export async function POST(req) {
 
         if (error) throw error;
 
-        // În producție, poți pune NEXT_PUBLIC_BASE_URL="https://contractsmart.ro" în .env.local
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://contractsmart.ro';
-        const shortUrl = `${baseUrl}/q/${shortId}`;
+        // Am hardcodat direct domeniul de producție pentru a suprascrie 
+        // orice variabilă de mediu care ar putea trage "localhost:3000"
+        const shortUrl = `https://contractsmart.ro/q/${shortId}`;
         
         return NextResponse.json({ success: true, shortUrl });
     } catch (err) {
