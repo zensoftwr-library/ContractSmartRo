@@ -178,6 +178,13 @@ const gumroadLinks = {
 };
 
 export default function Home() {
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'file_download');
+    }
+  }, []);
+
   const [loadingText, setLoadingText] = useState(null);
   const [step, setStep] = useState(1);
   const [autoStep, setAutoStep] = useState('upload');
