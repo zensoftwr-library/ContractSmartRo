@@ -43,7 +43,7 @@ export default function RootLayout({ children }) {
         {/* GOOGLE ANALYTICS 4 - Incarcare Asincrona Optimizata */}
         <Script
           strategy="afterInteractive"
-          src={`https://www.googletagmanager.com/gtag/js?id=G-96RCSSYK3W`}
+          src={`https://www.googletagmanager.com/gtag/js?id=G-V645FSMJYD`}
         />
         <Script
           id="google-analytics"
@@ -53,7 +53,7 @@ export default function RootLayout({ children }) {
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
-              gtag('config', 'G-96RCSSYK3W', {
+              gtag('config', 'G-V645FSMJYD', {
                 page_path: window.location.pathname,
               });
             `,
