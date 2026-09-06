@@ -92,7 +92,6 @@ export default function PricingAddons({ handleCumparaPremium, user }) {
 
       {/* Banner Orizontal Compact pentru Pachetul AI & Somații la baza */}
       <div className="bg-[#12181D]/90 backdrop-blur-xl border border-purple-500/40 p-4 md:p-5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 shadow-xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-32 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
         
         <div className="flex items-center gap-4 text-left">
           <div className="w-10 h-10 rounded-xl bg-purple-900/30 border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0 shadow-inner">
