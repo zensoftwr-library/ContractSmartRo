@@ -1488,10 +1488,7 @@ const reseteazaSemnaturiB2B = () => {
         {showAuthModal && (
           <div className="fixed inset-0 bg-[#0B0F12]/80 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fadeIn">
             <div className="bg-[#12181D]/90 backdrop-blur-xl border border-slate-800/80 p-8 rounded-3xl max-w-sm w-full shadow-[0_20px_50px_-15px_rgba(0,0,0,0.7)] relative overflow-hidden">
-              
-              {/* Ambient Glow */}
-              <div className="absolute -top-20 -right-20 w-48 h-48 bg-[#8ba888]/10 rounded-full blur-3xl pointer-events-none"></div>
-              
+                            
               {/* Close Button */}
               <button 
                 type="button" 
@@ -1602,10 +1599,7 @@ const reseteazaSemnaturiB2B = () => {
         {showPaymentModal && (
           <div className="fixed inset-0 bg-[#0B0F12]/80 backdrop-blur-md z-[70] flex items-center justify-center p-4 animate-fadeIn">
             <div className="bg-[#12181D]/90 backdrop-blur-xl border border-slate-800/80 p-8 rounded-3xl max-w-md w-full shadow-[0_20px_50px_-15px_rgba(0,0,0,0.7)] relative text-center overflow-hidden">
-              
-              {/* Ambient Glow */}
-              <div className="absolute -top-20 -left-20 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
+                            
               {/* Close Button */}
               <button 
                 type="button" 
@@ -1735,9 +1729,7 @@ const reseteazaSemnaturiB2B = () => {
 
           <div className="max-w-6xl w-full mx-auto px-4 sm:px-6 mt-4 mb-12">              
             <div className="bg-[#12181D]/60 backdrop-blur-xl rounded-2xl border border-slate-800/80 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden group hover:border-[#8ba888]/30 transition-colors relative w-full overflow-x-hidden">
-              {/* Subtle ambient glow */}
-              <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#8ba888]/5 rounded-full blur-3xl pointer-events-none"></div>
-
+            
               {/* Header & Tabs - COMPACT */}
               <div className="p-5 border-b border-slate-800/80 bg-[#0B0F12]/50">
                 <div className="text-center sm:text-left mb-4">
