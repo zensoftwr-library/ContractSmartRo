@@ -182,6 +182,7 @@ export default function Home() {
   useEffect(() => {
     if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('event', 'file_download');
+      window.gtag('event', 'conversion', { 'send_to': 'AW-18427625678/hY3wCJ2G7O8cEM6B_dJE' });
     }
   }, []);
 

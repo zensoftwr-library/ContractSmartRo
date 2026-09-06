@@ -56,6 +56,7 @@ export default function RootLayout({ children }) {
               gtag('config', 'G-V645FSMJYD', {
                 page_path: window.location.pathname,
               });
+              gtag('config', 'AW-18427625678');
             `,
           }}
         />
