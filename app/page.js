@@ -899,6 +899,17 @@ const reseteazaSemnaturiB2B = () => {
   };
 
   useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
+        setUser(session?.user ?? null);
+        isProcessingForm.current = false; 
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+  
+  useEffect(() => {
     const fetchUserProfile = async (userId, email) => {
       try {
         // 1. Am adăugat 'ai_audits_used' în .select()
@@ -1429,6 +1440,7 @@ const reseteazaSemnaturiB2B = () => {
         setAuthEmail('');
         setAuthPassword('');
         setAuthConfirmPassword('');
+        window.location.reload();
       }
     } catch (err) {
       console.error("Eroare detaliată Auth:", err);
