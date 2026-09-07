@@ -40,6 +40,17 @@ export default function RootLayout({ children }) {
       </head>
       <body className="bg-[#0B0F12] text-slate-200 antialiased relative min-h-screen selection:bg-[#8ba888]/30 selection:text-[#8ba888]" suppressHydrationWarning>
         
+        {/* FIX PENTRU EROAREA CHUNKLOAD (La update-uri platformă) */}
+        <Script id="chunk-error-handler" strategy="beforeInteractive">
+          {`
+            window.addEventListener('error', function(event) {
+              if (event.message && (event.message.includes('Failed to load chunk') || event.message.includes('ChunkLoadError'))) {
+                window.location.reload();
+              }
+            });
+          `}
+        </Script>
+
         {/* GOOGLE ANALYTICS 4 - Incarcare Asincrona Optimizata */}
         <Script
           strategy="afterInteractive"
