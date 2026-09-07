@@ -1350,8 +1350,11 @@ const reseteazaSemnaturiB2B = () => {
       if (data.success) {
         await supabase.auth.signOut();
         setUser(null);
+        setProfil(null);
+        setUserTier('free');
         setWidgetCompany(null);
         alert("Contul tău a fost șters.");
+        window.location.reload(); // Forțează reîncărcarea curată a aplicației
       } else {
         alert(data.message);
       }
@@ -1403,7 +1406,7 @@ const reseteazaSemnaturiB2B = () => {
         }
 
         if (data?.user && !data?.session) {
-            alert("Cont creat! Verifică-ți emailul (inclusiv Spam) și dă click pe link pentru activare.");
+            alert(`Un email de confirmare a fost trimis către ${authEmail}. Te rugăm să verifici inbox-ul și folderul Spam pentru a activa contul.`);
         } else {
             alert("Cont creat cu succes! Te poți autentifica acum.");
         }
@@ -1428,10 +1431,9 @@ const reseteazaSemnaturiB2B = () => {
         setAuthConfirmPassword('');
       }
     } catch (err) {
-      alert(err.message || "Eroare la autentificare. Verificați datele introduse.");
-    } finally {
-      isProcessingForm.current = false;
-      setLoadingText(null);
+      console.error("Eroare detaliată Auth:", err);
+      const errorMessage = err?.message || (typeof err === 'object' ? JSON.stringify(err) : String(err));
+      alert(errorMessage === "{}" ? "A apărut o eroare necunoscută de la serverul de autentificare." : errorMessage);
     }
   };
 
