@@ -63,10 +63,10 @@ export default function GlobalAIAssistant({ user }) {
   return (
     <div className="fixed bottom-6 right-6 z-[60] flex flex-col items-end">
       {isAiOpen && (
-        <div className="bg-[#0B0F12]/95 backdrop-blur-xl border border-slate-700/50 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.7)] rounded-2xl w-[340px] sm:w-[400px] h-[550px] mb-5 flex flex-col overflow-hidden animate-fadeIn ring-1 ring-white/5 origin-bottom-right">
+        <div className="bg-[#0B0F12]/95 backdrop-blur-xl border border-slate-700/50 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.7)] rounded-2xl w-[340px] sm:w-[400px] h-[600px] max-h-[85vh] sm:max-h-[90vh] mb-5 flex flex-col overflow-hidden animate-fadeIn ring-1 ring-white/5 origin-bottom-right">
           
           {/* HEADER PREMIUM */}
-          <div className="bg-gradient-to-r from-[#16221A] to-[#0B0F12] border-b border-[#8ba888]/20 p-4 flex justify-between items-center relative overflow-hidden">
+          <div className="flex-none bg-gradient-to-r from-[#16221A] to-[#0B0F12] border-b border-[#8ba888]/20 p-4 flex justify-between items-center relative overflow-hidden">
             <div className="absolute -right-4 -top-4 w-16 h-16 bg-[#8ba888]/10 blur-xl rounded-full pointer-events-none"></div>
             <div className="flex items-center gap-3 relative z-10">
               <div className="relative flex items-center justify-center w-8 h-8 rounded-full bg-[#12181D] border border-slate-700">
@@ -133,7 +133,7 @@ export default function GlobalAIAssistant({ user }) {
           </div>
 
           {/* INPUT AREA */}
-          <div className="p-3 bg-[#0B0F12] border-t border-slate-800/80">
+          <div className="flex-none p-3 bg-[#0B0F12] border-t border-slate-800/80">
             <form onSubmit={handleSendAiMessage} className="flex gap-2 items-end">
               <textarea
                 rows="1"
