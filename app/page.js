@@ -1392,6 +1392,22 @@ const reseteazaSemnaturiB2B = () => {
     }
   };
 
+  const handleSocialLogin = async (provider) => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: provider, // 'google' sau 'github'
+        options: {
+          redirectTo: `${window.location.origin}/`,
+        },
+      });
+
+      if (error) throw error;
+    } catch (err) {
+      console.error(`Eroare logare ${provider}:`, err);
+      alert(`Eroare la autentificarea cu ${provider}: ${err.message}`);
+    }
+  };
+
   const handleAuthSubmit = async (e) => {
     e.preventDefault();
     if (isProcessingForm.current) return;
@@ -1518,6 +1534,7 @@ const reseteazaSemnaturiB2B = () => {
           authConfirmPassword={authConfirmPassword} 
           setAuthConfirmPassword={setAuthConfirmPassword}
           handleAuthSubmit={handleAuthSubmit}
+          handleSocialLogin={handleSocialLogin}
           loadingText={loadingText}
         />
 
