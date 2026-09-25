@@ -32,6 +32,12 @@ export default function Footer({ handleInapoiPrincipal }) {
           <p className="text-[10px] text-slate-500 font-mono max-w-3xl text-center leading-relaxed px-4">
             <strong className="text-red-500">Disclaimer Legal!</strong> <strong className="text-[#8ba888]">ContractSmart</strong> este o platformă de software. <strong className="text-red-500">NU</strong> suntem o casă de avocatură și nu oferim consultanță juridică. Utilizarea platformei reprezintă acceptarea faptului că modelele generate necesită revizuirea de către un specialist.
           </p>
+          
+          {/* Adăugat: Explicația de transparență pentru procesarea plăților prin MoR */}
+          <p className="text-[10px] text-slate-500 font-mono max-w-3xl text-center leading-relaxed px-4">
+            Platformă dezvoltată și operată independent. Toate tranzacțiile financiare, emiterea facturilor și conformitatea fiscală (inclusiv colectarea TVA) sunt gestionate exclusiv și securizat de către <a href="https://gumroad.com" target="_blank" rel="nofollow" className="text-[#8ba888] hover:underline font-bold">Gumroad, Inc</a>.
+          </p>
+
           <p className="text-[11px] text-slate-500 font-mono">© 2026 <strong className="text-[#8ba888]">ContractSmart</strong>. Powered by <strong className="text-[#8ba888]">ZenSoftWare</strong>. Toate drepturile rezervate legal.</p>
         </div>
       </div>

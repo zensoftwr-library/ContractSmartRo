@@ -281,7 +281,7 @@ export default function ModeleContracte() {
             Șabloane Tipizate <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8ba888] to-emerald-400">Academice</span>
           </h1>
           <p className="text-sm text-slate-400 max-w-2xl mx-auto leading-relaxed">
-            Descarcă modele oficiale în format protejat PDF, structurate rigid de experți juridici respectând prevederile Codului Civil, gata de imprimat și completat.
+            Descarcă modele oficiale în format protejat PDF, structurate rigid, respectând prevederile Codului Civil, gata de imprimat și completat.
           </p>
         </div>
 
