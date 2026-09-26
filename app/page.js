@@ -1501,6 +1501,8 @@ const reseteazaSemnaturiB2B = () => {
       console.error("Eroare detaliată Auth:", err);
       const errorMessage = err?.message || (typeof err === 'object' ? JSON.stringify(err) : String(err));
       alert(errorMessage === "{}" ? "A apărut o eroare necunoscută de la serverul de autentificare." : errorMessage);
+      isProcessingForm.current = false;
+      setLoadingText(null);
     }
   };
 
