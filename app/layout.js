@@ -57,6 +57,15 @@ export default function RootLayout({ children }) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         
+        {/* PWA: Plasă de siguranță pentru evenimentul de instalare (ADAUGAT ACUM) */}
+        <script dangerouslySetInnerHTML={{ __html: `
+          window.pwaDeferredPrompt = null;
+          window.addEventListener('beforeinstallprompt', function(e) {
+            e.preventDefault();
+            window.pwaDeferredPrompt = e;
+          });
+        `}} />
+
         {/* PWA iOS Fallback Tags */}
         <meta name="mobile-web-app-capable" content="yes" />
         <link rel="apple-touch-icon" href="/icon-512x512.png" />
