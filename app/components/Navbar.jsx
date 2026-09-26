@@ -21,6 +21,37 @@ export default function Navbar({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMatchaLight, setIsMatchaLight] = useState(false);
   
+  // STATE PENTRU BUTONUL PWA
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [isInstallable, setIsInstallable] = useState(false);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setIsInstallable(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    window.addEventListener('appinstalled', () => {
+      setIsInstallable(false);
+      setDeferredPrompt(null);
+    });
+
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setIsInstallable(false);
+    }
+    setDeferredPrompt(null);
+  };
+
   // Stare locală independentă pentru utilizator pe orice pagină
   const [localUser, setLocalUser] = useState(propUser || null);
 
@@ -225,6 +256,17 @@ export default function Navbar({
           
           <button onClick={mergiLaPreturi} className="bg-gradient-to-r from-[#8ba888] to-[#6d8a6a] text-black font-black text-[11px] px-5 py-2.5 rounded-xl uppercase tracking-widest transition-all shadow-[0_0_15px_rgba(139,168,136,0.3)] hover:scale-[1.02] active:scale-[0.98]">Tarife</button>
           
+          {/* BUTON PWA DESKTOP */}
+          {isInstallable && (
+            <button 
+              onClick={handleInstallClick}
+              className="ml-4 flex items-center gap-2 bg-[#16221A] border border-emerald-500/30 text-emerald-400 font-bold px-4 py-2.5 rounded-xl text-xs uppercase tracking-wide hover:bg-emerald-900/30 transition-colors animate-pulse shadow-lg"
+            >
+              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+              Instalează
+            </button>
+          )}
+
           <button onClick={toggleTheme} className="ml-4 w-9 h-9 flex items-center justify-center rounded-full bg-[#12181D] border border-slate-700 hover:border-[#8ba888] transition-all" title="Schimbă Tema">
             {isMatchaLight ? '🌙' : '☀️'}
           </button>
@@ -296,6 +338,18 @@ export default function Navbar({
               </div>
             </div>
           )}
+
+          {/* BUTON PWA MOBILE */}
+          {isInstallable && (
+            <button 
+              onClick={() => { setIsMobileMenuOpen(false); handleInstallClick(); }}
+              className="w-full mt-3 bg-[#16221A] border border-emerald-500/30 text-emerald-400 font-black px-4 py-3.5 rounded-xl text-sm uppercase tracking-widest hover:bg-emerald-900/30 transition-colors shadow-lg flex items-center justify-center gap-2 animate-pulse"
+            >
+              <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+              Instalează Aplicația
+            </button>
+          )}
+
           <div className="flex gap-3 mt-2">
             <button onClick={mergiLaPreturi} className="flex-1 bg-gradient-to-r from-[#8ba888] to-[#6d8a6a] text-black font-black text-sm px-4 py-3.5 rounded-xl text-center uppercase tracking-widest shadow-lg">Vezi Oferte & Tarife</button>
             <button onClick={toggleTheme} className="w-14 shrink-0 flex items-center justify-center rounded-xl bg-[#12181D] border border-slate-700 hover:border-[#8ba888] transition-all text-xl shadow-lg" title="Schimbă Tema">

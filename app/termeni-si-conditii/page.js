@@ -190,26 +190,7 @@ export default function TermeniSiConditii() {
               </section>
             </div>
 
-            {/* 8. SOLUȚIONAREA LITIGIILOR & ANPC (SECȚIUNE NOUĂ OBLIGATORIE) */}
-            <section className="bg-[#12181D]/40 border border-slate-800/80 p-6 md:p-8 rounded-2xl shadow-lg hover:border-[#8ba888]/30 transition-colors">
-              <h2 className="text-xl md:text-2xl font-black text-white mb-4 flex items-center gap-3">
-                <span className="w-8 h-8 rounded-lg bg-[#8ba888]/20 flex items-center justify-center text-[#8ba888] font-black text-sm border border-[#8ba888]/30">8</span>
-                Soluționarea Litigiilor și ANPC
-              </h2>
-              <p className="text-slate-400 leading-relaxed mb-5">
-                Orice dispută rezultată din utilizarea platformei va fi soluționată pe cale amiabilă. În caz contrar, litigiile vor fi deduse instanțelor judecătorești competente. Pentru soluționarea alternativă a litigiilor (SAL/SOL), aveți la dispoziție următoarele platforme oficiale:
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <a href="https://anpc.ro/" target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 bg-[#16221A] border border-[#8ba888]/30 text-[#8ba888] px-4 py-2.5 rounded-lg hover:bg-[#8ba888] hover:text-black transition-colors text-xs font-bold uppercase tracking-wider">
-                  Site Oficial ANPC
-                </a>
-                <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 bg-[#16221A] border border-[#8ba888]/30 text-[#8ba888] px-4 py-2.5 rounded-lg hover:bg-[#8ba888] hover:text-black transition-colors text-xs font-bold uppercase tracking-wider">
-                  Platforma SOL (UE)
-                </a>
-              </div>
-            </section>
-
-          </div>
+            </div>
         </div>
 
         {/* TRUST BADGES ENTERPRISE */}

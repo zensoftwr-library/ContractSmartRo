@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Navbar from '../components/Navbar';
 import PricingPlans from '../components/PricingPlans';
@@ -15,6 +16,7 @@ const supabase = createClient(
 const GUMROAD_SABLON_LINK = 'https://zensoftware.gumroad.com/l/sablon-tipizat-legal';
 
 export default function ModeleContracte() {
+  const router = useRouter();
   const [loadingTemplate, setLoadingTemplate] = useState(null);
   const [user, setUser] = useState(null);
   const [userTier, setUserTier] = useState('free'); 
@@ -175,7 +177,8 @@ export default function ModeleContracte() {
 
   const handleDescarcaSauCumpara = async (sablon) => {
     if (!user) {
-      alert('Trebuie să fii autentificat pentru a descărca șabloane de contracte. Te rugăm să te întorci pe pagina principală și să creezi un cont gratuit.');
+      // REDIRECȚIONARE DEEP LINK CĂTRE MODALUL DE AUTH (REȚENȚIE DOWNLOAD)
+      router.push('/?auth_intent=register&return_to=/modele-contracte');
       return;
     }
 

@@ -1,11 +1,30 @@
 import './globals.css';
 import CookieConsent from './components/CookieConsent';
 import GlobalAIAssistant from './components/GlobalAIAssistant';
-import Script from 'next/script'; // Importăm componenta optimizată Next.js
+import Script from 'next/script';
+import PwaRegister from './components/PwaRegister'; // Importăm înregistrarea PWA
 
 export const metadata = {
   title: 'ContractSmart | Infrastructură Legală & Contracte B2B',
   description: 'Sistem avansat pentru generarea, validarea și semnarea electronică a contractelor comerciale. Auditare criptografică la standarde europene.',
+  themeColor: '#0B0F12',
+  manifest: '/manifest.json', // Legătura către manifest
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'ContractSmart',
+  },
+  formatDetection: {
+    telephone: false,
+  },
+};
+
+// Configurație extinsă viewport necesară pentru PWA nativ
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
   themeColor: '#0B0F12',
 };
 
@@ -37,9 +56,15 @@ export default function RootLayout({ children }) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        
+        {/* PWA iOS Fallback Tags */}
+        <meta name="mobile-web-app-capable" content="yes" />
+        <link rel="apple-touch-icon" href="/icon-512x512.png" />
       </head>
       <body className="bg-[#0B0F12] text-slate-200 antialiased relative min-h-screen selection:bg-[#8ba888]/30 selection:text-[#8ba888]" suppressHydrationWarning>
         
+        <PwaRegister /> {/* Activatorul aplicației de mobil */}
+
         {/* FIX PENTRU EROAREA CHUNKLOAD (La update-uri platformă) */}
         <Script id="chunk-error-handler" strategy="beforeInteractive">
           {`

@@ -187,6 +187,29 @@ export default function Home() {
     }
   }, []);
 
+  // =========================================================================
+  // LOGICĂ NOUĂ PENTRU REDIRECȚIONARE DEEP LINKING (REȚENȚIE DOWNLOAD PWA)
+  // =========================================================================
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const authIntent = urlParams.get('auth_intent');
+      
+      if (authIntent === 'register') {
+        setIsSignUp(true); 
+        setShowAuthModal(true); 
+        
+        // Curățăm URL-ul pentru estetică, păstrăm return_to
+        const returnTo = urlParams.get('return_to');
+        let cleanUrl = window.location.pathname;
+        if (returnTo) {
+           cleanUrl += `?return_to=${encodeURIComponent(returnTo)}`;
+        }
+        window.history.replaceState({}, document.title, cleanUrl);
+      }
+    }
+  }, []);
+
   const [loadingText, setLoadingText] = useState(null);
   const [step, setStep] = useState(1);
   const [autoStep, setAutoStep] = useState('upload');
@@ -1392,12 +1415,21 @@ const reseteazaSemnaturiB2B = () => {
     }
   };
 
+  // =========================================================================
+  // LOGICA MODIFICATĂ PENTRU A SUPORTA RETURN_TO DUPĂ LOGIN/REGISTER
+  // =========================================================================
   const handleSocialLogin = async (provider) => {
     try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const returnTo = urlParams.get('return_to');
+      const redirectToUrl = returnTo 
+        ? `${window.location.origin}${returnTo}` 
+        : `${window.location.origin}/`;
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: provider, // 'google' sau 'github'
         options: {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: redirectToUrl,
         },
       });
 
@@ -1456,7 +1488,14 @@ const reseteazaSemnaturiB2B = () => {
         setAuthEmail('');
         setAuthPassword('');
         setAuthConfirmPassword('');
-        window.location.reload();
+        // Dacă utilizatorul s-a logat și avea o intenție de return_to, îl redirecționăm
+        const urlParams = new URLSearchParams(window.location.search);
+        const returnTo = urlParams.get('return_to');
+        if (returnTo) {
+          window.location.href = returnTo;
+        } else {
+          window.location.reload();
+        }
       }
     } catch (err) {
       console.error("Eroare detaliată Auth:", err);
