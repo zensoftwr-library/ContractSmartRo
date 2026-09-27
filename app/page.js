@@ -1748,7 +1748,11 @@ const reseteazaSemnaturiB2B = () => {
 
             {/* ADAUGAM PREȚURILE AICI ÎN PASUL 1 */}
             <div className="-mt-16 relative z-20">
-              <PricingPlans handleCumparaPremium={handleCumparaPremium} user={user} />
+              <PricingPlans 
+                handleCumparaPremium={handleCumparaPremium} 
+                user={user} 
+                onRegisterClick={() => { setIsSignUp(true); setShowAuthModal(true); }} 
+              />
             </div>
 
             {/* QR CODE STUDIO */}
