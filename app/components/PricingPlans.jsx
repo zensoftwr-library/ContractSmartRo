@@ -65,9 +65,8 @@ export default function PricingPlans({ handleCumparaPremium, user, onRegisterCli
             <p className="text-xs text-slate-400 [.matcha-light-theme_&]:!text-slate-600 leading-relaxed mb-4">Plătești strict pentru documentele generate, încărcând portofelul digital cu Credite când ai nevoie.</p>
           </div>
           
-          {/* LOGICA CORECTATĂ PENTRU BUTONUL DE FREE */}
           {!user ? (
-            <button type="button" onClick={onRegisterClick} className="w-full bg-slate-800 hover:bg-slate-700 [.matcha-light-theme_&]:!bg-slate-900 [.matcha-light-theme_&]:hover:!bg-slate-800 text-white font-black py-2.5 rounded-lg text-xs transition-colors shadow-sm uppercase tracking-wider">Crează Cont Gratuit</button>
+            <button type="button" onClick={onRegisterClick} className="w-full bg-slate-900 hover:bg-slate-800 [.matcha-light-theme_&]:!bg-slate-900 text-white font-black py-2.5 rounded-lg text-xs transition-colors shadow-sm uppercase tracking-wider">Crează Cont Gratuit</button>
           ) : (isFounder || isBusiness || isPro) ? (
             <div className="w-full text-center py-2.5 text-slate-400 font-black text-[10px] uppercase tracking-wider bg-slate-800/20 border border-slate-700/50 rounded-lg">Disponibil</div>
           ) : (
@@ -92,8 +91,8 @@ export default function PricingPlans({ handleCumparaPremium, user, onRegisterCli
           )}
         </div>
 
-        {/* BUSINESS PLAN (REPARAT LIGHT THEME) */}
-        <div className="bg-gradient-to-b from-[#16221A] to-[#12181D] [.matcha-light-theme_&]:!bg-white border-2 border-emerald-500/30 [.matcha-light-theme_&]:!border-emerald-300 hover:border-emerald-500/60 rounded-xl p-6 flex flex-col justify-between transition-colors relative shadow-md">
+        {/* BUSINESS PLAN (REPARAT FĂRĂ GRADIENT ÎN LIGHT MODE) */}
+        <div className="bg-[#16221A] [.matcha-light-theme_&]:!bg-white border-2 border-emerald-500/30 [.matcha-light-theme_&]:!border-emerald-300 hover:border-emerald-500/60 rounded-xl p-6 flex flex-col justify-between transition-colors relative shadow-md">
           <div>
             <div className="flex justify-center items-center mb-3">
               <span className="text-[9px] font-black text-white uppercase tracking-wider bg-emerald-600 px-3 py-0.5 rounded shadow-sm">Nelimitat (No-Brainer)</span>
@@ -149,7 +148,7 @@ export default function PricingPlans({ handleCumparaPremium, user, onRegisterCli
       </div>
 
       {/* --- FOUNDER LIFETIME --- */}
-      <div className="bg-gradient-to-r from-[#16221A] via-[#12181D] to-[#0B0F12] [.matcha-light-theme_&]:!bg-gradient-to-r [.matcha-light-theme_&]:!from-slate-900 [.matcha-light-theme_&]:!to-black border-2 border-amber-500/40 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl relative overflow-hidden group">
+      <div className="bg-[#16221A] [.matcha-light-theme_&]:!bg-slate-900 border-2 border-amber-500/40 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl relative overflow-hidden group">
         <div className="flex items-start md:items-center gap-5 text-left relative z-10">
           <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0 shadow-inner">
             <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
