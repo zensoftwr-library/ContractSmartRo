@@ -7,7 +7,7 @@ export default function PricingAddons({ handleCumparaPremium, user }) {
   return (
     <div className="max-w-6xl mx-auto px-4 mb-20 mt-4">
       <div className="pb-4 mb-6 text-center">
-        <h3 className="text-xl font-black text-white [.matcha-light-theme_&]:!text-slate-900 tracking-tight">Șabloane & Extensii QR <span className="text-[#8ba888] [.matcha-light-theme_&]:!text-emerald-700 font-bold">(Deblocare din Portofel)</span></h3>
+        <h3 className="text-xl font-black text-white [.matcha-light-theme_&]:!text-slate-900 tracking-tight">Șabloane & Extensii QR <span className="text-[#8ba888] [.matcha-light-theme_&]:!text-emerald-700 font-bold">(Deblocare Rapidă din Portofel)</span></h3>
       </div>
       
       {/* Primele 4 carduri pe un singur rând (4 coloane) */}
@@ -20,7 +20,7 @@ export default function PricingAddons({ handleCumparaPremium, user }) {
               <span className="text-[9px] font-bold text-slate-400 [.matcha-light-theme_&]:!text-slate-500 uppercase tracking-wider bg-slate-800/50 [.matcha-light-theme_&]:!bg-slate-100 px-2 py-0.5 rounded">Document Legal</span>
             </div>
             <h4 className="text-sm font-bold text-white [.matcha-light-theme_&]:!text-slate-900">Șablon Tipizat</h4>
-            <div className="text-xl font-black text-white [.matcha-light-theme_&]:!text-slate-900 mt-1 mb-2">49 <span className="text-xs text-[#8ba888] [.matcha-light-theme_&]:!text-emerald-700 font-bold">Credite</span></div>
+            <div className="text-xl font-black text-white [.matcha-light-theme_&]:!text-slate-900 mt-1 mb-2">15 <span className="text-xs text-[#8ba888] [.matcha-light-theme_&]:!text-emerald-700 font-bold">Credite</span></div>
             <p className="text-[10px] text-slate-400 [.matcha-light-theme_&]:!text-slate-600 leading-relaxed mb-4">Contracte PDF standard, gata redactate și verificate juridic.</p>
           </div>
           {isUnlocked ? (
@@ -28,8 +28,8 @@ export default function PricingAddons({ handleCumparaPremium, user }) {
               Inclus VIP
             </div>
           ) : (
-            <button type="button" onClick={() => alert("Această acțiune va consuma 49 de Credite din portofelul tău digital.")} className="w-full bg-[#0B0F12] [.matcha-light-theme_&]:!bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white font-bold py-2 rounded-lg text-xs transition-colors shadow-sm flex items-center justify-center gap-1.5">
-              <span>Folosește 49 Credite</span>
+            <button type="button" onClick={() => alert("Această acțiune va consuma 15 credite din portofelul tău digital.")} className="w-full bg-[#0B0F12] [.matcha-light-theme_&]:!bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white font-bold py-2 rounded-lg text-xs transition-colors shadow-sm flex items-center justify-center gap-1.5">
+              <span>Folosește 15 Credite</span>
             </button>
           )}
         </div>
@@ -41,7 +41,7 @@ export default function PricingAddons({ handleCumparaPremium, user }) {
               <span className="text-[9px] font-bold text-slate-400 [.matcha-light-theme_&]:!text-slate-500 uppercase tracking-wider bg-slate-800/50 [.matcha-light-theme_&]:!bg-slate-100 px-2 py-0.5 rounded">Design QR</span>
             </div>
             <h4 className="text-sm font-bold text-white [.matcha-light-theme_&]:!text-slate-900">Pachet Branding</h4>
-            <div className="text-xl font-black text-white [.matcha-light-theme_&]:!text-slate-900 mt-1 mb-2">49 <span className="text-xs text-[#8ba888] [.matcha-light-theme_&]:!text-emerald-700 font-bold">Credite</span></div>
+            <div className="text-xl font-black text-white [.matcha-light-theme_&]:!text-slate-900 mt-1 mb-2">15 <span className="text-xs text-[#8ba888] [.matcha-light-theme_&]:!text-emerald-700 font-bold">Credite</span></div>
             <p className="text-[10px] text-slate-400 [.matcha-light-theme_&]:!text-slate-600 leading-relaxed mb-4">Adaugă logo-ul companiei tale în centrul codului QR generat.</p>
           </div>
           {isUnlocked ? (
@@ -49,8 +49,8 @@ export default function PricingAddons({ handleCumparaPremium, user }) {
               Inclus VIP
             </div>
           ) : (
-            <button type="button" onClick={() => alert("Această acțiune va consuma 49 de Credite din portofelul tău digital.")} className="w-full bg-[#0B0F12] [.matcha-light-theme_&]:!bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white font-bold py-2 rounded-lg text-xs transition-colors shadow-sm flex items-center justify-center gap-1.5">
-              <span>Folosește 49 Credite</span>
+            <button type="button" onClick={() => alert("Această acțiune va consuma 15 credite din portofelul tău digital.")} className="w-full bg-[#0B0F12] [.matcha-light-theme_&]:!bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white font-bold py-2 rounded-lg text-xs transition-colors shadow-sm flex items-center justify-center gap-1.5">
+              <span>Folosește 15 Credite</span>
             </button>
           )}
         </div>
@@ -62,7 +62,7 @@ export default function PricingAddons({ handleCumparaPremium, user }) {
               <span className="text-[9px] font-bold text-[#8ba888] [.matcha-light-theme_&]:!text-emerald-700 uppercase tracking-wider bg-[#8ba888]/10 [.matcha-light-theme_&]:!bg-emerald-50 px-2 py-0.5 rounded border border-[#8ba888]/20 transition-colors">Sistem QR</span>
             </div>
             <h4 className="text-sm font-bold text-white [.matcha-light-theme_&]:!text-slate-900">QR Dinamic + PDF</h4>
-            <div className="text-xl font-black text-[#8ba888] [.matcha-light-theme_&]:!text-emerald-700 mt-1 mb-2">39 <span className="text-xs font-bold">Credite</span></div>
+            <div className="text-xl font-black text-[#8ba888] [.matcha-light-theme_&]:!text-emerald-700 mt-1 mb-2">19 <span className="text-xs font-bold">Credite</span></div>
             <p className="text-[10px] text-slate-400 [.matcha-light-theme_&]:!text-slate-600 leading-relaxed mb-4">Schimbă destinația link-ului oricând + Găzduire PDF inclusă.</p>
           </div>
           {isUnlocked ? (
@@ -70,8 +70,8 @@ export default function PricingAddons({ handleCumparaPremium, user }) {
               Inclus VIP
             </div>
           ) : (
-            <button type="button" onClick={() => alert("Această acțiune va consuma 39 de Credite din portofelul tău digital.")} className="w-full bg-[#0B0F12] [.matcha-light-theme_&]:!bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white font-bold py-2 rounded-lg text-xs transition-colors shadow-sm flex items-center justify-center gap-1.5">
-              <span>Folosește 39 Credite</span>
+            <button type="button" onClick={() => alert("Această acțiune va consuma 19 credite din portofelul tău digital.")} className="w-full bg-[#0B0F12] [.matcha-light-theme_&]:!bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white font-bold py-2 rounded-lg text-xs transition-colors shadow-sm flex items-center justify-center gap-1.5">
+              <span>Folosește 19 Credite</span>
             </button>
           )}
         </div>
@@ -83,7 +83,7 @@ export default function PricingAddons({ handleCumparaPremium, user }) {
               <span className="text-[9px] font-bold text-blue-400 [.matcha-light-theme_&]:!text-blue-700 uppercase tracking-wider bg-blue-900/20 [.matcha-light-theme_&]:!bg-blue-50 px-2 py-0.5 rounded border border-blue-500/20 transition-colors">Premium QR</span>
             </div>
             <h4 className="text-sm font-bold text-white [.matcha-light-theme_&]:!text-slate-900">vCard Pro</h4>
-            <div className="text-xl font-black text-white [.matcha-light-theme_&]:!text-slate-900 mt-1 mb-2">69 <span className="text-xs text-blue-400 [.matcha-light-theme_&]:!text-blue-700 font-bold">Credite</span></div>
+            <div className="text-xl font-black text-white [.matcha-light-theme_&]:!text-slate-900 mt-1 mb-2">25 <span className="text-xs text-blue-400 [.matcha-light-theme_&]:!text-blue-700 font-bold">Credite</span></div>
             <p className="text-[10px] text-slate-400 [.matcha-light-theme_&]:!text-slate-600 leading-relaxed mb-4">Carte de vizită digitală inteligentă cu salvare directă în agendă.</p>
           </div>
           {isUnlocked ? (
@@ -91,8 +91,8 @@ export default function PricingAddons({ handleCumparaPremium, user }) {
               Inclus VIP
             </div>
           ) : (
-            <button type="button" onClick={() => alert("Această acțiune va consuma 69 de Credite din portofelul tău digital.")} className="w-full bg-[#0B0F12] [.matcha-light-theme_&]:!bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white font-bold py-2 rounded-lg text-xs transition-colors shadow-sm flex items-center justify-center gap-1.5">
-              <span>Folosește 69 Credite</span>
+            <button type="button" onClick={() => alert("Această acțiune va consuma 25 de credite din portofelul tău digital.")} className="w-full bg-[#0B0F12] [.matcha-light-theme_&]:!bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white font-bold py-2 rounded-lg text-xs transition-colors shadow-sm flex items-center justify-center gap-1.5">
+              <span>Folosește 25 Credite</span>
             </button>
           )}
         </div>
@@ -117,7 +117,7 @@ export default function PricingAddons({ handleCumparaPremium, user }) {
 
         <div className="flex items-center gap-4 shrink-0 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 pt-3 md:pt-0 border-slate-800 [.matcha-light-theme_&]:!border-slate-200">
           <div className="text-left md:text-right">
-            <span className="text-lg font-black text-white [.matcha-light-theme_&]:!text-slate-900 block">49 Credite</span>
+            <span className="text-lg font-black text-white [.matcha-light-theme_&]:!text-slate-900 block">25 Credite</span>
             <span className="text-[9px] text-purple-400 [.matcha-light-theme_&]:!text-purple-700 uppercase font-bold block">Din Portofel</span>
           </div>
           {isUnlocked ? (
@@ -126,10 +126,10 @@ export default function PricingAddons({ handleCumparaPremium, user }) {
             </div>
           ) : (
             <button 
-              onClick={() => alert("Această acțiune va consuma 49 de Credite din portofelul tău digital.")}
+              onClick={() => alert("Această acțiune va consuma 25 de credite din portofelul tău digital.")}
               className="bg-purple-600 hover:bg-purple-500 text-white font-black px-5 py-3 rounded-xl text-xs uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(147,51,234,0.3)] shrink-0 flex items-center justify-center gap-1.5"
             >
-              Deblochează (49 Credite)
+              Deblochează (25 Credite)
             </button>
           )}
         </div>
