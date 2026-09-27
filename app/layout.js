@@ -110,6 +110,7 @@ export default function RootLayout({ children }) {
         
         <CookieConsent />
         <GlobalAIAssistant />
+        <Script src="https://gumroad.com/js/gumroad.js" strategy="lazyOnload" />
       </body>
     </html>
   );

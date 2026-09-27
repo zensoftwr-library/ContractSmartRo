@@ -64,20 +64,20 @@ export async function POST(req) {
       return NextResponse.json({ success: false, message: 'Neautentificat' }, { status: 401 });
     }
     
-    const { data: profile } = await supabase.from('profiles').select('subscription_tier, is_pro').eq('id', data.userId).single();
-    const tier = (profile?.subscription_tier || '').toLowerCase().trim();
-    const isPremium = tier.includes('founder') || tier.includes('pro') || profile?.is_pro;
+    // -------------------------------------------------------------------------
+    // 2. VERIFICARE SOLD PORTFOLFEL (GATEKEEPER 99 CREDITE)
+    // -------------------------------------------------------------------------
+    const COST_CREDITE = 99; // Costul stabilit pentru Pachetul Auto DITL
 
-    if (!isPremium) {
-      const { data: achizitie } = await supabase.from('user_purchases')
-        .select('id')
-        .eq('user_id', data.userId)
-        .eq('product_id', 'contract_auto')
-        .single();
-        
-      if (!achizitie) {
-        return NextResponse.json({ success: false, needsPayment: true, message: 'Acces interzis. Necesită achiziție.' }, { status: 403 });
-      }
+    const { data: profile } = await supabase.from('profiles').select('subscription_tier, credits_remaining').eq('id', data.userId).single();
+    
+    const tier = (profile?.subscription_tier || 'free').toLowerCase().trim();
+    // Doar Founder și Business au generări auto nelimitate
+    const areAccesNelimitat = ['founder', 'business'].includes(tier);
+    const availableCredits = profile?.credits_remaining || 0;
+
+    if (!areAccesNelimitat && availableCredits < COST_CREDITE) {
+      return NextResponse.json({ success: false, needsPayment: true, message: `Sold insuficient. Ai nevoie de ${COST_CREDITE} credite.` }, { status: 403 });
     }
 
     // Salvare istoric vechi (opțional)
@@ -540,6 +540,13 @@ Infrastructură operată automat prin platforma securizată ContractSmart 2026.
     zip.file(`Ghid_Post_Vanzare.txt`, continutGhidTxt);
 
     const zipContent = await zip.generateAsync({ type: "uint8array" });
+
+    // -------------------------------------------------------------------------
+    // NOU: ÎNCASARE CREDITE (DEDUCERE FIZICĂ DIN BAZA DE DATE)
+    // -------------------------------------------------------------------------
+    if (!areAccesNelimitat) {
+      await supabase.from('profiles').update({ credits_remaining: availableCredits - COST_CREDITE }).eq('id', data.userId);
+    }
 
     // -------------------------------------------------------------------------
     // NOU: SMART VAULT (SALVARE ÎN CRM) PENTRU AUTO

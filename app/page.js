@@ -164,18 +164,13 @@ const nomenclatorClauze = {
   ]
 };
 
-// LINK-URI GUMROAD DINAMICE
+// LINK-URI GUMROAD DINAMICE (NOUA ECONOMIE SAAS)
 const gumroadLinks = {
-  founder: 'https://zensoftware.gumroad.com/l/founder-lifetime',
-  pro: 'https://zensoftware.gumroad.com/l/abonament-pro',
-  contract_auto: 'https://zensoftware.gumroad.com/l/pachet-acte-auto',
-  qr_vcard: 'https://zensoftware.gumroad.com/l/qr-vcard-pro',
-  qr_branding: 'https://zensoftware.gumroad.com/l/qr-branding',
-  qr_dynamic: 'https://zensoftware.gumroad.com/l/qr-dinamic',
-  sablon_tipizat: 'https://zensoftware.gumroad.com/l/sablon-tipizat-legal',
-  one_time_contract: 'https://zensoftware.gumroad.com/l/contract-b2b',
-  raport_detaliat: 'https://zensoftware.gumroad.com/l/raport-companie',
-  ai_audit_pack: 'https://zensoftware.gumroad.com/l/wuwjp'
+  founder: 'https://zensoftware.gumroad.com/l/founder-lifetime', // VIP Lifetime
+  pro: 'https://zensoftware.gumroad.com/l/abonament-pro', // 49 RON/lună (Freelanceri)
+  business: 'https://zensoftware.gumroad.com/l/abonament-business', // 99 RON/lună (Nelimitat)
+  credits_starter: 'https://zensoftware.gumroad.com/l/credite-starter', // Pachet 50 Credite (50 RON)
+  credits_smart: 'https://zensoftware.gumroad.com/l/credite-smart' // Pachet 180 Credite (150 RON)
 };
 
 export default function Home() {
@@ -333,10 +328,31 @@ export default function Home() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false); 
 
+  // --- ECONOMIA DE CREDITE CONTRACTSMART ---
+  const COSTURI = {
+    contract_b2b: 19,
+    pachet_auto: 99,
+    raport_anaf: 19
+  };
+  
+  // Utilizatorii 'founder' și 'business' au by-pass (totul gratuit/nelimitat)
+  const areAccesNelimitat = ['founder', 'business'].includes(user?.status);
+
+  // Funcția de validare a "Portofelului" (Gatekeeper)
+  const verificaSold = (costCredite) => {
+    if (areAccesNelimitat) return true;
+    if ((user?.credits || 0) >= costCredite) return true;
+    
+    // Dacă NU are credite suficiente, oprim execuția și arătăm modalul de reîncărcare
+    setShowPaymentModal(true);
+    return false;
+  };
+
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [authConfirmPassword, setAuthConfirmPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
+  const [keepSignedIn, setKeepSignedIn] = useState(true);
 
   const [widgetCompany, setWidgetCompany] = useState(null);
   const [widgetLoading, setWidgetLoading] = useState(false);
@@ -435,46 +451,36 @@ export default function Home() {
     }
   };
   
-  // --- LOGICA NOUĂ PENTRU BUTON (Aici definim rolurile dinamic) ---
-  const isFounder = user?.role === 'founder' || user?.plan === 'founder';
-  const userRole = isFounder ? 'founder' : (isPremium ? 'pro' : 'free');
-  const proReportsUsed = user?.proReportsUsed || 0;
-  const GUMROAD_LINK = "https://zensoftware.gumroad.com/l/raport-companie";
+  // --- LOGICA NOUĂ PENTRU BUTON ANAF (Bazată pe Portofelul Digital) ---
+  const isFounder = user?.role === 'founder' || user?.status === 'founder';
+  const isPro = user?.status === 'pro';
+  const rapoarteConsumate = user?.proReportsUsed || 0;
 
+  // Când utilizatorul apasă butonul "Descarcă Raport" pe widget
   const handleReportAction = async () => {
-    if (!user) return alert("Trebuie să fii autentificat pentru a descărca rapoarte.");
+    if (!user) {
+      setIsSignUp(false);
+      setShowAuthModal(true);
+      return;
+    }
 
-    if (user?.status === 'free') {
-      window.open(GUMROAD_LINK, '_blank');
-      return;
-    }
-    if (user?.status === 'pro') {
-      if ((user?.proReportsUsed || 0) < 3) {
-        await handleDownloadPremiumReport(cuiDataResult.cui);
-      } else {
-        window.open(GUMROAD_LINK, '_blank');
-      }
-      return;
-    }
-    if (user?.status === 'founder') {
-      await handleDownloadPremiumReport(cuiDataResult.cui);
-      return;
-    }
+    // Funcția principală care conține verificarea de credite și limite
+    await handleDownloadPremiumReport(cuiDataResult.cui);
   };
 
-  let buttonText = "Descarcă Raport ( Pret 19 Ron ( 3.99€ ) / Raport )";
+  // Setăm dinamic textul butonului
+  let buttonText = "Descarcă Raport Financiar (19 Credite)";
   let isLocked = true; 
 
-  if (user?.status === 'founder') {
-    buttonText = "Descarcă Raport Detaliat";
+  if (isFounder || user?.status === 'business') {
+    buttonText = "Descarcă Raport Detaliat (Inclus Nelimitat)";
     isLocked = false;
-  } else if (user?.status === 'pro') {
-    if (user?.proReportsUsed < 3) {
-      const rapoarteRamase = 3 - (user?.proReportsUsed || 0);
-      buttonText = `Descarcă Raport (Gratuit PRO - Mai ai ${rapoarteRamase}/3)`;
+  } else if (isPro) {
+    if (rapoarteConsumate < 3) {
+      buttonText = `Descarcă Raport (Gratuit PRO - Mai ai ${3 - rapoarteConsumate}/3)`;
       isLocked = false;
     } else {
-      buttonText = "Descarcă Raport ( Pret 19 Ron ( 3.99€ ) / Raport )";
+      buttonText = "Descarcă Raport (Depășire Cotă: 19 Credite)";
       isLocked = true;
     }
   }
@@ -938,8 +944,7 @@ const reseteazaSemnaturiB2B = () => {
         // 1. Am adăugat 'ai_audits_used' în .select()
         const { data: profile } = await supabase
           .from('profiles')
-          .select('subscription_tier, credits_remaining, has_qr_branding, has_qr_vcard, has_qr_dynamic, has_qr_pdf, is_pro, is_enterprise, pro_reports_used, ai_audits_used')
-          .eq('id', userId)
+          .select('subscription_tier, credits_remaining, ai_audits_used')          .eq('id', userId)
           .single();
 
         setUser({ 
@@ -1010,7 +1015,6 @@ const reseteazaSemnaturiB2B = () => {
     if (isProcessingForm.current) return;
 
     if (!user) {
-      alert('Trebuie să fii autentificat pentru a putea plasa comenzi și a atașa produsele contului tău.');
       setIsSignUp(false);
       setAuthEmail('');
       setAuthPassword('');
@@ -1027,12 +1031,24 @@ const reseteazaSemnaturiB2B = () => {
       if (destinatie) {
         const urlObj = new URL(destinatie);
         urlObj.searchParams.set('user_id', user.id); 
-        window.location.href = urlObj.toString();
+        
+        // MAGIA GUMROAD OVERLAY: Creăm un buton invizibil și îl apăsăm automat
+        const tempLink = document.createElement('a');
+        tempLink.href = urlObj.toString();
+        tempLink.setAttribute('data-gumroad-overlay-checkout', 'true');
+        document.body.appendChild(tempLink);
+        
+        // Închidem rotița de loading fix înainte să apară pop-up-ul de plată
+        setLoadingText(null); 
+        isProcessingForm.current = false;
+        
+        tempLink.click();
+        document.body.removeChild(tempLink);
       } else {
         alert("Eroare: Produsul nu a fost găsit în catalog.");
         setLoadingText(null);
+        isProcessingForm.current = false;
       }
-      isProcessingForm.current = false;
     }, 1200);
   };
 
@@ -1116,7 +1132,6 @@ const reseteazaSemnaturiB2B = () => {
     }
 
     if (!user) {
-      alert('Pentru a descărca sau salva documentul, creează un cont rapid în 10 secunde.');
       setIsSignUp(false);
       setAuthEmail('');
       setAuthPassword('');
@@ -1129,6 +1144,9 @@ const reseteazaSemnaturiB2B = () => {
       alert("Vă rugăm așteptați validarea anti-spam (Cloudflare).");
       return;
     }
+
+    // --- VERIFICARE SOLD CREDITE B2B ---
+    if (!verificaSold(COSTURI.contract_b2b)) return;
 
     isProcessingForm.current = true;
     setLoadingText({ 
@@ -1168,10 +1186,8 @@ const reseteazaSemnaturiB2B = () => {
           elementA.click();
           document.body.removeChild(elementA);
           window.URL.revokeObjectURL(urlDownload);
-          alert('Succes! Contractul a fost generat dinamic și descărcat automat în format PDF.');
         } else {
           // A fost doar salvat in baza de date
-          alert('Succes! Contractul a fost înregistrat și arhivat în CRM-ul tău.');
         }
         handleInapoiPrincipal();
       } else {
@@ -1288,7 +1304,6 @@ const reseteazaSemnaturiB2B = () => {
     }
 
     if (!user) {
-      alert('Creează un cont rapid pentru a securiza și descărca documentele auto.');
       setIsSignUp(false);
       setAuthEmail('');
       setAuthPassword('');
@@ -1301,6 +1316,9 @@ const reseteazaSemnaturiB2B = () => {
       alert("Vă rugăm așteptați validarea anti-spam (Cloudflare).");
       return;
     }
+
+    // --- VERIFICARE SOLD CREDITE AUTO ---
+    if (!verificaSold(COSTURI.pachet_auto)) return;
 
     isProcessingForm.current = true;
     setLoadingText({ title: "COMPILARE DOSAR AUTO...", desc: "Generăm cele 5 exemplare DITL și fișa de înmatriculare." });
@@ -1474,6 +1492,7 @@ const reseteazaSemnaturiB2B = () => {
         setAuthPassword('');
         setAuthConfirmPassword('');
       } else {
+        // Logica pentru conectare (Login)
         const { data, error } = await supabase.auth.signInWithPassword({ email: authEmail, password: authPassword });
         if (error) {
             if (error.message.includes("Invalid login credentials")) {
@@ -1483,11 +1502,19 @@ const reseteazaSemnaturiB2B = () => {
             }
         }
 
-        alert("Autentificare realizată cu succes!");
+        // --- SISTEM "KEEP ME SIGNED IN" ---
+        if (!keepSignedIn && typeof window !== 'undefined') {
+          // Dacă clientul a DEBIFAT căsuța, ștergem sesiunea automat la închiderea tab-ului (Session cookie simulation)
+          window.addEventListener('beforeunload', () => {
+              supabase.auth.signOut();
+          });
+        }
+
         setShowAuthModal(false);
         setAuthEmail('');
         setAuthPassword('');
         setAuthConfirmPassword('');
+        
         // Dacă utilizatorul s-a logat și avea o intenție de return_to, îl redirecționăm
         const urlParams = new URLSearchParams(window.location.search);
         const returnTo = urlParams.get('return_to');
@@ -1577,6 +1604,8 @@ const reseteazaSemnaturiB2B = () => {
           handleAuthSubmit={handleAuthSubmit}
           handleSocialLogin={handleSocialLogin}
           loadingText={loadingText}
+          keepSignedIn={keepSignedIn}
+          setKeepSignedIn={setKeepSignedIn}
         />
 
         {/* MODAL PLĂȚI - FACELIFT PREMIUM */}
@@ -1597,18 +1626,37 @@ const reseteazaSemnaturiB2B = () => {
                 <div className="w-16 h-16 bg-amber-900/20 border border-amber-500/30 text-amber-500 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-inner">
                   <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                 </div>
-                <h3 className="text-2xl font-black text-white tracking-tight mb-2">Plafon Gratuit Atins</h3>
-                <p className="text-xs text-slate-400 mb-8 leading-relaxed">Ai utilizat generarea gratuită din această lună. Deblochează documentul actual sau treci la Premium pentru generări nelimitate.</p>
+                <h3 className="text-2xl font-black text-white tracking-tight mb-2">Sold Insuficient</h3>
+                <p className="text-xs text-slate-400 mb-8 leading-relaxed">
+                  Balanța ta curentă este de <strong className="text-white">{user?.credits || 0} Credite</strong>. Reîncarcă portofelul digital sau treci la abonamentul Business (Nelimitat).
+                </p>
 
                 <div className="space-y-4">
-                  <button onClick={() => { setShowPaymentModal(false); handleCumparaPremium('one_time_contract'); }} className="w-full bg-[#0B0F12] hover:bg-slate-900 border border-slate-700/80 text-white font-bold py-3.5 rounded-xl text-xs transition-colors flex justify-between items-center px-5 shadow-inner">
-                    <span className="uppercase tracking-wider">Cumpără 1 Contract Acum</span>
-                    <span className="text-[#8ba888] font-black">19 RON <span className="font-normal text-[10px] text-slate-500">(~3.99 €)</span></span>
+                  {/* Pachet Starter (50 RON) */}
+                  <button onClick={() => { setShowPaymentModal(false); handleCumparaPremium('credits_starter'); }} className="w-full bg-[#0B0F12] hover:bg-slate-900 border border-slate-700/80 text-white font-bold py-3.5 rounded-xl text-xs transition-colors flex justify-between items-center px-5 shadow-inner">
+                    <span className="uppercase tracking-wider">Încarcă 50 Credite</span>
+                    <div className="text-right">
+                      <span className="text-[#8ba888] font-black block">50 RON</span>
+                      <span className="text-[9px] text-slate-500 font-normal">(~9.99 €)</span>
+                    </div>
                   </button>
                   
-                  <button onClick={() => { setShowPaymentModal(false); handleCumparaPremium('pro'); }} className="w-full bg-gradient-to-r from-[#8ba888] to-[#6d8a6a] text-[#0B0F12] font-black py-3.5 rounded-xl text-xs transition-all hover:scale-[1.02] active:scale-[0.98] flex justify-between items-center px-5 shadow-[0_0_15px_rgba(139,168,136,0.3)]">
-                    <span className="uppercase tracking-wider">Abonament Pro (Nelimitat)</span>
-                    <span>99 RON <span className="font-normal text-[10px] opacity-80">(~19.99 €)</span></span>
+                  {/* Pachet Smart (150 RON - 180 Credite) */}
+                  <button onClick={() => { setShowPaymentModal(false); handleCumparaPremium('credits_smart'); }} className="w-full bg-[#16221A] hover:bg-[#1a291f] border border-emerald-900/50 text-[#8ba888] font-bold py-3.5 rounded-xl text-xs transition-colors flex justify-between items-center px-5 shadow-inner group">
+                    <span className="uppercase tracking-wider flex items-center gap-2">Încarcă 180 Credite <span className="bg-amber-500 text-black px-1.5 py-0.5 rounded text-[8px] font-black leading-none shadow-sm group-hover:scale-105 transition-transform">+30 BONUS</span></span>
+                    <div className="text-right">
+                      <span className="text-[#8ba888] font-black block">150 RON</span>
+                      <span className="text-[9px] text-emerald-700 font-normal">(~29.99 €)</span>
+                    </div>
+                  </button>
+                  
+                  {/* Abonament Nelimitat Business */}
+                  <button onClick={() => { setShowPaymentModal(false); handleCumparaPremium('business'); }} className="w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white font-black py-3.5 rounded-xl text-xs transition-all hover:scale-[1.02] active:scale-[0.98] flex justify-between items-center px-5 shadow-[0_0_15px_rgba(37,99,235,0.3)] mt-2">
+                    <span className="uppercase tracking-wider">Abonament Business (Nelimitat)</span>
+                    <div className="text-right">
+                      <span className="font-black block">99 RON / lună</span>
+                      <span className="text-[9px] text-blue-200 font-normal">(~19.99 €)</span>
+                    </div>
                   </button>
                 </div>
                 
@@ -2482,7 +2530,7 @@ const reseteazaSemnaturiB2B = () => {
                       <button 
                         type="button" 
                         onClick={(e) => handleLansareContract(e, 'download')}
-                        disabled={!!loadingText} 
+                        disabled={!!loadingText || !acordGdpr}
                         className="w-full bg-gradient-to-r from-[#8ba888] to-[#6d8a6a] text-[#0B0F12] font-black px-6 sm:px-10 py-4 rounded-xl text-[13px] tracking-wide transition-all shadow-[0_0_20px_rgba(139,168,136,0.3)] hover:shadow-[0_0_25px_rgba(139,168,136,0.5)] hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
                       >
                         {loadingText && loadingText.title === "SECURIZARE ȘI DESCĂRCARE..." ? (
@@ -2511,7 +2559,7 @@ const reseteazaSemnaturiB2B = () => {
                         <button 
                           type="button" 
                           onClick={(e) => handleLansareContract(e, 'save_only')}
-                          disabled={!!loadingText} 
+                          disabled={!!loadingText || !acordGdpr} 
                           className="w-full sm:w-auto text-[10px] text-emerald-400 font-black uppercase tracking-widest bg-emerald-900/10 px-4 py-3 sm:py-2.5 rounded-lg border border-emerald-500/30 hover:bg-emerald-900/30 transition-colors shadow-sm flex items-center justify-center gap-1.5 order-1 sm:order-2"
                         >
                           {loadingText && loadingText.title === "SALVARE ÎN CRM..." ? (
@@ -2981,7 +3029,7 @@ const reseteazaSemnaturiB2B = () => {
                         <button type="button" onClick={handleInapoiPrincipal} className="text-xs font-semibold text-slate-400 hover:text-white transition-colors underline underline-offset-4 order-2 sm:order-1">
                           Anulează și întoarce-te
                         </button>
-                        <button type="submit" disabled={isUploading || !!loadingText} className="w-full sm:w-auto bg-gradient-to-r from-[#8ba888] to-[#6d8a6a] text-black font-black px-10 py-4 rounded-xl text-sm tracking-wide transition-all shadow-[0_0_20px_rgba(139,168,136,0.3)] hover:shadow-[0_0_25px_rgba(139,168,136,0.5)] hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 order-1 sm:order-2">
+                        <button type="submit" disabled={isUploading || !!loadingText || !acordGdpr} className="w-full sm:w-auto bg-gradient-to-r from-[#8ba888] to-[#6d8a6a] text-black font-black px-10 py-4 rounded-xl text-sm tracking-wide transition-all shadow-[0_0_20px_rgba(139,168,136,0.3)] hover:shadow-[0_0_25px_rgba(139,168,136,0.5)] hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 order-1 sm:order-2">
                           {loadingText ? (
                             <>
                               <svg className="animate-spin h-4 w-4 text-black" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>

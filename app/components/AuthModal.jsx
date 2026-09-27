@@ -6,7 +6,7 @@ export default function AuthModal({
   authEmail, setAuthEmail,
   authPassword, setAuthPassword,
   authConfirmPassword, setAuthConfirmPassword,
-  handleAuthSubmit, handleSocialLogin, loadingText
+  handleAuthSubmit, handleSocialLogin, loadingText, keepSignedIn, setKeepSignedIn
 }) {
   if (!showAuthModal) return null;
 
@@ -110,6 +110,28 @@ export default function AuthModal({
                 value={authConfirmPassword} onChange={e => setAuthConfirmPassword(e.target.value)} 
                 className="w-full p-3.5 bg-[#0B0F12] border border-slate-700/60 rounded-xl text-xs text-white outline-none focus:border-[#8ba888] focus:ring-1 focus:ring-[#8ba888]/30 transition-all shadow-inner" 
               />
+            </div>
+          )}
+
+          {/* Keep me signed in (Opțiune persistentă) */}
+          {!isSignUp && (
+            <div className="pt-1 pb-1 animate-fadeIn">
+              <label className="flex items-start cursor-pointer group bg-[#12181D]/30 p-2.5 rounded-xl border border-slate-800/50 hover:border-slate-700 transition-colors">
+                <div className="relative flex items-center justify-center mt-0.5 shrink-0">
+                  <input 
+                    type="checkbox" 
+                    checked={keepSignedIn} 
+                    onChange={e => setKeepSignedIn(e.target.checked)} 
+                    className="peer appearance-none w-4 h-4 border border-slate-600 rounded bg-[#0B0F12] checked:bg-[#8ba888] checked:border-[#8ba888] transition-all cursor-pointer shadow-inner" 
+                  />
+                  <svg className="absolute w-3 h-3 text-[#0B0F12] opacity-0 peer-checked:opacity-100 pointer-events-none stroke-current" fill="none" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                </div>
+                <span className="ml-2 text-[10px] text-slate-400 font-medium select-none group-hover:text-slate-300 transition-colors">
+                  Păstrează-mă autentificat (Keep me signed in)
+                </span>
+              </label>
             </div>
           )}
           

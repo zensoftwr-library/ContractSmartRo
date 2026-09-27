@@ -93,15 +93,18 @@ export async function POST(request) {
       .eq('id', userId)
       .single();
 
+    const COST_CREDITE = 19; // Noul cost al platformei pentru B2B
     const tier = (profile?.subscription_tier || 'free').toLowerCase().trim();
-    const isPremium = tier.includes('founder') || tier.includes('pro') || profile?.is_pro;
+    
+    // Doar Founder și Business au generări nelimitate. (Pro va consuma din cota de credite alocată)
+    const areAccesNelimitat = ['founder', 'business'].includes(tier);
     const availableCredits = profile?.credits_remaining || 0;
 
-    if (!isPremium && availableCredits <= 0) {
+    if (!areAccesNelimitat && availableCredits < COST_CREDITE) {
       return NextResponse.json({ 
         success: false, 
         needsPayment: true, 
-        message: `Ai atins limita gratuită lunară. Achiziționează un credit sau un plan Pro.` 
+        message: `Sold insuficient. Ai nevoie de ${COST_CREDITE} credite.` 
       }, { status: 403 });
     }
 
@@ -571,11 +574,11 @@ export async function POST(request) {
     }
 
     // -------------------------------------------------------------------------
-    // -------------------------------------------------------------------------
     // 9. GESTIUNE CREDITE ȘI SMART VAULT (UPLOAD PDF)
     // -------------------------------------------------------------------------
-    if (!isPremium && availableCredits > 0) {
-      await supabase.from('profiles').update({ credits_remaining: availableCredits - 1 }).eq('id', userId);
+    if (!areAccesNelimitat) {
+      // Scădem fizic cele 19 credite după ce generarea a avut succes
+      await supabase.from('profiles').update({ credits_remaining: availableCredits - COST_CREDITE }).eq('id', userId);
     }
 
     const hashSha256 = crypto.createHash('sha256').update(pdfBuffer).digest('hex');

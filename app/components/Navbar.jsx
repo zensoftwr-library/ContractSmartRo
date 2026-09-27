@@ -224,13 +224,14 @@ export default function Navbar({
                     <span className="text-[9px] uppercase font-black bg-gradient-to-r from-amber-400 to-amber-600 text-black px-2 py-0.5 rounded shadow-sm border border-amber-300 tracking-widest">
                       FONDATOR
                     </span>
+                  ) : user.status === 'business' ? (
+                    <span className="text-[9px] uppercase font-black bg-emerald-600 text-white px-2 py-0.5 rounded shadow-sm border border-emerald-500 tracking-widest">
+                      BUSINESS (NELIMITAT)
+                    </span>
                   ) : user.status === 'pro' ? (
                     <>
                       <span className="text-[9px] uppercase font-black bg-blue-900/20 text-blue-400 px-2 py-0.5 rounded shadow-sm border border-blue-900/50">
                         PRO
-                      </span>
-                      <span className="text-[9px] uppercase font-bold bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700 shadow-sm">
-                        {3 - (user?.proReportsUsed || 0)}/3 Rapoarte
                       </span>
                       <span className="text-[9px] uppercase font-bold bg-purple-950/40 text-purple-300 px-2 py-0.5 rounded border border-purple-800/50 shadow-sm">
                         {10 - (user?.aiAuditsUsed || 0)}/10 Audituri AI
@@ -307,13 +308,14 @@ export default function Navbar({
                     <span className="text-[10px] uppercase font-black bg-gradient-to-r from-amber-400 to-amber-600 text-black px-2.5 py-1 rounded shadow-sm border border-amber-300 tracking-widest">
                       FONDATOR
                     </span>
+                  ) : user.status === 'business' ? (
+                    <span className="text-[10px] uppercase font-black bg-emerald-600 text-white px-2.5 py-1 rounded shadow-sm border border-emerald-500 tracking-widest">
+                      BUSINESS (NELIMITAT)
+                    </span>
                   ) : user.status === 'pro' ? (
                     <>
                       <span className="text-[10px] uppercase font-black bg-blue-900/20 text-blue-400 px-2.5 py-1 rounded shadow-sm border border-blue-900/50">
                         PRO
-                      </span>
-                      <span className="text-[10px] uppercase font-bold bg-slate-800 text-slate-300 px-2.5 py-1 rounded border border-slate-700 shadow-sm">
-                        {3 - (user?.proReportsUsed || 0)}/3 Rapoarte
                       </span>
                       <span className="text-[10px] uppercase font-bold bg-purple-950/40 text-purple-300 px-2.5 py-1 rounded border border-purple-800/50 shadow-sm">
                         {10 - (user?.aiAuditsUsed || 0)}/10 Audituri AI
