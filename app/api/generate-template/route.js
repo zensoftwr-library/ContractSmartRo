@@ -23,7 +23,7 @@ export async function POST(request) {
 
       const { data: profil } = await supabase
         .from('profiles')
-        .select('subscription_tier, subscription_status, is_pro')
+        .select('subscription_tier')
         .eq('id', userId)
         .single();
 
@@ -33,13 +33,15 @@ export async function POST(request) {
         .eq('user_id', userId)
         .eq('product_id', templateId);
 
-      const isPremium = profil && (profil.subscription_tier === 'founder' || profil.subscription_tier === 'pro' || profil.is_pro);
+      const tier = (profil?.subscription_tier || '').toLowerCase().trim();
+      // Acum DOAR Founder și Business au acces instant/nelimitat. Restul consumă cele 15 credite.
+      const hasBypass = ['founder', 'business'].includes(tier);
       const areAchizitieIndividuala = achizitii && achizitii.length > 0;
 
-      if (!isPremium && !areAchizitieIndividuala) {
+      if (!hasBypass && !areAchizitieIndividuala) {
         return NextResponse.json({ 
           success: false, 
-          message: 'Acces refuzat. Acest șablon academic necesită un abonament Pro / Lifetime activ sau achiziție individuală (49 RON).' 
+          message: 'Acces refuzat. Acest șablon necesită un abonament Business / VIP activ sau deblocarea prealabilă cu 15 Credite din portofelul digital.' 
         }, { status: 403 });
       }
     }

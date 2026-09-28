@@ -51,7 +51,13 @@ export async function POST(req) {
       throw new Error(updateErr.message);
     }
 
-    // (Opțional) Poți salva și înregistrarea achiziției într-un tabel separat dacă dorești istoric
+    // Salvăm deblocarea în tabelul de achiziții ca să rămână deblocat permanent pentru acest utilizator!
+    await supabaseAdmin.from('user_purchases').insert({
+      user_id: userId,
+      product_id: addonType,
+      amount_paid: 0,
+      currency: 'CREDITS'
+    });
 
     return NextResponse.json({ 
       success: true, 
