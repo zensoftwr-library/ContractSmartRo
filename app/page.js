@@ -324,6 +324,59 @@ export default function Home() {
   const [userTier, setUserTier] = useState('free');
 
   const isPremium = ['founder', 'pro'].includes(profil?.subscription_tier) || profil?.is_pro;
+  
+  const [achizitiiIndividuale, setAchizitiiIndividuale] = useState([]);
+
+  useEffect(() => {
+    if (user?.id) {
+      supabase.from('user_purchases').select('product_id').eq('user_id', user.id).then(({ data }) => {
+        if (data) setAchizitiiIndividuale(data.map(p => p.product_id));
+      });
+    }
+  }, [user?.id]);
+
+  const areAccesLaFeature = (featureId) => {
+    if (['founder', 'business'].includes(userTier)) return true;
+    if (achizitiiIndividuale.includes(featureId)) return true;
+    return false;
+  };
+
+  const handleUnlockFeature = async (featureId, costCredite, featureName) => {
+    if (!user) {
+      alert("Trebuie să fii autentificat pentru a folosi funcțiile premium.");
+      setIsSignUp(true);
+      setShowAuthModal(true);
+      return false;
+    }
+    if (areAccesLaFeature(featureId)) return true;
+
+    if ((user.credits || 0) < costCredite) {
+      alert(`Sold insuficient! Ai nevoie de ${costCredite} credite pentru a debloca "${featureName}".`);
+      setShowPaymentModal(true);
+      return false;
+    }
+
+    const confirmare = window.confirm(`Ești sigur că vrei să folosești ${costCredite} Credite pentru a debloca permanent "${featureName}"?`);
+    if (!confirmare) return false;
+
+    try {
+      const res = await fetch('/api/unlock-addon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id, addonType: featureId, creditCost: costCredite })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Eroare la deblocare');
+
+      alert(`Felicitări! Ai deblocat cu succes ${featureName}.`);
+      setUser(prev => ({ ...prev, credits: data.newCredits }));
+      setAchizitiiIndividuale(prev => [...prev, featureId]);
+      return true;
+    } catch (err) {
+      alert(`Eroare: ${err.message}`);
+      return false;
+    }
+  };
 
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false); 
@@ -1763,7 +1816,7 @@ const reseteazaSemnaturiB2B = () => {
             <p className="text-xs text-slate-400 mt-1 max-w-lg mx-auto leading-relaxed">Generator multifuncțional avansat pentru extinderea capacităților digitale.</p>
           </div>
 
-          <div className="max-w-6xl w-full mx-auto px-4 sm:px-6 mt-4 mb-12">              
+          <div className="max-w-6xl w-full mx-auto px-4 sm:px-6 mt-4 mb-12">               
             <div className="bg-[#12181D]/60 backdrop-blur-xl rounded-2xl border border-slate-800/80 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden group hover:border-[#8ba888]/30 transition-colors relative w-full overflow-x-hidden">
             
               {/* Header & Tabs - COMPACT */}
@@ -1792,49 +1845,97 @@ const reseteazaSemnaturiB2B = () => {
                     : 'bg-[#8ba888]/10 text-[#8ba888] border-[#8ba888]/30 hover:bg-[#8ba888]/20 hover:shadow-[0_0_10px_rgba(139,168,136,0.2)] [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-emerald-700 [.matcha-light-theme_&]:!border-emerald-200 [.matcha-light-theme_&]:hover:!bg-emerald-50 [.matcha-light-theme_&]:!shadow-sm'
                 }`}>Portofel Crypto</button>
                 
-                <button onClick={() => { if(!isPremium && !profil?.has_qr_vcard) handleCheckout('qr_vcard'); else setQrType('vcard'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all border ${
+                <button 
+                  onClick={async () => { 
+                    if(areAccesLaFeature('vcard')) {
+                      setQrType('vcard'); 
+                    } else {
+                      const success = await handleUnlockFeature('vcard', 25, 'vCard Contact');
+                      if (success) setQrType('vcard');
+                    }
+                  }} 
+                  className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all border ${
                   qrType === 'vcard' 
                     ? 'bg-[#8ba888] text-[#0B0F12] border-[#8ba888] shadow-[0_0_15px_rgba(139,168,136,0.6)] [.matcha-light-theme_&]:!bg-emerald-600 [.matcha-light-theme_&]:!text-white [.matcha-light-theme_&]:!border-emerald-700 [.matcha-light-theme_&]:!shadow-[0_4px_10px_rgba(5,150,105,0.3)]' 
                     : 'bg-[#8ba888]/10 text-[#8ba888] border-[#8ba888]/30 hover:bg-[#8ba888]/20 hover:shadow-[0_0_10px_rgba(139,168,136,0.2)] [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-emerald-700 [.matcha-light-theme_&]:!border-emerald-200 [.matcha-light-theme_&]:hover:!bg-emerald-50 [.matcha-light-theme_&]:!shadow-sm'
                 }`}>
                   vCard Contact
-                  {(!isPremium && !profil?.has_qr_vcard) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-amber-400 to-amber-600 text-black px-1.5 py-0.5 rounded shadow-md border border-amber-300">69 RON</span>}
+                  {!areAccesLaFeature('vcard') && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-amber-400 to-amber-600 text-black px-1.5 py-0.5 rounded shadow-md border border-amber-300">25 CREDITE</span>}
                 </button>
                 
-                <button onClick={() => { if(!isPremium && !profil?.has_qr_pdf) handleCheckout('qr_dynamic'); else setQrType('dynamic'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all border ${
+                <button 
+                  onClick={async () => { 
+                    if(areAccesLaFeature('qr_dinamic')) {
+                      setQrType('dynamic'); 
+                    } else {
+                      const success = await handleUnlockFeature('qr_dinamic', 19, 'Dinamic / PDF');
+                      if (success) setQrType('dynamic');
+                    }
+                  }} 
+                  className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all border ${
                   qrType === 'dynamic' 
                     ? 'bg-[#9333ea] text-white border-[#9333ea] shadow-[0_0_15px_rgba(147,51,234,0.6)] [.matcha-light-theme_&]:!bg-purple-600 [.matcha-light-theme_&]:!text-white [.matcha-light-theme_&]:!border-purple-700 [.matcha-light-theme_&]:!shadow-[0_4px_10px_rgba(147,51,234,0.3)]' 
                     : 'bg-[#9333ea]/10 text-[#a855f7] border-[#9333ea]/30 hover:bg-[#9333ea]/20 hover:shadow-[0_0_10px_rgba(147,51,234,0.2)] [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-purple-700 [.matcha-light-theme_&]:!border-purple-200 [.matcha-light-theme_&]:hover:!bg-purple-50 [.matcha-light-theme_&]:!shadow-sm'
                 }`}>
                   Dinamic / PDF
-                  {(!isPremium && !profil?.has_qr_pdf) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-purple-500 to-purple-600 text-white px-1.5 py-0.5 rounded shadow-md border border-purple-400">39 RON</span>}
+                  {!areAccesLaFeature('qr_dinamic') && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-purple-500 to-purple-600 text-white px-1.5 py-0.5 rounded shadow-md border border-purple-400">19 CREDITE</span>}
                 </button>
                 
-                <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('smart'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all border ${
+                <button 
+                  onClick={() => { 
+                    if(['founder', 'business'].includes(userTier)) {
+                      setQrType('smart'); 
+                    } else {
+                      alert("Această funcționalitate PRO este disponibilă doar abonaților Business sau Founder.");
+                      const el = document.getElementById('sectiune-preturi');
+                      if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }} 
+                  className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all border ${
                   qrType === 'smart' 
                     ? 'bg-[#2563eb] text-white border-[#2563eb] shadow-[0_0_15px_rgba(37,99,235,0.6)] [.matcha-light-theme_&]:!bg-blue-600 [.matcha-light-theme_&]:!text-white [.matcha-light-theme_&]:!border-blue-700 [.matcha-light-theme_&]:!shadow-[0_4px_10px_rgba(37,99,235,0.3)]' 
                     : 'bg-[#2563eb]/10 text-[#3b82f6] border-[#2563eb]/30 hover:bg-[#2563eb]/20 hover:shadow-[0_0_10px_rgba(37,99,235,0.2)] [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-blue-700 [.matcha-light-theme_&]:!border-blue-200 [.matcha-light-theme_&]:hover:!bg-blue-50 [.matcha-light-theme_&]:!shadow-sm'
                 }`}>
                   Smart OS Route
-                  {(!isPremium) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-blue-500 to-blue-600 text-white px-1.5 py-0.5 rounded shadow-md border border-blue-400">PRO</span>}
+                  {!['founder', 'business'].includes(userTier) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-blue-500 to-blue-600 text-white px-1.5 py-0.5 rounded shadow-md border border-blue-400">PRO</span>}
                 </button>
                 
-                <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('geo'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all border ${
+                <button 
+                  onClick={() => { 
+                    if(['founder', 'business'].includes(userTier)) {
+                      setQrType('geo'); 
+                    } else {
+                      alert("Această funcționalitate PRO este disponibilă doar abonaților Business sau Founder.");
+                      const el = document.getElementById('sectiune-preturi');
+                      if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }} 
+                  className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all border ${
                   qrType === 'geo' 
                     ? 'bg-[#2563eb] text-white border-[#2563eb] shadow-[0_0_15px_rgba(37,99,235,0.6)] [.matcha-light-theme_&]:!bg-blue-600 [.matcha-light-theme_&]:!text-white [.matcha-light-theme_&]:!border-blue-700 [.matcha-light-theme_&]:!shadow-[0_4px_10px_rgba(37,99,235,0.3)]' 
                     : 'bg-[#2563eb]/10 text-[#3b82f6] border-[#2563eb]/30 hover:bg-[#2563eb]/20 hover:shadow-[0_0_10px_rgba(37,99,235,0.2)] [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-blue-700 [.matcha-light-theme_&]:!border-blue-200 [.matcha-light-theme_&]:hover:!bg-blue-50 [.matcha-light-theme_&]:!shadow-sm'
                 }`}>
                   Geo-Target
-                  {(!isPremium) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-blue-500 to-blue-600 text-white px-1.5 py-0.5 rounded shadow-md border border-blue-400">PRO</span>}
+                  {!['founder', 'business'].includes(userTier) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-blue-500 to-blue-600 text-white px-1.5 py-0.5 rounded shadow-md border border-blue-400">PRO</span>}
                 </button>
                 
-                <button onClick={() => { if(!isPremium) handleCheckout('pro'); else setQrType('landing'); }} className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all border ${
+                <button 
+                  onClick={() => { 
+                    if(['founder', 'business'].includes(userTier)) {
+                      setQrType('landing'); 
+                    } else {
+                      alert("Această funcționalitate PRO este disponibilă doar abonaților Business sau Founder.");
+                      const el = document.getElementById('sectiune-preturi');
+                      if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }} 
+                  className={`relative px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide transition-all border ${
                   qrType === 'landing' 
                     ? 'bg-[#2563eb] text-white border-[#2563eb] shadow-[0_0_15px_rgba(37,99,235,0.6)] [.matcha-light-theme_&]:!bg-blue-600 [.matcha-light-theme_&]:!text-white [.matcha-light-theme_&]:!border-blue-700 [.matcha-light-theme_&]:!shadow-[0_4px_10px_rgba(37,99,235,0.3)]' 
                     : 'bg-[#2563eb]/10 text-[#3b82f6] border-[#2563eb]/30 hover:bg-[#2563eb]/20 hover:shadow-[0_0_10px_rgba(37,99,235,0.2)] [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-blue-700 [.matcha-light-theme_&]:!border-blue-200 [.matcha-light-theme_&]:hover:!bg-blue-50 [.matcha-light-theme_&]:!shadow-sm'
                 }`}>
                   Mini-Landing Page
-                  {(!isPremium) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-blue-500 to-blue-600 text-white px-1.5 py-0.5 rounded shadow-md border border-blue-400">PRO</span>}
+                  {!['founder', 'business'].includes(userTier) && <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-blue-500 to-blue-600 text-white px-1.5 py-0.5 rounded shadow-md border border-blue-400">PRO</span>}
                 </button>
               </div>
               </div>
@@ -2032,16 +2133,16 @@ const reseteazaSemnaturiB2B = () => {
                       </div>
                       
                       <div className="flex items-center gap-2">
-                        {!isPremium ? (
-                          <a 
-                            href="https://zensoftware.gumroad.com/l/qr-branding" 
-                            target="_blank" 
-                            rel="noopener noreferrer"
+                        {!areAccesLaFeature('qr_branding') ? (
+                          <button 
+                            onClick={async () => {
+                              await handleUnlockFeature('qr_branding', 15, 'Încărcare Logo Central');
+                            }}
                             className="relative text-[9px] text-slate-300 font-black uppercase tracking-wide border border-slate-700 px-4 py-2.5 rounded-lg bg-[#12181D] cursor-pointer hover:bg-slate-800 transition-colors shadow-sm [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-slate-700 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-100"
                           >
                             INCARCA LOGO CENTRAL
-                            <span className="absolute -top-2 -right-2 text-[8px] bg-gradient-to-r from-amber-400 to-amber-600 text-black px-1.5 py-0.5 rounded shadow-md border border-amber-300">49 RON</span>
-                          </a>
+                            <span className="absolute -top-2 -right-2 text-[8px] font-black bg-gradient-to-r from-amber-400 to-amber-600 text-black px-1.5 py-0.5 rounded shadow-md border border-amber-300">15 CREDITE</span>
+                          </button>
                         ) : (
                           <label className="text-[9px] text-slate-300 font-black uppercase tracking-wide border border-slate-700 px-4 py-2.5 rounded-lg bg-[#12181D] cursor-pointer hover:bg-slate-800 transition-colors shadow-sm [.matcha-light-theme_&]:!bg-white [.matcha-light-theme_&]:!text-slate-700 [.matcha-light-theme_&]:!border-slate-300 [.matcha-light-theme_&]:hover:!bg-slate-100">
                             <span>INCARCA LOGO CENTRAL</span>

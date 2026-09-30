@@ -55,7 +55,7 @@ export async function POST(req) {
     await supabaseAdmin.from('user_purchases').insert({
       user_id: userId,
       product_id: addonType,
-      amount_paid: 0,
+      amount_paid: creditCost, // Salvăm costul real în credite în loc de 0
       currency: 'CREDITS'
     });
 
