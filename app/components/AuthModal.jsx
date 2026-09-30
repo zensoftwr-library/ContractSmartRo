@@ -12,7 +12,7 @@ export default function AuthModal({
 
   return (
     <div className="fixed inset-0 bg-[#0B0F12]/80 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fadeIn">
-      <div className="bg-[#12181D]/90 backdrop-blur-xl border border-slate-800/80 p-8 rounded-3xl max-w-sm w-full shadow-[0_20px_50px_-15px_rgba(0,0,0,0.7)] relative overflow-hidden">
+      <div className="bg-[#12181D]/90 backdrop-blur-xl border border-slate-800/80 p-6 sm:p-8 rounded-3xl max-w-sm w-full shadow-[0_20px_50px_-15px_rgba(0,0,0,0.7)] relative max-h-[90vh] overflow-y-auto custom-scrollbar">
         
         {/* Buton Închidere */}
         <button 
