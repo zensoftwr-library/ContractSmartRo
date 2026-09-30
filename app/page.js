@@ -2230,7 +2230,7 @@ const reseteazaSemnaturiB2B = () => {
 
             {/* SEPARATOR BORDER - EXTENSII QR */}
             <div className="max-w-6xl mx-auto border-t border-slate-800/80 pt-16 mt-8 w-full px-4 [.matcha-light-theme_&]:!border-slate-200">
-              <PricingAddons handleCumparaPremium={handleCumparaPremium} user={user} />
+              <PricingAddons handleCumparaPremium={handleCumparaPremium} user={user} onRegisterClick={() => { setIsSignUp(false); setShowAuthModal(true); }} />
             </div>
 
           </div>

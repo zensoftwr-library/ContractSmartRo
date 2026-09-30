@@ -1,15 +1,14 @@
 'use client';
 import { useState } from 'react';
 
-export default function PricingAddons({ user, setShowAuthModal, setIsSignUp, onUnlockSuccess }) {
+export default function PricingAddons({ user, onRegisterClick, onUnlockSuccess }) {
   const isUnlocked = ['founder', 'business'].includes(user?.status);
   const [loadingAddon, setLoadingAddon] = useState(null);
 
   const handleUnlock = async (addonType, creditCost, addonName) => {
-    // 1. Dacă utilizatorul nu este logat, deschidem modalul de înregistrare/autentificare
+    // 1. Dacă utilizatorul nu este logat, deschidem modalul din funcția primită de la părinte
     if (!user) {
-      setIsSignUp?.(true);
-      setShowAuthModal?.(true);
+      if (onRegisterClick) onRegisterClick();
       return;
     }
 
