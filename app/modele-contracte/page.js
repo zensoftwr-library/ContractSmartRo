@@ -20,6 +20,26 @@ export default function ModeleContracte() {
   const [userCredits, setUserCredits] = useState(0); // NOU: Stocăm creditele curente
   const [achizitiiIndividuale, setAchizitiiIndividuale] = useState([]);
 
+  // --- MAGIA GUMROAD OVERLAY REDIRECT ---
+  useEffect(() => {
+    const handleGumroadSale = (event) => {
+      try {
+        let data = event.data;
+        if (typeof data === 'string') {
+          data = JSON.parse(data);
+        }
+        
+        if (data && data.post_message_name === 'sale') {
+          setLoadingTemplate?.(null);
+          window.location.href = '/checkout/success';
+        }
+      } catch (err) {}
+    };
+
+    window.addEventListener('message', handleGumroadSale);
+    return () => window.removeEventListener('message', handleGumroadSale);
+  }, []);
+
   useEffect(() => {
     async function getSesiuneSiProfil() {
       const { data: { session } } = await supabase.auth.getSession();

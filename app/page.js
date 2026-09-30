@@ -205,6 +205,27 @@ export default function Home() {
     }
   }, []);
 
+  // --- MAGIA GUMROAD OVERLAY REDIRECT ---
+  useEffect(() => {
+    const handleGumroadSale = (event) => {
+      try {
+        let data = event.data;
+        if (typeof data === 'string') {
+          data = JSON.parse(data);
+        }
+        
+        if (data && data.post_message_name === 'sale') {
+          setLoadingText?.(null);
+          if (isProcessingForm.current) isProcessingForm.current = false;
+          window.location.href = '/checkout/success';
+        }
+      } catch (err) {}
+    };
+
+    window.addEventListener('message', handleGumroadSale);
+    return () => window.removeEventListener('message', handleGumroadSale);
+  }, []);
+
   const [loadingText, setLoadingText] = useState(null);
   const [step, setStep] = useState(1);
   const [autoStep, setAutoStep] = useState('upload');

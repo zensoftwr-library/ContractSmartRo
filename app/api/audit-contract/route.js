@@ -21,15 +21,17 @@ export async function POST(request) {
     // 1. Verificăm creditele utilizatorului
     const { data: profile } = await supabase
       .from('profiles')
-      .select('subscription_tier, credits_remaining, is_pro')
+      .select('subscription_tier, credits_remaining')
       .eq('id', userId)
       .single();
 
-    const isPremium = ['founder', 'pro'].includes(profile?.subscription_tier?.toLowerCase()) || profile?.is_pro;
+    const tier = (profile?.subscription_tier || '').toLowerCase().trim();
+    const hasBypass = ['founder', 'business'].includes(tier);
     const availableCredits = profile?.credits_remaining || 0;
+    const COST_AUDIT = 25; // Noul cost stabilit pentru un audit AI complet
 
-    if (!isPremium && availableCredits <= 0) {
-      return NextResponse.json({ success: false, needsPayment: true, message: 'Ai nevoie de credite sau plan PRO.' }, { status: 403 });
+    if (!hasBypass && availableCredits < COST_AUDIT) {
+      return NextResponse.json({ success: false, needsPayment: true, message: `Sold insuficient. Ai nevoie de ${COST_AUDIT} credite.` }, { status: 403 });
     }
 
     // 2. Extragem buffer-ul fișierului PDF/DOCX
@@ -82,9 +84,9 @@ export async function POST(request) {
     const cleanJsonText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
     const raportJson = JSON.parse(cleanJsonText);
 
-    // 4. Scădem creditul dacă e cont Free
-    if (!isPremium && availableCredits > 0) {
-      await supabase.from('profiles').update({ credits_remaining: availableCredits - 1 }).eq('id', userId);
+    // 4. Scădem creditele după consum (Dacă nu este pe abonament VIP/Business)
+    if (!hasBypass) {
+      await supabase.from('profiles').update({ credits_remaining: availableCredits - COST_AUDIT }).eq('id', userId);
     }
 
     // 5. Salvăm istoricul auditului în Supabase
