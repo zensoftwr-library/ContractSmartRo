@@ -357,7 +357,8 @@ export default function Home() {
   }, [user?.id]);
 
   const areAccesLaFeature = (featureId) => {
-    if (['founder', 'business'].includes(userTier)) return true;
+    const statusCurent = (userTier || user?.status || profil?.subscription_tier || '').toLowerCase().trim();
+    if (['founder', 'fondator', 'business'].includes(statusCurent)) return true;
     if (achizitiiIndividuale.includes(featureId)) return true;
     return false;
   };
@@ -409,18 +410,19 @@ export default function Home() {
     raport_anaf: 19
   };
   
-  // Utilizatorii 'founder' și 'business' au by-pass (totul gratuit/nelimitat)
-  const areAccesNelimitat = ['founder', 'business'].includes(userTier?.toLowerCase()?.trim());
-
-  // Funcția de validare a "Portofelului" (Gatekeeper)
+  // Funcția robustă de validare a "Portofelului" (Gatekeeper)
   const verificaSold = (costCredite) => {
-    if (areAccesNelimitat) return true;
+    // Luăm starea reală și proaspătă din toate sursele posibile pentru a evita race-conditions
+    const statusCurent = (userTier || user?.status || profil?.subscription_tier || '').toLowerCase().trim();
+    const crediteCurente = user?.credits ?? profil?.credits_remaining ?? 0;
+
+    // Verificăm by-pass-ul pentru founder și business
+    if (['founder', 'fondator', 'business'].includes(statusCurent)) return true;
     
-    // Folosim un fallback direct din profil ca măsură de siguranță absolută
-    const crediteDisponibile = user?.credits ?? profil?.credits_remaining ?? 0;
-    if (crediteDisponibile >= costCredite) return true;
+    // Verificăm dacă are credite destule
+    if (crediteCurente >= costCredite) return true;
     
-    // Dacă NU are credite suficiente, oprim execuția și arătăm modalul de reîncărcare
+    // Dacă nu, blocăm și cerem plata
     setShowPaymentModal(true);
     return false;
   };
@@ -1897,7 +1899,7 @@ const reseteazaSemnaturiB2B = () => {
                 
                 <button 
                   onClick={() => { 
-                    if(['founder', 'business'].includes(userTier)) {
+                    if(['founder', 'fondator', 'business'].includes((userTier || user?.status || '').toLowerCase().trim())) {
                       setQrType('smart'); 
                     } else {
                       alert("Această funcționalitate PRO este disponibilă doar abonaților Business sau Founder.");
