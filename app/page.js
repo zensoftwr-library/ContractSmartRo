@@ -1009,14 +1009,14 @@ const reseteazaSemnaturiB2B = () => {
   useEffect(() => {
     const fetchUserProfile = async (userId, email) => {
       try {
-        // Cerem DOAR coloanele care suntem 100% siguri că există, evitând erorile fatale
+        // 🔥 CEREM DOAR CELE 2 COLOANE SIGURE. Evităm orice crash.
         const { data: profile, error } = await supabase
           .from('profiles')
           .select('subscription_tier, credits_remaining')
           .eq('id', userId)
           .single();
 
-        if (error) throw error;
+        if (error) throw error; // Dacă ceva pică, o aruncăm intenționat ca să vedem
 
         const tierFormated = (profile?.subscription_tier || 'free').toLowerCase().trim();
         
@@ -1024,11 +1024,12 @@ const reseteazaSemnaturiB2B = () => {
         let crediteAlocate = profile?.credits_remaining ?? 0;
         
         if (['founder', 'fondator', 'business'].includes(tierFormated)) {
-            crediteAlocate = 999999;
+            crediteAlocate = 999999; // Fondatorii și Business au credite nelimitate
         } else if (tierFormated === 'pro' && crediteAlocate < 180) {
-            crediteAlocate = 180;
+            crediteAlocate = 180; // Abonamentul PRO primește 180 credite garantate
         }
 
+        // Setăm utilizatorul VIP
         setUser({ 
           id: userId, 
           email: email, 
@@ -1037,9 +1038,11 @@ const reseteazaSemnaturiB2B = () => {
         });
         setProfil({ ...profile, subscription_tier: tierFormated, credits_remaining: crediteAlocate });
         setUserTier(tierFormated);
+        
       } catch (err) {
-        console.error("Eroare Supabase la preluarea profilului:", err.message);
-        // Fallback în caz de eșec conexiune
+        // 🔥 AICI E CAPCANA! Dacă ajunge aici, te face FREE. Acum măcar o vedem cu F12.
+        console.error("EROARE FATALĂ SUPABASE LA PROFIL:", err.message);
+        
         setUser({ id: userId, email: email, status: 'free', credits: 0 });
         setProfil({ subscription_tier: 'free', has_qr_branding: false, has_qr_vcard: false, has_qr_dynamic: false, has_qr_pdf: false, is_pro: false });
         setUserTier('free');
