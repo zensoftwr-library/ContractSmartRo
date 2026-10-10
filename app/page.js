@@ -1010,25 +1010,36 @@ const reseteazaSemnaturiB2B = () => {
   useEffect(() => {
     const fetchUserProfile = async (userId, email) => {
       try {
-        // 1. Am adăugat 'ai_audits_used' în .select()
         const { data: profile } = await supabase
           .from('profiles')
-          .select('subscription_tier, credits_remaining, ai_audits_used')          .eq('id', userId)
+          .select('subscription_tier, credits_remaining, pro_reports_used, ai_audits_used')
+          .eq('id', userId)
           .single();
+
+        const tierFormated = (profile?.subscription_tier || 'free').toLowerCase().trim();
+        
+        // 🔥 AUTO-ALOCARE CREDITE PENTRU VIP ȘI PRO
+        let crediteAlocate = profile?.credits_remaining ?? 0;
+        
+        if (['founder', 'fondator', 'business'].includes(tierFormated)) {
+            crediteAlocate = 999999; // Fondatorii și Business au credite nelimitate
+        } else if (tierFormated === 'pro' && crediteAlocate < 180) {
+            crediteAlocate = 180; // Abonamentul PRO primește 180 credite garantate
+        }
 
         setUser({ 
           id: userId, 
           email: email, 
-          status: profile?.subscription_tier || 'free', 
-          credits: profile?.credits_remaining ?? 0,
+          status: tierFormated, 
+          credits: crediteAlocate,
           proReportsUsed: profile?.pro_reports_used || 0,
-          aiAuditsUsed: profile?.ai_audits_used || 0 // <-- 2. Am adăugat această linie
+          aiAuditsUsed: profile?.ai_audits_used || 0
         });
-        setProfil(profile);
-        setUserTier(profile?.subscription_tier || 'free');
+        setProfil({ ...profile, subscription_tier: tierFormated, credits_remaining: crediteAlocate });
+        setUserTier(tierFormated);
       } catch (err) {
         setUser({ id: userId, email: email, status: 'free', credits: 0, aiAuditsUsed: 0 });
-        setProfil({ subscription_tier: 'free', has_qr_branding: false, has_qr_vcard: false, has_qr_dynamic: false, has_qr_pdf: false, is_pro: false});
+        setProfil({ subscription_tier: 'free', has_qr_branding: false, has_qr_vcard: false, has_qr_dynamic: false, has_qr_pdf: false, is_pro: false });
         setUserTier('free');
       }
     };
@@ -1050,7 +1061,7 @@ const reseteazaSemnaturiB2B = () => {
         fetchUserProfile(session.user.id, session.user.email);
       } else {
         setUser(null);
-        setProfil({ subscription_tier: 'free', has_qr_branding: false, has_qr_vcard: false, has_qr_dynamic: false, has_qr_pdf: false, is_pro: false});
+        setProfil({ subscription_tier: 'free', has_qr_branding: false, has_qr_vcard: false, has_qr_dynamic: false, has_qr_pdf: false, is_pro: false });
         setUserTier('free');
       }
     });
