@@ -1006,16 +1006,17 @@ const reseteazaSemnaturiB2B = () => {
     setB2bSignStep('prestator');
   };
 
-   
   useEffect(() => {
     const fetchUserProfile = async (userId, email) => {
       try {
-        // Am scos pro_reports_used de aici pentru a nu mai bloca cererea!
-        const { data: profile } = await supabase
+        // Cerem DOAR coloanele care suntem 100% siguri că există, evitând erorile fatale
+        const { data: profile, error } = await supabase
           .from('profiles')
-          .select('subscription_tier, credits_remaining, ai_audits_used')
+          .select('subscription_tier, credits_remaining')
           .eq('id', userId)
           .single();
+
+        if (error) throw error;
 
         const tierFormated = (profile?.subscription_tier || 'free').toLowerCase().trim();
         
@@ -1023,23 +1024,23 @@ const reseteazaSemnaturiB2B = () => {
         let crediteAlocate = profile?.credits_remaining ?? 0;
         
         if (['founder', 'fondator', 'business'].includes(tierFormated)) {
-            crediteAlocate = 999999; // Fondatorii și Business au credite nelimitate
+            crediteAlocate = 999999;
         } else if (tierFormated === 'pro' && crediteAlocate < 180) {
-            crediteAlocate = 180; // Abonamentul PRO primește 180 credite garantate
+            crediteAlocate = 180;
         }
 
         setUser({ 
           id: userId, 
           email: email, 
           status: tierFormated, 
-          credits: crediteAlocate,
-          aiAuditsUsed: profile?.ai_audits_used || 0
+          credits: crediteAlocate
         });
         setProfil({ ...profile, subscription_tier: tierFormated, credits_remaining: crediteAlocate });
         setUserTier(tierFormated);
       } catch (err) {
-        console.error("Eroare Supabase:", err.message); // Dacă mai e o eroare, o vei vedea în consolă
-        setUser({ id: userId, email: email, status: 'free', credits: 0, aiAuditsUsed: 0 });
+        console.error("Eroare Supabase la preluarea profilului:", err.message);
+        // Fallback în caz de eșec conexiune
+        setUser({ id: userId, email: email, status: 'free', credits: 0 });
         setProfil({ subscription_tier: 'free', has_qr_branding: false, has_qr_vcard: false, has_qr_dynamic: false, has_qr_pdf: false, is_pro: false });
         setUserTier('free');
       }
