@@ -410,12 +410,15 @@ export default function Home() {
   };
   
   // Utilizatorii 'founder' și 'business' au by-pass (totul gratuit/nelimitat)
-  const areAccesNelimitat = ['founder', 'business'].includes(user?.status?.toLowerCase()?.trim());
+  const areAccesNelimitat = ['founder', 'business'].includes(userTier?.toLowerCase()?.trim());
 
   // Funcția de validare a "Portofelului" (Gatekeeper)
   const verificaSold = (costCredite) => {
     if (areAccesNelimitat) return true;
-    if ((user?.credits || 0) >= costCredite) return true;
+    
+    // Folosim un fallback direct din profil ca măsură de siguranță absolută
+    const crediteDisponibile = user?.credits ?? profil?.credits_remaining ?? 0;
+    if (crediteDisponibile >= costCredite) return true;
     
     // Dacă NU are credite suficiente, oprim execuția și arătăm modalul de reîncărcare
     setShowPaymentModal(true);
@@ -526,8 +529,8 @@ export default function Home() {
   };
   
   // --- LOGICA NOUĂ PENTRU BUTON ANAF (Bazată pe Portofelul Digital) ---
-  const isFounder = user?.role?.toLowerCase()?.trim() === 'founder' || user?.status?.toLowerCase()?.trim() === 'founder';
-  const isPro = user?.status?.toLowerCase()?.trim() === 'pro';
+  const isFounder = userTier?.toLowerCase()?.trim() === 'founder';
+  const isPro = userTier?.toLowerCase()?.trim() === 'pro';
   const rapoarteConsumate = user?.proReportsUsed || 0;
 
   // Când utilizatorul apasă butonul "Descarcă Raport" pe widget
@@ -1001,17 +1004,7 @@ const reseteazaSemnaturiB2B = () => {
     setB2bSignStep('prestator');
   };
 
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
-        setUser(session?.user ?? null);
-        isProcessingForm.current = false; 
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-  
+   
   useEffect(() => {
     const fetchUserProfile = async (userId, email) => {
       try {
