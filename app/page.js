@@ -344,7 +344,7 @@ export default function Home() {
   const [profil, setProfil] = useState(null);
   const [userTier, setUserTier] = useState('free');
 
-  const isPremium = ['founder', 'pro'].includes(profil?.subscription_tier) || profil?.is_pro;
+  const isPremium = ['founder', 'pro'].includes(profil?.subscription_tier?.toLowerCase()?.trim()) || profil?.is_pro;
   
   const [achizitiiIndividuale, setAchizitiiIndividuale] = useState([]);
 
@@ -410,7 +410,7 @@ export default function Home() {
   };
   
   // Utilizatorii 'founder' și 'business' au by-pass (totul gratuit/nelimitat)
-  const areAccesNelimitat = ['founder', 'business'].includes(user?.status);
+  const areAccesNelimitat = ['founder', 'business'].includes(user?.status?.toLowerCase()?.trim());
 
   // Funcția de validare a "Portofelului" (Gatekeeper)
   const verificaSold = (costCredite) => {
@@ -526,8 +526,8 @@ export default function Home() {
   };
   
   // --- LOGICA NOUĂ PENTRU BUTON ANAF (Bazată pe Portofelul Digital) ---
-  const isFounder = user?.role === 'founder' || user?.status === 'founder';
-  const isPro = user?.status === 'pro';
+  const isFounder = user?.role?.toLowerCase()?.trim() === 'founder' || user?.status?.toLowerCase()?.trim() === 'founder';
+  const isPro = user?.status?.toLowerCase()?.trim() === 'pro';
   const rapoarteConsumate = user?.proReportsUsed || 0;
 
   // Când utilizatorul apasă butonul "Descarcă Raport" pe widget
