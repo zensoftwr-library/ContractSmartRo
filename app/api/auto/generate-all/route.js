@@ -72,8 +72,9 @@ export async function POST(req) {
     const { data: profile } = await supabase.from('profiles').select('subscription_tier, credits_remaining').eq('id', data.userId).single();
     
     const tier = (profile?.subscription_tier || 'free').toLowerCase().trim();
-    // Doar Founder și Business au generări auto nelimitate
-    const areAccesNelimitat = ['founder', 'business'].includes(tier);
+    
+    // Am adăugat "fondator"
+    const areAccesNelimitat = ['founder', 'fondator', 'business'].includes(tier);
     const availableCredits = profile?.credits_remaining || 0;
 
     if (!areAccesNelimitat && availableCredits < COST_CREDITE) {

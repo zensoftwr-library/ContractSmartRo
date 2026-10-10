@@ -89,15 +89,15 @@ export async function POST(request) {
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('subscription_tier, subscription_status, credits_remaining, is_pro')
+      .select('subscription_tier, credits_remaining') // Am șters coloanele care provocau crash-ul
       .eq('id', userId)
       .single();
 
-    const COST_CREDITE = 19; // Noul cost al platformei pentru B2B
+    const COST_CREDITE = 19; 
     const tier = (profile?.subscription_tier || 'free').toLowerCase().trim();
     
-    // Doar Founder și Business au generări nelimitate. (Pro va consuma din cota de credite alocată)
-    const areAccesNelimitat = ['founder', 'business'].includes(tier);
+    // Am adăugat "fondator" pentru a securiza permisiunile
+    const areAccesNelimitat = ['founder', 'fondator', 'business'].includes(tier);
     const availableCredits = profile?.credits_remaining || 0;
 
     if (!areAccesNelimitat && availableCredits < COST_CREDITE) {
